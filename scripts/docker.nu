@@ -28,10 +28,6 @@ def "nu-complete docker images" [] {
     docker images | from ssv | each {|x| $"($x.REPOSITORY):($x.TAG)"}
 }
 
-def dr [img: string@"nu-complete docker images"] {
-    docker run --rm -i -t -v $"($env.PWD):/world" $img
-}
-
 def da [ctn: string@"nu-complete docker ps", ...args] {
     if ($args|empty?) {
         docker exec -it $ctn /bin/sh -c "[ -e /bin/zsh ] && /bin/zsh || [ -e /bin/bash ] && /bin/bash || /bin/sh"
@@ -53,3 +49,23 @@ def dsv [ img: string@"nu-complete docker images" ] {
 }
 
 alias dld = docker load
+
+###
+def "nu-complete docker run vol" [] {
+    [ $"($env.PWD):/world" ]
+}
+
+def "nu-complete docker run port" [ctx: string, pos: int] {
+    let x = (ns | get 1.port | into int ) + 1
+    [ $"($x):80" ]
+}
+
+def dr [
+    img: string@"nu-complete docker images",
+    -v: string@"nu-complete docker run vol",
+    -p: string@"nu-complete docker run port",
+] {
+    let mnt = if not ($v|empty?) { $"-v=($v)" }
+    docker run --rm -i -t $mnt $img
+}
+
