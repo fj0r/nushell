@@ -3,6 +3,7 @@
 - config
     - [x] struct
     - [ ] reload
+        - keybinding
 - prompt
     - [x] nu
         - [x] panache-git
@@ -53,6 +54,8 @@
     - [x] popd
         - enter/shells/g #/n/p
 - history
+    - [ ] per dir
+    - [ ] time duration code
 - alternatives
     - [x] yq, jq, rq ...
         - get
