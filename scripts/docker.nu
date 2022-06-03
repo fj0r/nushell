@@ -1,6 +1,8 @@
+alias docker = podman
+
 def dp [] {
-    # podman ps --all --no-trunc --format='{{json .}}' | jq
-    podman ps -a --format '{"id":"{{.ID}}", "image": "{{.Image}}", "name":"{{.Names}}", "cmd":"{{.Command}}", "port":"{{.Ports}}", "status":"{{.Status}}", "created":"{{.Created}}"}'
+    # docker ps --all --no-trunc --format='{{json .}}' | jq
+    docker ps -a --format '{"id":"{{.ID}}", "image": "{{.Image}}", "name":"{{.Names}}", "cmd":"{{.Command}}", "port":"{{.Ports}}", "status":"{{.Status}}", "created":"{{.Created}}"}'
     | lines
     | each {|x|
             let r = ($x | from json)
@@ -10,44 +12,44 @@ def dp [] {
 }
 
 def di [] {
-    podman images
+    docker images
     | from ssv -a
     | rename repo tag id created size
 }
 
 def "nu-complete docker ps" [] {
-    podman ps | from ssv
+    docker ps | from ssv
     | reduce -f [] {|x, a|
         if ($x.NAMES|empty?) { $a } else { $a | append $x.NAMES} | append $x.'CONTAINER ID'
     }
 }
 
 def "nu-complete docker images" [] {
-    podman images | from ssv | each {|x| $"($x.REPOSITORY):($x.TAG)"}
+    docker images | from ssv | each {|x| $"($x.REPOSITORY):($x.TAG)"}
 }
 
 def dr [img: string@"nu-complete docker images"] {
-    podman run --rm -i -t -v $"($env.PWD):/world" $img
+    docker run --rm -i -t -v $"($env.PWD):/world" $img
 }
 
 def da [ctn: string@"nu-complete docker ps", ...args] {
     if ($args|empty?) {
-        podman exec -it $ctn /bin/sh -c "[ -e /bin/zsh ] && /bin/zsh || [ -e /bin/bash ] && /bin/bash || /bin/sh"
+        docker exec -it $ctn /bin/sh -c "[ -e /bin/zsh ] && /bin/zsh || [ -e /bin/bash ] && /bin/bash || /bin/sh"
     } else {
-        podman exec -it $ctn $args
+        docker exec -it $ctn $args
     }
 }
 
 def dcr [ctn: string@"nu-complete docker ps"] {
-    podman container rm -f $ctn
+    docker container rm -f $ctn
 }
 
 def dis [ img: string@"nu-complete docker images" ] {
-    podman inspect $img
+    docker inspect $img
 }
 
 def dsv [ img: string@"nu-complete docker images" ] {
-    podman save $img
+    docker save $img
 }
 
-alias dld = podman load
+alias dld = docker load
