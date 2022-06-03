@@ -162,11 +162,11 @@ def kdp [pod: string@"nu-complete kube pods"] {
     kubectl describe pod $pod
 }
 
-def ka [pod: string@"nu-complete kube pods", -n: string@"nu-complete kube ns"] {
+def ka [pod: string@"nu-complete kube pods", -n: string@"nu-complete kube ns", ...args] {
     if ($n|empty?) {
-        kubectl exec -it $pod -- bash
+        kubectl exec -it $pod -- (if ($args|empty?) { 'bash' } else { $args })
     } else {
-        kubectl -n $n exec -it $pod -- bash
+        kubectl -n $n exec -it $pod -- (if ($args|empty?) { 'bash' } else { $args })
     }
 }
 

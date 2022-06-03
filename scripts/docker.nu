@@ -14,3 +14,32 @@ def di [] {
     | from ssv -a
     | rename repo tag id created size
 }
+
+def "nu-complete docker ps" [] {
+    podman ps | from ssv
+    | reduce -f [] {|x, a|
+        if ($x.NAMES|empty?) { $a } else { $a | append $x.NAMES} | append $x.'CONTAINER ID'
+    }
+}
+
+def "nu-complete docker images" [] {
+    podman images | from ssv | each {|x| $"($x.REPOSITORY):($x.TAG)"}
+}
+
+def dr [ img: string@"nu-complete docker images" ] {
+    podman run --rm -i -t -v $"($env.PWD):/world" $img
+}
+
+def da [cnt: string@"nu-complete docker ps", ...args] {
+    if ($args|empty?) {
+        podman exec -it $cnt /bin/sh -c "[ -e /bin/zsh ] && /bin/zsh || [ -e /bin/bash ] && /bin/bash || /bin/sh"
+    } else {
+        podman exec -it $cnt $args
+    }
+}
+
+def dsv [ img: string@"nu-complete docker images" ] {
+    podman save $img
+}
+
+alias dld = podman load
