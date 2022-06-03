@@ -275,6 +275,17 @@ let-env config = {
       mode: [emacs, vi_normal, vi_insert]
       event: { send: menu name: commands_with_description }
     }
+    #{
+    #    name: reload_config
+    #    modifier: alt
+    #    keycode: char_r
+    #    mode: emacs
+    #    event: [
+    #        { edit: { cmd: clear } }
+    #        { edit: { cmd: insertString value: $"source ($nu.config-path)" } }
+    #        { send: Enter }
+    #    ]
+    #}
   ]
 }
 
@@ -282,10 +293,12 @@ let-env config = {
 # starship init nu | save ~/.cache/starship/init.nu
 #source ~/.cache/starship/init.nu
 
+source legacy.nu
 source alias.nu
 source git.nu
 source git-cmp.nu
 source dir.nu
+source ssh.nu
 source kubernetes.nu
 source docker.nu
 

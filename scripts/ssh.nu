@@ -4,6 +4,7 @@ def "nu-complete ssh host" [] {
 
 extern ssh [
     host: string@"nu-complete ssh host" # host
+    ...cmd                              # cmd
     -v                                  # verbose
     -i: string                          # key
     -p: int                             # port
