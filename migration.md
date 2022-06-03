@@ -1,0 +1,91 @@
+## migrate
+
+- config
+    - [x] struct
+    - [ ] reload
+- prompt
+    - [x] nu
+        - [x] panache-git
+        - [ ] k8s
+    - [x] startship
+        - [x] git
+        - [x] k8s
+        - [ ] right prompt
+        - [ ] indicator
+- alias 
+    - [ ] utils
+        - [ ] a: alias
+        - [ ] e: nvim
+        - [ ] t: tmux
+        - alias sget='wget -m -k -E -p -np -e robots=off'
+        - toggle-proxy
+        - slam
+        - wg
+        - if (( $+commands[ss] )); then
+              alias ns='ss -tulwnp'
+          else
+              alias ns="netstat -plnetu"
+          fi
+        - china_mirrors
+    - [ ] docker
+        - [ ] docker dev helper
+        - [ ] list to table
+    - [ ] k8s
+        - [ ] list to table
+        - [ ] kubectx kubens
+    - [ ] ssh
+    - [ ] git
+- completions
+    - [ ] podman
+    - [ ] k8s
+    - [ ] ssh
+    - [ ] git
+- edit
+    - [-] `enter` for `ls`
+    - [-] `tab` in empty for cd: direct path and then `enter`
+    - [ ] `ctrl+q`
+    - [ ] Brace Expansion {,a,b,c}
+- path
+    - [ ] named dir
+        - auto enter at dir
+    - [x] history
+        - -
+    - [x] popd
+        - enter/shells/g #/n/p
+- history
+- alternatives
+    - [x] yq, jq, rq ...
+        - get
+        - update
+        - insert
+        - [ ] delete
+    - [x] fd (recursive)
+        - ls **/*
+    - [x] sd
+        - 'my_library.rb' | str replace '(.+).rb' '$1.nu'
+    - [=] rg
+        - [x]find
+    - [=] just
+        - [x] overlays
+        - [x] Parameterizing Scripts
+        - [ ] hooks
+            - [x] enter/leave dir
+                - env_change.PWD
+            - [x] pre_prompt + cache
+    - [x] watchexec
+        - watch . { |op, path, new_path| $"($op) ($path) ($new_path)"}
+    - [=] curl
+        - fetch, post
+    - [=] btm
+    - [=] dog
+    - [=] dust
+    - [=] xh
+- [x] login shell
+
+### size
+    - zsh       4.8M
+    - yq        7.0M
+    - rq        3.9M
+    - watchexec 5.5M
+    - sd        1.8M
+    - jq        0.4M

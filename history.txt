@@ -1,0 +1,2474 @@
+ls
+cd ~/.config/nushell/
+ls
+cat config.nu
+ls
+g
+ls
+cd
+ls
+cd  Music/
+ls
+cd
+ls
+gs
+gl
+gdca
+gs
+ls
+htop
+ls
+cd /opt/nushell-0.62.0/
+ls
+strip -s nu
+ls
+date
+date now
+date now to-table
+date now | date to-table
+date now | date to-table | get year
+sys
+sys | get cpu
+sys | get disks
+sys | get mem
+sys | get tmp
+sys | get temp
+sys | get net
+sys
+sys | get host
+sys | get host | get name
+sys | get host | get sessions
+sys | get host | get sessions | get 2
+sys | get host | get sessions | get 2 | get groups
+sys | get host 
+sys | get host
+sys | get host.sessions
+sys | get host.sessions.2
+sys | get host.sessions.name
+sys | get host.sessions
+sys | get host.sessions | select name
+ls
+ls --help
+find
+find --help
+fd
+fd --help
+ls
+ echo {name: sam, rank: 10}
+ echo [{name: sam, rank: 10}]
+ls
+open alacritty.yml 
+open alacritty.yml | get font
+open alacritty.yml | get font.size
+open alacritty.yml | set font.size 11
+open alacritty.yml | get font.size 
+open alacritty.yml | get font.size | set 11
+open alacritty.yml | update font.size 11
+open alacritty.yml | update font.size 11 | save x.yaml
+ls
+open alacritty.yml | save y.yaml
+dns
+echo $"($nu.config-path)"
+echo $"($nu.config-path)/scripts"
+e
+ ssh/
+ssh/
+zsh 
+ls
+ps aux
+ps
+ps | sort-by mem 
+ps |  | sort-by mem 
+ps | where name ~ 'nu' | sort-by mem 
+ps | where name =~ 'nu' | sort-by mem 
+ps | where name =~ 'zsh' | sort-by mem 
+cd /opt/nushell-0.62.0/
+ls
+gstat
+dfr
+git lg
+cd ~/Configuration/
+git log
+git log --pretty=%h»¦«%s»¦«%aN»¦«%aE»¦«%aD -n 5 | lines | split column "»¦«"
+git log --pretty=%h»¦«%s»¦«%aN»¦«%aE»¦«%aD | lines | split column "»¦«"
+gl
+glg
+gs
+gdca
+glg
+e ~/.config/nushell/scripts/git.nu
+nvim ~/.config/nushell/scripts/git.nu
+e ~/.config/nushell/scripts/git.nu
+nvim ~/.config/nushell/scripts/git.nu
+nu
+nu
+glg
+e ~/.config/nushell/scripts/git.nu
+nu
+glg
+cd ~/Configuration/
+glg
+e ~/.config/nushell/scripts/git.nu
+glg
+cd ~/Configuration/
+glg
+gs
+gd
+gaa
+gpp!
+gca!
+gs
+ls
+echo $env.LD_LIBRARY_PATH
+echo $env
+echo $nu.env-path
+echo $nu.plugin-path
+echo $nu.home-path
+echo $nu.config-path
+echo $nu.pid
+ech $env.LIB_DIRS
+ech $env.NU_LIB_DIRS
+echo $env.NU_LIB_DIRS
+e nushell/config.nu
+g
+gs
+e nushell/config.nu
+ls
+cat nushell/scripts/alias.nu
+d
+d ps
+e
+k
+k get pods
+s
+gaa
+gs
+e nushell/config.nu
+git remotes
+git remote
+ls
+ls | sort-by modified
+cat export.json.jpg
+ls 
+ls | sort-by modified
+nautilus .
+ls | sort-by modified
+nautilus .
+ls | sort-by modified
+cd
+cd ~
+version
+ls -h
+ls
+ls */**
+ls
+ls --help
+fd yaml
+cat hs/config.ustc.yaml
+cat hs/config.ustc.yaml | get templates.params
+open hs/config.ustc.yaml | get templates.params
+open hs/config.ustc.yaml | get templates
+open hs/config.ustc.yaml | get templates.params
+open hs/config.ustc.yaml | get setup-info-locations
+cd ~/Configuration/
+ls
+fd yaml
+cat wireguard/boringtun/k8s/configmap.yaml
+cat wireguard/boringtun/k8s/deploy.yaml
+open wireguard/boringtun/k8s/deploy.yaml | get template.metadata.labels
+open wireguard/boringtun/k8s/deploy.yaml | get templates.metadata.labels
+open wireguard/boringtun/k8s/deploy.yaml | get spec.template.metadata.labels
+open wireguard/boringtun/k8s/deploy.yaml | get spec.template.metadata.labels.app
+./etc/
+~
+ls
+~/Configuration/nushell/env.nu
+~/Configuration/nushell/
+ls
+tmux
+now
+time
+date
+date humanize
+date now
+date now --help
+date now
+(date now)
+date now | str
+date now | str upcase
+date now
+$"(date now) 123"
+echo 13123123 | base64 
+base64 
+echo 13123123 | base64 
+echo '13123123' | base64 
+du
+cd ..
+du
+which bash
+nvim README.md
+gs
+gd
+gaa
+gs
+gc
+ls
+mv README.md migration.md
+gs
+gaa
+gca!
+glg
+gs
+gp
+ls
+ls **/*
+e
+gs
+gd
+gaa
+gpp! 
+watch
+watch . 
+watch . {|x| echo $x}
+watch . { echo $in}
+e
+ls
+mv migration.md migration.md
+mv migration.md migration.md1
+mv migration.md1 migration.md
+gs
+gd
+dr
+watch . { |op, path, new_path| $"($op) ($path) ($new_path)"}
+echo $in
+e
+watch . { |...a| $"($a)"}
++ [1 2 3 4 5 6 ]
+reduce [1 2 3 4 5 6 ] +
+help reduce
+sum 1 2 3 4 5 6
+sum [ 1 2 3 4 5 6]
+help sum
+gs
+gd
+watch . { |op, path, new_path| $"($op) ($path) ($new_path)"}
+sd
+sd --help
+'my_library.rb' | str replace '(.+).rb' '$1.nu'
+match 
+find ls
+find rg
+help find
+fetch xinminghui.com
+fetch http://xinminghui.com
+fetch http://xinminghui.com | grep go
+fetch http://xinminghui.com | find go
+help post
+help fetch
+help put
+help http
+help fetch
+help pull
+help fetch
+help request
+help network
+du /usr/local/bin/xh
+du -h /usr/local/bin/xh
+du /usr/local/bin/
+du /usr/local/bin/xh
+ls /usr/local/bin/xh
+base64 
+ls /usr/local/bin/just
+xh registry.xinminghui.com 
+xh registry.xinminghui.com | get avaiables
+xh registry.xinminghui.com | open | get avaiables
+xh registry.xinminghui.com | open 
+xh registry.xinminghui.com | to json
+xh registry.xinminghui.com | to json| get avaiables
+xh registry.xinminghui.com | from json
+xh registry.xinminghui.com | from json | get avaiables
+xh registry.xinminghui.com | from json | get avaiables.0
+xh registry.xinminghui.com | from json | set avaiables.0 123
+xh registry.xinminghui.com | from json | get avaiables.0 
+xh registry.xinminghui.com | from json | get avaiables.0
+xh registry.xinminghui.com | from json | get avaiables.0 = 1
+xh registry.xinminghui.com | from json | get avaiables = 1
+xh registry.xinminghui.com | from json | avaiables = 1
+xh registry.xinminghui.com | from json | set avaiables.0 = 1
+xh registry.xinminghui.com | from json | json set avaiables.0 = 1
+help get
+help set
+xh registry.xinminghui.com | from json |update avaiables.0 = 1
+xh registry.xinminghui.com | from json |update avaiables.0 1
+xh registry.xinminghui.com | from json |update avaiables.0 1 | to md
+xh registry.xinminghui.com | from json |update avaiables.0 1 | to json
+xh registry.xinminghui.com | from json |update avaiables.0 1 | to yaml
+xh registry.xinminghui.com | from json |update avaiables.0 1123123123 | to yaml
+xh registry.xinminghui.com | from json |delete avaiables.0 1123123123 | to yaml
+xh registry.xinminghui.com | from json |insert avaiables 1123123123 | to yaml
+xh registry.xinminghui.com | from json |insert .avaiables 1123123123 | to yaml
+xh registry.xinminghui.com | from json |update avaiables.0 1123123123 | to yaml
+xh registry.xinminghui.com | from json |drop avaiables.0  | to yaml
+xh registry.xinminghui.com | from json |drop 0  | to yaml
+xh registry.xinminghui.com | from json |drop 1  | to yaml
+xh registry.xinminghui.com | from json |insert sdf 123  | to yaml
+overlay list 
+overlay add a
+overlay add a a
+help query
+query
+query json
+help query json
+xh registry.xinminghui.com | from json |rm avaiables.0  | to yaml
+xh registry.xinminghui.com | from json |del avaiables.0  | to yaml
+' asdf af as  '
+' asdf af as  ' | str trim 
+' asdf af as  ' | str    trim 
+' asdf af as  ' | str       trim 
+ls /usr/local/bin/nu
+ls /opt/nushell-0.63.0/nu
+du -h ~/Downloads/nu_0_63_0_linux.tar.gz
+ls ~/Downloads/nu_0_63_0_linux.tar.gz
+cd ~/temp/
+ls
+tar zcvf a.tgz /usr/local/bin/yq /usr/local/bin/rq /usr/local/bin/watchexec /usr/local/bin/sd
+ls a.tgz
+tar zcvf a.tgz /usr/local/bin/yq /usr/local/bin/rq /usr/local/bin/watchexec /usr/local/bin/sd /usr/local/bin/xh
+ls a.tgz
+tar zcvf b.tgz /opt/nushell-0.63.0/nu
+ls *.tgz
+cd /opt/nushell-0.63.0/
+ls
+cd ~/temp/
+ls
+cp /opt/nushell-0.63.0/nu .
+strip -s nu
+ls nu
+tar zcvf c.tgz nu
+ls *.tgz
+popd
+enter /opt/go/
+leave
+exit 
+./nu
+enter /opt/go/
+enter ~/temp/
+shells 
+help shells 
+gaa
+ls
+┼┼┼┼┼┼┼┼┼┼┼┼┼┼┼┼┼┼┼┼┼┼┼┼┼
+ls
+gs
+gaa
+cd shop/
+kk overlays/xmh/ > xmh.out.yaml
+kubectl kustomize overlays/xmh/ > xmh.out.yaml
+ls
+podman ps
+sudo podman ps
+cd
+enter Configuration/
+shells
+ls
+enter ~/.config/nvim/
+shells 
+cd
+ls
+shells 
+g 1
+n
+exit
+enter ~/.config/nvim/
+shells 
+cd nu
+n
+cd nushell/
+ls
+e 
+g
+enter ~/Configuration/
+enter ~/Configuration/nvim/
+ls
+shells 
+g 0
+cd ~/pub/Platform/
+shells 
+g 1
+cd nushell/
+shells 
+e
+gs
+ls
+enter ~/Downloads/
+ls
+rm starship-x86_64-unknown-linux-gnu.tar.gz
+tar zxvf starship-x86_64-unknown-linux-musl.tar.gz
+du -h starship
+du  starship
+du .
+dust
+clear
+./starship
+^du -h ./starship
+mv starship /usr/local/bin/
+sudo mv starship /usr/local/bin/
+shells
+nu
+shells
+cd nushell/
+cd ~/Configuration/
+ls
+startship
+starship 
+starship init
+starship init nushell
+starship init nu
+g 1
+ls
+cd scripts/
+e starshop.nu
+cd ..
+ls
+e config.nu
+ls scripts/
+cd scripts/
+mv starshop.nu starship.nu
+ls
+cd ~/Configuration/
+ls
+cd ..
+e
+mv /usr/local/bin/starship ~/temp/
+sludo mv /usr/local/bin/starship ~/temp/
+sudo mv /usr/local/bin/starship ~/temp/
+path exists '/usr/local/bin/starship'
+'/usr/local/bin/starship' | path exists
+e
+sudo mv ~/temp/starship /usr/local/bin/
+'/usr/local/bin/starship' | path exists
+if '/usr/local/bin/starship' | path exists { echo '123' }
+if ('/usr/local/bin/starship' | path exists) { echo '123' }
+if ('/us/local/bin/starship' | path exists) { echo '123' }
+if ('/usr/local/bin/starship' | path exists) { echo '123' }
+if ('/usr/local/bin/starship' | path exists) { source starship.nu }
+ls
+cd
+cd ~/Configuration/
+ls
+let-env KUBECONFIG=~/.kube/xmh/be
+let-env KUBECONFIG = ~/.kube/xmh/be
+let-env KUBECONFIG = '~/.kube/xmh/be'
+echo $KUBECONFIG
+echo $env.KUBECONFIG
+kgp
+kubectl get pods
+cat ~/.kube/xmh/be
+echo $env.KUBECONFIG
+cat $env.KUBECONFIG
+kubectl get pods
+e
+cd ~/.config/
+ls
+ls starsh*
+cd ~/Configuration/
+ls
+e starship.toml
+cd ~/.config/
+ln -fs ~/Configuration/starship.toml .
+e starship.toml
+let-env KUBECONFIG = '~/.kube/xmh/be'
+kgp
+let-env KUBECONFIG = ''
+let-env KUBECONFIG = null
+kgp
+kubectl get pods
+kgp
+cd ~/.kube/
+cp xmh/be config
+kgp
+kubectl get pods
+kubectl krew install ctx
+kubectl krew install ns
+kgp
+cd ~/Downloads/
+ls
+tar zxvf kubens_v0.9.4_linux_x86_64.tar.gz
+tar zxvf kubectx_v0.9.4_linux_x86_64.tar.gz
+sudo mv kubens kubectx /usr/local/bin/
+^du -h /usr/local/bin/kubens /usr/local/bin/kubectx
+kubeens
+kubens
+kubectx
+kubectx 
+kubectx --help
+kubectx 
+ls
+cp dev/x .
+cp dev/n .
+kubectx 
+ls
+rm n x
+e config
+kubectx 
+kubectx dev-x
+kubectl get pods
+kubectl get node
+e config
+kubectl get node
+kubectx dev-n
+kubectx dev-new
+kubectx 
+e config
+kubectx dev-new
+kgno
+kubectl get node
+kubectx 
+kubectx eainger
+kubectl get node
+kubectx hty
+kgno
+kubectl get node
+kubectx sq
+kubectl get node
+kubectx 
+kubectx tjsa
+kgno
+kubectl get node
+kubectx xmh-es
+kubectl get node
+kubectx xmh-sc
+kubectl get node
+e
+shells
+s
+g 1
+cd ~/Configuration/
+cd nushell/
+ls
+e scripts/alias.nu
+s
+cd ~/world/go-cdc/
+cd ../mail/
+kubectx dev-x
+pwd
+cd ~/Configuration/nushell/
+ls
+cd -
+cd -1
+cd --help
+ls
+kubectx xmh-be
+kubectx 
+kubectx be3
+kubectx be
+kgp
+kubectl get pods
+kubectx n 
+kubectx 
+kubectx dev-x
+kgp
+kubectl get pods
+kubectl get pods
+ls
+cd ~/Configuration/nushell/
+^/usr/local/bin/starship prompt $"--cmd-duration=($env.CMD_DURATION_MS)" $"--status=($env.LAST_EXIT_CODE)" $"--terminal-width=($width)"
+    let width = (term size -c | get columns | into string)
+echo $width
+^/usr/local/bin/starship prompt $"--cmd-duration=($env.CMD_DURATION_MS)" $"--status=($env.LAST_EXIT_CODE)" $"--terminal-width=($width)"
+startship --help
+startship 
+starship 
+starship  help
+starship  prompt
+starship  help
+starship  help prompt
+ls
+c
+ls
+kgp
+ls
+e
+gs
+gd
+gaa
+gs
+gc
+gs
+gd
+gdca
+e
+ls
+cd ~/Configuration/nushell/
+gdca
+e
+kgp
+e
+fd -H . ./srv -X rm -rf
+ls srv
+ls srv -a
+cd srv
+touch index.html
+cd ..
+fd -H . ./srv -X rm -rf
+ls /srv
+bash convert.bash
+ls
+fd --help
+bash run.sh
+fd --help | rg abs
+bash run.sh
+ip addr
+ls **/*.zip
+cd ../Blog/
+ls
+cd -
+ls **/*.zip
+ls **/*.zip | where name =~ ' '
+ls **/*.zip | where name =~ ' ' | {|x| echo $x}
+ls **/*.zip | where name =~ ' ' | {|x| print $x}
+ls **/*.zip | where name =~ ' ' | {|x| print $"($x) ---"}
+ls **/*.zip | where name =~ ' ' | {|x| $"($x) ---"}
+ls **/*.zip | where name =~ ' ' | each {|x| $"($x) ---"}
+ls **/*.zip | where name =~ ' ' | each {|x| $"($x.name)"}
+ls **/*.zip | where name =~ ' ' | each {|x| $"($x.name) -> ($x.name|str replace ' ' '')"}
+ls **/*.zip | where name =~ ' ' | each {|x| $"($x.name) -> ($x.name|str replace ' ' ' ')"}
+ls **/*.zip | where name =~ ' ' | each {|x| $"($x.name) -> ($x.name|str replace -a ' ' ' ')"}
+ls **/*.zip | where name =~ ' ' | each {|x| $"($x.name) -> ($x.name|str replace ' ' ' ' -a)"}
+ls **/*.zip | where name =~ ' ' | each {|x| $"($x.name) -> ($x.name|str replace --all ' ' ' ' )"}
+ls **/*.zip | where name =~ ' ' | each {|x| $"($x.name) -> ($x.name|str replace ' ' ' ' --all)"}
+ls **/*.zip | where name =~ ' ' | each {|x| mv $x.name) ($x.name|str replace ' ' ' ' --all)}
+ls **/*.zip | where name =~ ' ' | each {|x| mv $x.name ($x.name|str replace ' ' ' ' --all)}
+ls **/*.zip | where name =~ ' ' | each {|x| $"($x.name) -> ($x.name|str replace ' ' ' ' --all)"}
+ls **/*.html | where name =~ ' ' | each {|x| $"($x.name) -> ($x.name|str replace ' ' ' ' --all)"}
+ls **/*.html | where name =~ ' ' | each {|x| mv $x.name ($x.name|str replace ' ' ' ' --all)}
+ls **/*.html | where name =~ ' ' | each {|x| $"($x.name) -> ($x.name|str replace ' ' ' ' --all)"}
+ls **/*.html | where name =~ ' ' | each {|x| mv $x.name ($x.name|str replace ' ' ' ' --all)}
+ls
+cd ../Blog/
+ls **/* | where name =~ ' ' | each {|x| $"($x.name) -> ($x.name|str replace ' ' ' ' --all)"}
+ls **/* | where 
+cd -
+ls
+ls **/* | where name =~ '['
+ls **/* | where name =~ '\['
+ls **/* | where name =~ '\[' 
+ls **/* | where name =~ '\[' | get name
+ls **/* | where name =~ '\[' | get name | basename
+ls **/* | where name =~ '\[' | get name | path dirname 
+ls **/* | where name =~ '\[' | get name | path basename
+ls **/* | where name =~ '\[' | get name | path type 
+ls **/* | where name =~ '\[' | get name | path expand 
+ls **/* | where name =~ '\[' | get name | path split 
+ls **/* | where name =~ '\[' | get name | path split | str
+ls **/* | where name =~ '\[' | get name | path split | path join '---'
+ls **/* | where name =~ '\[' | get name | path split | path join
+ls **/* | where name =~ '\[' | get name | path split | path join 
+ls **/* | where name =~ '\[' | get name | path split 
+ls **/* | where name =~ '\[' | get name 
+ls **/* | where name =~ '\[' | get name | path parse 
+ls **/* | where name =~ ''
+ls **/* | where name =~ '' | find tool
+ls **/* | find '' 
+ls **/* | where name =~ '' | each {|x| $"($x.name) -> ($x.name|str replace '' '' --all)"}
+ls **/* | where name =~ '' | each {|x| mv ($x.name) ($x.name|str replace '' '' --all)}
+ls **/* | where name =~ '' | each {|x| $"($x.name) -> ($x.name|str replace '' '' --all)"}
+ls
+e nushell/migration.md
+gs
+gaa
+gca!
+gp
+gpf!
+gpp! 
+alias gpp!
+ls
+pwd
+gs
+e
+cd ~/Configuration/nushell/
+ls
+gs
+gd
+gaa
+gs
+gc
+gp
+ls **/* | where name =~ '   ' |  each {|x| $"($x.name) -> ($x.name|str replace '' '' --all)"}
+ls **/* | where name =~ ' '|  each {|x| $"($x.name) -> ($x.name|str replace '' '' --all)"}
+ls **/* | where name =~ '' |  each {|x| $"($x.name) -> ($x.name|str replace '' '' --all)"}
+ls **/* | find '' |  each {|x| $"($x.name) -> ($x.name|str replace '' '' --all)"}
+ls **/* | find '' |  each {|x| $"($x.name) -> ($x.name|str replace '' '' --all)"}
+ls **/* | find '' |  each {|x| mv ($x.name)  ($x.name|str replace '' '' --all)}
+ls **/* | find '' |  each {|x| $"($x.name) -> ($x.name|str replace '' '' --all)"}
+'qweqwe'
+ $'(char nl)Building nushell'
+'asdf' | hash base64
+hash base64 123123
+hash base64 '123123'
+'asdf' | hash 
+'asdf' | hash md5
+a=1
+a  =                   123
+a =                   123
+a = 123
+let a                 =            12312312
+$a
+ls | where $it.size > 10kb
+ls | where size > 10kb
+ls | where size > 1kb 
+ls | where size > 1kb and type == file
+ls **/*.zip | wc -l
+ls **/*.zip | count
+ls **/*.zip 
+ls **/*.zip | count
+ls **/*.zip | sum
+ls **/*.zip | group-by type
+ls **/*.zip | group-by type | count
+ls **/*.zip | group-by type 
+ls **/*.zip | length 
+ls **/*.zip | group-by type | length 
+ls **/*.zip | group-by type 
+ls **/*.zip | group-by type | each { $it | length}
+ls **/*.zip | group-by type | each {|it| $it | length}
+ls **/*.zip | group-by type | each {|it| $it.file | length}
+ls **/*.zip | group-by type | each {$it.file | length}
+ls **/*.zip | group-by type | each $it.file | length
+ls **/*.zip | group-by type | each ($it.file | length)
+ls **/*.zip | length 
+e
+ls **/*.zip | length 
+version
+e
+cd ~/Configuration/nushell/
+ls
+ls **/*.zip | length 
+kgp
+ls **/*.zip | length 
+glgp
+ls **/*.zip | length 
+ls
+ls **/*.json
+ls  /media/agent/PSSD/pub/ScrapBook/ | find 'json'
+cp /media/agent/PSSD/pub/ScrapBook/__meta.json .
+cat __meta.json
+find
+find 密码
+ls **/* | find 密码
+~/pub/ScrapBook/Web Development/security/如何安全地存储密码？.html
+apt update
+sudo apt update
+apt list --upgradable
+sudo apt upgrade
+~/Downloads/nvim.appimage
+ls **/*.zip | count
+ls **/*.zip | length 
+gs
+gd
+e
+ls 
+y
+ipython
+ipython3
+python3
+cl
+clear
+ls **/*.zip | length 
+kubectx 
+kubectl get pods
+pwd
+e
+kubectx tjsa
+kubectx 
+kubectx
+e
+kubectx
+kgp
+kubectl get pods
+e
+kubectx
+kubectx list
+kubectx help
+kubectx --help
+e
+ls **/*.zip | length 
+cd /home/agent/pub/ScrapBook/New Folder/计算机程序的思维逻辑/
+cd `/home/agent/pub/ScrapBook/New Folder/计算机程序的思维逻辑/`
+ls
+mv `(9) - 条件执行的本质.zip` `(9)  - 条件执行的本质.zip`
+ls
+mv `(9)  - 条件执行的本质.zip` `(9) - 条件执行的本质.zip`
+ls
+cd -
+ls **/*.zip | length 
+ls
+nautilus .
+cd /home/agent/Configuration/.zshrc.d/../nushell
+cd /home/agent/Configuration/.zshrc.d/../nushellwd
+nautilus .
+cd -
+nautilus .
+ cd ~/.config/nvim/
+e
+ls
+e nushell/scripts/starship.nu
+ls
+which starship
+e nushell/scripts/starship.nu
+e
+cd nushell/
+e
+cd nushell/
+e
+cd nushell/
+e
+cd nushell/
+e
+ls
+cd nushell/
+ls
+e
+ls
+scp scripts/starship.nu dx:
+ls
+date humanize 
+e scripts/migration.md
+ls
+e scripts/migration.md
+e migration.md
+e
+cd
+ls
+cp JetBrainsMono/JetBrainsMono-Thin.ttf .termux/font.ttf
+ls
+pwd
+cd nushell/
+cd .config/nushell/
+ls
+e
+ls
+e
+cd /home/agent/Configuration/.zshrc.d/../nushellwd
+cd /home/agent/Configuration/.zshrc.d/
+cd ...
+cd .....
+cd -
+ls
+s
+cd .config/nushell/
+ls
+e
+s
+e .config/nushell/
+s
+g 1
+g 2
+g 1
+ls
+e
+cd .config/nushell/
+ls
+e
+which asdf
+if (which asdf) { echo 123}
+if (which asdf| path exists) { echo 123}
+if (which asdf| length) { echo 123}
+if (which asdf| length) > 0 { echo 123}
+if (which asdf| length) == 0 { echo 123}
+if (which starship| length) > 0 { echo 123}
+if (which sarship| length) > 0 { echo 123}
+if (which starship| length) > 0 { echo 123}
+cd .config/nushell/
+e
+cd .config/nushell/
+e
+nvim
+s
+nu
+e
+nu
+e
+ls
+e
+cd .config/nushell/
+ls
+s
+ls
+e
+cd .config/nushell/
+e
+nu
+cd .config/nushell/
+e
+cd ..
+cd -
+export env 
+ls
+cat env.nu
+e
+cd .config/nushell/
+ls
+cd
+cd -
+ls
+nvim migration.md
+cd
+e overlay.nu
+a
+cd .config/nushell/
+e
+ls
+cd .config/nushell/
+nvim config.nu
+cat overlay.nu
+overlay add a f
+overlay add a --help 
+a
+overlay add cd overlay.nu
+overlay add overlay.nu
+nvim overlay.nu
+overlay add overlay.nu
+source overlay.nu 
+cd .config/nushell/
+e
+gs
+cd
+overlay add overlay.nu
+e
+e overlay.nu
+overlay add overlay.nu
+def a [] { 123 }
+a
+e overlay.nu
+overlay add overlay.nu
+e
+cd .config/nushell/
+nvim overlay.nu
+nvim config.nu
+overlay add overlay.nu
+e overlay.nu
+overlay add overlay.nu
+def a[x] { x}
+def a[x] {}
+def a[x] { $x }
+def a[x] { echo $x }
+def a[x] { <\n>echo $x<\n>}
+ls
+s
+n
+g 0
+g 1
+g 2
+ls
+cd nushell/
+ls
+e
+cd ..
+cd Configuration/
+cd nushell/
+ls
+e
+cd nushell/
+ls
+pwd
+e
+cd Configuration/nushell/
+gs
+gd
+gaa
+gc
+gp
+git push origin
+git push
+git status
+git push
+sudo podman ps
+sudo podman start gitea-pg
+sudo podman start gitea
+git push
+e  ~/.ssh/config/git
+e  ~/.ssh/config.d/git
+gp
+git push
+e  ~/.ssh/config.d/git
+git push
+cd ~/pub/ScrapBook/
+ls **/*.zip | count
+ls **/*.zip | length 
+kubectl get pods
+curl -sSL https://api.github.com/repos/nushell/nushell/releases -H 'Accept: application/vnd.github.v3+json' \           | jq -r '[.[]|select(.prerelease == false)][0].assets[].browser_download_url' | grep linux
+curl -sSL https://api.github.com/repos/nushell/nushell/releases -H 'Accept: application/vnd.github.v3+json' 
+cd ~/temp/
+ls
+ls nu*
+s
+ls
+ls | where modified > 2020
+ls | where modified > '2020'
+ls | where modified > '2020-01-01'
+ls | where modified > 2020-01-01
+ls | find 
+ls **/* | find |  each {|x| $"($x.name) -> ($x.name|str replace  '' --all)"}
+ls **/* | find |  each {|x| $"($x.name) -> ($x.name|str replace  '-' --all)"}
+ls **/* | find |  each {|x| mv ($x.name) -> ($x.name|str replace  '-' --all) }
+ls **/* | find |  each {|x| mv ($x.name) ($x.name|str replace  '-' --all) }
+ls **/* | find 酒鬼
+ls **/* | find 巴
+ls **/* | find 
+ls **/* | find   |  each {|x| mv ($x.name) ($x.name|str replace  '-' --all) }
+ls **/* | find 
+ls **/* | find 如何理解dependent
+ls **/* | find Lambda算子
+ls **/*.zip | length 
+ls **/* | find Lambda算子
+ls **/* | find 
+ls **/* | find  |  each {|x| mv ($x.name) ($x.name|str replace  '-' --all) }
+ls **/* | find ,this!
+ls **/* | find Lambda算子
+cd Configuration/nushell/
+e
+ls **/* | find Lambda算子 | echo $it.name
+ls **/* | find Lambda算子 
+ls | echo $it.name
+ls | each { echo $it.name }
+ls | each { |it| echo $it.name }
+ls | each { echo $it.name }
+ls **/* | find Lambda算子 
+ls **/*.zip | length 
+ls **/* | find Lambda算子 
+ls **/* | find 酷
+ls **/* | find Lambda算子 
+cd /opt/nushell-0.63.0/
+ls
+cd ~/temp/
+ls
+cd a
+mkdir a
+cd a
+tar zxvf ~/Downloads/nu_0_63_0_linux.tar.gz 
+ls
+rm -rf *
+tar zxvf ~/Downloads/nu_0_63_0_linux.tar.gz --strip-components=2 nu -C .
+tar zxvf ~/Downloads/nu_0_63_0_linux.tar.gz --strip-components=2 -C . nu
+tar zxvf ~/Downloads/nu_0_63_0_linux.tar.gz --strip-components=2 */*/nu -C .
+tar zxvf ~/Downloads/nu_0_63_0_linux.tar.gz --strip-components=2 '*/*/nu' -C .
+tar zxvf ~/Downloads/nu_0_63_0_linux.tar.gz --strip-components=2  -C .
+ls
+rm -rf *
+ls
+tar zxvf ~/Downloads/nu_0_63_0_linux.tar.gz --strip-components=2  -C .
+ls
+ls **/*.zip | length 
+mv `Computer Science/functional programming/lambda算子 1.b.html` `Computer Science/functional programming/lambda算子1b.html`
+ls **/*.zip | find lambda
+ls **/* | find lambda
+mv `Computer Science/functional programming/lambda算子简介1.a.html` `Computer Science/functional programming/lambda算子简介1a.html`
+ls **/* | find lambda
+cat `Computer Science/functional programming/Lambda算子5a：Why oh why Y.html`
+ls **/* | find lambda
+ls **/* | where size < 1k
+ls **/* | where size < 1kb
+ls **/* | find lambda
+rm `Computer Science/functional programming/Lambda算子5a：Why oh why Y.html`
+ls **/* | find lambda
+ls **/* | where size < 1kb
+ls **/* | where size < 1kb and type == file
+ls **/* | where size < 1kb and type == file | each {|x| echo $x; echo '-----------'; cat $x}
+ls **/* | where size < 1kb and type == file | each {|x| echo $x.name; echo '-----------'; cat $x}
+ls **/* | where size < 1kb and type == file | each {|x| echo $x.name; echo '-----------'; cat $x.name}
+ls **/* | where size < 1kb and type == file
+ls **/* | where size < 700b and type == file
+ls **/* | where size < 700b and type == file | each {|x| rm $x.name}
+ls **/* | where size < 700b and type == file
+ls **/* | find 七
+ls **/* | find 七周
+dpl fj0rd/nu
+podman pull fj0rd/nu
+podman pull fj0rd/nu:alpine
+di | r nu
+zsh
+bash run.sh
+ls **/*.zip | length 
+ls **/* | where size < 700b and type == file
+ls **/*.zip | length 
+dp
+podman ps
+podman exec -it f31
+podman exec -it f31 nu
+ls **/* | where size < 700b and type == file
+ls **/* | find 
+ls **/* | find |  each {|x| mv ($x.name) ($x.name|str replace  '-' --all) }
+ls **/* | where size < 700b and type == file
+ls **/* | find `What are the lesser known but`
+ls **/* | find `两种基本`
+ls **/* | find `两种基本` | get name
+ls **/* | find `两种基本` | get name | cat
+ls **/* | find `两种基本` | each {|X| cat $X.name}
+ls **/* | where size < 700b and type == file
+ls **/* | find 
+ls **/* | where size < 700b and type == file
+ls **/* | where size < 700b and type == file | each {|x| rm $x.name}
+ls **/* | where size < 700b and type == file
+ls
+cd ~/pub/ScrapBook
+ls
+ls **/*.zip | length 
+ls **/* | where size < 700b and type == file
+ls **/* | where size < 700b 
+buildah from alpine
+buildah from localhost/ci
+buildah list
+buildah rm 3c
+buildah rm c3
+buildah list
+ls **
+podman ps
+podman ps | from ssv
+podman ps | detect column
+podman ps | from ssv
+podman ps 
+cd
+cd temp/
+e overlay.nu
+overlay add overlay.nu
+overlay list 
+overlay remove overlay.nu
+overlay remove overlay
+e
+e overlay.nu
+overlay list
+overlay add overlay.nu
+e overlay.nu
+overlay add overlay.nu
+e overlay.nu
+overlay remove overlay
+overlay list
+overlay add overlay.nu
+e overlay.nu
+echo $env.BAZ
+overlay add overlay.nu
+echo $env.BAZ
+a
+cat overlay.nu
+foo
+bar
+overlay remove overlay
+bar
+cd ~/Configuration/nushell/
+e
+cd ~/Configuration/nushell/
+ls
+cd ~/Configuration/nushell/
+cd
+cd ~/Configuration/nushell/
+cd ~/temp/
+eval ls
+cd ~/temp/
+cd ~/Configuration/nushell/
+cd ~/temp/
+ls
+cd ~/temp/
+cd
+cd ~/temp/
+ls overlay.nu
+cat overlay.nu
+cd ~/temp/
+cd
+cd ~/temp/
+ls
+eval "ls"
+exec "overlay add overlay.nu"
+exec "overlay add temp/overlay.nu"
+cd ~/temp/
+exec "overlay add overlay.nu"
+cd ~/temp/
+ps 
+ps | sort-by mem 
+ps | sort-by mem desc
+ps | sort-by mem | reverse
+ps | sort-by mem | reverse | take 10
+cd ~/temp/
+cd
+cd ~/temp/
+dir-overlay
+dir-overlay 1 1
+dir-overlay
+type dir-overlay
+let dir-overlay = { |before, after|<\n>    ps | sort-by mem | reverse | take 10<\n>    let o = $"($after)/overlay.nu"<\n>    if ($o | path exists) {<\n>        #overlay add overlay.nu<\n>    }<\n>}
+dir-overlay
+cd ~/temp/
+cat overlay.nu
+foo
+bar
+echo $env.BAZ
+cd ~/temp/
+overlay ls
+overlay list
+overlay add overlay.nu
+overlay list
+cd ~/temp/
+cd ..
+cp temp/overlay.nu .
+overlay list
+rm overlay.nu
+cd ~/temp/
+cd
+cd ~/temp/
+let o = $"($env.PWD)/overlay.nu"
+o
+$o
+$o | path exists
+cd ..
+let o = $"($env.PWD)/overlay.nu"
+$o | path exists
+if ($o | path exists) { echo 12}
+cd temp/
+let o = $"($env.PWD)/overlay.nu"
+if ($o | path exists) { echo 12}
+cd temp/
+cd ~/Configuration/nushell/
+ls
+overlay list
+cd temp/
+ls
+cp temp/overlay.nu .
+ls overlay.nu
+cat overlay.nu
+gaa
+gs
+gd
+gdca
+e
+gaa
+gs
+gdca
+gc
+gp
+docker ps --all --no-trunc --format='{{json .}}'
+podman ps --all --no-trunc --format='{{json .}}'
+podman ps --all --no-trunc --format='{{json .}}' | from json
+sudo podman ps --all --no-trunc --format='{{json .}}' | from json
+sudo podman ps --all --no-trunc --format='{{json .}}' 
+podman ps --all --no-trunc --format='{{json .}}' 
+podman ps --all --no-trunc --format='{{json .}}' | from json
+'{"AutoRemove":true,"Command":null,"Created":"2022-06-02T08:53:00.249501086+08:00"}' | from json
+podman ps --all --no-trunc --format='{{json .}}' | from json
+podman ps --format '{"ID":"{{ .ID }}", "Image": "{{ .Image }}", "Names":"{{ .Names }}"}'
+podman ps --format '{"ID":"{{ .ID }}", "Image": "{{ .Image }}", "Names":"{{ .Names }}"}' | from json
+sudo podman ps --format '{"ID":"{{ .ID }}", "Image": "{{ .Image }}", "Names":"{{ .Names }}"}' | from json
+sudo podman ps --format '{"ID":"{{ .ID }}", "Image": "{{ .Image }}", "Names":"{{ .Names }}"}' | each {|x| $x| from json }
+sudo podman ps --format '{"ID":"{{ .ID }}", "Image": "{{ .Image }}", "Names":"{{ .Names }}"}' | each {|x| echo $x }
+sudo podman ps --format '{"ID":"{{ .ID }}", "Image": "{{ .Image }}", "Names":"{{ .Names }}"}' 
+sudo podman ps --format '{"ID":"{{ .ID }}", "Image": "{{ .Image }}", "Names":"{{ .Names }}"}' | each {|x| echo -- $x }
+sudo podman ps --format '{"ID":"{{ .ID }}", "Image": "{{ .Image }}", "Names":"{{ .Names }}"}' | each {|x| echo '--' $x }
+sudo podman ps --format '{"ID":"{{ .ID }}", "Image": "{{ .Image }}", "Names":"{{ .Names }}"}' | each {|x| echo $x | from json }
+kubectl get pods
+kubectl get pods -o json
+kubectl get pods -o json | from json
+kubectl get pods -o json | from json | get items
+kubectl get pods 
+kubectl get pods -o json | from json | get items | each {|x| {name: $x.metadata.name}}
+kubectl get pods -o json | from json | get items | each {|x| {name: $x.metadata.name, namespace: $x.metadata.namespace}}
+kgp
+kgp | get name
+kubectl get pods -o json
+kubectl get pods -o yaml
+kubectl get pods
+kgp
+kubectl get pods
+kubectl get pods -o yaml
+kubectl get pods -o yaml | r age
+kubectl get pods -o yaml | rg age
+kubectl get pods -o yaml | rg AGE
+kubectl get pods -o yaml
+kgp
+kubectl get pods
+kgp
+kubectx 
+kubens
+kubens kube-system
+kgp
+kubectl get pods
+kubectl get pods -o yaml coredns-64897985d-m2t22
+kgp
+kubectl get pods -o yaml coredns-64897985d-m2t22
+kubectl get pods
+kubectl get pods | from ssv
+kubectl get pods -A | from ssv
+kgpa
+kgpa | where namespace == shop
+kgpa | where NAMESPACE == shop
+kubectxes
+kubectxes | <\n>each {|x| echo $x}
+kubectxes | lines
+kcc tjsa
+kcc dev-new
+kcc be
+kgp
+kubectl get pods
+zsh
+kcc dev-x
+kgp
+kn monitor
+kgp
+e
+gs
+gd
+gaa
+gc
+gp
+cd ~/data/docker.io/
+cd io/
+gpp!
+gpf!
+gp
+zsh
+kubectx
+kubectx --help
+kn kube-node-lease
+kgp
+kn shop
+kgp
+kgpa
+kgpa | where NAMESPACE == shop
+kcc eainger
+kgp
+kn hello
+kgp
+kn -
+kubectl get node
+kgno
+kgp
+_kubepods 
+_kubedeployments 
+kgp
+ked kingdee-85b58bc496-d4wv4
+ked manage
+kgp
+kdp manage-58ddcc86c7-qbfzk
+podman ps
+podman ps | from ssv
+sudo podman ps --format '{"ID":"{{ .ID }}", "Image": "{{ .Image }}", "Names":"{{ .Names }}"}' | each {|x| echo $x | from json }
+podman ps --format '{"ID":"{{ .ID }}", "Image": "{{ .Image }}", "Names":"{{ .Names }}"}' | each {|x| echo $x | from json }
+podman ps --format '{"ID":"{{ .ID }}", "Image": "{{ .Image }}", "Names":"{{ .Names }}"}' | lines | each {|x| echo $x | from json }
+sudo podman ps --format '{"ID":"{{ .ID }}", "Image": "{{ .Image }}", "Names":"{{ .Names }}"}' | lines | each {|x| echo $x | from json }
+dp
+sudo dp
+dp
+podman ps
+podman ps --format '{{.}}'
+podman ps --all --no-trunc --format='{{json .}}' 
+podman ps --all --no-trunc --format='{{json .}}' | lines | to json
+podman ps --all --no-trunc --format='{{json .}}' | lines | from json
+podman ps --all --no-trunc --format='{{json .}}' | lines | from json | get Command
+podman ps --all --no-trunc --format='{{json .}}' | lines | from json 
+sudo podman ps --all --no-trunc --format='{{json .}}' | lines | from json 
+podman ps --all --no-trunc --format='{{json .}}' | lines | from json 
+podman ps --all --no-trunc --format='{{json .}}' | lines g 
+podman ps --all --no-trunc --format='{{json .}}' | lines 
+echo '{"a": 1}' | from json
+podman ps --all --no-trunc --format='{{json .}}' | lines | from json
+ podman ps --all --no-trunc --format='{{json .}}' | lines | from json
+e
+podman ps --all --no-trunc --format='{{json .}}' | jq
+podman ps --all --no-trunc --format='{{json .}}' 
+echo '{"a": 1}' | jq
+podman ps --all --no-trunc --format='{{json .}}' | jq
+zsh
+dp
+'asdfsafd' | str substring 0 4
+'asdfsafd' | str substring 0
+'asdfsafd' | str substring
+'asdfsafd' | str substring 0-4
+'asdfsafd' | str substring 1-4
+'asdfsafd' | str substring 1..4
+'asdfsafd' | str substring range(1..4)
+'asdfsafd' | str substring range(1)..4
+'asdfsafd' | range(1)..4
+[1 2 3 4 5] | range(1)..3
+[1 2 3 4 5] | 1..3
+'asdfsafd' | 1..4
+'asdfsafd' | str substring  1..4
+'asdfsafd' | str substring  '1,4'
+dp
+'2022-06-02 08:53:00.249501086 +0800'| length
+'2022-06-02 08:53:00.249501086 +0800'|str length 
+dp
+'2022-06-02 08:53:00.249501086 +0800 CST' | into datetime
+'2022-06-02 08:53:00.249501086 +0800 CST' |str trim | into datetime
+'2022-06-02 08:53:00.249501086 +0800 CST' |str substring ',36' | into datetime
+'2022-06-02 08:53:00.249501086 +0800 CST' |str substring ',26' | into datetime
+'2022-06-02 08:53:00.249501086 +0800 CST' |str substring ',36' | into datetime
+dp
+'2022-06-02 08:53:00.249501086 +0800 CST' |str substring ',36' | into datetime
+dp
+'2022-06-02 08:53:00.249501086 +0800 CST' |str substring ',36' | into datetime
+let a = '2022-06-02 08:53:00.249501086 +0800 CST' |str substring ',36' | into datetime
+let a = ('2022-06-02 08:53:00.249501086 +0800 CST' |str substring ',36' | into datetime)
+$a
+(date now) - $a
+(date now) - $a | time 
+(date now) - $a | time --help
+(date now) - $a 
+(date now) - $a | date humanize 
+('2022-06-02 08:53:00.249501086 +0800 CST' | into datetime)
+('2022-06-02 08:53:00.249501086 +0800 CST' | date humanize)
+'2022-06-02 08:53:00.249501086 +0800 CST' | date humanize
+dp
+sudo podman run -d localhost:io
+sudo podman images
+sudo podman run -d localhost/io
+dp 
+sudo podman stop 782994041e906074424d7645b8d0e67dc08ae4a8e5a9f5f09e903b0627fb56e1
+dp 
+di
+from ssv --help
+podman images | from ssv -a 
+podman images | from ssv | headers
+cd ~/world/ci-data/
+ls
+e
+gaa
+gs
+gc
+gca!
+gp
+podman images | from ssv 
+di
+dp
+di
+glg
+cd ~/world/ci-data/
+glg
+cd ~/world/ci-data/
+glg
+rename
+git log --pretty='%h»¦«%s»¦«%aN»¦«%aE»¦«%aD' -n 10 | lines | split column "»¦«"
+git log --pretty='%h»¦«%s»¦«%aN»¦«%aE»¦«%aD' -n 10 | lines | split column "»¦«" | rename id message
+glg
+cd ~/world/ci-data/
+glg
+dp
+di
+kgp
+kgpa
+kgno
+kcc dev-x
+kgp
+kn shop
+kgp
+e
+gs
+gd
+e
+gs
+gd
+gaa
+gs
+gdca
+gc
+gp
+kgpa | where restart > 0
+kgpa | where restarts > 0
+kgpa | where ($it.restarts | str to-int) > 0
+kgpa | where ($it.restarts | into int) > 0
+kgpa | get restarts | into int
+kgpa | get restarts 
+kgpa | get restarts | str split ' '
+kgpa | get restarts | split 
+kgpa | get restarts | split chars
+kgpa | get restarts | split chars ' '
+kgpa | get restarts | split row ' '
+kgpa | get restarts | split row ' ' | get 1
+kgpa | get restarts | split row ' ' | nth n 
+kgpa | get restarts | split row ' ' | nth 2
+kgpa | get restarts | (split row ' ' ).0
+kgpa | get restarts | split row ' ' | get 1
+kgpa | get restarts | each {|x| $x| split row ' ' | get 1}
+kgpa | get restarts | each {|x| $x| split row ' ' | get 0}
+kgpa | get restarts | each {|x| $x| split row ' ' | get 0} | into int
+dp
+kgpa
+kgpa | where restarts > 0
+cd ~/world/ci-data/
+e
+gaa
+gc
+gp
+e
+gs
+gd
+gdca
+gaa
+gc
+kgp
+kgp | where restart >1
+kgp | where restart > 1
+kgp | where restarts > 1
+kgp
+e
+gs
+gd
+e
+gaas
+gaa
+gs
+gdca
+gaa
+gc
+gp
+kgp | get age > 1day
+kgp | get age > '1day'
+kgp | get age 
+kgp | get age | get 1
+kgp | get age | get 1 | str substring ',10'
+kgp | get age > 1d
+kgp | get age > 1day
+kgp | where age > 1day
+kgp | where age > 10day
+kgp | where age > 20day
+kgp | where age > 30day
+kcc be
+zsh;
+kgp
+kcc xmh-es
+kcc dev-x
+kgp
+kgpa
+kgpa | length
+kgpa 
+kgp
+kgpa
+kgpa | where ns == shop
+kgpa | where ns == shop and resetarts > 1
+kgpa | where ns == shop and restarts > 1
+kgp
+e
+gs
+glg
+gpp! 
+gpf!
+gp
+zsh
+kgp
+kgp
+kgpa
+kgp
+kgpi
+kubectl get pods -o json
+kgp
+e
+gaa
+zsh
+kgpi -n tunnel
+zsh
+kgp
+kgpa
+kgpa | where status == ImagePullBackOff
+cd  ~/world/deployment/
+kgp
+cd ~/Configuration/nushell/
+zsh 
+e
+cd restaurant/
+e
+cd ..
+rg svc.cluster
+e visit/overlays/xmh/virtualservice.yaml
+zsh 
+cd restaurant/
+e
+gaa
+kgp
+ls
+kk 
+cd ~/world/deployment/restaurant/
+kk 
+gs
+gd
+ssh xmh-be
+ls
+kgp
+cd .config/nushell/
+ls
+cd ../nvim/
+ls
+e
+cd
+cd .config/nushell/
+ls
+run
+run asf as fsf 
+e
+run asf as fsf 
+e .nu
+run 1 2 3 
+nu .nu 1 2 3
+e .nu
+nu .nu 1 2 3
+run 1 2 3 
+cd .config/nushell/
+e
+run 1 2 3 
+cd .config/nushell/
+e
+run 1
+cd
+run 1
+e .nu
+run 1
+e
+e .nu
+run 1
+e
+e .nu
+run 1
+e .nu
+run 1
+e
+run 1
+let a = [ 1 2 3 ]
+let b = [4,5,6,7 3]
+$b
+$a
+[$a]
+[...$a]
+[$...a]
+[...$a]
+...$a
+... $a
+[... $a]
+nu .nu 1 2 3
+nu .nu 1
+e .nu
+nu .nu 1
+1 + 1
+nu .nu 1
+nu .nu 1.
+nu .nu .1
+main
+source .nu
+main
+main 12
+main 1233
+ls
+cd .config/nushell/
+e
+glg
+e
+ls
+kgp
+ls
+e
+cd ..
+cd nvim/
+ls
+gs
+git init .
+gaa  
+gc
+git config --global user.name "asf@fads"
+git config --global user.email "asf@fads"
+gc
+glg
+cd nvim/
+cd .config/nvim/
+glg
+cd ../nu
+cd ../nushell/
+e
+from ssv --help
+'a b<\n>1 2' | from ssv
+'a   b<\n>1   2' | from ssv
+'a   b<\n>1   2' | from ssv c d
+e
+glg
+cd .config/nvim/
+ls
+glg
+cd ../nushell/
+e
+cd .config/nvim/
+glg
+kgp
+glg
+e
+cd ../nushell/
+ls && ls
+ls ; ls
+e
+cd .config/nvim/
+gha
+cd ../nushell/
+e
+ls
+cd
+def a [-f] { echo $f }
+a 
+a -f
+def a [-f: string] { echo $f }
+a -f
+a -f asfd
+def a [-f] { echo (if $f {'-f'}) }
+a -f asfd
+a -f
+a
+cd -
+e
+def a [-f] { echo (if $f {-f}) }
+a 
+a -f
+e
+def a [ x@path] {echo $x}
+def a [ x@Path] {echo $x}
+def a [ x@cd] {echo $x}
+def a [ x:path @cd] {echo $x}
+cd
+cd -
+e
+startship --help
+e
+nu
+startship prompt
+starship prompt 
+starship prompt --help
+starship prompt --continuation
+starship prompt --help
+starship prompt --status 12313
+starship prompt --status 123
+e
+rm .config/nushell/env.nu
+e
+ls starship prompt --status 123
+cd ../nushell/
+cd .config/nushell/
+ls
+cd ..
+ls
+t
+cd .config/nushell/
+e
+tmux
+cd .config/nushell/
+e
+ls
+cd .config/nushell/
+ls
+cd ..
+ls
+cd ~/Configuration/nushell/
+gs
+gdca
+dp
+kgp 
+ka admin-89548fc58-ggdqq
+kl admin-89548fc58-ggdqq
+e
+kl api-7b8957cd54-v79gl
+if true { 'afdf' }
+if true { '-f' }
+ls (if true { '-a' })
+ls $"(if true { '-a' })"
+ $"(if true { '-a' })"
+ls $"(if true { '-a' })"
+ls -a
+ls
+ls (if true { '-a' })
+(if true { '-a' })
+(if true { -a })
+(if true { ls -a })
+ls (if true {  -a })
+ls (if true { -a })
+-a
+-a | type
+e
+ka api-7b8957cd54-v79gl
+cd ~/data/docker.io/
+ls
+cd nu/
+ls
+htop
+ps --help
+e Dockerfile
+gs
+gd
+cd nu/
+pwd
+gs
+gd
+gdca
+cd ../scratch/
+ls
+gs
+gd
+gaa
+gc
+gs
+gd
+gp
+gaa
+dp
+sudo dp
+gdca
+e
+gs
+gd
+gaa
+gc
+gp
+kgp
+ls
+cd ../scratch/
+kgp
+cd ../scratch/
+htop
+ls
+ls $"-a"
+^ls $"-a"
+^ls (if true { -a })
+kl api-7b8957cd54-v79gl
+kl -f api-7b8957cd54-v79gl
+kl api-7b8957cd54-v79gl
+klf api-7b8957cd54-v79gl
+kl api-7b8957cd54-v79gl
+klf api-7b8957cd54-v79gl
+kl api-7b8957cd54-v79gl
+klf api-7b8957cd54-v79gl
+kl -f api-7b8957cd54-v79gl
+kl api-7b8957cd54-v79gl
+kubectl logs api-7b8957cd54-v79gl
+kl admin-89548fc58-ggdqq
+kl asdf
+klf asdf
+kl -f asdf
+kl  admin-89548fc58-ggdqq
+kubectl logs     admin-89548fc58-ggdqq
+kl
+kl api-7b8957cd54-v79gl
+kl admin-89548fc58-ggdqq
+kl -f admin-89548fc58-ggdqq
+e
+gs
+gd
+e
+gs
+gd
+gpp! 
+kl api-7b8957cd54-v79gl
+klf admin-89548fc58-ggdqq
+cd ~/data/docker.io/
+cd nu
+gpp! 
+cd ../io
+gpp! 
+cd ..
+ls
+tar nu.tgz nushell/
+tar zcvf  nu.tgz nushell/
+scp nu.tgz dx:
+rm nu.tgz
+ls
+gs
+ls
+glgp
+glg
+gha 
+glg
+git log --pretty='%h»¦«%s»¦«%aN»¦«%aE»¦«%aD'
+cd ~/Configuration/nushell/
+git log --pretty='%h»¦«%s»¦«%aN»¦«%aE»¦«%aD'
+git log --pretty=%h»¦«%s»¦«%aN»¦«%aE»¦«%aD
+e
+gaa
+gs
+glg
+cd ~/Configuration/nushell/
+glg
+glg | take 10
+gaa
+gc
+gp
+glg | where date < 1day
+glg | where (date now) - date < 1day
+glg | where ((date now) - date) < 1day
+glg | each ((date now) - date) 
+glg | each ((date now) - $it.date) 
+glg | each {|it| ((date now) - $it.date) }
+glg | where ((date now) - date) < 1day
+glg | where {|it| ((date now) - $it.date) < 1day }
+glg | where {|it| ((date now) - $it.date) < 2day }
+glg | where {|it| ((date now) - $it.date) < 4day }
+gs
+glg | where {|it| $it.date < 4day }
+glg | where {|it| $it.date < (date now) - 4day }
+glg | where {|it| $it.date < (date now) + 4day }
+glg | where {|it| $it.date > (date now) - 4day }
+glg | where date > (date now) - 4day 
+glg | where ((date now) - date) < 4day
+glg | where date > (date now) - 4day 
+cd ~/data/docker.io/
+ls
+cd 0x/
+gpp! 
+cd ../ng
+gpp! 
+cd ../ci
+gppf
+gpp!
+def a [] { return 123}
+a
+cd ~/pub/
+e justfile
+cd ~/data/docker.io/
+e
+sudo apt update
+apt list --upgradable
+sudo apt upgrade
+cd ~/Configuration/oh-my-zsh/
+cd ..
+ls
+rm -rf oh-my-zsh/
+gs
+gd
+cd .zshrc.d/
+e ./keybinding.zsh
+cd ~/Configuration/nushell/
+ls
+cd ~/Configuration/nushell/
+ls
+git_prompt
+gstat
+cd ~/Configuration/nushell/
+ls
+panache-git 
+cd ~/Configuration/nushell/
+ls
+cd ~/Configuration/nushell/
+ls
+cd ~/Configuration/nushell/
+ls
+cd ~/Configuration/nushell/
+ls
+e
+gc
+gs
+gd
+gp
+e migration.md
+gaa
+gpp! 
+514090 / 60 /60
+514090 / 60 / 60
+514090 / 60 / 60 / 24
+zsh
+zsh
+ls
+cd ~/Configuration/nushell/
+ls
+e
+gs
+gd
+gaa
+gc
+gp
+cd ~/Configuration/nushell/
+glg
+glg | get 10
+glg | take 10
+zsh
+cd ~/Configuration/nushell/
+ls
+ansi green
+ansi red
+ansi red asdf
+(ansi green)123
+$"(ansi green)123"
+e
+gs
+gd
+cd ~/Configuration/nushell/
+gpp! 
+cd ~/Configuration/nushell/
+ls
+glg
+e
+gs
+e
+gaa
+cd ~/Configuration/nushell/
+gpp! 
+cd ~/Configuration/nushell/
+gs
+gd
+gaa
+gc
+gp
+j
+cd ~/Configuration/nushell/
+gaa
+gs
+gca!
+gs
+gd
+cd ~/Configuration/nushell/
+gaa
+gca!
+gp
+gpp! 
+e
+cd ~/Configuration/nushell/
+gpp! 
+cd ~/Configuration/nushell/
+e
+gs
+gaa
+gpp! 
+cd ~/Configuration/nushell/
+git --no-optional-locks status --porcelain=2 --branch | lines
+e
+gs
+e
+gaa
+cd ~/Configuration/nushell/
+gs
+gpp! 
+e
+cd ~/Configuration/nushell/
+ls
+gpp! 
+kubectl status
+kubectx --help
+kubectx -c
+kubectl config get-contexts
+kubectl config current-contexts
+kubectl config current-context
+kubectl config current-contexts
+kubectl config get-contexts
+kubectl config get-contexts -o json
+kubectl config get-contexts -o yaml
+kubectl config get-contexts -o jsonpath='{.}'
+kubectl config view
+kubectl config view -o json
+kubectl config get-contexts --help
+kubectl config get-contexts -o
+kubectl config get-contexts
+kubectl config get-contexts | from ssv
+kubectl config get-contexts | from ssv --help
+kubectl config get-contexts | from ssv -a
+kgp
+di
+dp
+kgno
+kgd
+e
+gs
+gd
+gc
+gaa
+gc
+gp
+do --ignore-errors { kubectl config get-contexts | from ssv -a } | empty? | nope
+do --ignore-errors { kubectl config get-contexts | from ssv -a } | empty? 
+do --ignore-errors { kubectl config get-contexts | from ssv -a }
+do --ignore-errors { kubectl config get-contexs | from ssv -a }
+do --ignore-errors { kbectl config get-contexs | from ssv -a }
+do --ignore-errors { kubectl config get-contexs | from ssv -a }
+do --ignore-errors { kubectl config get-contexts | from ssv -a }
+do --ignore-errors { kubectl config get-contexts | from ssv -a | where CURRENT == '*'}
+    def "kube ctx" [] {        let ctx = (do --ignore-errors {                       kubectl config get-contexts                       | from ssv -a                       | where CURRENT == '*'                  })    }
+kube ctx
+    def "kube ctx" [] {        do --ignore-errors {           kubectl config get-contexts           | from ssv -a           | where CURRENT == '*'        }    }
+kube ctx
+kube ctx | get NAME
+    def "kube ctx" [] {        do --ignore-errors {           kubectl config get-contexts           | from ssv -a           | where CURRENT == '*'           | rename curr name cluster authinfo namespace        }    }
+kube ctx | get NAME
+kube ctx | get name
+kube ctx
+kube ctx | each {|X| $X.name}
+    def "kube ctx" [] {        do --ignore-errors {           kbectl config get-contexts           | from ssv -a           | where CURRENT == '*'           | rename curr name cluster authinfo namespace        }    }
+kube ctx | each {|X| $X.name}
+kube ctx 
+kube ctx | get name
+    def "kube ctx" [] {        do --ignore-errors {           kubectl config get-contexts           | from ssv -a           | where CURRENT == '*'           | rename curr name cluster authinfo namespace        }    }
+kube ctx
+let a = kube ctx
+a
+$a
+kgp
+cd ~/Configuration/nushell/
+cd
+           kubectl config get-contexts
+           | from ssv -a
+           | where CURRENT == '*'
+           | rename curr name cluster authinfo namespace
+           | take 1
+kube ctx
+kube ctx | get name
+kube ctx | select 1
+kube ctx | select name
+kube ctx | get name
+kube ctx | get name.0
+kgp
+kcc sq
+kube ctx | into datetime 
+kube ctx | get 1
+kube ctx | get 0
+kube ctx | get name
+cd
+ls
+cd ~/Configuration/nushell/
+bright-cyan 
+cd ~/Configuration/nushell/
+1 == 1 == 1
+1 == 1
+cd ~/Configuration/nushell/
+zsh
+char nl
+cd ~/Configuration/nushell/
+zsh
+kcc be
+kgp
+cd ~/.kube/
+e config
+kcc be
+kgp
+e
+kcc be
+kgp
+e
+kgp
+kn restaurant
+kgp
+ka admin-89548fc58-ggdqq
+ka admin-799c85c798-svtvv
+kg virtualservices
+kubectl get virtualservices
+kubectl edit virtualservices api
+kn shop
+kgp
+kubectl get pods -o jsonpath="{.items[*].spec.containers[*].image}" 
+kubectl get pods -o jsonpath="{.items}" 
+kubectl get pods -o jsonpath="{.items}" | jq
+kubectl get pods -o jsonpath="{.items}" | each jq
+kubectl get pods -o jsonpath="{.items}" | lines
+kubectl get pods -o jsonpath="{.items}" | jq
+kubectl get pods -o jsonpath="{.items}" | from json
+kubectl get resources
+kubectl list resources
+kubectl get service, pod, deployment
+zsh
+kubectl get all
+kubectl get services
+kubectl get services -o wide
+kgs
+kubectl get services
+kubectl get services -o wide
+kgs
+kgs |rename {|x| $x| str camel-case }
+help rename
+kgs
+kes business
+kubectl get deployments 
+kubectl get deployments | from ssv -a
+kubectl get deployments -o wide| from ssv -a
+kgd
+help rename
+[[a, b, c]; [1, 2, 3]] | rename -c [a ham]
+[[a, b]; [1, 2]] | rename my_column
+kgd | reject selector
+kgd
+kgp
+kgs
+kgp
+kubectl get pods
+kgpa
+kgno
+kubectl get node
+kubectl get node -o wide
+kgno
+zsh
+ksd api 1
+kgp
+kgd
+ksd backend 1
+ksd backend afsdfasdf
+kgp
+ksd redis 13
+ksd redis 2
+ksd redis 1
+kgp
+1..9
+[1 2 3 4 5] 
+"asdf asdf" | split ' '
+"asdf asdf" | split
+"asdf asdf" | split row 
+"asdf asdf" | split row ' '
+"asdf asdf" | split row ' ' | get 1
+kubectl get node | get name
+kubectl get node 
+kubectl get node | from ssv -a | get NAME
+kg pod hasura-54fd8f5687-f2pmv
+kd deployment backend
+kd pod backend-86d8478984-vt88r
+kd svc business
+ke virtualservice backend
+kg pod 
+kg pod cron-769d6f79c7-55txx
+kg svc
+kg gateway
+kg gateway -A
+kg virtualservice
+kg pod
+kubectl get pod | str kebab-case 
+kgp
+kgp | columns
+kgp | columns | each {|x| $x | str kebab-case}
+kubectl get pods | columns | each {|x| $x | str kebab-case}
+kubectl get pods | from ssv -a | columns | each {|x| $x | str kebab-case}
+kubectl get pods | from ssv -a | columns 
+kubectl get pods | from ssv -a | headers
+kg pod
+kg
+kg  svc
+rename --help
+kg  svc
+kgp
+kg endpoint
+kg endpoints
+kg pod
+kg node
+kg svc
+kg virtualservice
+ke virtualservice el
+kg endpoint
+kg endpoints
+zsh
+kg ingress
+kg pods -A 
+kg pods 
+kg pods -n
+kg pods -n devops
+kg pods -A
+kg pods -A -n asdf
+kg pods  -n asdf
+kg pods  
+nothing
+kg pods  
+kg pods  -A
+kg pods --all 
+kg pods -n kube-public
+kg pods -n shop
+kg pods -
+kg pods 
+kgp
+kg
+kg svc
+kd virtualservice backend
+kd -n default events  
+kd deployments cron
+kd deployments cron -n devops
+[a -n b]
+[a -n b] | find -n
+[a -n b] | find '-n'
+[a -n b] | str index-of -n
+[a -n b] | str index-of '-n'
+'my_library.rb' | str index-of '.rb'
+[a -n b] | find '-n'
+[a -n b] | find a
+[a -n b] | find --help
+[a -n b] | find -r a
+[a -n b] | find -r b
+[a -n b] | find --help 
+[a -n b] | match --help 
+[a -n b] | match -b
+[a -n b] | match b
+[a -n b] | match 'b'
+[a -n b] | str index-of '-n'
+[a -n b] | find {|x| $x == b}
+[a -n b] | find {|x| $x == 'b'}
+[a -n b] | find {|x| $x == 'a'}
+[a -n b] | where $it == '-n'
+[a -n b] | each -n {|x| if $x.item=='b' { $x.index }}
+[a -n b] | each -n {|x| if $x.item { $x.index }}
+[a -n b] | each -n {|x| if $x.item == a { $x.index }}
+[a -n b] | each -n {|x| if $x.item == b { $x.index }}
+[a -n b] | each -n {|x| if $x.item == ab { $x.index }}
+[a -n b] | each -n {|x| if $x.item == aaab { $x.index }}
+[a -n b ] | reject a
+[a -n b ] | remove a
+[a -n b ] | remove 1
+[a -n b ] | pop 1
+[1,2,3,4,5,6] | where $it != 3
+[1,2,3,4,5,6] | reduce -n -f [] {|it, acc| $acc| if $it.index != 2 { append $it.item} }
+[1,2,3,4,5,6] | reduce -n -f [] {|it, acc| $acc| if $it.index != 2 { append $it.item} } | get 0
+[1,2,3,4,5,6] | reduce -n -f [] {|it, acc| $acc| if $it.index != 2 { append $it.item} } 
+[1,2,3,4,5,6] | reduce -n -f [] {|it, acc| if $it.index != 2 { $acc | append $it.item} else { $acc } } 
+[1,2,3,4,5,6] | reduce -n {|it, acc| if $it.index != 2 { $acc | append $it.item} else { $acc } } 
+[1,2,3,4,5,6] | reduce -n {|it, acc| if $it.index > 2 { $acc | append $it.item} else { $acc } } 
+[1,2,3,4,5,6] | reduce -n {|it, acc| if $it.index > 2 { $acc | append $it.item} else { $acc } }  | get 0
+[1,2,3,4,5,6] | reduce -n {|it, acc| if $it.index > 2 { $acc | append $it.item} else { $acc } }  | get 0 | get 1
+[1,2,3,4,5,6] | reduce -n {|it, acc| if $it.index > 2 { $acc | append $it.item} else { $acc } }  | get 0.1
+[1,2,3,4,5,6] | reduce -n {|it, acc| if $it.index > 2 { $acc | append $it.item} else { $acc } }  | get 0
+[1,2,3,4,5,6] | reduce -n {|it, acc| if $it.index > 2 { $acc | append $it.item} else { $acc } }  | get 0.item
+[1,2,3,4,5,6] | reduce -n {|it, acc| if $it.index > 2 { $acc | append $it.item} else { $acc } }  | get 0.item.0
+[1,2,3,4,5,6] | reduce -n {|it, acc| if $it.index > 2 { $acc | append $it.item} else { $acc } }  | get 0.item.0.item
+[1,2,3,4,5,6] | get -1
+[1,2,3,4,5,6] | latest
+[1,2,3,4,5,6] | get -1
+[1,2,3,4,5,6] | get --help
+[1,2,3,4,5,6] | late
+[1,2,3,4,5,6] | last
+[1,2,3,4,5,6] | get 1
+[1,2,3,4,5,6] | get (1+3)
+[1,2,3,4,5,6] | get (1 + 3)
+[1,2,3,4,5,6] | reject 2
+[1,2,3,4,5,6] | where $it != 3
+[1,2,3,4,5,6] | where $it.index != 3
+[1,2,3,4,5,6] | where -n 
+[1,2,3,4,5,6] | where -h
+[1,2,3,4,5,6] | reduce -n {|it, acc| if $it.index > 2 { $acc | append $it.item} else { $acc } } 
+[1,2,3,4,5,6] | reduce -n {|it, acc| if $it.index > 2 { $acc + $it.item} else { $acc } } 
+[1,2,3,4,5,6] | reduce -n {|it, acc| if $it.index > 2 { $acc.item | append $it.item} else { $acc.item } } 
+[1,2,3,4,5,6] | reduce -n {|it, acc| if $it.index in [1 2] { $acc.item | append $it.item} else { $acc.item } } 
+[1,2,3,4,5,6] | reduce -f [] -n {|it, acc| if $it.index in [1 2] { $acc.item | append $it.item} else { $acc.item } } 
+[1,2,3,4,5,6] | reduce -f [] -n {|it, acc| if $it.index not-in [1 2] { $acc.item | append $it.item} else { $acc.item } } 
+let ns = 3
+[$ns $ns + 1]
+[$ns, $ns + 1]
+[$ns ($ns + 1)]
+kgp
+kg svc
+kg svc -n default
+kg -n default svc
+kg -n shop-pre pods
+ke -n default deployments
+ke -n default pv 
+ke -n shop pods
+ke -n shop pods ke
+12 | into string 
+ke -n shop pods 
+[ke -n a b ] | each -n {|x| if $x.item == '-n' { $x.index }}
+[ke -n a b ] | each -n {|x| if $x.item == '-n' { $x.index }} | get 0
+ke -n shop pods 
+[ke -n a b ] | each -n {|x| if $x.item == '-n' { $x.index }} | get 0
+[ke n a b ] | each -n {|x| if $x.item == '-n' { $x.index }} | get 0
+if 1 > 0 { 111 }
+kg -n shop virtualservice
+kg -n shop-pre virtualservice
+kd pods
+kd -n kube-system pods kube-scheduler-iz2zefncj4o3wkfdnc6f0sz
+ke -n shop nodes iz2zeg7qx8vufn7tedi4oaz
+ke -A clusterissuers selfsigned
+ke  clusterissuers selfsigned
+ka hasura-54fd8f5687-f2pmv
+kd pods -n istio-system istio-egressgateway-84dd96468b-w68f4
+ka backend-86d8478984-vt88r
+ka -n istio-system istio-ingressgateway-66f64ffb5b-2ghnq
+kl cron-769d6f79c7-55txx
+kl -n istio-system istio-ingressgateway-66f64ffb5b-2ghnq
+def filter-list [list, idx:[int]] {<\n>    $list | reduce -f [] -n {|it, acc| if $it.index not-in $idx { $acc.item | append $it.item} else { $acc.item }}<\n>}
+def filter-list [list, idx:int[]] {<\n>    $list | reduce -f [] -n {|it, acc| if $it.index not-in $idx { $acc.item | append $it.item} else { $acc.item }}<\n>}
+def filter-list [list, idx: []int] {<\n>    $list | reduce -f [] -n {|it, acc| if $it.index not-in $idx { $acc.item | append $it.item} else { $acc.item }}<\n>}
+def filter-list [list, idx] {<\n>    $list | reduce -f [] -n {|it, acc| if $it.index not-in $idx { $acc.item | append $it.item} else { $acc.item }}<\n>}
+filter-list [1,2,3,4,5,5,6,7] [1 2 3 ]
+filter-list [1,2,3,4,5,5,6,7] [0 1 2 3 ]
+kd -n istio-system pods istio-ingressgateway-66f64ffb5b-2ghnq
+kdp hasura-pg-65d5fd86cf-8szdc
+kd -n shop-pre pods hasura-54fd8f5687-57hgp
+e
+gs
+gd
+gaa
+gc
+gp
+kcc be
+kgp
+cd ~/data/k8s/
+ls
+ls **/* | where name =~ READ
+e devops/argo/README.md
+cd ~/data/k8s/
+ansi --list 
+ansi --list st
+kgp
+e
+cd ~/Configuration/nushell/
+ls
+e
+cd ~/Configuration/nushell/
+zsh
+kgp
+ls
+cd ..
+ls
+cd .config/nvim/
+ls
+e .git/config
+cd ..
+ls
+gp
+e .gitignore
+cd nvim/lua/
+cd ..
+ls
+e .gitmodules
+e .git/config
+cd ../nushell/
+ls
+gra origin git@github.com:fj0r/nushell.git 
+e .git/config
+git submodule init .
+gs
+e .git/config
+cd ..
+git submodule
+git submodule add nushell
+git submodule add ./nushell
+cd Configuration/nushell/
+cd ..
+tar zcvf  nu.tgz nushell/
+scp nu.tgz dx:
+rm nu.tgz
+git rm --cached .nushell
+git --cached rm .nushell
+git rm --cached nushell
+git rm --cached -r nushell
+git submodule add ./nushell
+ls
+cd Configuration/nushell/
+ls
+e .git/config
+cd  ../.zshrc.d/
+ls
+ls -a
+e
+cd ..
+e .git/config
+e .git/config
+gs
+gd
+gaa
+gs
+gc
+gp
+gp --recursive
+gp --help
+cd nushell/
+gp
+ls -a
+ls .git
+cd ../.git/
+ls
+cd modules/
+ls
+cd nushell/
+ls
+detect columns 
+e config
+cd ....
+gp
+e .git/modules/nushell/config
+e
+mkdir ns
+cd ns
+git init .
