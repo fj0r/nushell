@@ -26,16 +26,24 @@ def "nu-complete docker images" [] {
     podman images | from ssv | each {|x| $"($x.REPOSITORY):($x.TAG)"}
 }
 
-def dr [ img: string@"nu-complete docker images" ] {
+def dr [img: string@"nu-complete docker images"] {
     podman run --rm -i -t -v $"($env.PWD):/world" $img
 }
 
-def da [cnt: string@"nu-complete docker ps", ...args] {
+def da [ctn: string@"nu-complete docker ps", ...args] {
     if ($args|empty?) {
-        podman exec -it $cnt /bin/sh -c "[ -e /bin/zsh ] && /bin/zsh || [ -e /bin/bash ] && /bin/bash || /bin/sh"
+        podman exec -it $ctn /bin/sh -c "[ -e /bin/zsh ] && /bin/zsh || [ -e /bin/bash ] && /bin/bash || /bin/sh"
     } else {
-        podman exec -it $cnt $args
+        podman exec -it $ctn $args
     }
+}
+
+def dcr [ctn: string@"nu-complete docker ps"] {
+    podman container rm -f $ctn
+}
+
+def dis [ img: string@"nu-complete docker images" ] {
+    podman inspect $img
 }
 
 def dsv [ img: string@"nu-complete docker images" ] {
