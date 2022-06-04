@@ -54,6 +54,7 @@ let default_theme = {
 }
 
 source dir-overlay.nu
+source zoxide-menu.nu
 # The default config record. This is where much of your global configuration is setup.
 let-env config = {
   filesize_metric: false
@@ -110,7 +111,7 @@ let-env config = {
       {
         name: history_menu
         only_buffer_difference: true
-        marker: "? "
+        marker: "# "
         type: {
             layout: list
             page_size: 10
@@ -145,7 +146,7 @@ let-env config = {
       {
         name: commands_menu
         only_buffer_difference: false
-        marker: "# "
+        marker: ": "
         type: {
             layout: columnar
             columns: 4
@@ -166,7 +167,7 @@ let-env config = {
       {
         name: vars_menu
         only_buffer_difference: true
-        marker: "# "
+        marker: "$ "
         type: {
             layout: list
             page_size: 10
@@ -186,7 +187,7 @@ let-env config = {
       {
         name: commands_with_description
         only_buffer_difference: true
-        marker: "# "
+        marker: ": "
         type: {
             layout: description
             columns: 4
@@ -206,8 +207,10 @@ let-env config = {
             | each { |it| {value: $it.command description: $it.usage} }
         }
       }
+      $__zoxide_menu
   ]
   keybindings: [
+    $__zoxide_keybinding
     {
       name: completion_menu
       modifier: none
