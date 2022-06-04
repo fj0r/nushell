@@ -35,12 +35,12 @@
         - [ ] list to table
         - [ ] kubectx kubens
     - [ ] ssh
-    - [ ] git
 - completions
     - [ ] podman
     - [ ] k8s
     - [ ] ssh
-    - [ ] git
+- git
+    - [x] glg
 - edit
     - [-] `enter` for `ls`
     - [-] `tab` in empty for cd: direct path and then `enter`

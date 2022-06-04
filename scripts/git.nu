@@ -1,8 +1,21 @@
-def glg [] {
+def _git_log [] {
     git log --pretty=%h»¦«%s»¦«%aN»¦«%aE»¦«%aD
     | lines
     | split column "»¦«" sha message author email date
     | each {|x| ($x| update date ($x.date | into datetime))}
+}
+
+def "nu-complete git log" [] {
+    _git_log
+    | each {|x| {description: $x.message value: $x.sha extra: [a b c]}}
+}
+
+def glg [commit?: string@"nu-complete git log", -n: int=20] {
+    if ($commit|empty?) {
+        _git_log | take $n
+    } else {
+        git log --stat -p -n 1 $commit
+    }
 }
 
 def gpp! [] {
