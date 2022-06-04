@@ -211,6 +211,7 @@ let-env config = {
   ]
   keybindings: [
     $__zoxide_keybinding
+    $__edit_keybinding
     {
       name: completion_menu
       modifier: none

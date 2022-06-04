@@ -20,10 +20,19 @@ let __zoxide_menu = {
 let __zoxide_keybinding = {
   name: zoxide_menu
   modifier: control
-  keycode: char_q
+  keycode: char_o
   mode: [emacs, vi_normal, vi_insert]
   event: [
-    { edit: InsertString value: "z "}
     { send: menu name: zoxide_menu }
+  ]
+}
+
+let __edit_keybinding = {
+  name: edit
+  modifier: alt
+  keycode: char_o
+  mode: [emacs, vi_normal, vi_insert]
+  event: [
+    { send: OpenEditor }
   ]
 }
