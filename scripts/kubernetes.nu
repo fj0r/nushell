@@ -36,43 +36,14 @@ def "nu-complete kube def" [] {
     ]
 }
 
-def filter-list [list, idx] {
-    $list | reduce -f [] -n {|it, acc| if $it.index not-in $idx { $acc.item | append $it.item} else { $acc.item }}
-}
-
-def "parse cmd" [cmd: string] {
-    $cmd | split row ' '
-    | reduce -f { cmd: [], sw: '' } {|it, acc|
-        if ($acc.sw|empty?) {
-            if ($it|str starts-with '-') {
-                $acc | update sw $it
-            } else {
-                let cmd = ($acc.cmd | append $it)
-                $acc | update cmd $cmd
-            }
-        } else {
-            if ($it|str starts-with '-') {
-                $acc
-                | insert $acc.sw true
-                | update sw $it
-            } else {
-                $acc | insert $acc.sw $it | update sw ''
-            }
-        }
-    }
-    | reject sw
-}
-
 def "nu-complete kube res" [context: string, offset: int] {
-    let ctx = ($context | split row ' ')
-    let ns = ($ctx | each -n {|x| if $x.item == '-n' { $x.index }} )
-    let ns = if ($ns | empty?) { -1 } else { $ns | get 0 }
-    if $ns < 0 {
-        kubectl get ($ctx | last) | from ssv -a | get NAME
+    let ctx = ($context | parse cmd)
+    let def = ($ctx | get args | get 1)
+    let ns = do -i { $ctx | get '-n' }
+    if ($ns|empty?) {
+        kubectl get $def | from ssv -a | get NAME
     } else {
-        let n = ($ctx | get ($ns + 1))
-        let def = (filter-list $ctx [$ns ($ns + 1)])
-        kubectl -n $n get ($def | last) | from ssv -a | get NAME
+        kubectl -n $ns get $def | from ssv -a | get NAME
     }
 }
 

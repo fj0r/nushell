@@ -2,15 +2,16 @@ def filter-list [list, idx] {
     $list | reduce -f [] -n {|it, acc| if $it.index not-in $idx { $acc.item | append $it.item} else { $acc.item }}
 }
 
-def "parse cmd" [cmd: string] {
-    $cmd | split row ' '
-    | reduce -f { cmd: [], sw: '' } {|it, acc|
+def "parse cmd" [] {
+    $in
+    | split row ' '
+    | reduce -f { args: [], sw: '' } {|it, acc|
         if ($acc.sw|empty?) {
             if ($it|str starts-with '-') {
                 $acc | update sw $it
             } else {
-                let cmd = ($acc.cmd | append $it)
-                $acc | update cmd $cmd
+                let args = ($acc.args | append $it)
+                $acc | update args $args
             }
         } else {
             if ($it|str starts-with '-') {
@@ -24,3 +25,4 @@ def "parse cmd" [cmd: string] {
     }
     | reject sw
 }
+

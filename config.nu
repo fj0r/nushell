@@ -53,6 +53,7 @@ let default_theme = {
     shape_nothing: light_cyan
 }
 
+source utils.nu
 source dir-overlay.nu
 source zoxide-menu.nu
 # The default config record. This is where much of your global configuration is setup.
