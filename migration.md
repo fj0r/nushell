@@ -2,7 +2,7 @@
 
 - config
     - [x] struct
-    - [ ] reload
+    - [x] reload
         - keybinding
 - prompt
     - [x] nu

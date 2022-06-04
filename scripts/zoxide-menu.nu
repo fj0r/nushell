@@ -1,10 +1,10 @@
 let __zoxide_menu = {
   name: zoxide_menu
   only_buffer_difference: true
-  marker: "^ "
+  marker: "┊ "
   type: {
-      layout: list
-      page_size: 10
+      layout: columnar
+      page_size: 20
   }
   style: {
       text: green
@@ -19,8 +19,11 @@ let __zoxide_menu = {
 
 let __zoxide_keybinding = {
   name: zoxide_menu
-  modifier: alt
-  keycode: char_o
+  modifier: control
+  keycode: char_q
   mode: [emacs, vi_normal, vi_insert]
-  event: { send: menu name: zoxide_menu }
+  event: [
+    { edit: InsertString value: "z "}
+    { send: menu name: zoxide_menu }
+  ]
 }

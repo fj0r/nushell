@@ -278,17 +278,17 @@ let-env config = {
       mode: [emacs, vi_normal, vi_insert]
       event: { send: menu name: commands_with_description }
     }
-    #{
-    #    name: reload_config
-    #    modifier: alt
-    #    keycode: char_r
-    #    mode: emacs
-    #    event: [
-    #        { edit: { cmd: clear } }
-    #        { edit: { cmd: insertString value: $"source ($nu.config-path)" } }
-    #        { send: Enter }
-    #    ]
-    #}
+    {
+        name: reload_config
+        modifier: alt
+        keycode: char_r
+        mode: emacs
+        event: [
+            { edit: Clear }
+            { edit: InsertString value: $"source ($nu.config-path)" }
+            { send: Enter }
+        ]
+    }
   ]
 }
 
