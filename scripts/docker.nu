@@ -18,10 +18,8 @@ def di [] {
 }
 
 def "nu-complete docker ps" [] {
-    docker ps | from ssv
-    | reduce -f [] {|x, a|
-        if ($x.NAMES|empty?) { $a } else { $a | append $x.NAMES} | append $x.'CONTAINER ID'
-    }
+    docker ps | from ssv -a
+    | each {|x| {description: $x.NAMES value: $x.'CONTAINER ID'}}
 }
 
 def "nu-complete docker images" [] {
