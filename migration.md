@@ -47,10 +47,11 @@
     - [ ] `ctrl+q`
     - [ ] Brace Expansion {,a,b,c}
 - path
-    - [ ] named dir
-        - auto enter at dir
-    - [x] history
-        - -
+    - [x] zoxide
+        - [x] named dir
+            - auto enter at dir
+        - [x] history
+            - -
     - [x] popd
         - enter/shells/g #/n/p
 - history

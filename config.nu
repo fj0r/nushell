@@ -304,3 +304,4 @@ source docker.nu
 
 source _prompt.nu
 #source starship.nu
+source zoxide.nu
