@@ -298,7 +298,7 @@ let-env config = {
 # starship init nu | save ~/.cache/starship/init.nu
 #source ~/.cache/starship/init.nu
 
-source legacy.nu
+source sys.nu
 source alias.nu
 source git.nu
 source git-cmp.nu

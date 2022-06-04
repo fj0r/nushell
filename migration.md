@@ -29,8 +29,9 @@
           fi
         - china_mirrors
     - [ ] docker
-        - [ ] docker dev helper
-        - [ ] list to table
+        - [ ] docker run
+            - [ ] docker dev helper
+        - [x] list to table
     - [ ] k8s
         - [ ] list to table
         - [ ] kubectx kubens
