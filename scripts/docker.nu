@@ -67,3 +67,18 @@ def dr [
     docker run --rm -i -t $mnt $img
 }
 
+### buildah
+
+def "bud ps" [] {
+    buildah ps | from ssv -a
+}
+
+def "nu-complete bud ps" [] {
+    bud ps | select 'CONTAINER ID' "CONTAINER NAME" | rename value description
+}
+
+def "bud rm" [
+    id: string@"nu-complete bud ps"
+] {
+    buildah rm $id
+}
