@@ -26,13 +26,14 @@ def kn [ns: string@"nu-complete kube ns"] {
 
 ### common
 def "nu-complete kube def" [] {
-    [ pods deployments svc endpoints
-      configmaps secrets events
-      namespaces nodes pv pvc
-      jobs cronjobs daemonsets statefulsets
-      ingress gateways virtualservice
-      clusterroles clusterrolebindings roles serviceaccounts rolebindings
-      certificates clusterissuers issuers
+    [
+        pod deployment svc endpoint
+        configmap secret event
+        namespace node pv pvc
+        job cronjob daemonset statefulset
+        ingress gateway virtualservice
+        clusterrole clusterrolebinding role serviceaccount rolebinding
+        certificate clusterissuer issuer
     ]
 }
 

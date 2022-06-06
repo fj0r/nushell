@@ -118,13 +118,13 @@ def "nu-complete docker run sshkey" [ctx: string, pos: int] {
 }
 
 def dr [
-    --debug: bool,
+    --debug(-x): bool,
     --appimage: bool,
-    --netadmin: bool,
+    --netadmin(-n): bool,
     --proxy: bool,
-    --ssh: string@"nu-complete docker run sshkey",  # specify ssh key
+    --ssh(-s): string@"nu-complete docker run sshkey",  # specify ssh key
     --sshuser: string=root,                         # default root
-    --cache: string,                                # cache
+    --cache(-c): string,                                # cache
     --vol(-v): string@"nu-complete docker run vol",        # volume
     --port(-p): string@"nu-complete docker run port",       # port
     img: string@"nu-complete docker images",
