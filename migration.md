@@ -33,8 +33,10 @@
             - [ ] docker dev helper
         - [x] list to table
     - [ ] k8s
-        - [ ] list to table
-        - [ ] kubectx kubens
+        - [x] list to table
+        - [x] kubectx kubens
+        - [-] kcp
+        - [x] ktp ktn
     - [ ] ssh
 - completions
     - [ ] podman

@@ -180,6 +180,10 @@ def klf [pod: string@"nu-complete kube pods", -n: string@"nu-complete kube ns"] 
     }
 }
 
+def kcp [lhs: string@"nu-complete kube pods", rhs: string@"nu-complete kube pods", -n: string@"nu-complete kube ns"] {
+    kubectl cp $lhs $rhs
+}
+
 ### service
 def "nu-complete kube service" [] {
     kubectl get services | from ssv -a | get NAME
@@ -220,4 +224,25 @@ def ksd [d: string@"nu-complete kube deployments", n: int@"nu-complete num9"] {
     } else {
         kubectl scale deployments $d --replicas $n
     }
+}
+
+### top
+def ktp [] {
+    kubectl top pod | from ssv -a | rename name cpu mem
+    | each {|x| {
+        name: $x.name
+        cpu: ($x.cpu| str substring ',-1' | into decimal)
+        mem: ($x.mem | str substring ',-2' | into decimal)
+    } }
+}
+
+def ktn [] {
+    kubectl top node | from ssv -a | rename name cpu pcpu mem pmem
+    | each {|x| {
+        name: $x.name
+        cpu: ($x.cpu| str substring ',-1' | into decimal)
+        cpu%: (($x.pcpu| str substring ',-1' | into decimal) / 100)
+        mem: ($x.mem | str substring ',-2' | into decimal)
+        mem%: (($x.pmem | str substring ',-1' | into decimal) / 100)
+    } }
 }
