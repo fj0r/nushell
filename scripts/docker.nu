@@ -125,11 +125,12 @@ def dr [
     --ssh: string@"nu-complete docker run sshkey",  # specify ssh key
     --sshuser: string=root,                         # default root
     --cache: string,                                # cache
-    -v: string@"nu-complete docker run vol",        # volume
-    -p: string@"nu-complete docker run port",       # port
+    --vol(-v): string@"nu-complete docker run vol",        # volume
+    --port(-p): string@"nu-complete docker run port",       # port
     img: string@"nu-complete docker images",
 ] {
-    let mnt = if not ($v|empty?) { [-v $v] } else { [] }
+    let mnt = if not ($vol|empty?) { [-v $vol] } else { [] }
+    let port = if not ($port|empty?) { [-p $port] } else { [] }
     let debug = if $debug { [--cap-add=SYS_ADMIN --cap-add=SYS_PTRACE --security-opt seccomp=unconfined] } else { [] }
     #let appimage = if $appimage { [--device /dev/fuse --security-opt apparmor:unconfined] } else { [] }
     let appimage = if $appimage { [--device /dev/fuse] } else { [] }
@@ -147,7 +148,7 @@ def dr [
     let cache = if not ($cache|empty?) {
         []
     } else { [] }
-    let args = ([$ssh $proxy $debug $appimage $netadmin $clip $mnt $cache] | flatten)
+    let args = ([$ssh $proxy $debug $appimage $netadmin $clip $mnt $port $cache] | flatten)
     let name = $"($img | split row '/' | last | str replace ':' '-')_(date format %m%d%H%M)"  
     echo $"docker run --name ($name) --rm -it ($args|str collect ' ') ($img)"
     docker run --name $name --rm -it $args $img
