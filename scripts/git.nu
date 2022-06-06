@@ -1,9 +1,5 @@
-def _git_log [] {
-    git log --pretty=%h»¦«%s»¦«%aN»¦«%aE»¦«%aD
-    | lines
-    | split column "»¦«" sha message author email date
-    | each {|x| ($x| update date ($x.date | into datetime))}
-    | merge { 
+def _git_log [v] {
+    let stat = if $v {
         git log  --oneline --pretty="@%h"  --stat
         | parse -r "\"@(?P<sha>[0-9a-f]+)\"(\n.*)+\n(?P<stat>.+)"
         | select sha stat
@@ -23,18 +19,28 @@ def _git_log [] {
                     $a | insert $col $num
                     }
         }
+    } else { {} }
+    let r = ( git log --pretty=%h»¦«%s»¦«%aN»¦«%aE»¦«%aD
+            | lines
+            | split column "»¦«" sha message author email date
+            | each {|x| ($x| update date ($x.date | into datetime))}
+            )
+    if $v {
+        $r | merge { $stat }
+    } else {
+        $r
     }
 }
 
 def "nu-complete git log" [] {
     git log --pretty=%h»¦«%s»
     | lines
-    | split column "»¦«" value message
+    | split column "»¦«" value description
 }
 
-def glg [commit?: string@"nu-complete git log", -n: int=20] {
+def glg [commit?: string@"nu-complete git log", --verbose(-v):bool, -n: int=20] {
     if ($commit|empty?) {
-        _git_log | take $n
+        _git_log $verbose | take $n
     } else {
         git log --stat -p -n 1 $commit
     }
