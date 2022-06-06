@@ -40,6 +40,7 @@ def red [] {
 }
 
 # Internal commands for building up the my-git shell prompt
+let DIR_COMP_ABBR = 3
 module git {
 
   # Get the current directory with home abbreviated
@@ -58,7 +59,21 @@ module git {
       $current-dir
     })
 
-    $'($current-dir-abbreviated)'
+    let dir-comp = ($current-dir-abbreviated | split row (char separator))
+    let dir-comp = if ($dir-comp | length) > $DIR_COMP_ABBR {
+        let first = ($dir-comp | first)
+        let last = ($dir-comp | last)
+        let body = (
+            $dir-comp
+            |range 1..-2
+            |each {|x| $x | str substring ',1' }
+            )
+        [$first $body $last] | flatten
+    } else {
+        $dir-comp
+    }
+
+    $'($dir-comp | str collect (char separator))'
   }
 
   # Get repository status as structured data
@@ -502,10 +517,20 @@ def create_right_prompt [] {
 
     $"(kube prompt)($time_segment)"
 }
+
+def host-abbr [] {
+    let n = (hostname)
+    let n = if ($n | str trim | str length) > 5 {
+        $"($n | str substring ',5')."
+    } else {
+        $n | str trim
+    }
+    $"(ansi dark_gray)($n)(ansi reset)(ansi dark_gray_bold):(ansi light_green_bold)"
+}
 # An opinionated Git prompt for Nushell, styled after posh-git
 def my-prompt [] {
   use git *
-  $"(my-git dir)(my-git styled)"
+  $"(host-abbr)(my-git dir)(my-git styled)"
 }
 
 let-env PROMPT_COMMAND = { my-prompt }

@@ -7,17 +7,17 @@
 - prompt
     - [x] nu
         - [x] panache-git
-        - [ ] k8s
+        - [x] k8s
     - [x] startship
         - [x] git
         - [x] k8s
-        - [ ] right prompt
-        - [ ] indicator
-- alias 
+        - [-] right prompt
+        - [-] indicator
+- alias
     - [ ] utils
         - [ ] a: alias
-        - [ ] e: nvim
-        - [ ] t: tmux
+        - [x] e: nvim
+        - [x] t: tmux
         - alias sget='wget -m -k -E -p -np -e robots=off'
         - toggle-proxy
         - slam
@@ -42,11 +42,11 @@
             - [ ] complete: container id with path
         - [x] ktp ktn
         - [ ] kgp with images
-    - [ ] ssh
+    - [=] ssh
 - completions
-    - [ ] podman
-    - [ ] k8s
-    - [ ] ssh
+    - [x] podman
+    - [x] k8s
+    - [x] ssh
 - git
     - [x] glg
 - edit
@@ -70,7 +70,7 @@
         - get
         - update
         - insert
-        - [ ] delete
+        - [x] delete
     - [x] fd (recursive)
         - ls **/*
     - [x] sd
