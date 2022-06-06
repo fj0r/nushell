@@ -130,8 +130,10 @@ def dr [
     --cache(-c): string                                 # cache
     --vol(-v): string@"nu-complete docker run vol"      # volume
     --port(-p): string@"nu-complete docker run port"    # port
+    --daemon(-d): bool
     img: string@"nu-complete docker images"
 ] {
+    let daemon = if $daemon { [-d] } else { [--rm -it] }
     let mnt = if not ($vol|empty?) { [-v $vol] } else { [] }
     let port = if not ($port|empty?) { [-p $port] } else { [] }
     let debug = if $debug { [--cap-add=SYS_ADMIN --cap-add=SYS_PTRACE --security-opt seccomp=unconfined] } else { [] }
@@ -151,10 +153,10 @@ def dr [
     let cache = if not ($cache|empty?) {
         []
     } else { [] }
-    let args = ([$ssh $proxy $debug $appimage $netadmin $clip $mnt $port $cache] | flatten)
+    let args = ([$daemon $ssh $proxy $debug $appimage $netadmin $clip $mnt $port $cache] | flatten)
     let name = $"($img | split row '/' | last | str replace ':' '-')_(date format %m%d%H%M)"
-    echo $"docker run --name ($name) --rm -it ($args|str collect ' ') ($img)"
-    docker run --name $name --rm -it $args $img
+    echo $"docker run --name ($name) ($args|str collect ' ') ($img)"
+    docker run --name $name $args $img
 }
 
 
