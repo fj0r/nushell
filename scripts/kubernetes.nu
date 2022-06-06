@@ -49,8 +49,8 @@ def "nu-complete kube res" [context: string, offset: int] {
 }
 
 def kg [
-    r: string@"nu-complete kube def",
-    -n: string@"nu-complete kube ns",
+    r: string@"nu-complete kube def"
+    -n: string@"nu-complete kube ns"
     --all (-A):bool
 ] {
     let d = (if $all {
@@ -66,8 +66,8 @@ def kg [
 }
 
 def kd [
-    r: string@"nu-complete kube def",
-    i: string@"nu-complete kube res",
+    r: string@"nu-complete kube def"
+    i: string@"nu-complete kube res"
     -n: string@"nu-complete kube ns"
 ] {
     if ($n|empty?) {
@@ -78,8 +78,8 @@ def kd [
 }
 
 def ke [
-    r: string@"nu-complete kube def",
-    i: string@"nu-complete kube res",
+    r: string@"nu-complete kube def"
+    i: string@"nu-complete kube res"
     -n: string@"nu-complete kube ns"
 ] {
     if ($n|empty?) {
@@ -90,8 +90,8 @@ def ke [
 }
 
 def kdel [
-    r: string@"nu-complete kube def",
-    i: string@"nu-complete kube res",
+    r: string@"nu-complete kube def"
+    i: string@"nu-complete kube res"
     -n: string@"nu-complete kube ns"
 ] {
     if ($n|empty?) {
@@ -157,7 +157,11 @@ def kdp [pod: string@"nu-complete kube pods"] {
     kubectl describe pod $pod
 }
 
-def ka [pod: string@"nu-complete kube pods", -n: string@"nu-complete kube ns", ...args] {
+def ka [
+    pod: string@"nu-complete kube pods"
+    -n: string@"nu-complete kube ns"
+    ...args
+] {
     if ($n|empty?) {
         kubectl exec -it $pod -- (if ($args|empty?) { 'bash' } else { $args })
     } else {
@@ -165,7 +169,10 @@ def ka [pod: string@"nu-complete kube pods", -n: string@"nu-complete kube ns", .
     }
 }
 
-def kl [pod: string@"nu-complete kube pods", -n: string@"nu-complete kube ns"] {
+def kl [
+    pod: string@"nu-complete kube pods"
+    -n: string@"nu-complete kube ns"
+] {
     if ($n|empty?) {
         kubectl logs $pod
     } else {
@@ -173,7 +180,10 @@ def kl [pod: string@"nu-complete kube pods", -n: string@"nu-complete kube ns"] {
     }
 }
 
-def klf [pod: string@"nu-complete kube pods", -n: string@"nu-complete kube ns"] {
+def klf [
+    pod: string@"nu-complete kube pods"
+    -n: string@"nu-complete kube ns"
+] {
     if ($n|empty?) {
         kubectl logs -f $pod
     } else {
@@ -181,7 +191,11 @@ def klf [pod: string@"nu-complete kube pods", -n: string@"nu-complete kube ns"] 
     }
 }
 
-def kcp [lhs: string@"nu-complete kube pods", rhs: string@"nu-complete kube pods", -n: string@"nu-complete kube ns"] {
+def kcp [
+    lhs: string@"nu-complete kube pods"
+    rhs: string@"nu-complete kube pods"
+    -n: string@"nu-complete kube ns"
+] {
     kubectl cp $lhs $rhs
 }
 

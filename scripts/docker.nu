@@ -27,7 +27,10 @@ def "nu-complete docker images" [] {
     docker images | from ssv | each {|x| $"($x.REPOSITORY):($x.TAG)"}
 }
 
-def da [ctn: string@"nu-complete docker ps", ...args] {
+def da [
+    ctn: string@"nu-complete docker ps"
+    ...args
+] {
     if ($args|empty?) {
         docker exec -it $ctn /bin/sh -c "[ -e /bin/zsh ] && /bin/zsh || [ -e /bin/bash ] && /bin/bash || /bin/sh"
     } else {
@@ -118,16 +121,16 @@ def "nu-complete docker run sshkey" [ctx: string, pos: int] {
 }
 
 def dr [
-    --debug(-x): bool,
-    --appimage: bool,
-    --netadmin(-n): bool,
-    --proxy: bool,
-    --ssh(-s): string@"nu-complete docker run sshkey",  # specify ssh key
-    --sshuser: string=root,                         # default root
-    --cache(-c): string,                                # cache
-    --vol(-v): string@"nu-complete docker run vol",        # volume
-    --port(-p): string@"nu-complete docker run port",       # port
-    img: string@"nu-complete docker images",
+    --debug(-x): bool
+    --appimage: bool
+    --netadmin(-n): bool
+    --proxy: bool
+    --ssh(-s): string@"nu-complete docker run sshkey"   # specify ssh key
+    --sshuser: string=root                              # default root
+    --cache(-c): string                                 # cache
+    --vol(-v): string@"nu-complete docker run vol"      # volume
+    --port(-p): string@"nu-complete docker run port"    # port
+    img: string@"nu-complete docker images"
 ] {
     let mnt = if not ($vol|empty?) { [-v $vol] } else { [] }
     let port = if not ($port|empty?) { [-p $port] } else { [] }
@@ -140,7 +143,7 @@ def dr [
         let sshkey = (cat ([~/.ssh $ssh] | path join) | split row ' ' | get 1)
         [-e $"ed25519_($sshuser)=($sshkey)"]
     } else { [] }
-    let proxy = if not ($proxy|empty?) { 
+    let proxy = if not ($proxy|empty?) {
         let hostaddr = (hostname -I | split row ' ' | get 0)
         [-e $"http_proxy=http://($hostaddr):7890" -e $"https_proxy=http://($hostaddr):7890"]
     } else { [] }
@@ -149,10 +152,11 @@ def dr [
         []
     } else { [] }
     let args = ([$ssh $proxy $debug $appimage $netadmin $clip $mnt $port $cache] | flatten)
-    let name = $"($img | split row '/' | last | str replace ':' '-')_(date format %m%d%H%M)"  
+    let name = $"($img | split row '/' | last | str replace ':' '-')_(date format %m%d%H%M)"
     echo $"docker run --name ($name) --rm -it ($args|str collect ' ') ($img)"
     docker run --name $name --rm -it $args $img
 }
+
 
 def "nu-complete registry list" [cmd: string, offset: int] {
     let cmd = ($cmd | split row ' ')
@@ -175,7 +179,10 @@ def "nu-complete registry list" [cmd: string, offset: int] {
 }
 
 ### docker registry list
-def "registry list" [url: string, reg: string@"nu-complete registry list"] {
+def "registry list" [
+    url: string
+    reg: string@"nu-complete registry list"
+] {
     if (do -i { $env.REGISTRY_TOKEN } | empty?) {
         fetch $"($url)/v2/($reg)/tags/list"
     } else {
