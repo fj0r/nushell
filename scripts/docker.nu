@@ -35,30 +35,76 @@ def da [ctn: string@"nu-complete docker ps", ...args] {
     }
 }
 
+def dcp [lhs: string@"nu-complete docker ps", rhs: string@"nu-complete docker ps"] {
+    docker cp $lhs $rhs
+}
+
 def dcr [ctn: string@"nu-complete docker ps"] {
     docker container rm -f $ctn
 }
 
-def dis [ img: string@"nu-complete docker images" ] {
+def dis [img: string@"nu-complete docker images"] {
     docker inspect $img
 }
 
-def dsv [ img: string@"nu-complete docker images" ] {
+def dh [img: string@"nu-complete docker images"] {
+    docker history --no-trunc $img | from ssv -a
+}
+
+def dsv [img: string@"nu-complete docker images"] {
     docker save $img
 }
 
 alias dld = docker load
 
 def dsp [] {
-    podman system prune -f
+    docker system prune -f
 }
 
-def drmi [ img: string@"nu-complete docker images" ] {
+alias dspall = system prune --all --force --volumes
+
+def drmi [img: string@"nu-complete docker images"] {
     docker rmi $img
 }
-###
+
+def dtg [from: string@"nu-complete docker images"  to: string] {
+    docker tag $from $to
+}
+
+def dps [img: string@"nu-complete docker images"] {
+    docker push $img
+}
+
+alias dpl = docker pull
+
+### volume
+def dvl [] {
+    docker volume ls | from ssv -a
+}
+
+def "nu-complete docker volume" [] {
+    dvl | get name
+}
+
+def dvc [name: string] {
+    docker volume create
+}
+
+def dvi [name: string@"nu-complete docker volume"] {
+    docker volume inspect $name
+}
+
+def dvr [...name: string@"nu-complete docker volume"] {
+    docker volume rm $name
+}
+
+### run
 def "nu-complete docker run vol" [] {
-    [ $"($env.PWD):/world" ]
+    [
+        $"($env.PWD):/world"
+        $"($env.PWD):/app"
+        $"($env.PWD):/srv"
+    ]
 }
 
 def "nu-complete docker run port" [ctx: string, pos: int] {
@@ -71,7 +117,7 @@ def dr [
     -v: string@"nu-complete docker run vol",
     -p: string@"nu-complete docker run port",
 ] {
-    let mnt = if not ($v|empty?) { $"-v=($v)" }
+    let mnt = if not ($v|empty?) { $"-v=($v)" } else { $"-v=($env.PWD):/world" }
     docker run --rm -i -t $mnt $img
 }
 

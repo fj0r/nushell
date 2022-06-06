@@ -32,10 +32,14 @@
         - [ ] docker run
             - [ ] docker dev helper
         - [x] list to table
+        - [ ] dcp
+            - [ ] complete: container id with path
+        - [-] volume
     - [ ] k8s
         - [x] list to table
         - [x] kubectx kubens
-        - [-] kcp
+        - [ ] kcp
+            - [ ] complete: container id with path
         - [x] ktp ktn
     - [ ] ssh
 - completions
