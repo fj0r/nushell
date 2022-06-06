@@ -159,6 +159,14 @@ def dr [
     docker run --name $name $args $img
 }
 
+def "nu-complete docker dev env" [] {
+    [ io io:rs io:hs io:jpl io:go ng ng:pg ]
+}
+
+def dx [env:string@"nu-complete docker dev env"] {
+    dr -v $"($env.PWD):/world" -p 8080:80 --debug --proxy --ssh id_ed25519.pub $env
+}
+
 
 def "nu-complete registry list" [cmd: string, offset: int] {
     let cmd = ($cmd | split row ' ')
