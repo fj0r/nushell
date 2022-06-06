@@ -15,6 +15,7 @@ def di [] {
     docker images
     | from ssv -a
     | rename repo tag id created size
+    | update size { |i| $i.size | into filesize }
 }
 
 def "nu-complete docker ps" [] {
@@ -48,6 +49,13 @@ def dsv [ img: string@"nu-complete docker images" ] {
 
 alias dld = docker load
 
+def dsp [] {
+    podman system prune -f
+}
+
+def drmi [ img: string@"nu-complete docker images" ] {
+    docker rmi $img
+}
 ###
 def "nu-complete docker run vol" [] {
     [ $"($env.PWD):/world" ]
@@ -68,6 +76,16 @@ def dr [
 }
 
 ### buildah
+
+def "bud img" [] {
+    buildah images | from ssv -a
+    | rename repo tag id created size
+    | update size { |i| $i.size | into filesize }
+}
+
+def "bud ls" [] {
+    buildah list | from ssv -a
+}
 
 def "bud ps" [] {
     buildah ps | from ssv -a
