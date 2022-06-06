@@ -117,8 +117,37 @@ def dr [
     -v: string@"nu-complete docker run vol",
     -p: string@"nu-complete docker run port",
 ] {
-    let mnt = if not ($v|empty?) { $"-v=($v)" } else { $"-v=($env.PWD):/world" }
+    let mnt = if not ($v|empty?) { [-v $v] } else { [] }
     docker run --rm -i -t $mnt $img
+}
+
+def "nu-complete registry list" [cmd: string, offset: int] {
+    let cmd = ($cmd | split row ' ')
+    let url = do -i { $cmd | get 2 }
+    let reg = do -i { $cmd | get 3 }
+    let tag = do -i { $cmd | get 4 }
+    if ($reg|empty?) {
+        if (do -i { $env.REGISTRY_TOKEN } | empty?) {
+            fetch $"($url)/v2/_catalog"
+        } else {
+            fetch -H [authorization $"Basic ($env.REGISTRY_TOKEN)"] $"($url)/v2/_catalog"
+        } | get repositories
+    } else if ($tag|empty?) {
+        if (do -i { $env.REGISTRY_TOKEN } | empty?) {
+            fetch $"($url)/v2/($reg)/tags/list"
+        } else {
+            fetch -H [authorization $"Basic ($env.REGISTRY_TOKEN)"] $"($url)/v2/($reg)/tags/list"
+        } | get tags
+    }
+}
+
+### docker registry list
+def "registry list" [url: string, reg: string@"nu-complete registry list"] {
+    if (do -i { $env.REGISTRY_TOKEN } | empty?) {
+        fetch $"($url)/v2/($reg)/tags/list"
+    } else {
+        fetch -H [authorization $"Basic ($env.REGISTRY_TOKEN)"] $"($url)/v2/($reg)/tags/list"
+    } | get tags
 }
 
 ### buildah

@@ -226,7 +226,7 @@ def ksd [d: string@"nu-complete kube deployments", n: int@"nu-complete num9"] {
     }
 }
 
-### top
+### kubecto top pod
 def ktp [] {
     kubectl top pod | from ssv -a | rename name cpu mem
     | each {|x| {
@@ -236,6 +236,7 @@ def ktp [] {
     } }
 }
 
+### kubecto top node
 def ktn [] {
     kubectl top node | from ssv -a | rename name cpu pcpu mem pmem
     | each {|x| {

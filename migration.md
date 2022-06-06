@@ -41,6 +41,7 @@
         - [ ] kcp
             - [ ] complete: container id with path
         - [x] ktp ktn
+        - [ ] kgp with images
     - [ ] ssh
 - completions
     - [ ] podman
