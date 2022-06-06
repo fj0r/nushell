@@ -1,30 +1,34 @@
-def _git_log [v] {
+let DEFAULT_NUM = 32
+def _git_log [v num] {
     let stat = if $v {
-        git log  --oneline --pretty="@%h"  --stat
-        | parse -r "\"@(?P<sha>[0-9a-f]+)\"(\n.*)+\n(?P<stat>.+)"
-        | select sha stat
-        | each {|x| $x.stat
-            | split row ','
-            | each {|x| $x
-                | str trim
-                | parse -r "(?P<num>[0-9]+) (?P<col>[a-z]+)"
-                | get 0
-            } | reduce -f {sha: $x.sha} {|i,a| 
-                    let col = if ($i.col | str starts-with 'file') {
-                            'file'
-                        } else {
-                            $i.col | str substring ',3'
+        do -i {
+            git log -n $num --oneline --pretty="@%h"  --stat
+            | parse -r "\"@(?P<sha>[0-9a-f]+)\"(\n.*)+\n(?P<stat>.+)"
+            | select sha stat
+            | each {|x| $x.stat
+                | split row ','
+                | each {|x| $x
+                    | str trim
+                    | parse -r "(?P<num>[0-9]+) (?P<col>[a-z]+)"
+                    | get 0
+                } | reduce -f {sha: $x.sha} {|i,a|
+                        let col = if ($i.col | str starts-with 'file') {
+                                'file'
+                            } else {
+                                $i.col | str substring ',3'
+                            }
+                        let num = ($i.num | into int)
+                        $a | insert $col $num
                         }
-                    let num = ($i.num | into int)
-                    $a | insert $col $num
-                    }
+            }
         }
     } else { {} }
-    let r = ( git log --pretty=%h»¦«%s»¦«%aN»¦«%aE»¦«%aD
-            | lines
-            | split column "»¦«" sha message author email date
-            | each {|x| ($x| update date ($x.date | into datetime))}
-            )
+    let r = do -i {
+        git log -n $num --pretty=%h»¦«%s»¦«%aN»¦«%aE»¦«%aD
+        | lines
+        | split column "»¦«" sha message author email date
+        | each {|x| ($x| update date ($x.date | into datetime))}
+    }
     if $v {
         $r | merge { $stat }
     } else {
@@ -33,14 +37,18 @@ def _git_log [v] {
 }
 
 def "nu-complete git log" [] {
-    git log --pretty=%h»¦«%s»
+    git log -n $DEFAULT_NUM --pretty=%h»¦«%s
     | lines
     | split column "»¦«" value description
 }
 
-def glg [commit?: string@"nu-complete git log", --verbose(-v):bool, -n: int=20] {
+def glg [
+    commit?: string@"nu-complete git log"
+    --verbose(-v):bool
+    --num(-n):int=$DEFAULT_NUM
+] {
     if ($commit|empty?) {
-        _git_log $verbose | take $n
+        _git_log $verbose $num
     } else {
         git log --stat -p -n 1 $commit
     }
