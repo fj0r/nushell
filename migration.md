@@ -29,8 +29,8 @@
           fi
         - china_mirrors
     - [ ] docker
-        - [ ] docker run
-            - [ ] docker dev helper
+        - [x] docker run
+            - [x] docker dev helper
         - [x] list to table
         - [ ] dcp
             - [ ] complete: container id with path

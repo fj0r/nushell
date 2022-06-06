@@ -12,4 +12,5 @@ extern "nu" [
   --log-level:string        # log level for performance logs
   --threads:int             # threads to use for parallel commands
   --table-mode(-m):string   # the table mode to use. rounded is default.
+  ...script:string
 ]

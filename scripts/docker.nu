@@ -109,16 +109,48 @@ def "nu-complete docker run vol" [] {
 
 def "nu-complete docker run port" [ctx: string, pos: int] {
     let x = (ns | get 1.port | into int ) + 1
+    # todo:
     [ $"($x):80" ]
 }
 
+def "nu-complete docker run sshkey" [ctx: string, pos: int] {
+    (do { cd ~/.ssh; ls **/*.pub } | get name)
+}
+
 def dr [
+    --debug: bool,
+    --appimage: bool,
+    --netadmin: bool,
+    --proxy: bool,
+    --ssh: string@"nu-complete docker run sshkey",  # specify ssh key
+    --sshuser: string=root,                         # default root
+    --cache: string,                                # cache
+    -v: string@"nu-complete docker run vol",        # volume
+    -p: string@"nu-complete docker run port",       # port
     img: string@"nu-complete docker images",
-    -v: string@"nu-complete docker run vol",
-    -p: string@"nu-complete docker run port",
 ] {
     let mnt = if not ($v|empty?) { [-v $v] } else { [] }
-    docker run --rm -i -t $mnt $img
+    let debug = if $debug { [--cap-add=SYS_ADMIN --cap-add=SYS_PTRACE --security-opt seccomp=unconfined] } else { [] }
+    #let appimage = if $appimage { [--device /dev/fuse --security-opt apparmor:unconfined] } else { [] }
+    let appimage = if $appimage { [--device /dev/fuse] } else { [] }
+    let netadmin = if $netadmin { [--cap-add=NET_ADMIN --device /dev/net/tun] } else { [] }
+    let clip = if true { [-e DISPLAY -v /tmp/.X11-unix:/tmp/.X11-unix] } else { [] }
+    let ssh = if not ($ssh|empty?) {
+        let sshkey = (cat ([~/.ssh $ssh] | path join) | split row ' ' | get 1)
+        [-e $"ed25519_($sshuser)=($sshkey)"]
+    } else { [] }
+    let proxy = if not ($proxy|empty?) { 
+        let hostaddr = (hostname -I | split row ' ' | get 0)
+        [-e $"http_proxy=http://($hostaddr):7890" -e $"https_proxy=http://($hostaddr):7890"]
+    } else { [] }
+    # todo:
+    let cache = if not ($cache|empty?) {
+        []
+    } else { [] }
+    let args = ([$ssh $proxy $debug $appimage $netadmin $clip $mnt $cache] | flatten)
+    let name = $"($img | split row '/' | last | str replace ':' '-')_(date format %m%d%H%M)"  
+    echo $"docker run --name ($name) --rm -it ($args|str collect ' ') ($img)"
+    docker run --name $name --rm -it $args $img
 }
 
 def "nu-complete registry list" [cmd: string, offset: int] {
