@@ -13,6 +13,7 @@
         - [x] k8s
         - [-] right prompt
         - [-] indicator
+    - [ ] time spent
 - alias
     - [ ] utils
         - [ ] a: alias

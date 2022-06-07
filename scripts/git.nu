@@ -2,26 +2,36 @@ let DEFAULT_NUM = 32
 
 def _git_stat [n]  {
     do -i {
-        git log -n $n --oneline --pretty="@%h"  --stat
-        | parse -r "\"@(?P<sha>[0-9a-f]+)\"(\n.*)+\n(?P<stat>.+)"
-        | select sha stat
-        | each {|x| $x.stat
-            | split row ','
-            | each {|x| $x
-                | str trim
-                | parse -r "(?P<num>[0-9]+) (?P<col>[a-z]+)"
-                | get 0
-                }
-            | reduce -f {sha: $x.sha} {|i,a|
-                let col = if ($i.col | str starts-with 'file') {
-                        'file'
-                    } else {
-                        $i.col | str substring ',3'
+        git log -n $n --pretty=»¦«%h --stat
+        | lines
+        | reduce -f { c: '', r: [] } {|it, acc|
+            if ($it | str starts-with '»¦«') {
+                $acc | update c ($it | str substring '6,')
+            } else if ($it | find -r '[0-9]+ file.+change' | empty?) {
+                $acc
+            } else {
+                let x = (
+                    $it
+                    | split row ','
+                    | each {|x| $x
+                        | str trim
+                        | parse -r "(?P<num>[0-9]+) (?P<col>.+)"
+                        | get 0
+                        }
+                    | reduce -f {sha: $acc.c} {|i,a|
+                        let col = if ($i.col | str starts-with 'file') {
+                                'file'
+                            } else {
+                                $i.col | str substring ',3'
+                            }
+                        let num = ($i.num | into int)
+                        $a | insert $col $num
                     }
-                let num = ($i.num | into int)
-                $a | insert $col $num
+                )
+                $acc | update r ($acc.r | append $x)
             }
         }
+        | get r
     }
 }
 
