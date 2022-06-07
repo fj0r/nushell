@@ -131,7 +131,8 @@ def dr [
     --vol(-v): string@"nu-complete docker run vol"      # volume
     --port(-p): string@"nu-complete docker run port"    # port
     --daemon(-d): bool
-    img: string@"nu-complete docker images"
+    img: string@"nu-complete docker images"             # image
+    ...cmd                                              # command args
 ] {
     let daemon = if $daemon { [-d] } else { [--rm -it] }
     let mnt = if not ($vol|empty?) { [-v $vol] } else { [] }
@@ -155,8 +156,8 @@ def dr [
     } else { [] }
     let args = ([$daemon $ssh $proxy $debug $appimage $netadmin $clip $mnt $port $cache] | flatten)
     let name = $"($img | split row '/' | last | str replace ':' '-')_(date format %m%d%H%M)"
-    echo $"docker run --name ($name) ($args|str collect ' ') ($img)"
-    docker run --name $name $args $img
+    echo $"docker run --name ($name) ($args|str collect ' ') ($img) ($cmd)"
+    docker run --name $name $args $img $cmd
 }
 
 def "nu-complete docker dev env" [] {
