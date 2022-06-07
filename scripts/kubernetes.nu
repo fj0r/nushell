@@ -27,7 +27,7 @@ def kn [ns: string@"nu-complete kube ns"] {
 ### common
 def "nu-complete kube def" [] {
     [
-        pod deployment svc endpoint
+        pod deployment svc endpoints
         configmap secret event
         namespace node pv pvc
         job cronjob daemonset statefulset
