@@ -81,6 +81,11 @@ def gm [branch:string@"nu-complete git branches"] {
     git merge $branch
 }
 
+extern "git reset" [
+    sha?:string@"nu-complete git log"
+    --hard:bool
+]
+
 alias gp = git push
 alias gl = git pull
 alias ga = git add
