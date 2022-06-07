@@ -303,7 +303,6 @@ source sys.nu
 source alias.nu
 source git-cmp.nu
 source git.nu
-source dir.nu
 source ssh.nu
 source kubernetes.nu
 source docker.nu

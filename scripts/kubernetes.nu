@@ -65,6 +65,18 @@ def kg [
     $d
 }
 
+def kc [
+    r: string@"nu-complete kube def"
+    -n: string@"nu-complete kube ns"
+    name:string
+] {
+    if ($n|empty?) {
+        kubectl create $r $name
+    } else {
+        kubectl -n $n create $r $name
+    }
+}
+
 def kd [
     r: string@"nu-complete kube def"
     i: string@"nu-complete kube res"
