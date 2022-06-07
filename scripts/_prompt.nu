@@ -498,11 +498,13 @@ module k8s {
         let ctx = kube ctx
         let left-bracket = ('' | bright-yellow)
         let right-bracket = ('|' | bright-yellow)
-        let c = if $ctx.authinfo == $ctx.cluster {
-                    $ctx.cluster
-                } else {
-                    $"($ctx.authinfo)@($ctx.cluster)"
-                }
+        let c = do -i {
+            if $ctx.authinfo == $ctx.cluster {
+                $ctx.cluster
+            } else {
+                $"($ctx.authinfo)@($ctx.cluster)"
+            }
+        } 
         let p = $"(ansi red)($c)(ansi yellow)/(ansi cyan_bold)($ctx.namespace)"
         $"($left-bracket)($p)($right-bracket)(ansi purple_bold)" | str trim
     }
