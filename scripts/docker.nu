@@ -132,8 +132,10 @@ def dr [
     --port(-p): string@"nu-complete docker run port"    # port
     --daemon(-d): bool
     img: string@"nu-complete docker images"             # image
+    --entrypoint(-e): string                            # entrypoint
     ...cmd                                              # command args
 ] {
+    let entrypoint = if ($entrypoint|empty?) { [] } else { [--entrypoint $entrypoint] }
     let daemon = if $daemon { [-d] } else { [--rm -it] }
     let mnt = if not ($vol|empty?) { [-v $vol] } else { [] }
     let port = if not ($port|empty?) { [-p $port] } else { [] }
@@ -154,7 +156,7 @@ def dr [
     let cache = if not ($cache|empty?) {
         []
     } else { [] }
-    let args = ([$daemon $ssh $proxy $debug $appimage $netadmin $clip $mnt $port $cache] | flatten)
+    let args = ([$entrypoint $daemon $ssh $proxy $debug $appimage $netadmin $clip $mnt $port $cache] | flatten)
     let name = $"($img | split row '/' | last | str replace ':' '-')_(date format %m%d%H%M)"
     echo $"docker run --name ($name) ($args|str collect ' ') ($img) ($cmd)"
     docker run --name $name $args $img $cmd
