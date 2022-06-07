@@ -301,8 +301,8 @@ let-env config = {
 source nushell.nu
 source sys.nu
 source alias.nu
-source git.nu
 source git-cmp.nu
+source git.nu
 source dir.nu
 source ssh.nu
 source kubernetes.nu

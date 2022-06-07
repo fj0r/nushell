@@ -56,3 +56,4 @@ let-env NU_PLUGIN_DIRS = [
 
 # To add entries to PATH (on Windows you might use Path), you can use the following pattern:
 # let-env PATH = ($env.PATH | split row (char esep) | prepend '/some/path')
+let-env LD_LIBRARY_PATH = do -i { $env.LD_LIBRARY_PATH | prepend (ls ((ghc --print-libdir) | str trim) | where type == dir | get name) }

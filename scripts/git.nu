@@ -69,6 +69,18 @@ def gha [] {
     | reverse
 }
 
+def "nu-complete git branches" [] {
+  ^git branch | lines | each { |line| $line | str replace '[\*\+] ' '' | str trim }
+}
+
+def "nu-complete git remotes" [] {
+  ^git remote | lines | each { |line| $line | str trim }
+}
+
+def gm [branch:string@"nu-complete git branches"] {
+    git merge $branch
+}
+
 alias gp = git push
 alias gl = git pull
 alias ga = git add
