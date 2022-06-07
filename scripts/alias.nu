@@ -1,6 +1,6 @@
+alias t = tmux
+alias j = just
 alias e = nvim
-alias d = docker
+alias d = podman
 alias k = kuberctl
 alias s = shells
-
-
