@@ -40,7 +40,7 @@ def red [] {
 }
 
 # Internal commands for building up the my-git shell prompt
-let DIR_COMP_ABBR = 3
+let DIR_COMP_ABBR = 5
 module git {
 
   # Get the current directory with home abbreviated
