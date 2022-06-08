@@ -4,6 +4,9 @@
     - [x] struct
     - [x] reload
         - keybinding
+- sys
+    - [x] toggle-proxy
+    - [ ] timeit
 - prompt
     - [x] nu
         - [x] panache-git
@@ -65,7 +68,6 @@
         - enter/shells/g #/n/p
 - history
     - [ ] per dir
-    - [ ] time duration code
 - alternatives
     - [x] yq, jq, rq ...
         - get
