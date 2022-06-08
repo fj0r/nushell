@@ -156,9 +156,7 @@ def dr [
         [-e $"http_proxy=http://($hostaddr):7890" -e $"https_proxy=http://($hostaddr):7890"]
     } else { [] }
     # todo:
-    let cache = if not ($cache|empty?) {
-        []
-    } else { [] }
+    let cache = if not ($cache|empty?) { [-v $cache] } else { [] }
     let args = ([$entrypoint $daemon $envs $ssh $proxy $debug $appimage $netadmin $clip $mnt $port $cache] | flatten)
     let name = $"($img | split row '/' | last | str replace ':' '-')_(date format %m%d%H%M)"
     if $dry-run {
@@ -172,18 +170,39 @@ def "nu-complete docker dev env" [] {
     [ io io:rs io:hs io:jpl io:go ng ng:pg ]
 }
 
+let __dx_cache = {
+    hs: 'stack:/opt/stack'
+    rs: 'cargo:/opt/cargo'
+    go: 'gopkg:/opt/gopkg'
+    ng: 'ng:/srv'
+    pg: 'pg:/var/lib/postgresql/data'
+}
+
 def dx [
     --dry-run(-v): bool
+    --mount-cache: bool
     dx:string@"nu-complete docker dev env"
     --envs(-e): any                                     # { FOO: BAR }
     ...cmd                                              # command args
 ] {
     # -p 8080:80
     # --cache
-    if $dry-run {
-        dr --dry-run --envs $envs -v $"($env.PWD):/world" --debug --proxy --ssh id_ed25519.pub $dx $cmd
+    let c = do -i {$__dx_cache | transpose k v | where {|x| $dx | str contains $x.k} | get v.0}
+    let c = if ($c|empty?) { '' } else if $mount-cache {
+        let c = ( $c
+                | split row ':'
+                | each -n {|x| if $x.index == 1 { $"/cache($x.item)" } else { $x.item } }
+                | str collect ':'
+                )
+        $"($env.HOME)/.cache/($c)"
     } else {
-        dr --envs $envs -v $"($env.PWD):/world" --debug --proxy --ssh id_ed25519.pub $dx $cmd
+        $"($env.HOME)/.cache/($c)"
+    }
+    if $dry-run {
+        print $"cache: ($c)"
+        dr --dry-run --envs $envs --cache $c -v $"($env.PWD):/world" --debug --proxy --ssh id_ed25519.pub $dx $cmd
+    } else {
+        dr --envs $envs --cache $c -v $"($env.PWD):/world" --debug --proxy --ssh id_ed25519.pub $dx $cmd
     }
 }
 
