@@ -5,3 +5,7 @@ let dir-overlay = { |before, after|
         #overlay add overlay.nu
     }
 }
+
+let-env config = ($env.config
+                 | update hooks.env_change.PWD ($env.config.hooks.env_change.PWD | append $dir-overlay)
+                 )

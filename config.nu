@@ -53,8 +53,6 @@ let default_theme = {
     shape_nothing: light_cyan
 }
 
-source utils.nu
-source dir-overlay.nu
 # The default config record. This is where much of your global configuration is setup.
 let-env config = {
   filesize_metric: false
@@ -86,7 +84,7 @@ let-env config = {
       $nothing  # replace with source code to run before the repl input is run
     }]
     env_change: {
-      PWD: [$dir-overlay]
+      PWD: []
     }
   }
   menus: [
@@ -294,6 +292,7 @@ let-env config = {
 # starship init nu | save ~/.cache/starship/init.nu
 #source ~/.cache/starship/init.nu
 
+source utils.nu
 source zoxide-menu.nu
 source nushell.nu
 source sys.nu
@@ -303,6 +302,8 @@ source git.nu
 source ssh.nu
 source kubernetes.nu
 source docker.nu
+source timeit.nu
+source dir-overlay.nu
 
 source _prompt.nu
 #source starship.nu
