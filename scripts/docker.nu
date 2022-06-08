@@ -130,15 +130,17 @@ def dr [
     --cache(-c): string                                 # cache
     --vol(-v): string@"nu-complete docker run vol"      # volume
     --port(-p): string@"nu-complete docker run port"    # port
+    --envs(-e): string                                  # env
     --daemon(-d): bool
     img: string@"nu-complete docker images"             # image
-    --entrypoint(-e): string                            # entrypoint
+    --entrypoint: string                                # entrypoint
     ...cmd                                              # command args
 ] {
     let entrypoint = if ($entrypoint|empty?) { [] } else { [--entrypoint $entrypoint] }
     let daemon = if $daemon { [-d] } else { [--rm -it] }
     let mnt = if not ($vol|empty?) { [-v $vol] } else { [] }
     let port = if not ($port|empty?) { [-p $port] } else { [] }
+    let envs = if not ($envs|empty?) { [-e $"($envs)"] } else { [] }
     let debug = if $debug { [--cap-add=SYS_ADMIN --cap-add=SYS_PTRACE --security-opt seccomp=unconfined] } else { [] }
     #let appimage = if $appimage { [--device /dev/fuse --security-opt apparmor:unconfined] } else { [] }
     let appimage = if $appimage { [--device /dev/fuse] } else { [] }
@@ -156,7 +158,7 @@ def dr [
     let cache = if not ($cache|empty?) {
         []
     } else { [] }
-    let args = ([$entrypoint $daemon $ssh $proxy $debug $appimage $netadmin $clip $mnt $port $cache] | flatten)
+    let args = ([$entrypoint $daemon $envs $ssh $proxy $debug $appimage $netadmin $clip $mnt $port $cache] | flatten)
     let name = $"($img | split row '/' | last | str replace ':' '-')_(date format %m%d%H%M)"
     echo $"docker run --name ($name) ($args|str collect ' ') ($img) ($cmd)"
     docker run --name $name $args $img $cmd
@@ -166,8 +168,16 @@ def "nu-complete docker dev env" [] {
     [ io io:rs io:hs io:jpl io:go ng ng:pg ]
 }
 
-def dx [env:string@"nu-complete docker dev env"] {
-    dr -v $"($env.PWD):/world" -p 8080:80 --debug --proxy --ssh id_ed25519.pub $env
+def dx [
+    dx:string@"nu-complete docker dev env"
+    --envs(-e): string                                  # env
+    ...cmd                                              # command args
+] {
+    # -p 8080:80
+    # --cache
+    # todo: expansion $envs to bottom
+    let envs = if not ($envs|empty?) { [-e $"($envs)"] } else { [] }
+    dr -v $"($env.PWD):/world" --debug --proxy --ssh id_ed25519.pub $dx
 }
 
 

@@ -17,6 +17,7 @@
         - [-] right prompt
         - [-] indicator
     - [ ] time spent
+        - [ ] global state
 - alias
     - [ ] utils
         - [ ] a: alias
