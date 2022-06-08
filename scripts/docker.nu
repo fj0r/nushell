@@ -23,6 +23,11 @@ def "nu-complete docker ps" [] {
     | each {|x| {description: $x.NAMES value: $x.'CONTAINER ID'}}
 }
 
+def "nu-complete docker container" [] {
+    docker ps | from ssv -a
+    | each {|x| {description: $x.'CONTAINER ID' value: $x.NAMES}}
+}
+
 def "nu-complete docker images" [] {
     docker images | from ssv | each {|x| $"($x.REPOSITORY):($x.TAG)"}
 }
@@ -132,6 +137,7 @@ def dr [
     --port(-p): string@"nu-complete docker run port"    # port
     --envs(-e): any                                     # { FOO: BAR }
     --daemon(-d): bool
+    --attach(-a): string@"nu-complete docker container" # attach
     --entrypoint: string                                # entrypoint
     --dry-run: bool
     img: string@"nu-complete docker images"             # image
@@ -155,9 +161,12 @@ def dr [
         let hostaddr = (hostname -I | split row ' ' | get 0)
         [-e $"http_proxy=http://($hostaddr):7890" -e $"https_proxy=http://($hostaddr):7890"]
     } else { [] }
-    # todo:
+    let attach = if ($attach|empty?) { [] } else {
+        let c = $"container:($attach)"
+        [--uts $c --ipc $c --pid $c --network $c]
+    }
     let cache = if not ($cache|empty?) { [-v $cache] } else { [] }
-    let args = ([$entrypoint $daemon $envs $ssh $proxy $debug $appimage $netadmin $clip $mnt $port $cache] | flatten)
+    let args = ([$entrypoint $attach $daemon $envs $ssh $proxy $debug $appimage $netadmin $clip $mnt $port $cache] | flatten)
     let name = $"($img | split row '/' | last | str replace ':' '-')_(date format %m%d%H%M)"
     if $dry-run {
         echo $"docker run --name ($name) ($args|str collect ' ') ($img) ($cmd | flatten)"
@@ -181,6 +190,7 @@ let __dx_cache = {
 def dx [
     --dry-run(-v): bool
     --mount-cache: bool
+    --attach(-a): string@"nu-complete docker container" # attach
     dx:string@"nu-complete docker dev env"
     --envs(-e): any                                     # { FOO: BAR }
     ...cmd                                              # command args
@@ -200,9 +210,9 @@ def dx [
     }
     if $dry-run {
         print $"cache: ($c)"
-        dr --dry-run --envs $envs --cache $c -v $"($env.PWD):/world" --debug --proxy --ssh id_ed25519.pub $dx $cmd
+        dr --dry-run --attach $attach --envs $envs --cache $c -v $"($env.PWD):/world" --debug --proxy --ssh id_ed25519.pub $dx $cmd
     } else {
-        dr --envs $envs --cache $c -v $"($env.PWD):/world" --debug --proxy --ssh id_ed25519.pub $dx $cmd
+        dr --attach $attach --envs $envs --cache $c -v $"($env.PWD):/world" --debug --proxy --ssh id_ed25519.pub $dx $cmd
     }
 }
 
