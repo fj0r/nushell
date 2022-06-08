@@ -130,7 +130,7 @@ def dr [
     --cache(-c): string                                 # cache
     --vol(-v): string@"nu-complete docker run vol"      # volume
     --port(-p): string@"nu-complete docker run port"    # port
-    --envs(-e): string                                  # env
+    --envs(-e): any                                     # { FOO: BAR }
     --daemon(-d): bool
     img: string@"nu-complete docker images"             # image
     --entrypoint: string                                # entrypoint
@@ -140,7 +140,7 @@ def dr [
     let daemon = if $daemon { [-d] } else { [--rm -it] }
     let mnt = if not ($vol|empty?) { [-v $vol] } else { [] }
     let port = if not ($port|empty?) { [-p $port] } else { [] }
-    let envs = if not ($envs|empty?) { [-e $"($envs)"] } else { [] }
+    let envs = if not ($envs|empty?) { $envs | transpose k v | each {|x| $"-e ($x.k)=($x.v)"} } else { [] }
     let debug = if $debug { [--cap-add=SYS_ADMIN --cap-add=SYS_PTRACE --security-opt seccomp=unconfined] } else { [] }
     #let appimage = if $appimage { [--device /dev/fuse --security-opt apparmor:unconfined] } else { [] }
     let appimage = if $appimage { [--device /dev/fuse] } else { [] }
