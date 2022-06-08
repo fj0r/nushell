@@ -36,3 +36,8 @@ let __edit_keybinding = {
     { send: OpenEditor }
   ]
 }
+
+let-env config = ($env.config
+               | update menus ($env.config.menus | append $__zoxide_menu)
+               | update keybindings ($env.config.keybindings | append [$__zoxide_keybinding $__edit_keybinding])
+               )

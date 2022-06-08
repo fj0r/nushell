@@ -55,7 +55,6 @@ let default_theme = {
 
 source utils.nu
 source dir-overlay.nu
-source zoxide-menu.nu
 # The default config record. This is where much of your global configuration is setup.
 let-env config = {
   filesize_metric: false
@@ -208,11 +207,8 @@ let-env config = {
             | each { |it| {value: $it.command description: $it.usage} }
         }
       }
-      $__zoxide_menu
   ]
   keybindings: [
-    $__zoxide_keybinding
-    $__edit_keybinding
     {
       name: completion_menu
       modifier: none
@@ -298,6 +294,7 @@ let-env config = {
 # starship init nu | save ~/.cache/starship/init.nu
 #source ~/.cache/starship/init.nu
 
+source zoxide-menu.nu
 source nushell.nu
 source sys.nu
 source alias.nu

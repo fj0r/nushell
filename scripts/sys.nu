@@ -10,7 +10,7 @@ def-env "toggle proxy" [] {
                 'http://localhost:9876'
             } else {
                 echo 'hide proxy'
-                ''
+                $nothing
             }
     let-env http_proxy = $p
     let-env https_proxy = $p
