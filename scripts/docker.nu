@@ -133,6 +133,7 @@ def dr [
     --envs(-e): any                                     # { FOO: BAR }
     --daemon(-d): bool
     --entrypoint: string                                # entrypoint
+    --dry-run: bool
     img: string@"nu-complete docker images"             # image
     ...cmd                                              # command args
 ] {
@@ -160,8 +161,11 @@ def dr [
     } else { [] }
     let args = ([$entrypoint $daemon $envs $ssh $proxy $debug $appimage $netadmin $clip $mnt $port $cache] | flatten)
     let name = $"($img | split row '/' | last | str replace ':' '-')_(date format %m%d%H%M)"
-    echo $"docker run --name ($name) ($args|str collect ' ') ($img) ($cmd)"
-    docker run --name $name $args $img ($cmd | flatten)
+    if $dry-run {
+        echo $"docker run --name ($name) ($args|str collect ' ') ($img) ($cmd | flatten)"
+    } else {
+        docker run --name $name $args $img ($cmd | flatten)
+    }
 }
 
 def "nu-complete docker dev env" [] {
@@ -169,13 +173,18 @@ def "nu-complete docker dev env" [] {
 }
 
 def dx [
+    --dry-run(-v): bool
     dx:string@"nu-complete docker dev env"
     --envs(-e): any                                     # { FOO: BAR }
     ...cmd                                              # command args
 ] {
     # -p 8080:80
     # --cache
-    dr --envs $envs -v $"($env.PWD):/world" --debug --proxy --ssh id_ed25519.pub $dx $cmd
+    if $dry-run {
+        dr --dry-run --envs $envs -v $"($env.PWD):/world" --debug --proxy --ssh id_ed25519.pub $dx $cmd
+    } else {
+        dr --envs $envs -v $"($env.PWD):/world" --debug --proxy --ssh id_ed25519.pub $dx $cmd
+    }
 }
 
 
