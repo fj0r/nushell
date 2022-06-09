@@ -7,6 +7,7 @@
 - sys
     - [x] toggle-proxy
     - [ ] timeit
+    - [ ] datetime convert / format
 - prompt
     - [x] nu
         - [x] panache-git
