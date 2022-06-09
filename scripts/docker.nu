@@ -134,7 +134,7 @@ def dr [
     --sshuser: string=root                              # default root
     --cache(-c): string                                 # cache
     --vol(-v): string@"nu-complete docker run vol"      # volume
-    --port(-p): string@"nu-complete docker run port"    # port
+    --port(-p): any                                     # { 8080: 80 }
     --envs(-e): any                                     # { FOO: BAR }
     --daemon(-d): bool
     --attach(-a): string@"nu-complete docker container" # attach
@@ -146,8 +146,8 @@ def dr [
     let entrypoint = if ($entrypoint|empty?) { [] } else { [--entrypoint $entrypoint] }
     let daemon = if $daemon { [-d] } else { [--rm -it] }
     let mnt = if ($vol|empty?) { [] } else { [-v $vol] }
-    let port = if ($port|empty?) { [] } else { [-p $port] }
     let envs = if ($envs|empty?) { [] } else { $envs | transpose k v | each {|x| $"-e ($x.k)=($x.v)"} }
+    let port = if ($port|empty?) { [] } else { $port | transpose k v | each {|x|[-p $"($x.k):($x.v)"]} | flatten }
     let debug = if $debug { [--cap-add=SYS_ADMIN --cap-add=SYS_PTRACE --security-opt seccomp=unconfined] } else { [] }
     #let appimage = if $appimage { [--device /dev/fuse --security-opt apparmor:unconfined] } else { [] }
     let appimage = if $appimage { [--device /dev/fuse] } else { [] }
@@ -193,10 +193,9 @@ def dx [
     --attach(-a): string@"nu-complete docker container" # attach
     dx:string@"nu-complete docker dev env"
     --envs(-e): any                                     # { FOO: BAR }
+    --port(-p): any                                     # { 8080: 80 }
     ...cmd                                              # command args
 ] {
-    # -p 8080:80
-    # --cache
     let c = do -i {$__dx_cache | transpose k v | where {|x| $dx | str contains $x.k} | get v.0}
     let c = if ($c|empty?) { '' } else if $mount-cache {
         let c = ( $c
@@ -210,9 +209,9 @@ def dx [
     }
     if $dry-run {
         print $"cache: ($c)"
-        dr --dry-run --attach $attach --envs $envs --cache $c -v $"($env.PWD):/world" --debug --proxy --ssh id_ed25519.pub $dx $cmd
+        dr --dry-run --attach $attach --port $port --envs $envs --cache $c -v $"($env.PWD):/world" --debug --proxy --ssh id_ed25519.pub $dx $cmd
     } else {
-        dr --attach $attach --envs $envs --cache $c -v $"($env.PWD):/world" --debug --proxy --ssh id_ed25519.pub $dx $cmd
+        dr --attach $attach --port $port --envs $envs --cache $c -v $"($env.PWD):/world" --debug --proxy --ssh id_ed25519.pub $dx $cmd
     }
 }
 
