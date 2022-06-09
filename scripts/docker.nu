@@ -145,27 +145,27 @@ def dr [
 ] {
     let entrypoint = if ($entrypoint|empty?) { [] } else { [--entrypoint $entrypoint] }
     let daemon = if $daemon { [-d] } else { [--rm -it] }
-    let mnt = if not ($vol|empty?) { [-v $vol] } else { [] }
-    let port = if not ($port|empty?) { [-p $port] } else { [] }
-    let envs = if not ($envs|empty?) { $envs | transpose k v | each {|x| $"-e ($x.k)=($x.v)"} } else { [] }
+    let mnt = if ($vol|empty?) { [] } else { [-v $vol] }
+    let port = if ($port|empty?) { [] } else { [-p $port] }
+    let envs = if ($envs|empty?) { [] } else { $envs | transpose k v | each {|x| $"-e ($x.k)=($x.v)"} }
     let debug = if $debug { [--cap-add=SYS_ADMIN --cap-add=SYS_PTRACE --security-opt seccomp=unconfined] } else { [] }
     #let appimage = if $appimage { [--device /dev/fuse --security-opt apparmor:unconfined] } else { [] }
     let appimage = if $appimage { [--device /dev/fuse] } else { [] }
     let netadmin = if $netadmin { [--cap-add=NET_ADMIN --device /dev/net/tun] } else { [] }
     let clip = if true { [-e DISPLAY -v /tmp/.X11-unix:/tmp/.X11-unix] } else { [] }
-    let ssh = if not ($ssh|empty?) {
+    let ssh = if ($ssh|empty?) { [] } else {
         let sshkey = (cat ([~/.ssh $ssh] | path join) | split row ' ' | get 1)
         [-e $"ed25519_($sshuser)=($sshkey)"]
-    } else { [] }
-    let proxy = if not ($proxy|empty?) {
+    }
+    let proxy = if ($proxy|empty?) { [] } else {
         let hostaddr = (hostname -I | split row ' ' | get 0)
         [-e $"http_proxy=http://($hostaddr):7890" -e $"https_proxy=http://($hostaddr):7890"]
-    } else { [] }
+    }
     let attach = if ($attach|empty?) { [] } else {
         let c = $"container:($attach)"
         [--uts $c --ipc $c --pid $c --network $c]
     }
-    let cache = if not ($cache|empty?) { [-v $cache] } else { [] }
+    let cache = if ($cache|empty?) { [] } else { [-v $cache] }
     let args = ([$entrypoint $attach $daemon $envs $ssh $proxy $debug $appimage $netadmin $clip $mnt $port $cache] | flatten)
     let name = $"($img | split row '/' | last | str replace ':' '-')_(date format %m%d%H%M)"
     if $dry-run {
