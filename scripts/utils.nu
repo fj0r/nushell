@@ -14,18 +14,18 @@ def "parse cmd" [] {
     | reduce -f { args: [], sw: '' } {|it, acc|
         if ($acc.sw|empty?) {
             if ($it|str starts-with '-') {
-                $acc | update sw $it
+                $acc | upsert sw $it
             } else {
                 let args = ($acc.args | append $it)
-                $acc | update args $args
+                $acc | upsert args $args
             }
         } else {
             if ($it|str starts-with '-') {
                 $acc
-                | insert $acc.sw true
-                | update sw $it
+                | upsert $acc.sw true
+                | upsert sw $it
             } else {
-                $acc | insert $acc.sw $it | update sw ''
+                $acc | upsert $acc.sw $it | upsert sw ''
             }
         }
     }

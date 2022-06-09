@@ -20,7 +20,7 @@ def _git_stat_it [n]  {
                             $i.col | str substring ',3'
                         }
                     let num = ($i.num | into int)
-                    $a | insert $col $num
+                    $a | upsert $col $num
                 } }
         }
     }
@@ -32,7 +32,7 @@ def _git_stat [n]  {
         | lines
         | reduce -f { c: '', r: [] } {|it, acc|
             if ($it | str starts-with '»¦«') {
-                $acc | update c ($it | str substring '6,')
+                $acc | upsert c ($it | str substring '6,')
             } else if ($it | find -r '[0-9]+ file.+change' | empty?) {
                 $acc
             } else {
@@ -51,10 +51,10 @@ def _git_stat [n]  {
                                 $i.col | str substring ',3'
                             }
                         let num = ($i.num | into int)
-                        $a | insert $col $num
+                        $a | upsert $col $num
                     }
                 )
-                $acc | update r ($acc.r | append $x)
+                $acc | upsert r ($acc.r | append $x)
             }
         }
         | get r
@@ -69,7 +69,7 @@ def _git_log [v num] {
         git log -n $num --pretty=%h»¦«%s»¦«%aN»¦«%aE»¦«%aD
         | lines
         | split column "»¦«" sha message author email date
-        | each {|x| ($x| update date ($x.date | into datetime))}
+        | each {|x| ($x| upsert date ($x.date | into datetime))}
     }
     if $v {
         $r | merge { $stat }

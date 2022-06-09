@@ -38,6 +38,6 @@ let __edit_keybinding = {
 }
 
 let-env config = ($env.config
-               | update menus ($env.config.menus | append $__zoxide_menu)
-               | update keybindings ($env.config.keybindings | append [$__zoxide_keybinding $__edit_keybinding])
+               | upsert menus ($env.config.menus | append $__zoxide_menu)
+               | upsert keybindings ($env.config.keybindings | append [$__zoxide_keybinding $__edit_keybinding])
                )

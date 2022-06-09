@@ -7,5 +7,5 @@ let dir-overlay = { |before, after|
 }
 
 let-env config = ($env.config
-                 | update hooks.env_change.PWD ($env.config.hooks.env_change.PWD | append $dir-overlay)
+                 | upsert hooks.env_change.PWD ($env.config.hooks.env_change.PWD | append $dir-overlay)
                  )

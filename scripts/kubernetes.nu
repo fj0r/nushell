@@ -150,14 +150,14 @@ def kgpo [] {
 def kgpa [] {
     kubectl get pods -o wide -A | from ssv -a
     | rename namespace name ready status restarts age ip node
-    | each {|x| ($x| update restarts ($x.restarts|split row ' '| get 0 | into int)) }
+    | each {|x| ($x| upsert restarts ($x.restarts|split row ' '| get 0 | into int)) }
     | reject 'NOMINATED NODE' 'READINESS GATES'
 }
 
 def kgp [] {
     kubectl get pods -o wide | from ssv -a
     | rename name ready status restarts age ip node
-    | each {|x| ($x| update restarts ($x.restarts|split row ' '| get 0 | into int)) }
+    | each {|x| ($x| upsert restarts ($x.restarts|split row ' '| get 0 | into int)) }
     | reject 'NOMINATED NODE' 'READINESS GATES'
 }
 

@@ -7,7 +7,7 @@ def dp [] {
     | each {|x|
             let r = ($x | from json)
             let t = ($r.created | str substring ',32' | into datetime)
-            $r | update created ((date now) - $t)
+            $r | upsert created ((date now) - $t)
            }
 }
 
@@ -15,7 +15,7 @@ def di [] {
     docker images
     | from ssv -a
     | rename repo tag id created size
-    | update size { |i| $i.size | into filesize }
+    | upsert size { |i| $i.size | into filesize }
 }
 
 def "nu-complete docker ps" [] {
@@ -254,7 +254,7 @@ def "registry list" [
 def "bud img" [] {
     buildah images | from ssv -a
     | rename repo tag id created size
-    | update size { |i| $i.size | into filesize }
+    | upsert size { |i| $i.size | into filesize }
 }
 
 def "bud ls" [] {
