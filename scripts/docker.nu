@@ -258,11 +258,11 @@ def "bud img" [] {
 }
 
 def "bud ls" [] {
-    buildah list | from ssv -a
+    buildah list | from ssv -a | rename  id builder image-id image container
 }
 
 def "bud ps" [] {
-    buildah ps | from ssv -a
+    buildah ps | from ssv -a | rename  id builder image-id image container
 }
 
 def "nu-complete bud ps" [] {
