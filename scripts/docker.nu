@@ -33,7 +33,7 @@ def "nu-complete docker images" [] {
 }
 
 def da [
-    ctn: string@"nu-complete docker ps"
+    ctn: string@"nu-complete docker container"
     ...args
 ] {
     if ($args|empty?) {
@@ -43,11 +43,11 @@ def da [
     }
 }
 
-def dcp [lhs: string@"nu-complete docker ps", rhs: string@"nu-complete docker ps"] {
+def dcp [lhs: string@"nu-complete docker container", rhs: string@"nu-complete docker container"] {
     docker cp $lhs $rhs
 }
 
-def dcr [ctn: string@"nu-complete docker ps"] {
+def dcr [ctn: string@"nu-complete docker container"] {
     docker container rm -f $ctn
 }
 
