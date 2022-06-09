@@ -125,11 +125,16 @@ def "nu-complete docker run sshkey" [ctx: string, pos: int] {
     (do { cd ~/.ssh; ls **/*.pub } | get name)
 }
 
+def "nu-complete docker run proxy" [] {
+    let hostaddr = do -i {hostname -I | split row ' ' | get 0}
+    [$"http://($hostaddr):7890" $"http://localhost:7890"]
+}
+
 def dr [
     --debug(-x): bool
     --appimage: bool
     --netadmin(-n): bool
-    --proxy: bool
+    --proxy: string@"nu-complete docker run proxy"      # proxy
     --ssh(-s): string@"nu-complete docker run sshkey"   # specify ssh key
     --sshuser: string=root                              # default root
     --cache(-c): string                                 # cache
@@ -158,8 +163,7 @@ def dr [
         [-e $"ed25519_($sshuser)=($sshkey)"]
     }
     let proxy = if ($proxy|empty?) { [] } else {
-        let hostaddr = (hostname -I | split row ' ' | get 0)
-        [-e $"http_proxy=http://($hostaddr):7890" -e $"https_proxy=http://($hostaddr):7890"]
+        [-e $"http_proxy=($proxy)" -e $"https_proxy=($proxy)"]
     }
     let attach = if ($attach|empty?) { [] } else {
         let c = $"container:($attach)"
@@ -191,6 +195,7 @@ def dx [
     --dry-run(-v): bool
     --mount-cache: bool
     --attach(-a): string@"nu-complete docker container" # attach
+    --proxy: string@"nu-complete docker run proxy"      # proxy
     dx:string@"nu-complete docker dev env"
     --envs(-e): any                                     # { FOO: BAR }
     --port(-p): any                                     # { 8080: 80 }
@@ -207,11 +212,12 @@ def dx [
     } else {
         $"($env.HOME)/.cache/($c)"
     }
+    let proxy = if ($proxy|empty?) { nu-complete docker run proxy | get 0 } else { $proxy }
     if $dry-run {
         print $"cache: ($c)"
-        dr --dry-run --attach $attach --port $port --envs $envs --cache $c -v $"($env.PWD):/world" --debug --proxy --ssh id_ed25519.pub $dx $cmd
+        dr --dry-run --attach $attach --port $port --envs $envs --cache $c -v $"($env.PWD):/world" --debug --proxy $proxy --ssh id_ed25519.pub $dx $cmd
     } else {
-        dr --attach $attach --port $port --envs $envs --cache $c -v $"($env.PWD):/world" --debug --proxy --ssh id_ed25519.pub $dx $cmd
+        dr --attach $attach --port $port --envs $envs --cache $c -v $"($env.PWD):/world" --debug --proxy $proxy --ssh id_ed25519.pub $dx $cmd
     }
 }
 
