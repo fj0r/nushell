@@ -44,7 +44,7 @@ def _git_stat [n]  {
                         | parse -r "(?P<num>[0-9]+) (?P<col>.+)"
                         | get 0
                         }
-                    | reduce -f {sha: $acc.c} {|i,a|
+                    | reduce -f {sha: $acc.c file:0 ins:0 del:0} {|i,a|
                         let col = if ($i.col | str starts-with 'file') {
                                 'file'
                             } else {
