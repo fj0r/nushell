@@ -186,6 +186,19 @@ def klf [
     kubectl $n logs -f $pod
 }
 
+def "nu-complete port forward type" [] {
+    [pod svc]
+}
+def kpf [
+    res: string@"nu-complete port forward type"
+    target: string@"nu-complete kube res"
+    -n: string@"nu-complete kube ns"
+    port: string    ### reflect port num
+] {
+    let n = if ($n|empty?) { [] } else { [-n $n] }
+    kubectl $n port-forward $res $target $port
+}
+
 def kcp [
     lhs: string@"nu-complete kube pods"
     rhs: string@"nu-complete kube pods"
