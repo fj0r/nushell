@@ -112,7 +112,7 @@ def "nu-complete kube pods" [context: string, offset: int] {
     kubectl $ns get pods | from ssv -a | get NAME
 }
 
-def kgpo [] {
+def kgpl [] {
     kubectl get pods -o json
     | from json
     | get items
@@ -140,6 +140,11 @@ def kgp [-n: string@"nu-complete kube ns"] {
     | rename name ready status restarts age ip node
     | each {|x| ($x| upsert restarts ($x.restarts|split row ' '| get 0 | into int)) }
     | reject 'NOMINATED NODE' 'READINESS GATES'
+}
+
+def kgpo [-n: string@"nu-complete kube ns", pod: string@"nu-complete kube pods"] {
+    let n = if ($n|empty?) { [] } else { [-n $n] }
+    kubectl $n get pod -o yaml $pod
 }
 
 def kep [-n: string@"nu-complete kube ns", pod: string@"nu-complete kube pods"] {
