@@ -1,31 +1,5 @@
 let DEFAULT_NUM = 32
 
-def _git_stat_it [n]  {
-    do -i {
-        git log -n $n --pretty=»¦«%h --stat
-        | lines
-        | where {|x| ($x | str starts-with '»¦«') or (not ($x | find -r '[0-9]+ file.+change' | empty?))}
-        | each {|it| if ($it | str starts-with '»¦«') { $it } else {
-                $it
-                | split row ','
-                | each {|x| $x
-                    | str trim
-                    | parse -r "(?P<num>[0-9]+) (?P<col>.+)"
-                    | get 0
-                    }
-                | reduce -f {} {|i,a|
-                    let col = if ($i.col | str starts-with 'file') {
-                            'file'
-                        } else {
-                            $i.col | str substring ',3'
-                        }
-                    let num = ($i.num | into int)
-                    $a | upsert $col $num
-                } }
-        }
-    }
-}
-
 def _git_stat [n]  {
     do -i {
         git log -n $n --pretty=»¦«%h --stat
@@ -91,6 +65,17 @@ def glg [
 ] {
     if ($commit|empty?) {
         _git_log $verbose $num
+    } else {
+        git log --stat -p -n 1 $commit
+    }
+}
+
+def glgv [
+    commit?: string@"nu-complete git log"
+    --num(-n):int=$DEFAULT_NUM
+] {
+    if ($commit|empty?) {
+        _git_log true $num
     } else {
         git log --stat -p -n 1 $commit
     }
