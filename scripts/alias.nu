@@ -5,3 +5,4 @@ alias k = kubectl
 alias r = rg
 alias s = shells
 alias t = tmux
+alias zj = zellij -l compact
