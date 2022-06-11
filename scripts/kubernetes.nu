@@ -151,6 +151,10 @@ def kgp [-n: string@"nu-complete kube ns"] {
     | reject 'NOMINATED NODE' 'READINESS GATES'
 }
 
+def kgpw [] {
+    kubectl get pods --watch
+}
+
 def kep [-n: string@"nu-complete kube ns", pod: string@"nu-complete kube pods"] {
     let n = if ($n|empty?) { [] } else { [-n $n] }
     kubectl edit pod $n $pod
