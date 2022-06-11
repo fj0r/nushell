@@ -3,8 +3,16 @@ def kaf [p: path] {
     kubectl apply -f $p
 }
 
+def kdf [p: path] {
+    kubectl diff -f $p
+}
+
 def kak [p: path] {
     kubectl apply -k $p
+}
+
+def kdk [p: path] {
+    kubectl diff -k $p
 }
 
 def kk [p: path] {
