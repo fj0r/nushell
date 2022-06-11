@@ -145,6 +145,7 @@ def dr [
     --attach(-a): string@"nu-complete docker container" # attach
     --entrypoint: string                                # entrypoint
     --dry-run: bool
+    --no-x: bool
     img: string@"nu-complete docker images"             # image
     ...cmd                                              # command args
 ] {
@@ -157,7 +158,7 @@ def dr [
     #let appimage = if $appimage { [--device /dev/fuse --security-opt apparmor:unconfined] } else { [] }
     let appimage = if $appimage { [--device /dev/fuse] } else { [] }
     let netadmin = if $netadmin { [--cap-add=NET_ADMIN --device /dev/net/tun] } else { [] }
-    let clip = if true { [-e DISPLAY -v /tmp/.X11-unix:/tmp/.X11-unix] } else { [] }
+    let clip = if $no-x { [] } else { [-e DISPLAY -v /tmp/.X11-unix:/tmp/.X11-unix] }
     let ssh = if ($ssh|empty?) { [] } else {
         let sshkey = (cat ([~/.ssh $ssh] | path join) | split row ' ' | get 1)
         [-e $"ed25519_($sshuser)=($sshkey)"]
