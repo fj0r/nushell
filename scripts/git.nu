@@ -114,6 +114,7 @@ extern "git reset" [
 ]
 
 alias gp = git push
+alias gpf! = git push --force
 alias gl = git pull
 alias ga = git add
 alias gaa = git add --all
