@@ -285,3 +285,5 @@ module docker {
         buildah rm $id
     }
 }
+
+use docker *
