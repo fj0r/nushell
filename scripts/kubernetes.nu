@@ -42,7 +42,8 @@ module kubectl {
             job cronjob daemonset statefulset
             ingress gateway virtualservice
             clusterrole clusterrolebinding role serviceaccount rolebinding
-            certificate clusterissuer issuer
+            clusterissuer issuer
+            certificate certificaterequest order.acme challenge.acme
         ]
     }
     
@@ -300,6 +301,14 @@ module kubectl {
             mem: ($x.mem | str substring ',-2' | into decimal)
             mem%: (($x.pmem | str substring ',-1' | into decimal) / 100)
         } }
+    }
+
+    ### cert-manager
+    export def kgcert [] {
+        kubectl get certificates -o wide | from ssv | rename certificates
+        kubectl get certificaterequests -o wide | from ssv | rename certificaterequests
+        kubectl get order.acme -o wide | from ssv | rename order.acme
+        kubectl get challenges.acme -o wide | from ssv | rename challenges.acme
     }
 }
 
