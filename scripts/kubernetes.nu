@@ -112,11 +112,14 @@ module kubectl {
         r: string@"nu-complete kube def"
         i: string@"nu-complete kube res"
         -n: string@"nu-complete kube ns"
+        --force(-f): bool
     ] {
         let n = if ($n|empty?) { [] } else { [-n $n] }
-        kubectl $n delete $r $i
+        let f = if ($force|empty?) { [] } else { [--grace-period=0 --force] }
+        kubectl $n $f delete $r $i
     }
     
+
     ### node
     export def kgno [] {
         kubectl get nodes -o wide | from ssv -a
@@ -279,6 +282,13 @@ module kubectl {
             kubectl $n scale deployments $d --replicas $num
         }
     }
+
+    export alias krsd = kubectl rollout status deployment
+    export alias kgrs = kubectl get rs
+    export alias krh = kubectl rollout history
+    export alias kru = kubectl rollout undo
+    export alias ksss = kubectl scale statefulset
+    export alias krsss = kubectl rollout status statefulset
     
     ### kubecto top pod
     export def ktp [-n: string@"nu-complete kube ns"] {
@@ -291,7 +301,7 @@ module kubectl {
         } }
     }
     
-    ### kubeto top node
+    ### kube top node
     export def ktn [] {
         kubectl top node | from ssv -a | rename name cpu pcpu mem pmem
         | each {|x| {
@@ -303,6 +313,24 @@ module kubectl {
         } }
     }
 
+    ###
+    export def "kclean evicted" [] {
+        kubectl get pods -A
+        | from ssv -a
+        | where STATUS == Evicted
+        | each { |x| kdel pod -n $x.NAMESPACE $x.NAME }
+    }
+
+    ### fixme:
+    export def "kclean stucked ns" [ns: string] {
+        kubectl get namespace $ns -o json \
+        | tr -d "\n"
+        | sed 's/\"finalizers\": \[[^]]\+\]/\"finalizers\": []/' \
+        | kubectl replace --raw /api/v1/namespaces/$1/finalize -f -
+    }
+
+    export alias "kclean finalizer" = kubectl patch -p '{\"metadata\":{\"finalizers\":null}}'
+
     ### cert-manager
     export def kgcert [] {
         kubectl get certificates -o wide | from ssv | rename certificates
@@ -310,6 +338,8 @@ module kubectl {
         kubectl get order.acme -o wide | from ssv | rename order.acme
         kubectl get challenges.acme -o wide | from ssv | rename challenges.acme
     }
+
+
 }
 
 use kubectl *
