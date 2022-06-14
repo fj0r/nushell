@@ -20,17 +20,21 @@ module docker {
     }
     
     def "nu-complete docker ps" [] {
-        docker ps | from ssv -a
+        docker ps
+        | from ssv -a
         | each {|x| {description: $x.NAMES value: $x.'CONTAINER ID'}}
     }
     
     def "nu-complete docker container" [] {
-        docker ps | from ssv -a
+        docker ps
+        | from ssv -a
         | each {|x| {description: $x.'CONTAINER ID' value: $x.NAMES}}
     }
     
     def "nu-complete docker images" [] {
-        docker images | from ssv | each {|x| $"($x.REPOSITORY):($x.TAG)"}
+        docker images
+        | from ssv
+        | each {|x| $"($x.REPOSITORY):($x.TAG)"}
     }
     
     export def da [
@@ -237,13 +241,15 @@ module docker {
                 fetch $"($url)/v2/_catalog"
             } else {
                 fetch -H [authorization $"Basic ($env.REGISTRY_TOKEN)"] $"($url)/v2/_catalog"
-            } | get repositories
+            }
+            | get repositories
         } else if ($tag|empty?) {
             if (do -i { $env.REGISTRY_TOKEN } | empty?) {
                 fetch $"($url)/v2/($reg)/tags/list"
             } else {
                 fetch -H [authorization $"Basic ($env.REGISTRY_TOKEN)"] $"($url)/v2/($reg)/tags/list"
-            } | get tags
+            }
+            | get tags
         }
     }
     
@@ -256,27 +262,35 @@ module docker {
             fetch $"($url)/v2/($reg)/tags/list"
         } else {
             fetch -H [authorization $"Basic ($env.REGISTRY_TOKEN)"] $"($url)/v2/($reg)/tags/list"
-        } | get tags
+        }
+        | get tags
     }
     
     ### buildah
     
     export def "bud img" [] {
-        buildah images | from ssv -a
+        buildah images
+        | from ssv -a
         | rename repo tag id created size
         | upsert size { |i| $i.size | into filesize }
     }
     
     export def "bud ls" [] {
-        buildah list | from ssv -a | rename  id builder image-id image container
+        buildah list
+        | from ssv -a
+        | rename id builder image-id image container
     }
     
     export def "bud ps" [] {
-        buildah ps | from ssv -a | rename  id builder image-id image container
+        buildah ps
+        | from ssv -a
+        | rename id builder image-id image container
     }
     
     def "nu-complete bud ps" [] {
-        bud ps | select 'CONTAINER ID' "CONTAINER NAME" | rename value description
+        bud ps
+        | select 'CONTAINER ID' "CONTAINER NAME"
+        | rename value description
     }
     
     export def "bud rm" [
