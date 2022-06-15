@@ -69,7 +69,7 @@ module kubectl {
                 }
         #let h = ($d | columns | str kebab-case)
         #$d | rename ...$h
-        kubectl $n get $r | from ssv -a
+        kubectl get $n $r | from ssv -a
     }
     
     export def kc [

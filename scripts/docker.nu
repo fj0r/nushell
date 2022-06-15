@@ -71,13 +71,13 @@ module docker {
         docker save $img
     }
     
-    export alias dld = docker load
+    export alias dld = podman load
     
     export def dsp [] {
         docker system prune -f
     }
     
-    export alias dspall = system prune --all --force --volumes
+    export alias dspall = podman system prune --all --force --volumes
     
     export def drmi [img: string@"nu-complete docker images"] {
         docker rmi $img
@@ -91,7 +91,7 @@ module docker {
         docker push $img
     }
     
-    export alias dpl = docker pull
+    export alias dpl = podman pull
     
     ### volume
     export def dvl [] {
