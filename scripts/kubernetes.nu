@@ -52,7 +52,7 @@ module kubectl {
         let def = ($ctx | get args | get 1)
         let ns = do -i { $ctx | get '-n' }
         let ns = if ($ns|empty?) { [] } else { [-n $ns] }
-        kubectl $ns get $def | from ssv -a | get NAME
+        kubectl get $ns $def | from ssv -a | get NAME
     }
     
     export def kg [
@@ -87,7 +87,7 @@ module kubectl {
         -n: string@"nu-complete kube ns"
     ] {
         let n = if ($n|empty?) { [] } else { [-n $n] }
-        kubectl $n get -o yaml $r $i
+        kubectl get $n -o yaml $r $i
     }
     
     export def kd [
@@ -96,7 +96,7 @@ module kubectl {
         -n: string@"nu-complete kube ns"
     ] {
         let n = if ($n|empty?) { [] } else { [-n $n] }
-        kubectl $n describe $r $i
+        kubectl describe $n $r $i
     }
     
     export def ke [
@@ -105,7 +105,7 @@ module kubectl {
         -n: string@"nu-complete kube ns"
     ] {
         let n = if ($n|empty?) { [] } else { [-n $n] }
-        kubectl $n edit $r $i
+        kubectl edit $n $r $i
     }
     
     export def kdel [
@@ -115,8 +115,8 @@ module kubectl {
         --force(-f): bool
     ] {
         let n = if ($n|empty?) { [] } else { [-n $n] }
-        let f = if ($force|empty?) { [] } else { [--grace-period=0 --force] }
-        kubectl $n $f delete $r $i
+        let f = if $force { [--grace-period=0 --force] } else { [] }
+        kubectl delete $n $f $r $i
     }
     
 
@@ -131,7 +131,7 @@ module kubectl {
         let ctx = ($context | parse cmd)
         let ns = do -i { $ctx | get '-n' }
         let ns = if ($ns|empty?) { [] } else { [-n $ns] }
-        kubectl $ns get pods | from ssv -a | get NAME
+        kubectl get $ns pods | from ssv -a | get NAME
     }
     
     export def kgpl [] {
@@ -184,7 +184,7 @@ module kubectl {
         ...args
     ] {
         let n = if ($n|empty?) { [] } else { [-n $n] }
-        kubectl $n exec -it $pod -- (if ($args|empty?) { 'bash' } else { $args })
+        kubectl exec $n -it $pod -- (if ($args|empty?) { 'bash' } else { $args })
     }
     
     export def kl [
@@ -192,7 +192,7 @@ module kubectl {
         -n: string@"nu-complete kube ns"
     ] {
         let n = if ($n|empty?) { [] } else { [-n $n] }
-        kubectl $n logs $pod
+        kubectl logs $n $pod
     }
     
     export def klf [
@@ -200,7 +200,7 @@ module kubectl {
         -n: string@"nu-complete kube ns"
     ] {
         let n = if ($n|empty?) { [] } else { [-n $n] }
-        kubectl $n logs -f $pod
+        kubectl logs $n -f $pod
     }
     
     def "nu-complete port forward type" [] {
@@ -213,7 +213,7 @@ module kubectl {
         port: string    ### reflect port num
     ] {
         let n = if ($n|empty?) { [] } else { [-n $n] }
-        kubectl $n port-forward $res $target $port
+        kubectl port-forward $n $res $target $port
     }
     
     export def kcp [
@@ -230,7 +230,7 @@ module kubectl {
         let ctx = ($context | parse cmd)
         let ns = do -i { $ctx | get '-n' }
         let ns = if ($ns|empty?) { [] } else { [-n $ns] }
-        kubectl $ns get services | from ssv -a | get NAME
+        kubectl get $ns services | from ssv -a | get NAME
     }
     
     export def kgs [-n: string@"nu-complete kube ns"] {
@@ -254,19 +254,19 @@ module kubectl {
         let ctx = ($context | parse cmd)
         let ns = do -i { $ctx | get '-n' }
         let ns = if ($ns|empty?) { [] } else { [-n $ns] }
-        kubectl $ns get deployments | from ssv -a | get NAME
+        kubectl get $ns deployments | from ssv -a | get NAME
     }
     
     export def kgd [-n: string@"nu-complete kube ns"] {
         let n = if ($n|empty?) { [] } else { [-n $n] }
-        kubectl $n get deployments -o wide | from ssv -a
+        kubectl get $n deployments -o wide | from ssv -a
         | rename name ready up-to-date available age containers images selector
         | reject selector
     }
     
     export def ked [d: string@"nu-complete kube deployments", -n: string@"nu-complete kube ns"] {
         let n = if ($n|empty?) { [] } else { [-n $n] }
-        kubectl $n edit deployments $d
+        kubectl edit $n deployments $d
     }
     
     def "nu-complete num9" [] { [1 2 3] }
@@ -279,7 +279,7 @@ module kubectl {
             "too large"
         } else {
             let n = if ($n|empty?) { [] } else { [-n $n] }
-            kubectl $n scale deployments $d --replicas $num
+            kubectl scale $n deployments $d --replicas $num
         }
     }
 
@@ -293,7 +293,7 @@ module kubectl {
     ### kubecto top pod
     export def ktp [-n: string@"nu-complete kube ns"] {
         let n = if ($n|empty?) { [] } else { [-n $n] }
-        kubectl $n top pod | from ssv -a | rename name cpu mem
+        kubectl top $n pod | from ssv -a | rename name cpu mem
         | each {|x| {
             name: $x.name
             cpu: ($x.cpu| str substring ',-1' | into decimal)
