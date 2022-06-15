@@ -308,3 +308,4 @@ source dir-overlay.nu
 source _prompt.nu
 #source starship.nu
 source zoxide.nu
+source web.nu
