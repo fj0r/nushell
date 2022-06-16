@@ -60,4 +60,3 @@ let-env EDITOR = 'nvim'
 
 let-env LD_LIBRARY_PATH = do -i { $env.LD_LIBRARY_PATH | prepend (ls ((ghc --print-libdir) | str trim) | where type == dir | get name) }
 
-let-env KUBERNETES_SCHEMA_URL = $"file:///($env.HOME)/.config/kubernetes-json-schema/all.json"

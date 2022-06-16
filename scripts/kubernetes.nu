@@ -1,4 +1,8 @@
 module kubectl {
+    export env KUBECTL_EXTERNAL_DIFF { 'kubectl-neat-diff' }
+    export env KUBERNETES_SCHEMA_URL { $"file:///($env.HOME)/.config/kubernetes-json-schema/all.json" }
+
+
     ### file
     export def kaf [p: path] {
         kubectl apply -f $p
