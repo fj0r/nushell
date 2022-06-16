@@ -30,6 +30,12 @@ module docker {
         | from ssv -a
         | each {|x| {description: $x.'CONTAINER ID' value: $x.NAMES}}
     }
+
+    def "nu-complete docker all container" [] {
+        docker ps -a
+        | from ssv -a
+        | each {|x| {description: $x.'CONTAINER ID' value: $x.NAMES}}
+    }
     
     def "nu-complete docker images" [] {
         docker images
@@ -55,7 +61,7 @@ module docker {
         docker cp $lhs $rhs
     }
     
-    export def dcr [ctn: string@"nu-complete docker container"] {
+    export def dcr [ctn: string@"nu-complete docker all container"] {
         docker container rm -f $ctn
     }
     
