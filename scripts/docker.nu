@@ -73,7 +73,7 @@ module docker {
         docker history --no-trunc $img | from ssv -a
     }
     
-    def dsv [img: string@"nu-complete docker images"] {
+    export def dsv [...img: string@"nu-complete docker images"] {
         docker save $img
     }
     
