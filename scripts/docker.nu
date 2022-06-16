@@ -8,7 +8,7 @@ module docker {
         | each {|x|
                 let r = ($x | from json)
                 let t = ($r.created | str substring ',32' | into datetime ) - 8hr
-                $r | upsert created ((date now) - $t)
+                $r | upsert created $t
                }
     }
     

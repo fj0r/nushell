@@ -149,7 +149,7 @@ module kubectl {
                 name: $x.metadata.name,
                 status: $x.status.phase,
                 restarts: ($rs | split row ' '| get 0 | into int),
-                age: ((date now) - ($x.status.startTime | into datetime))
+                age: ($x.status.startTime | into datetime)
             }}
     }
     
