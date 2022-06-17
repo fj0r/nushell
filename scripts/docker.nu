@@ -43,6 +43,10 @@ module docker {
         | each {|x| $"($x.REPOSITORY):($x.TAG)"}
     }
     
+    export def dl [ctn: string@"nu-complete docker container"] {
+        docker logs -f $ctn
+    }
+
     export def da [
         ctn: string@"nu-complete docker container"
         ...args
