@@ -6,8 +6,8 @@
         - keybinding
 - sys
     - [x] toggle-proxy
-    - [ ] timeit
-    - [ ] datetime convert / format
+    - [x] timeit (benchmark)
+    - [x] datetime convert / format
 - prompt
     - [x] nu
         - [x] panache-git
@@ -15,8 +15,8 @@
     - [x] startship
         - [x] git
         - [x] k8s
-        - [-] right prompt
-        - [-] indicator
+        - [x] ~~right prompt~~
+        - [x] ~~indicator~~
     - [ ] time spent
         - [ ] global state
 - alias
@@ -24,11 +24,11 @@
         - [ ] a: alias
         - [x] e: nvim
         - [x] t: tmux
-        - alias sget='wget -m -k -E -p -np -e robots=off'
-        - toggle-proxy
+        - [ ] alias sget='wget -m -k -E -p -np -e robots=off'
+        - [x] toggle-proxy
         - slam
         - wg
-        - if (( $+commands[ss] )); then
+        - [ ] if (( $+commands[ss] )); then
               alias ns='ss -tulwnp'
           else
               alias ns="netstat -plnetu"
@@ -47,8 +47,8 @@
         - [ ] kcp
             - [ ] complete: container id with path
         - [x] ktp ktn
-        - [ ] kgp with images
-    - [=] ssh
+        - [x] ~~kgp with images~~ (kdp)
+    - [x] ssh
 - completions
     - [x] podman
     - [x] k8s
@@ -56,10 +56,11 @@
 - git
     - [x] glg
 - edit
-    - [-] `enter` for `ls`
-    - [-] `tab` in empty for cd: direct path and then `enter`
+    - [x] ~~`enter` for `ls`~~
+    - [x] ~~`tab` in empty for cd: direct path and then `enter`~~
     - [ ] `ctrl+q`
     - [ ] Brace Expansion {,a,b,c}
+    - [x] heredoc (multilines string)
 - path
     - [x] zoxide
         - [x] named dir
@@ -72,9 +73,9 @@
     - [ ] per dir
 - alternatives
     - [x] yq, jq, rq ...
-        - get
-        - update
-        - insert
+        - [x] get
+        - [x] update
+        - [x] insert
         - [x] delete
     - [x] fd (recursive)
         - ls **/*
