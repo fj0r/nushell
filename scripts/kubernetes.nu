@@ -297,8 +297,18 @@ module kubectl {
     ### kubecto top pod
     export def ktp [-n: string@"nu-complete kube ns"] {
         let n = if ($n|empty?) { [] } else { [-n $n] }
-        kubectl top $n pod | from ssv -a | rename name cpu mem
+        kubectl top pod $n | from ssv -a | rename name cpu mem
         | each {|x| {
+            name: $x.name
+            cpu: ($x.cpu| str substring ',-1' | into decimal)
+            mem: ($x.mem | str substring ',-2' | into decimal)
+        } }
+    }
+
+    export def ktpa [] {
+        kubectl top pod -A | from ssv -a | rename namespace name cpu mem
+        | each {|x| {
+            namespace: $x.namespace
             name: $x.name
             cpu: ($x.cpu| str substring ',-1' | into decimal)
             mem: ($x.mem | str substring ',-2' | into decimal)
