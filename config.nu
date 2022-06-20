@@ -354,6 +354,7 @@ source ssh.nu
 source kubernetes.nu
 source docker.nu
 source timeit.nu
+source webhook.nu
 source dir-overlay.nu
 
 source _prompt.nu
