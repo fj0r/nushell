@@ -50,13 +50,10 @@ module kubectl {
         [
             pod deployment svc endpoints
             configmap secret event
-            namespace node pv pvc
+            namespace node pv pvc ingress
             job cronjob daemonset statefulset
-            ingress gateway virtualservice
             clusterrole clusterrolebinding role serviceaccount rolebinding
-            clusterissuer issuer
-            certificate certificaterequest order.acme challenge.acme
-        ]
+        ] | append (kubectl get crd | from ssv -a | get NAME)
     }
     
     def "nu-complete kube res" [context: string, offset: int] {
