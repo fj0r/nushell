@@ -82,7 +82,7 @@ module kubectl {
         name:string
     ] {
         let n = if ($n|empty?) { [] } else { [-n $n] }
-        kubectl -n $n create $r $name
+        kubectl create $n $r $name
     }
     
     export def ky [
