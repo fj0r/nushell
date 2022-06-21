@@ -11,6 +11,10 @@ module kubectl {
     export def kdf [p: path] {
         kubectl diff -f $p
     }
+
+    export def kdelf [p: path] {
+        kubectl delete -f $p
+    }
     
     export def kak [p: path] {
         kubectl apply -k $p
@@ -18,6 +22,10 @@ module kubectl {
     
     export def kdk [p: path] {
         kubectl diff -k $p
+    }
+
+    export def kdelk [p: path] {
+        kubectl delete -k $p
     }
     
     export def kk [p: path] {
