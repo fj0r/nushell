@@ -142,6 +142,16 @@ module kubectl {
         let ns = if ($ns|empty?) { [] } else { [-n $ns] }
         kubectl get $ns pods | from ssv -a | get NAME
     }
+
+    def "nu-complete kube ctns" [context: string, offset: int] {
+        let ctx = ($context | parse cmd)
+        let ns = do -i { $ctx | get '-n' }
+        let ns = if ($ns|empty?) { [] } else { [-n $ns] }
+        let ctn = do -i { $ctx | get '-c' }
+        let ctn = if ($ctn|empty?) { [] } else { [-c $ctn] }
+        let pod = ($ctx | get args.1)
+        kubectl get $ns pod $pod -o jsonpath={.spec.containers[*].name} | split row ' '
+    }
     
     export def kgpl [] {
         kubectl get pods -o json
@@ -198,18 +208,22 @@ module kubectl {
     
     export def kl [
         pod: string@"nu-complete kube pods"
-        -n: string@"nu-complete kube ns"
+        --namespace(-n): string@"nu-complete kube ns"
+        --container(-c): string@"nu-complete kube ctns"
     ] {
-        let n = if ($n|empty?) { [] } else { [-n $n] }
-        kubectl logs $n $pod
+        let n = if ($namespace|empty?) { [] } else { [-n $namespace] }
+        let c = if ($container|empty?) { [] } else { [-c $container] }
+        kubectl logs $n $pod $c
     }
     
     export def klf [
         pod: string@"nu-complete kube pods"
-        -n: string@"nu-complete kube ns"
+        --namespace(-n): string@"nu-complete kube ns"
+        --container(-c): string@"nu-complete kube ctns"
     ] {
-        let n = if ($n|empty?) { [] } else { [-n $n] }
-        kubectl logs $n -f $pod
+        let n = if ($namespace|empty?) { [] } else { [-n $namespace] }
+        let c = if ($container|empty?) { [] } else { [-c $container] }
+        kubectl logs $n -f $pod $c
     }
     
     def "nu-complete port forward type" [] {
