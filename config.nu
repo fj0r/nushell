@@ -356,6 +356,7 @@ source docker.nu
 source timeit.nu
 source webhook.nu
 source dir-overlay.nu
+source ime.nu
 
 source _prompt.nu
 #source starship.nu
