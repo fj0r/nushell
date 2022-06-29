@@ -364,6 +364,8 @@ module kubectl {
 
     export alias "kclean finalizer" = kubectl patch -p '{\"metadata\":{\"finalizers\":null}}'
 
+    export alias "kadm renew" = kubeadm alpha certs renew all
+
     ### cert-manager
     export def kgcert [] {
         kubectl get certificates -o wide | from ssv | rename certificates
