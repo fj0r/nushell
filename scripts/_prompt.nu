@@ -521,13 +521,13 @@ def create_right_prompt [] {
 }
 
 def host-abbr [] {
-    let n = (hostname)
-    let n = if ($n | str trim | str length) > 5 {
-        $"($n | str substring ',5')."
-    } else {
-        $n | str trim
-    }
-    $"(ansi dark_gray)($n)(ansi reset)(ansi dark_gray_bold):(ansi light_green_bold)"
+    let n = (hostname | str trim)
+    let ucl = if (id -u | str trim) == '0' {
+            (ansi yellow)
+        } else {
+            (ansi dark_gray)
+        }
+    $"($ucl)($n)(ansi reset)(ansi dark_gray_bold):(ansi light_green_bold)"
 }
 # An opinionated Git prompt for Nushell, styled after posh-git
 def my-prompt [] {
