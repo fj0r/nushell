@@ -522,7 +522,7 @@ def create_right_prompt [] {
 
 def host-abbr [] {
     let n = (hostname | str trim)
-    let ucl = if (id -u | str trim) == '0' {
+    let ucl = if (is-admin) {
             (ansi yellow)
         } else {
             (ansi dark_gray)
