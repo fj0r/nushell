@@ -122,6 +122,7 @@ let-env config = {
   use_ansi_coloring: true
   filesize_format: "auto" # b, kb, kib, mb, mib, gb, gib, tb, tib, pb, pib, eb, eib, zb, zib, auto
   edit_mode: emacs # emacs, vi
+  history_file_format: "sqlite"
   max_history_size: 10000 # Session has to be reloaded for this to take effect
   sync_history_on_enter: true # Enable to share the history between multiple sessions, else you have to close the session to persist history to file
   shell_integration: true # enables terminal markers and a workaround to arrow keys stop working issue
