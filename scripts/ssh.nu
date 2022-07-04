@@ -14,6 +14,8 @@ module ssh {
         -L                                  # l
         -R                                  # r
         -D                                  # d
+        -J: string                          # j
+        -W: string                          # w
     ]
 }
 
