@@ -134,9 +134,14 @@ module docker {
     }
     
     def "nu-complete docker run port" [ctx: string, pos: int] {
-        let x = (ns | get 1.port | into int ) + 1
-        # todo:
-        [ $"($x):80" ]
+        [
+            $"(port 8080):80"
+            $"(port 2222):22"
+            $"(port 3000):3000"
+            $"(port 5000):5000"
+            $"(port 8000):8000"
+            $"(port 9000):9000"
+        ]
     }
     
     def "nu-complete docker run sshkey" [ctx: string, pos: int] {
