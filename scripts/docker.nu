@@ -215,7 +215,7 @@ module docker {
         --proxy: string@"nu-complete docker run proxy"      # proxy
         dx:string@"nu-complete docker dev env"
         --envs(-e): any                                     # { FOO: BAR }
-        --port(-p): any                                     # { 8080: 80 }
+        --port(-p): string@"nu-complete docker run port"    # { 8080: 80 }
         ...cmd                                              # command args
     ] {
         let __dx_cache = {
