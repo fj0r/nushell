@@ -236,7 +236,7 @@ module kubectl {
         port: string    ### reflect port num
     ] {
         let n = if ($n|empty?) { [] } else { [-n $n] }
-        kubectl port-forward $n $res $target $port
+        kubectl port-forward $n $"($res)/($target)" $port
     }
     
     export def kcp [
