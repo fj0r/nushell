@@ -62,7 +62,7 @@ let-env NU_PLUGIN_DIRS = [
 # let-env PATH = ($env.PATH | split row (char esep) | prepend '/some/path')
 let-env TERM = 'screen-256color'
 let-env EDITOR = 'nvim'
-let-env NVIM_PRESET = 'x'
+let-env NVIM_PRESET = if ('NVIM_PRESET' in (env).name) { $env.NVIM_PRESET } else { 'x' }
 
 let-env LD_LIBRARY_PATH = do -i { $env.LD_LIBRARY_PATH | prepend (ls ((ghc --print-libdir) | str trim) | where type == dir | get name) }
 
