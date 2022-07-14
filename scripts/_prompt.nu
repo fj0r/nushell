@@ -73,7 +73,7 @@ module git {
         $dir-comp
     }
 
-    $'($dir-comp | str collect (char separator))'
+    $"($dir-comp | str collect (char separator))"
   }
 
   # Get repository status as structured data
