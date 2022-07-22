@@ -505,19 +505,30 @@ module k8s {
                         $"($ctx.authinfo)@($ctx.cluster)"
                     }
             let p = $"(ansi red)($c)(ansi yellow)/(ansi cyan_bold)($ctx.namespace)"
-            $"($left-bracket)($p)($right-bracket)(ansi purple_bold)" | str trim
+            $"($left-bracket)($p)($right-bracket)" | str trim
         }
     }
 
 }
 
+module proxy {
+    export def "proxy prompt" [] {
+        if ('https_proxy' in (env).name) && (not ($env.https_proxy | empty?)) {
+            $"(ansi blue)|"
+        } else {
+            ""
+        }
+    }
+}
+
 def create_right_prompt [] {
     use k8s *
+    use proxy *
     let time_segment = ([
         (date now | date format '%m/%d/%Y %r')
     ] | str collect)
 
-    $"(kube prompt)($time_segment)"
+    $"(proxy prompt)(kube prompt)(ansi purple_bold)($time_segment)"
 }
 
 def host-abbr [] {
