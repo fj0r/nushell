@@ -378,22 +378,22 @@ let-env config = {
 # starship init nu | save ~/.cache/starship/init.nu
 #source ~/.cache/starship/init.nu
 
-source scripts/utils.nu
-source scripts/zoxide-menu.nu
-source scripts/nushell.nu
-source scripts/sys.nu
-source scripts/alias.nu
-source scripts/git-cmp.nu
-source scripts/git.nu
-source scripts/ssh.nu
-source scripts/kubernetes.nu
-source scripts/docker.nu
-source scripts/timeit.nu
-source scripts/webhook.nu
-source scripts/dir-overlay.nu
-source scripts/ime.nu
+source utils.nu
+source zoxide-menu.nu
+source nushell.nu
+source sys.nu
+source alias.nu
+source git-cmp.nu
+source git.nu
+source ssh.nu
+source kubernetes.nu
+source docker.nu
+source timeit.nu
+source webhook.nu
+source dir-overlay.nu
+source ime.nu
 
-source scripts/_prompt.nu
+source _prompt.nu
 #source scripts/starship.nu
-source scripts/zoxide.nu
-source scripts/web.nu
+source zoxide.nu
+source web.nu
