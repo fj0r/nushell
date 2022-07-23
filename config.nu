@@ -116,7 +116,6 @@ let-env config = {
   quick_completions: true  # set this to false to prevent auto-selecting completions when only one remains
   partial_completions: true  # set this to false to prevent partial filling of the prompt
   completion_algorithm: "fuzzy"  # prefix, fuzzy
-  animate_prompt: false # redraw the prompt every second
   float_precision: 2
   # buffer_editor: "emacs" # command that will be used to edit the current line buffer with ctrl+o, if unset fallback to $env.EDITOR and $env.VISUAL
   use_ansi_coloring: true
@@ -379,22 +378,22 @@ let-env config = {
 # starship init nu | save ~/.cache/starship/init.nu
 #source ~/.cache/starship/init.nu
 
-source utils.nu
-source zoxide-menu.nu
-source nushell.nu
-source sys.nu
-source alias.nu
-source git-cmp.nu
-source git.nu
-source ssh.nu
-source kubernetes.nu
-source docker.nu
-source timeit.nu
-source webhook.nu
-source dir-overlay.nu
-source ime.nu
+source scripts/utils.nu
+source scripts/zoxide-menu.nu
+source scripts/nushell.nu
+source scripts/sys.nu
+source scripts/alias.nu
+source scripts/git-cmp.nu
+source scripts/git.nu
+source scripts/ssh.nu
+source scripts/kubernetes.nu
+source scripts/docker.nu
+source scripts/timeit.nu
+source scripts/webhook.nu
+source scripts/dir-overlay.nu
+source scripts/ime.nu
 
-source _prompt.nu
-#source starship.nu
-source zoxide.nu
-source web.nu
+source scripts/_prompt.nu
+#source scripts/starship.nu
+source scripts/zoxide.nu
+source scripts/web.nu
