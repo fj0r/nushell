@@ -1,10 +1,10 @@
 let dir-overlay = [
     {
-        condition: {|before, after| ('x' in (overlay list)) }
+        condition: {|before, after| ($before != $after) and ('x' in (overlay list)) }
         code: "overlay remove x --keep-env [ PWD ]"
     }
     {
-        condition: {|_, after|($after | path join x.nu | path exists) }
+        condition: {|before, after| ($before != $after) and ($after | path join x.nu | path exists) }
         code: "overlay add x.nu"
     }
 ]        
