@@ -1,3 +1,3 @@
-export def foo [] {
-    echo config-dir
+export def foo [cmd: string, ...arg: any] {
+    ^$cmd $arg
 }
