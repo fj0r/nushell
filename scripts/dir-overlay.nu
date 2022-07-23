@@ -1,11 +1,12 @@
-let dir-overlay = { |before, after|
-    let o = $"($after)/overlay.nu"
-    if ($o | path exists) {
-        #TODO: unimplement
-        #overlay add overlay.nu
+let dir-overlay = [
+    {
+        condition: {|_, after|($after | path join oy.nu | path exists) }
+        code: "overlay add oy.nu"
     }
-}
+    {
+        condition: {|before, after| ('oy' in (overlay list)) }
+        code: "overlay remove oy --keep-env [ PWD ]"
+    }
+]        
 
-let-env config = ($env.config
-                 | upsert hooks.env_change.PWD ($env.config.hooks.env_change.PWD | append $dir-overlay)
-                 )
+let-env config = ($env.config | upsert hooks.env_change.PWD $dir-overlay)
