@@ -42,6 +42,10 @@ let-env ENV_CONVERSIONS = {
     from_string: { |s| $s | split row (char esep) }
     to_string: { |v| $v | path expand | str collect (char esep) }
   }
+  "LD_LIBRARY_PATH": {
+    from_string: { |s| if ($s | empty?) { [] } else { $s | split row (char esep) } }
+    to_string: { |v| if ($v | empty?) { "" } else { $v | path expand | str collect (char esep) } }
+  }
 }
 
 # Directories to search for scripts when calling source or use
@@ -64,18 +68,12 @@ let-env TERM = 'screen-256color'
 let-env EDITOR = 'nvim'
 let-env NVIM_PRESET = if ('NVIM_PRESET' in (env).name) { $env.NVIM_PRESET } else { 'x' }
 
-# :TODO: add to ENV_CONVERSIONS
 let-env LD_LIBRARY_PATH = do -i {
-    if ('LD_LIBRARY_PATH' in (env).name) {
-        $env.LD_LIBRARY_PATH
-    } else {
-        []
-    }
+    $env.LD_LIBRARY_PATH
     | prepend (
         ls ((ghc --print-libdir) | str trim)
         | where type == dir
         | get name
         )
-    | str collect (char esep)
 }
 
