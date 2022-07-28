@@ -341,7 +341,7 @@ let-env config = {
     {
       name: kill-line
       modifier: control
-      keycode: char_k
+      keycode: char_g
       mode: [emacs, vi_normal, vi_insert]
       event: {
         until: [
