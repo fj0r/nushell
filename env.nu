@@ -64,10 +64,7 @@ let-env NU_PLUGIN_DIRS = [
 
 # To add entries to PATH (on Windows you might use Path), you can use the following pattern:
 let-env PATH = ($env.PATH | split row (char esep) | prepend $'($env.HOME)/.local/bin')
-let-env TERM = 'screen-256color'
-let-env EDITOR = 'nvim'
-let-env NVIM_PRESET = if ('NVIM_PRESET' in (env).name) { $env.NVIM_PRESET } else { 'x' }
-
+let-env LD_LIBRARY_PATH = if 'LD_LIBRARY_PATH' in (env).name { $env.LD_LIBRARY_PATH } else { [] }
 let-env LD_LIBRARY_PATH = do -i {
     $env.LD_LIBRARY_PATH
     | prepend (
@@ -76,4 +73,8 @@ let-env LD_LIBRARY_PATH = do -i {
         | get name
         )
 }
+
+let-env TERM = 'screen-256color'
+let-env EDITOR = 'nvim'
+let-env NVIM_PRESET = if 'NVIM_PRESET' in (env).name { $env.NVIM_PRESET } else { 'x' }
 
