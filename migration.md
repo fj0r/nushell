@@ -1,4 +1,9 @@
 ## migrate
+- [ ] Nullability, null coalescing, null-safe calls, null-safe piping #4188
+- [ ] Bash Braces Expansion #2317
+- [ ] Status of equivalents of BASH history expansion #5011
+- [ ] implementation special variables and background jobs? #4564
+
 
 - config
     - [x] struct
@@ -28,7 +33,7 @@
         - [x] toggle-proxy
         - slam
         - wg
-        - [ ] if (( $+commands[ss] )); then
+        - [x] if (( $+commands[ss] )); then
               alias ns='ss -tulwnp'
           else
               alias ns="netstat -plnetu"
@@ -38,7 +43,7 @@
         - [x] docker run
             - [x] docker dev helper
         - [x] list to table
-        - [ ] dcp
+        - [x] dcp
             - [ ] complete: container id with path
         - [-] volume
     - [ ] k8s
@@ -59,7 +64,7 @@
     - [x] ~~`enter` for `ls`~~
     - [x] ~~`tab` in empty for cd: direct path and then `enter`~~
     - [ ] `ctrl+q`
-    - [ ] Brace Expansion {,a,b,c}
+    - [x] ~~Brace Expansion {,a,b,c}~~ (move)
     - [x] heredoc (multilines string)
 - path
     - [x] zoxide
@@ -86,7 +91,7 @@
     - [=] just
         - [x] overlays
         - [x] Parameterizing Scripts
-        - [ ] hooks
+        - [x] hooks
             - [x] enter/leave dir
                 - env_change.PWD
             - [x] pre_prompt + cache
