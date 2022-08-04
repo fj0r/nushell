@@ -403,7 +403,8 @@ source timeit.nu
 source webhook.nu
 source dir-overlay.nu
 #source env-conversions.nu
-source tmux.nu
+#source tmux.nu
+source zellij.nu
 source ime.nu
 
 source _prompt.nu

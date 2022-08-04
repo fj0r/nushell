@@ -18,6 +18,3 @@ module tmux {
 }
 
 use tmux *
-
-
-alias zj = zellij -l compact
