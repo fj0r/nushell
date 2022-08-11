@@ -199,10 +199,12 @@ module kubectl {
     export def ka [
         pod: string@"nu-complete kube pods"
         -n: string@"nu-complete kube ns"
+        --container(-c): string@"nu-complete kube ctns"
         ...args
     ] {
         let n = if ($n|empty?) { [] } else { [-n $n] }
-        kubectl exec $n -it $pod -- (if ($args|empty?) { 'bash' } else { $args })
+        let c = if ($container|empty?) { [] } else { [-c $container] }
+        kubectl exec $n -it $pod $c -- (if ($args|empty?) { 'bash' } else { $args })
     }
     
     export def kl [
