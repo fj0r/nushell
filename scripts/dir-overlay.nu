@@ -7,7 +7,10 @@ let dir-overlay = [
         condition: {|before, after| ($before != $after) and ($after | path join .nu | path exists) }
         # :XXX: `overlay add .nu` as module
         # :XXX: `cd $after` workaround for `overlay add .nu --keep-env [ PWD ]`
-        code: "overlay add ./.nu; cd $after"
+        code: "
+            overlay add ./.nu
+            cd $after
+        "
     }
 ]        
 
