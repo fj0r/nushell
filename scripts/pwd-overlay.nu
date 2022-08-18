@@ -13,4 +13,4 @@ let pwd_overlay = [
     }
 ]        
 
-let-env config = ($env.config | upsert hooks.env_change.PWD $dir_overlay)
+let-env config = ($env.config | upsert hooks.env_change.PWD $pwd_overlay)
