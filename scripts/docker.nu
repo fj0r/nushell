@@ -181,7 +181,7 @@ module docker {
         #let appimage = if $appimage { [--device /dev/fuse --security-opt apparmor:unconfined] } else { [] }
         let appimage = if $appimage { [--device /dev/fuse] } else { [] }
         let netadmin = if $netadmin { [--cap-add=NET_ADMIN --device /dev/net/tun] } else { [] }
-        let clip = if $no-x { [] } else { [-e DISPLAY -v /tmp/.X11-unix:/tmp/.X11-unix] }
+        let clip = if $no_x { [] } else { [-e DISPLAY -v /tmp/.X11-unix:/tmp/.X11-unix] }
         let ssh = if ($ssh|empty?) { [] } else {
             let sshkey = (cat ([~/.ssh $ssh] | path join) | split row ' ' | get 1)
             [-e $"ed25519_($sshuser)=($sshkey)"]
@@ -196,7 +196,7 @@ module docker {
         let cache = if ($cache|empty?) { [] } else { [-v $cache] }
         let args = ([$entrypoint $attach $daemon $envs $ssh $proxy $debug $appimage $netadmin $clip $mnt $port $cache] | flatten)
         let name = $"($img | split row '/' | last | str replace ':' '-')_(date format %m%d%H%M)"
-        if $dry-run {
+        if $dry_run {
             echo $"docker run --name ($name) ($args|str collect ' ') ($img) ($cmd | flatten)"
         } else {
             docker run --name $name $args $img ($cmd | flatten)
@@ -226,7 +226,7 @@ module docker {
             pg: 'pg:/var/lib/postgresql/data'
         }
         let c = do -i {$__dx_cache | transpose k v | where {|x| $dx | str contains $x.k} | get v.0}
-        let c = if ($c|empty?) { '' } else if $mount-cache {
+        let c = if ($c|empty?) { '' } else if $mount_cache {
             let c = ( $c
                     | split row ':'
                     | each -n {|x| if $x.index == 1 { $"/cache($x.item)" } else { $x.item } }
@@ -237,7 +237,7 @@ module docker {
             $"($env.HOME)/.cache/($c)"
         }
         let proxy = if ($proxy|empty?) { nu-complete docker run proxy | get 0 } else { $proxy }
-        if $dry-run {
+        if $dry_run {
             print $"cache: ($c)"
             dr --dry-run --attach $attach --port $port --envs $envs --cache $c -v $"($env.PWD):/world" --debug --proxy $proxy --ssh id_ed25519.pub $dx $cmd
         } else {
