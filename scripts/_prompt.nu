@@ -78,7 +78,7 @@ module git {
 
   # Get repository status as structured data
   export def "my-git structured" [] {
-    let in_git_repo = (do --ignore-errors { git rev_parse --abbrev-ref HEAD } | empty? | nope)
+    let in_git_repo = (do --ignore-errors { git rev-parse --abbrev-ref HEAD } | empty? | nope)
 
     let status = (if $in_git_repo {
       git --no-optional-locks status --porcelain=2 --branch | lines
@@ -420,25 +420,25 @@ module git {
   }
 
 
-  def branch_local_only [
+  def branch-local-only [
     branch: string
   ] {
     $branch | bright-cyan
   }
 
-  def branch_upstream_deleted [
+  def branch-upstream-deleted [
     branch: string
   ] {
     $'($branch)(char failed)' | bright-cyan
   }
 
-  def branch_up_to_date [
+  def branch-up-to-date [
     branch: string
   ] {
     $'($branch)(char identical_to)' | bright-cyan
   }
 
-  def branch_ahead [
+  def branch-ahead [
     branch: string
     ahead: int
   ] {
@@ -521,7 +521,7 @@ module proxy {
     }
 }
 
-def create_right_prompt [] {
+def create-right-prompt [] {
     use k8s *
     use proxy *
     let time_segment = ([
