@@ -47,17 +47,18 @@ module git {
   export def "my_git dir" [] {
     let current_dir = ($env.PWD)
 
-    let current_dir_relative_to_home = (
-      do --ignore-errors { $current_dir | path relative-to $nu.home-path } | str collect
-    )
-
-    let in_sub_dir_of_home = ($current_dir_relative_to_home | empty? | nope)
-
-    let current_dir_abbreviated = (if $in_sub_dir_of_home {
-      $'~(char separator)($current_dir_relative_to_home)'
+    let current_dir_abbreviated = if ($current_dir == $nu.home-path) {
+        "~"
     } else {
-      $current_dir
-    })
+        let current_dir_relative_to_home = (
+            do --ignore-errors { $current_dir | path relative-to $nu.home-path }
+        )
+        if ($current_dir_relative_to_home | empty?) {
+            $current_dir
+        } else {
+            $'~(char separator)($current_dir_relative_to_home)'
+        }
+    }
 
     let dir_comp = ($current_dir_abbreviated | split row (char separator))
     let dir_comp = if ($dir_comp | length) > $DIR_COMP_ABBR {
@@ -66,14 +67,19 @@ module git {
         let body = (
             $dir_comp
             |range 1..-2
-            |each {|x| $x | str substring ',1' }
+            |each {|x| $x | str substring ',2' }
             )
         [$first $body $last] | flatten
     } else {
         $dir_comp
     }
+    let dir_comp = if ($dir_comp | get 0) == '~' {
+        $dir_comp | str collect (char separator)
+    } else {
+        $"/($dir_comp | str collect (char separator))"
+    }
 
-    $"($dir_comp | str collect (char separator))"
+    $dir_comp
   }
 
   # Get repository status as structured data
