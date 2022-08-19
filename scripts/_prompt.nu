@@ -1,33 +1,33 @@
-# my-git
+# my_git
 # An opinionated Git prompt for Nushell, styled after posh-git
 #
 # Quick Start:
-# - Download this script (my-git.nu)
+# - Download this script (my_git.nu)
 # - In your Nushell config:
 #   - Source this script
-#   - Set my-git as your prompt command
+#   - Set my_git as your prompt command
 #   - Disable the separate prompt indicator by setting it to an empty string
 # - For example, with this script in your home directory:
-#     source ~/my-git.nu
-#     let-env PROMPT_COMMAND = { my-git }
+#     source ~/my_git.nu
+#     let-env PROMPT_COMMAND = { my_git }
 #     let-env PROMPT_INDICATOR = { "" }
 # - Restart Nushell
 #
-# For more documentation or to file an issue, see https://github.com/ehdevries/my-git
+# For more documentation or to file an issue, see https://github.com/ehdevries/my_git
 
-def bright-cyan [] {
+def bright_cyan [] {
   each { |it| $"(ansi -e '96m')($it)(ansi reset)" }
 }
 
-def bright-green [] {
+def bright_green [] {
   each { |it| $"(ansi -e '92m')($it)(ansi reset)" }
 }
 
-def bright-red [] {
+def bright_red [] {
   each { |it| $"(ansi -e '91m')($it)(ansi reset)" }
 }
 
-def bright-yellow [] {
+def bright_yellow [] {
   each { |it| $"(ansi -e '93m')($it)(ansi reset)" }
 }
 
@@ -39,12 +39,12 @@ def red [] {
   each { |it| $"(ansi red)($it)(ansi reset)" }
 }
 
-# Internal commands for building up the my-git shell prompt
+# Internal commands for building up the my_git shell prompt
 let DIR_COMP_ABBR = 5
 module git {
 
   # Get the current directory with home abbreviated
-  export def "my-git dir" [] {
+  export def "my_git dir" [] {
     let current_dir = ($env.PWD)
 
     let current_dir_relative_to_home = (
@@ -77,7 +77,7 @@ module git {
   }
 
   # Get repository status as structured data
-  export def "my-git structured" [] {
+  export def "my_git structured" [] {
     let in_git_repo = (do --ignore-errors { git rev-parse --abbrev-ref HEAD } | empty? | nope)
 
     let status = (if $in_git_repo {
@@ -280,8 +280,8 @@ module git {
   }
 
   # Get repository status as a styled string
-  export def "my-git styled" [] {
-    let status = (my-git structured)
+  export def "my_git styled" [] {
+    let status = (my_git structured)
 
     let is_local_only = ($status.tracking_upstream_branch != true)
 
@@ -326,17 +326,17 @@ module git {
 
     let branch_styled = (if $status.in_git_repo {
       (if $is_local_only {
-        (branch-local-only $branch_name)
+        (branch_local_only $branch_name)
       } else if $is_up_to_date {
-        (branch-up-to-date $branch_name)
+        (branch_up_to_date $branch_name)
       } else if $is_ahead {
-        (branch-ahead $branch_name $status.commits_ahead)
+        (branch_ahead $branch_name $status.commits_ahead)
       } else if $is_behind {
-        (branch-behind $branch_name $status.commits_behind)
+        (branch_behind $branch_name $status.commits_behind)
       } else if $is_ahead_and_behind {
-        (branch-ahead-and-behind $branch_name $status.commits_ahead $status.commits_behind)
+        (branch_ahead_and_behind $branch_name $status.commits_ahead $status.commits_behind)
       } else if $upstream_deleted {
-        (branch-upstream-deleted $branch_name)
+        (branch_upstream_deleted $branch_name)
       } else {
         $branch_name
       })
@@ -360,25 +360,25 @@ module git {
     let has_merge_conflicts = $status.merge_conflict_count > 0
 
     let staging_summary = (if $has_staging_changes {
-      (staging-changes $status.staging_added_count $status.staging_modified_count $status.staging_deleted_count)
+      (staging_changes $status.staging_added_count $status.staging_modified_count $status.staging_deleted_count)
     } else {
       ''
     })
 
     let worktree_summary = (if $has_worktree_changes {
-      (worktree-changes $status.untracked_count $status.worktree_modified_count $status.worktree_deleted_count)
+      (worktree_changes $status.untracked_count $status.worktree_modified_count $status.worktree_deleted_count)
     } else {
       ''
     })
 
     let merge_conflict_summary = (if $has_merge_conflicts {
-      (unresolved-conflicts $status.merge_conflict_count)
+      (unresolved_conflicts $status.merge_conflict_count)
     } else {
       ''
     })
 
     let delimiter = (if ($has_staging_changes && $has_worktree_changes) {
-      ('|' | bright-yellow)
+      ('|' | bright_yellow)
     } else {
       ''
     })
@@ -391,7 +391,7 @@ module git {
       (if $has_worktree_changes {
         ('!' | red)
       } else if $has_staging_changes {
-        ('~' | bright-cyan)
+        ('~' | bright_cyan)
       } else {
         ''
       })
@@ -403,8 +403,8 @@ module git {
       $'($branch_styled) ($local_summary) ($local_indicator)' | str trim
     )
 
-    let left_bracket = ('|' | bright-yellow)
-    let right_bracket = ('' | bright-yellow)
+    let left_bracket = ('|' | bright_yellow)
+    let right_bracket = ('' | bright_yellow)
 
     (if $status.in_git_repo {
       $'($left_bracket)($repo_summary)($right_bracket)'
@@ -420,47 +420,47 @@ module git {
   }
 
 
-  def branch-local-only [
+  def branch_local_only [
     branch: string
   ] {
-    $branch | bright-cyan
+    $branch | bright_cyan
   }
 
-  def branch-upstream-deleted [
+  def branch_upstream_deleted [
     branch: string
   ] {
-    $'($branch)(char failed)' | bright-cyan
+    $'($branch)(char failed)' | bright_cyan
   }
 
-  def branch-up-to-date [
+  def branch_up_to_date [
     branch: string
   ] {
-    $'($branch)(char identical_to)' | bright-cyan
+    $'($branch)(char identical_to)' | bright_cyan
   }
 
-  def branch-ahead [
+  def branch_ahead [
     branch: string
     ahead: int
   ] {
-    $'($branch)(char branch_ahead)($ahead)' | bright-green
+    $'($branch)(char branch_ahead)($ahead)' | bright_green
   }
 
-  def branch-behind [
+  def branch_behind [
     branch: string
     behind: int
   ] {
-    $'($branch)(char branch_behind)($behind)' | bright-red
+    $'($branch)(char branch_behind)($behind)' | bright_red
   }
 
-  def branch-ahead-and-behind [
+  def branch_ahead_and_behind [
     branch: string
     ahead: int
     behind: int
   ] {
-    $'($branch)(char branch_behind)($behind)(char branch_ahead)($ahead)' | bright-yellow
+    $'($branch)(char branch_behind)($behind)(char branch_ahead)($ahead)' | bright_yellow
   }
 
-  def staging-changes [
+  def staging_changes [
     added: int
     modified: int
     deleted: int
@@ -468,7 +468,7 @@ module git {
     $'+($added)~($modified)-($deleted)' | green
   }
 
-  def worktree-changes [
+  def worktree_changes [
     added: int
     modified: int
     deleted: int
@@ -476,7 +476,7 @@ module git {
     $'+($added)~($modified)-($deleted)' | red
   }
 
-  def unresolved-conflicts [
+  def unresolved_conflicts [
     conflicts: int
   ] {
     $'!($conflicts)' | red
@@ -497,8 +497,8 @@ module k8s {
     export def "kube prompt" [] {
         do -i {
             let ctx = kube ctx
-            let left_bracket = ('' | bright-yellow)
-            let right_bracket = ('|' | bright-yellow)
+            let left_bracket = ('' | bright_yellow)
+            let right_bracket = ('|' | bright_yellow)
             let c = if $ctx.authinfo == $ctx.cluster {
                         $ctx.cluster
                     } else {
@@ -521,7 +521,7 @@ module proxy {
     }
 }
 
-def create-right-prompt [] {
+def right_prompt [] {
     use k8s *
     use proxy *
     let time_segment = ([
@@ -531,7 +531,7 @@ def create-right-prompt [] {
     $"(proxy prompt)(kube prompt)(ansi purple_bold)($time_segment)"
 }
 
-def host-abbr [] {
+def host_abbr [] {
     let n = (hostname | str trim)
     let ucl = if (is-admin) {
             (ansi yellow)
@@ -541,10 +541,10 @@ def host-abbr [] {
     $"($ucl)($n)(ansi reset)(ansi dark_gray_bold):(ansi light_green_bold)"
 }
 # An opinionated Git prompt for Nushell, styled after posh-git
-def my-prompt [] {
+def my_prompt [] {
   use git *
-  $"(host-abbr)(my-git dir)(my-git styled)"
+  $"(host_abbr)(my_git dir)(my_git styled)"
 }
 
-let-env PROMPT_COMMAND = { my-prompt }
-let-env PROMPT_COMMAND_RIGHT = { create_right_prompt }
+let-env PROMPT_COMMAND = { my_prompt }
+let-env PROMPT_COMMAND_RIGHT = { right_prompt }
