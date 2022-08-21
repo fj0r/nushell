@@ -4,6 +4,12 @@ let pwd_overlay = [
         code: "overlay remove cwd --keep-env [ PWD ]"
     }
     {
+        condition: {|before, after| ($before != $after) and ($after | path join .env.yaml | path exists) }
+        code: "
+            cat .env.yaml | from yaml | load-env
+        "
+    }
+    {
         condition: {|before, after| ($before != $after) and ($after | path join .nu | path exists) }
         # :XXX: `cd $after` workaround for `overlay add .nu --keep-env [ PWD ]`
         code: "
