@@ -393,25 +393,25 @@ let-env config = {
   ]
 }
 
-use scripts/utils.nu *
-source zoxide-menu.nu
-use scripts/nushell.nu *
-use scripts/sys.nu *
-use scripts/alias.nu *
-use scripts/git-cmp.nu *
-use scripts/git.nu *
-use scripts/ssh.nu *
+use utils.nu *
+use zoxide-menu.nu *
+use nushell.nu *
+use sys.nu *
+use alias.nu *
+use git-cmp.nu *
+use git.nu *
+use ssh.nu *
 use kubernetes.nu *
 use docker.nu *
 #overlay use timeit.nu
 use webhook.nu *
-source pwd-overlay.nu
+use pwd-overlay.nu *
 ####overlay use env-conversions.nu
 ####overlay use tmux.nu
 use zellij.nu *
-source ime.nu
+use ime.nu *
 
-source _prompt.nu
-####overlay use scripts/starship.nu
+use _prompt.nu *
+####overlay use starship.nu
 source zoxide.nu
 use web.nu *
