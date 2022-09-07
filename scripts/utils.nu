@@ -1,4 +1,4 @@
-def 'filter index' [...idx] {
+export def 'filter index' [...idx] {
     reduce -f [] -n {|it, acc|
         if $it.index not-in ($idx|flatten) {
             $acc.item | append $it.item
@@ -8,7 +8,7 @@ def 'filter index' [...idx] {
     }
 }
 
-def "parse cmd" [] {
+export def "parse cmd" [] {
     $in
     | split row ' '
     | reduce -f { args: [], sw: '' } {|it, acc|

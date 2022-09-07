@@ -1,4 +1,4 @@
-extern "nu" [
+export extern "nu" [
   --help(-h)                # Display this help message
   --stdin                   # redirect the stdin
   --login(-l)               # start as a login shell

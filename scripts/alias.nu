@@ -1,6 +1,6 @@
-alias d = podman
-alias e = nvim
-alias j = just
-alias k = kubectl
-alias r = rg
-alias s = shells
+export alias d = podman
+export alias e = nvim
+export alias j = just
+export alias k = kubectl
+export alias r = rg
+export alias s = shells
