@@ -403,15 +403,15 @@ use git.nu *
 use ssh.nu *
 use kubernetes.nu *
 use docker.nu *
-#overlay use timeit.nu
+#use timeit.nu *
 use webhook.nu *
 use pwd-overlay.nu *
-####overlay use env-conversions.nu
-####overlay use tmux.nu
+####use env-conversions.nu *
+####use tmux.nu *
 use zellij.nu *
 use ime.nu *
 
 use _prompt.nu *
-####overlay use starship.nu
-source zoxide.nu
+####use starship.nu *
 use web.nu *
+source zoxide.nu
