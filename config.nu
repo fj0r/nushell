@@ -386,32 +386,32 @@ let-env config = {
         mode: emacs
         event: [
             { edit: Clear }
-            { edit: InsertString value: $"source ($nu.config-path)" }
+            { edit: InsertString value: $"overlay use ($nu.config-path)" }
             { send: Enter }
         ]
     }
   ]
 }
 
-source utils.nu
+overlay use utils.nu
 source zoxide-menu.nu
-source nushell.nu
-source sys.nu
-source alias.nu
-source git-cmp.nu
-source git.nu
-source ssh.nu
-source kubernetes.nu
-source docker.nu
-source timeit.nu
-source webhook.nu
+overlay use nushell.nu
+overlay use sys.nu
+overlay use alias.nu
+overlay use git-cmp.nu
+overlay use git.nu
+overlay use ssh.nu
+overlay use kubernetes.nu
+overlay use docker.nu
+#overlay use timeit.nu
+overlay use webhook.nu
 source pwd-overlay.nu
-#source env-conversions.nu
-#source tmux.nu
-source zellij.nu
+####overlay use env-conversions.nu
+####overlay use tmux.nu
+overlay use zellij.nu
 source ime.nu
 
 source _prompt.nu
-#source scripts/starship.nu
+####overlay use scripts/starship.nu
 source zoxide.nu
-source web.nu
+overlay use web.nu
