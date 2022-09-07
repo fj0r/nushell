@@ -4,7 +4,7 @@ module sys {
         | awk '(NR>2)'
         | parse -r '(?P<proto>\w+) +(?P<recv>[0-9]+) +(?P<send>[0-9]+) +(?P<local>[0-9.]+):(?P<port>[0-9]+) +(?P<foreign>[0-9.:]+):(?P<f_port>[0-9]+) +(?P<state>\w+) +(?P<user>[0-9]+) +(?P<inode>[0-9]+) +(?P<program>.+)'
     }
-    
+
     def "nu-complete proxys" [] {
         [
             'http://localhost:7890'
@@ -13,13 +13,13 @@ module sys {
     }
 
     export def-env "toggle proxy" [proxy?:string@"nu-complete proxys"] {
-        let has_set = not (do -i { $env.http_proxy } | empty?)
-        let no_val = ($proxy | empty?)
+        let has_set = not (do -i { $env.http_proxy } | is-empty)
+        let no_val = ($proxy | is-empty)
         let proxy = if $has_set and $no_val {
                     echo 'hide proxy'
                     $nothing
                 } else {
-                    let p = if ($proxy|empty?) {
+                    let p = if ($proxy|is-empty) {
                                 'http://localhost:7890'
                             } else {
                                 $proxy

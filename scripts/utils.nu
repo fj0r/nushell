@@ -12,7 +12,7 @@ def "parse cmd" [] {
     $in
     | split row ' '
     | reduce -f { args: [], sw: '' } {|it, acc|
-        if ($acc.sw|empty?) {
+        if ($acc.sw|is-empty) {
             if ($it|str starts-with '-') {
                 $acc | upsert sw $it
             } else {

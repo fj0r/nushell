@@ -8,7 +8,7 @@ module git {
             | reduce -f { c: '', r: [] } {|it, acc|
                 if ($it | str starts-with '»¦«') {
                     $acc | upsert c ($it | str substring '6,')
-                } else if ($it | find -r '[0-9]+ file.+change' | empty?) {
+                } else if ($it | find -r '[0-9]+ file.+change' | is-empty) {
                     $acc
                 } else {
                     let x = (
@@ -35,7 +35,7 @@ module git {
             | get r
         }
     }
-    
+
     export def _git_log [v num] {
         let stat = if $v {
             _git_stat $num
@@ -52,42 +52,42 @@ module git {
             $r
         }
     }
-    
+
     def "nu-complete git log" [] {
         git log -n $DEFAULT_NUM --pretty=%h»¦«%s
         | lines
         | split column "»¦«" value description
     }
-    
+
     export def glg [
         commit?: string@"nu-complete git log"
         --verbose(-v):bool
         --num(-n):int=$DEFAULT_NUM
     ] {
-        if ($commit|empty?) {
+        if ($commit|is-empty) {
             _git_log $verbose $num
         } else {
             git log --stat -p -n 1 $commit
         }
     }
-    
+
     export def glgv [
         commit?: string@"nu-complete git log"
         --num(-n):int=$DEFAULT_NUM
     ] {
-        if ($commit|empty?) {
+        if ($commit|is-empty) {
             _git_log true $num
         } else {
             git log --stat -p -n 1 $commit
         }
     }
-    
+
     export def gpp! [] {
         git add --all
         git commit -v -a --no-edit --amend
         git push --force
     }
-    
+
     export def gha [] {
         git log --pretty=%h»¦«%aN»¦«%s»¦«%aD
         | lines
@@ -96,24 +96,24 @@ module git {
         | sort-by merger
         | reverse
     }
-    
+
     def "nu-complete git branches" [] {
       ^git branch | lines | each { |line| $line | str replace '[\*\+] ' '' | str trim }
     }
-    
+
     def "nu-complete git remotes" [] {
       ^git remote | lines | each { |line| $line | str trim }
     }
-    
+
     export def gm [branch:string@"nu-complete git branches"] {
         git merge $branch
     }
-    
+
     extern "git reset" [
         sha?:string@"nu-complete git log"
         --hard:bool
     ]
-    
+
     export alias gp = git push
     export alias gpf! = git push --force
     export alias gl = git pull
@@ -124,7 +124,7 @@ module git {
     export alias gav = git add --verbose
     export alias gap = git apply
     export alias gapt = git apply --3way
-    
+
     export alias gb = git branch
     export alias gba = git branch -a
     export alias gbd = git branch -d
@@ -138,7 +138,7 @@ module git {
     export alias gbsg = git bisect good
     export alias gbsr = git bisect reset
     export alias gbss = git bisect start
-    
+
     export alias gc = git commit -v
     export alias gc! = git commit -v --amend
     export alias gcn! = git commit -v --no-edit --amend
@@ -162,7 +162,7 @@ module git {
     export alias gcpa = git cherry-pick --abort
     export alias gcpc = git cherry-pick --continue
     export alias gcs = git commit -S
-    
+
     export alias gd = git diff
     export alias gdca = git diff --cached
     export alias gdcw = git diff --cached --word-diff
@@ -170,7 +170,7 @@ module git {
     export alias gds = git diff --staged
     export alias gdt = git diff-tree --no-commit-id --name-only -r
     export alias gdw = git diff --word-diff
-    
+
     export alias gr = git remote
     export alias gra = git remote add
     export alias grb = git rebase
@@ -197,7 +197,7 @@ module git {
     export alias gru = git reset --
     export alias grup = git remote update
     export alias grv = git remote -v
-    
+
     export alias gsb = git status -sb
     export alias gsd = git svn dcommit
     export alias gsh = git show
@@ -206,8 +206,8 @@ module git {
     export alias gsr = git svn rebase
     export alias gss = git status -s
     export alias gs = git status
-    
-    
+
+
     export alias gstaa = git stash apply
     export alias gstc = git stash clear
     export alias gstd = git stash drop
@@ -219,16 +219,16 @@ module git {
     export alias gsu = git submodule update
     export alias gsw = git switch
     export alias gswc = git switch -c
-    
+
     export alias gts = git tag -s
-    
+
     export alias gunignore = git update-index --no-assume-unchanged
     export alias gup = git pull --rebase
     export alias gupv = git pull --rebase -v
     export alias gupa = git pull --rebase --autostash
     export alias gupav = git pull --rebase --autostash -v
     export alias glum = git pull upstream $(git_main_branch)
-    
+
     # cat ($nu.config-path | path dirname | path join 'scripts' | path join 'a.nu' )
 }
 

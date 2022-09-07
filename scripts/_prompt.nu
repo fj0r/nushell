@@ -53,7 +53,7 @@ module git {
         let current_dir_relative_to_home = (
             do --ignore-errors { $current_dir | path relative-to $nu.home-path }
         )
-        if ($current_dir_relative_to_home | empty?) {
+        if ($current_dir_relative_to_home | is-empty) {
             $current_dir
         } else {
             $'~(char separator)($current_dir_relative_to_home)'
@@ -84,7 +84,7 @@ module git {
 
   # Get repository status as structured data
   export def "my_git structured" [] {
-    let in_git_repo = (do --ignore-errors { git rev-parse --abbrev-ref HEAD } | empty? | nope)
+    let in_git_repo = (do --ignore-errors { git rev-parse --abbrev-ref HEAD } | is-empty | nope)
 
     let status = (if $in_git_repo {
       git --no-optional-locks status --porcelain=2 --branch | lines
@@ -127,7 +127,7 @@ module git {
       $status
       | where ($it | str starts-with '# branch.upstream')
       | str collect
-      | empty?
+      | is-empty
       | nope
     } else {
       false
@@ -137,7 +137,7 @@ module git {
       $status
       | where ($it | str starts-with '# branch.ab')
       | str collect
-      | empty?
+      | is-empty
       | nope
     } else {
       false
@@ -174,7 +174,7 @@ module git {
       $status
       | where ($it | str starts-with '1') || ($it | str starts-with '2')
       | str collect
-      | empty?
+      | is-empty
       | nope
     } else {
       false
@@ -184,7 +184,7 @@ module git {
       $status
       | where ($it | str starts-with '?')
       | str collect
-      | empty?
+      | is-empty
       | nope
     } else {
       false
@@ -194,7 +194,7 @@ module git {
       $status
       | where ($it | str starts-with 'u')
       | str collect
-      | empty?
+      | is-empty
       | nope
     } else {
       false
@@ -519,7 +519,7 @@ module k8s {
 
 module proxy {
     export def "proxy prompt" [] {
-        if ('https_proxy' in (env).name) && (not ($env.https_proxy | empty?)) {
+        if ('https_proxy' in (env).name) && (not ($env.https_proxy | is-empty)) {
             $"(ansi blue)|"
         } else {
             ""
