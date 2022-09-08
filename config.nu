@@ -117,7 +117,7 @@ let-env config = {
   table_mode: compact # basic, compact, compact_double, light, thin, with_love, rounded, reinforced, heavy, none, other
   use_ls_colors: true
   rm_always_trash: false
-  color_config: $light_theme   # if you want a light theme, replace `$dark_theme` to `$light_theme`
+  color_config: $dark_theme   # if you want a light theme, replace `$dark_theme` to `$light_theme`
   use_grid_icons: true
   footer_mode: "25" # always, never, number_of_rows, auto
   quick_completions: true  # set this to false to prevent auto-selecting completions when only one remains
