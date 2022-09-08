@@ -522,14 +522,6 @@ export def "proxy prompt" [] {
     }
 }
 
-def right_prompt [] {
-    let time_segment = ([
-        (date now | date format '%m/%d/%Y %r')
-    ] | str collect)
-
-    $"(proxy prompt)(kube prompt)(ansi purple_bold)($time_segment)"
-}
-
 def host_abbr [] {
     let n = (hostname | str trim)
     let ucl = if (is-admin) {
@@ -539,6 +531,18 @@ def host_abbr [] {
         }
     $"($ucl)($n)(ansi reset)(ansi dark_gray_bold):(ansi light_green_bold)"
 }
+
+
+def right_prompt [] {
+    {
+        let time_segment = ([
+            (date now | date format '%m/%d/%Y %r')
+        ] | str collect)
+
+        $"(proxy prompt)(kube prompt)(ansi purple_bold)($time_segment)"
+    }
+}
+
 # An opinionated Git prompt for Nushell, styled after posh-git
 def my_prompt [] {
     {
