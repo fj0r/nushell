@@ -308,8 +308,16 @@ export def ksd [
 
 export alias krsd = kubectl rollout status deployment
 export alias kgrs = kubectl get rs
-export alias krh = kubectl rollout history
-export alias kru = kubectl rollout undo
+export def krh [-n: string@"nu-complete kube ns", --revision (-v): int, dpl: string@"nu-complete kube deployments"] {
+    let n = if ($n|is-empty) { [] } else { [-n $n] }
+    let v = if ($revision|is-empty) { [] } else { [ $"--revision=($revision)" ] }
+    kubectl $n rollout history $"deployment/($dpl)" $v
+}
+export def kru [-n: string@"nu-complete kube ns", --revision (-v): int, dpl: string@"nu-complete kube deployments"] {
+    let n = if ($n|is-empty) { [] } else { [-n $n] }
+    let v = if ($revision|is-empty) { [] } else { [ $"--to-revision=($revision)" ] }
+    kubectl $n rollout undo $"deployment/($dpl)" $v
+}
 export alias ksss = kubectl scale statefulset
 export alias krsss = kubectl rollout status statefulset
 
