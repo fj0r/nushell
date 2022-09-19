@@ -129,6 +129,7 @@ def "nu-complete docker run vol" [] {
         $"($env.PWD):/world"
         $"($env.PWD):/app"
         $"($env.PWD):/srv"
+        $"($env.HOME)/.config/nvim:/etc/nvim"
     ]
 }
 
