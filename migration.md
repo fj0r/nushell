@@ -3,6 +3,8 @@
 - [ ] Bash Braces Expansion #2317
 - [ ] Status of equivalents of BASH history expansion #5011
 - [ ] implementation special variables and background jobs? #4564
+- [ ] Pasting multi-line command (with backslash) doesn't work #4044
+- [ ] source .env (/etc/os-release)
 
 
 - config
