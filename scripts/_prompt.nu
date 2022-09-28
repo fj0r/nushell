@@ -73,9 +73,9 @@ export def "my_git dir" [] {
       $dir_comp
   }
   let dir_comp = if ($dir_comp | get 0) == '~' {
-      $dir_comp | str collect (char separator)
+      $dir_comp | str join (char separator)
   } else {
-      $"/($dir_comp | str collect (char separator))"
+      $"/($dir_comp | str join (char separator))"
   }
 
   $dir_comp
@@ -125,7 +125,7 @@ export def "my_git structured" [] {
   let tracking_upstream_branch = (if $in_git_repo {
     $status
     | where ($it | str starts-with '# branch.upstream')
-    | str collect
+    | str join
     | is-empty
     | nope
   } else {
@@ -135,7 +135,7 @@ export def "my_git structured" [] {
   let upstream_exists_on_remote = (if $in_git_repo {
     $status
     | where ($it | str starts-with '# branch.ab')
-    | str collect
+    | str join
     | is-empty
     | nope
   } else {
@@ -172,7 +172,7 @@ export def "my_git structured" [] {
   let has_staging_or_worktree_changes = (if $in_git_repo {
     $status
     | where ($it | str starts-with '1') || ($it | str starts-with '2')
-    | str collect
+    | str join
     | is-empty
     | nope
   } else {
@@ -182,7 +182,7 @@ export def "my_git structured" [] {
   let has_untracked_files = (if $in_git_repo {
     $status
     | where ($it | str starts-with '?')
-    | str collect
+    | str join
     | is-empty
     | nope
   } else {
@@ -192,7 +192,7 @@ export def "my_git structured" [] {
   let has_unresolved_merge_conflicts = (if $in_git_repo {
     $status
     | where ($it | str starts-with 'u')
-    | str collect
+    | str join
     | is-empty
     | nope
   } else {
@@ -323,7 +323,7 @@ export def "my_git styled" [] {
     (if $status.on_named_branch {
       $status.branch_name
     } else {
-      ['(' $status.commit_hash '...)'] | str collect
+      ['(' $status.commit_hash '...)'] | str join
     })
   } else {
     ''
@@ -537,7 +537,7 @@ def right_prompt [] {
     {
         let time_segment = ([
             (date now | date format '%m/%d/%Y %r')
-        ] | str collect)
+        ] | str join)
 
         $"(proxy prompt)(kube prompt)(ansi purple_bold)($time_segment)"
     }

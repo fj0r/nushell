@@ -201,7 +201,7 @@ export def dr [
     let args = ([$entrypoint $attach $daemon $envs $ssh $proxy $debug $appimage $netadmin $clip $mnt $port $cache] | flatten)
     let name = $"($img | split row '/' | last | str replace ':' '-')_(date format %m%d%H%M)"
     if $dry_run {
-        echo $"docker run --name ($name) ($args|str collect ' ') ($img) ($cmd | flatten)"
+        echo $"docker run --name ($name) ($args|str join ' ') ($img) ($cmd | flatten)"
     } else {
         docker run --name $name $args $img ($cmd | flatten)
     }
@@ -234,7 +234,7 @@ export def dx [
         let c = ( $c
                 | split row ':'
                 | each -n {|x| if $x.index == 1 { $"/cache($x.item)" } else { $x.item } }
-                | str collect ':'
+                | str join ':'
                 )
         $"($env.HOME)/.cache/($c)"
     } else {
