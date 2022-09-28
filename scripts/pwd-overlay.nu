@@ -19,6 +19,8 @@ def pwd_overlay [] {
             "
         }
     ]
-} 
+}
 
-export env config { $env.config | upsert hooks.env_change.PWD (pwd_overlay) }
+export-env {
+    let config = ( $env.config | upsert hooks.env_change.PWD (pwd_overlay) )
+}

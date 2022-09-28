@@ -41,9 +41,11 @@ def __edit_keybinding [] {
         { send: OpenEditor }
       ]
     }
-} 
+}
 
-export env config { $env.config
+export-env {
+    let config  = ($env.config
                   | upsert menus ($env.config.menus | append (__zoxide_menu))
                   | upsert keybindings ($env.config.keybindings | append [(__zoxide_keybinding) (__edit_keybinding)])
-                  }
+                  )
+}

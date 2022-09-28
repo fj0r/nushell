@@ -550,5 +550,7 @@ def my_prompt [] {
     }
 }
 
-export env PROMPT_COMMAND { my_prompt }
-export env PROMPT_COMMAND_RIGHT { right_prompt }
+export-env {
+    let PROMPT_COMMAND = my_prompt
+    let PROMPT_COMMAND_RIGHT = right_prompt
+}
