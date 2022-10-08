@@ -76,10 +76,6 @@ export def dh [img: string@"nu-complete docker images"] {
     docker history --no-trunc $img | from ssv -a
 }
 
-export def dt [$from: string@"nu-complete docker images" to:string] {
-    docker tag $from $to
-}
-
 export def dsv [...img: string@"nu-complete docker images"] {
     docker save $img
 }
@@ -96,7 +92,7 @@ export def drmi [img: string@"nu-complete docker images"] {
     docker rmi $img
 }
 
-export def dtg [from: string@"nu-complete docker images"  to: string] {
+export def dt [from: string@"nu-complete docker images"  to: string] {
     docker tag $from $to
 }
 
