@@ -407,8 +407,8 @@ use docker.nu *
 use webhook.nu *
 use pwd-overlay.nu *
 ####use env-conversions.nu *
-####use tmux.nu *
 use zellij.nu *
+use nvim.nu *
 use ime.nu *
 
 use _prompt.nu *
