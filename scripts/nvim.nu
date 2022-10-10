@@ -30,3 +30,13 @@ export def t [...file: string] {
         edit tabnew $file
     }
 }
+
+export def drop [] {
+    if 'NVIM' in (env).name {
+        # TODO:
+        let b = (nvim --headless --noplugin --server $env.NVIM --remote-expr 'new')
+        nvim --headless --noplugin --server $env.NVIM --remote-send $in
+    } else {
+        echo $in
+    }
+}
