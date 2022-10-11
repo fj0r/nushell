@@ -40,7 +40,7 @@ export def e [...file: string] {
     if ($file|is-empty) {
         nvim
     } else {
-        edit split $file
+        edit vsplit $file
     }
 }
 
@@ -75,5 +75,14 @@ export def drop [] {
         nvim --headless --noplugin --server $env.NVIM --remote-send $in
     } else {
         echo $in
+    }
+}
+
+export def nvim_lua [...expr: string] {
+    if 'NVIM' in (env).name {
+        nvim --headless --noplugin --server $env.NVIM --remote-send $'<cmd>lua vim.g.remote_expr_lua = ($expr|str join " ")<cr>'
+        nvim --headless --noplugin --server $env.NVIM --remote-expr 'g:remote_expr_lua'
+    } else {
+        echo "not found nvim instance"
     }
 }
