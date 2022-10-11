@@ -1,3 +1,25 @@
+def nvim_tcd [] {
+    [
+        {|before, after|
+            if 'NVIM' in (env).name {
+                nvim --headless --noplugin --server $env.NVIM --remote-send $"<cmd>silent tcd! ($after)<cr>"
+            }
+        }
+    ]
+}
+
+export-env {
+    let-env config = ( $env.config | upsert hooks.env_change.PWD { |config|
+        let o = ($config | get -i hooks.env_change.PWD)
+        let val = (nvim_tcd)
+        if $o == $nothing {
+            $val
+        } else {
+            $o | append $val
+        }
+    })
+}
+
 def edit [action file] {
     if 'NVIM' in (env).name {
         let af = ($file | each {|f|
