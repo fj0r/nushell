@@ -22,6 +22,14 @@ export def e [...file: string] {
     }
 }
 
+export def c [...file: string] {
+    if ($file|is-empty) {
+        nvim
+    } else {
+        edit split $file
+    }
+}
+
 export def v [...file: string] {
     if ($file|is-empty) {
         nvim
@@ -30,7 +38,7 @@ export def v [...file: string] {
     }
 }
 
-export def t [...file: string] {
+export def x [...file: string] {
     if ($file|is-empty) {
         nvim
     } else {
