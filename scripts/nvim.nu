@@ -1,6 +1,13 @@
 def edit [action file] {
     if 'NVIM' in (env).name {
-        let cmd = $"<cmd>($action) ($file|str join ' ')<cr>"
+        let af = ($file | each {|f|
+            if ($f|str substring ',1') in ['/', '~'] {
+                $f
+            } else {
+                $"($env.PWD)/($f)"
+            }
+        })
+        let cmd = $"<cmd>($action) ($af|str join ' ')<cr>"
         nvim --headless --noplugin --server $env.NVIM --remote-send $cmd
     } else {
         nvim $file

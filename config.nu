@@ -301,7 +301,7 @@ let-env config = {
     {
       name: history_menu
       modifier: control
-      keycode: char_r
+      keycode: char_s
       mode: emacs
       event: { send: menu name: history_menu }
     }
@@ -374,7 +374,7 @@ let-env config = {
     }
     {
       name: commands_with_description
-      modifier: control
+      modifier: alt
       keycode: char_s
       mode: [emacs, vi_normal, vi_insert]
       event: { send: menu name: commands_with_description }
