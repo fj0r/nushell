@@ -70,9 +70,11 @@ export def x [...file: string] {
 
 export def drop [] {
     if 'NVIM' in (env).name {
-        # TODO:
-        let b = (nvim --headless --noplugin --server $env.NVIM --remote-expr 'new')
-        nvim --headless --noplugin --server $env.NVIM --remote-send $in
+        let c = $in
+        let temp = (mktemp -t nuvim.XXXXXXXX|str trim)
+        $c | save $temp
+        nvim --headless --noplugin --server $env.NVIM --remote-send $'<cmd>vnew|read ($temp)<cr>'
+        nvim --headless --noplugin --server $env.NVIM --remote-send $'<cmd>silent !rm -f ($temp)<cr>'
     } else {
         echo $in
     }
