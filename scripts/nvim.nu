@@ -83,7 +83,7 @@ export def drop [] {
 export def nvim_lua [...expr: string] {
     if 'NVIM' in (env).name {
         nvim --headless --noplugin --server $env.NVIM --remote-send $'<cmd>lua vim.g.remote_expr_lua = ($expr|str join " ")<cr>'
-        nvim --headless --noplugin --server $env.NVIM --remote-expr 'g:remote_expr_lua'
+        do -i { nvim --headless --noplugin --server $env.NVIM --remote-expr 'g:remote_expr_lua' } | complete | get stderr
     } else {
         echo "not found nvim instance"
     }
