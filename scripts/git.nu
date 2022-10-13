@@ -94,6 +94,11 @@ export def gha [] {
     | reverse
 }
 
+export def gsq [] {
+    git reflog expire --all --expire=now
+    git gc --prune=now --aggressive
+}
+
 def "nu-complete git branches" [] {
   ^git branch | lines | each { |line| $line | str replace '[\*\+] ' '' | str trim }
 }
