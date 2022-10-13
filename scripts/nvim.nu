@@ -2,7 +2,7 @@ def nvim_tcd [] {
     [
         {|before, after|
             if 'NVIM' in (env).name {
-                nvim --headless --noplugin --server $env.NVIM --remote-send $"<cmd>silent tcd! ($after)<cr>"
+                nvim --headless --noplugin --server $env.NVIM --remote-send $"<cmd>silent tcd! ($after)|let b:pwd='($after)'<cr>"
             }
         }
     ]
@@ -87,4 +87,8 @@ export def nvim_lua [...expr: string] {
     } else {
         echo "not found nvim instance"
     }
+}
+
+export def opwd [] {
+    nvim_lua 'OppositePwd()'
 }
