@@ -2,7 +2,7 @@ def nvim_tcd [] {
     [
         {|before, after|
             if 'NVIM' in (env).name {
-                nvim --headless --noplugin --server $env.NVIM --remote-send $"<cmd>silent tcd! ($after)|let b:pwd='($after)'<cr>"
+                nvim --headless --noplugin --server $env.NVIM --remote-send $"<cmd>lua HookPwdChanged\('($after)', '($before)')<cr>"
             }
         }
     ]
