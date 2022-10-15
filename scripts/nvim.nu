@@ -73,8 +73,7 @@ export def drop [] {
         let c = $in
         let temp = (mktemp -t nuvim.XXXXXXXX|str trim)
         $c | save $temp
-        nvim --headless --noplugin --server $env.NVIM --remote-send $'<cmd>vnew|read ($temp)<cr>'
-        nvim --headless --noplugin --server $env.NVIM --remote-send $'<cmd>silent !rm -f ($temp)<cr>'
+        nvim --headless --noplugin --server $env.NVIM --remote-send $"<cmd>lua ReadTempDrop\('($temp)')<cr>"
     } else {
         echo $in
     }
