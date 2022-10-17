@@ -1,0 +1,10 @@
+#!/usr/bin/env nu
+
+def main [file: string] {
+    if 'NVIM' in (env).name {
+        let cmd = $"<cmd>vsplit ($file)<cr>"
+        nvim --headless --noplugin --server $env.NVIM --remote-send $cmd
+    } else {
+        nvim $file
+    }
+}
