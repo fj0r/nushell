@@ -36,6 +36,15 @@ def edit [action file] {
     }
 }
 
+export def tcd [path?: string] {
+    let after = if ($path|is-empty) {
+        $env.PWD
+    } else {
+        $path
+    }
+    nvim --headless --noplugin --server $env.NVIM --remote-send $"<cmd>lua HookPwdChanged\('($after)', '($env.PWD)')<cr>"
+}
+
 export def e [...file: string] {
     if ($file|is-empty) {
         nvim
