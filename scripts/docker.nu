@@ -213,7 +213,7 @@ export def dx [
     --mount-cache: bool
     --attach(-a): string@"nu-complete docker container" # attach
     --proxy: string@"nu-complete docker run proxy"      # proxy
-    dx:string@"nu-complete docker dev env"
+    dx: string@"nu-complete docker images"              # image
     --envs(-e): any                                     # { FOO: BAR }
     --port(-p): any                                     # { 8080: 80 } # todo: multiple specify parameters(-p 8080:80 -p 8181:81)
     ...cmd                                              # command args
@@ -236,7 +236,7 @@ export def dx [
     } else {
         $"($env.HOME)/.cache/($c)"
     }
-    let proxy = if ($proxy|is-empty) { nu-complete docker run proxy | get 0 } else { $proxy }
+    let proxy = if ($proxy|is-empty) { [] } else { [--proxy $proxy] }
     if $dry_run {
         print $"cache: ($c)"
         dr --dry-run --attach $attach --port $port --envs $envs --cache $c -v $"($env.PWD):/world" --debug --proxy $proxy --ssh id_ed25519.pub $dx $cmd
