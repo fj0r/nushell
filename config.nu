@@ -413,8 +413,7 @@ use kubernetes.nu *
 use docker.nu *
 #use timeit.nu *
 use webhook.nu *
-use pwd-overlay.nu *
-####use env-conversions.nu *
+#use pwd-overlay.nu * (just)
 use nvim.nu *
 use ime.nu *
 
