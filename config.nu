@@ -201,7 +201,7 @@ let-env config = {
       {
         name: history_menu
         only_buffer_difference: true
-        marker: "# "
+        marker: "? "
         type: {
             layout: list
             page_size: 10
@@ -236,7 +236,7 @@ let-env config = {
       {
         name: commands_menu
         only_buffer_difference: false
-        marker: ": "
+        marker: "# "
         type: {
             layout: columnar
             columns: 4
@@ -257,7 +257,7 @@ let-env config = {
       {
         name: vars_menu
         only_buffer_difference: true
-        marker: "$ "
+        marker: "# "
         type: {
             layout: list
             page_size: 10
@@ -277,7 +277,7 @@ let-env config = {
       {
         name: commands_with_description
         only_buffer_difference: true
-        marker: ": "
+        marker: "# "
         type: {
             layout: description
             columns: 4
@@ -321,7 +321,7 @@ let-env config = {
     {
       name: history_menu
       modifier: control
-      keycode: char_s
+      keycode: char_r
       mode: emacs
       event: { send: menu name: history_menu }
     }
