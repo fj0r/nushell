@@ -195,7 +195,7 @@ export def dr [
     }
     let cache = if ($cache|is-empty) { [] } else { [-v $cache] }
     let args = ([$entrypoint $attach $daemon $envs $ssh $proxy $debug $appimage $netadmin $clip $mnt $port $cache] | flatten)
-    let name = $"($img | split row '/' | last | str replace ':' '-')_(date format %m%d%H%M)"
+    let name = $"($img | split row '/' | last | str replace ':' '-')_(date now | date format %m%d%H%M)"
     if $dry_run {
         echo $"docker run --name ($name) ($args|str join ' ') ($img) ($cmd | flatten)"
     } else {
