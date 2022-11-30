@@ -489,7 +489,7 @@ def unresolved_conflicts [
 
 ### kubernetes
 def "kube ctx" [] {
-    do --ignore-errors {
+    do -i {
        kubectl config get-contexts
        | from ssv -a
        | where CURRENT == '*'
@@ -499,8 +499,10 @@ def "kube ctx" [] {
 }
 
 export def "kube prompt" [] {
-    do -i {
-        let ctx = kube ctx
+    let ctx = kube ctx
+    if ($ctx | is-empty) {
+        ""
+    } else {
         let left_bracket = ('' | bright_yellow)
         let right_bracket = ('|' | bright_yellow)
         let c = if $ctx.authinfo == $ctx.cluster {
