@@ -406,6 +406,7 @@ use zoxide-menu.nu *
 use nushell.nu *
 use sys.nu *
 use alias.nu *
+use just.nu *
 use git-cmp.nu *
 use git.nu *
 use ssh.nu *
