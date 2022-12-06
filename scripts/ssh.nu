@@ -2,36 +2,42 @@ def "nu-complete ssh host" [] {
     rg -LNI '^Host [a-z0-9_\-\.]+' ~/.ssh | lines | each {|x| $x | split row ' '| get 1}
 }
 
-def parse-ssh-file [] {
+export def parse-ssh-file [group] {
     $in
-    | parse -r '\s+(?P<k>Host|HostName|User|Port|IdentityFile)\s+(?P<v>.+)'
+    | parse -r '(?P<k>Host|HostName|User|Port|IdentityFile)\s+(?P<v>.+)'
+    | append { k: Host, v: null}
     | reduce -f { rst: [], item: {Host: null} } {|it, acc|
           if $it.k == 'Host' {
               $acc | upsert rst ($acc.rst | append $acc.item)
-                   | upsert item { Host : $it.v, HostName: null, Port: null, User: null, IdentityFile: null }
+                   | upsert item { Host : $it.v, HostName: null, Port: null, User: null, IdentityFile: null, Group: $group }
           } else {
               $acc | upsert item ($acc.item | upsert $it.k $it.v)
           }
       }
     | get rst
-    | where {|x| not ($x.Host | is-empty)}
+    | where {|x| not (($x.Host | is-empty) or $x.Host =~ '\*')}
 }
 
 export def ssh-list [] {
-    rg -l 'Host' ~/.ssh
+    rg -L -l 'Host' ~/.ssh
     | lines
-    | each {|x| cat $x}
-    | parse-ssh-file
+    | each {|x| cat $x | parse-ssh-file $x}
+    | flatten
+}
+
+def fmt-group [p] {
+    $p | str replace $"($env.HOME)/.ssh/" ''
 }
 
 def "nu-complete ssh" [] {
     let cache = $'($env.HOME)/.cache/nu-complete/ssh.json'
-    let ts = (ls ~/.ssh/**/* | sort-by modified | reverse | get 0.modified)
-    let tc = (ls $cache | get 0.modified)
+    let ts = do -i { ls ~/.ssh/**/* | sort-by modified | reverse | get 0.modified }
+    if ($ts | is-empty) { return [] }
+    let tc = do -i { ls $cache | get 0.modified }
     if not (($cache | path exists) and ($ts < $tc)) {
         mkdir (dirname $cache)
         ssh-list
-        | each {|x| {value: $x.Host, description: $"($x.User)@($x.HostName):($x.Port) <($x.IdentityFile)>" } }
+        | each {|x| {value: $x.Host, description: $"($x.User)@($x.HostName):($x.Port) --- (fmt-group $x.Group)<($x.IdentityFile)>" } }
         | save $cache
     }
     cat $cache | from json
