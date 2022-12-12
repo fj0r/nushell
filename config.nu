@@ -413,6 +413,7 @@ use ssh.nu *
 use kubernetes.nu *
 use docker.nu *
 #use timeit.nu *
+use sh.nu *
 use webhook.nu *
 #use pwd-overlay.nu * (just)
 use nvim.nu *
