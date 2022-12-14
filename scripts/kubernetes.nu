@@ -40,7 +40,7 @@ export def "kube-config" [] {
 
 def "nu-complete kube ctx" [] {
     let k = (kube-config)
-    let cache = $'($env.HOME)/.cache/nu-complete/k8s.json'
+    let cache = $'($env.HOME)/.cache/nu-complete/k8s/(basename $k.path).json'
     if index-need-update $cache $k.path {
         let clusters = ($k.data | get clusters | select name cluster.server)
         let data = ( $k.data
@@ -84,10 +84,44 @@ export def kn [ns: string@"nu-complete kube ns"] {
 
 export def 'kconf import' [name: string, path: string] {
     let k = (kube-config)
+    let d = $k.data
+    let i = (cat $path | from yaml)
+    let c = [{
+        name: $name,
+        context: {
+            cluster: $name,
+            namespace: default,
+            user: $name
+        }
+    }]
+    $d
+    | upsert clusters ($d.clusters | append ($i.clusters.0 | upsert name $name))
+    | upsert users ($d.users | append ($i.users.0 | upsert name $name))
+    | upsert contexts ($d.contexts | append $c)
+    | to yaml
 }
 
-export def 'kconf export' [name: string, path: string] {
-    let k = (kube-config)
+export def 'kconf export' [name: string@"nu-complete kube ctx"] {
+    let d = (kube-config).data
+    let ctx = ($d | get contexts | where name == $name | get 0)
+    let user = ($d | get users | where name == $ctx.context.user)
+    let cluster = ($d | get clusters | where name == $ctx.context.cluster)
+    {
+        apiVersion: 'v1',
+        current-context: $ctx.name,
+        kind: Config,
+        clusters: $cluster,
+        preferences: {},
+        contexts: [$ctx],
+        users: $user,
+    } | to yaml
+}
+
+export def-env kcconf [name: string@"nu-complete kube ctx"] {
+    let dist = $"($env.HOME)/.kube/config.d"
+    mkdir $dist
+    kconf export $name | save -r $"($dist)/($name)"
+    let-env KUBECONFIG = $"($dist)/($name)"
 }
 
 ### common
