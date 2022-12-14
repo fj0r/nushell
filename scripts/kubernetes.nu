@@ -33,16 +33,26 @@ export def kk [p: path] {
 }
 
 ### ctx
-def "nu-complete kube ctx" [] { kubectx | lines}
+def "nu-complete kube ctx" [] {
+    cat ~/.kube/config
+    | from yaml
+    | get contexts
+    | each {|x|
+        let ns = if ('namespace' in ($x.context|columns)) { $x.context.namespace } else { 'none' }
+        {value: $x.name, description: $"($ns)\t($x.context.user)@($x.context.cluster)"}
+    }
+}
 
-def "nu-complete kube ns" [] { kubens | lines }
+def "nu-complete kube ns" [] {
+    kubectl get namespaces | from ssv -a | each {|x| {value: $x.NAME, description: $"($x.AGE)\t($x.STATUS)"}}
+}
 
 export def kcc [ctx: string@"nu-complete kube ctx"] {
-    kubectx $ctx
+    kubectl config use-context $ctx
 }
 
 export def kn [ns: string@"nu-complete kube ns"] {
-    kubens $ns
+    kubectl config set-context --current $"--namespace=($ns)"
 }
 
 ### common

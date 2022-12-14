@@ -1,3 +1,6 @@
+## todo
+- [x] kubernetes independent kubectx & kubens
+
 ## migrate
 - [ ] Nullability, null coalescing, null-safe calls, null-safe piping #4188
 - [ ] Bash Braces Expansion #2317
