@@ -31,11 +31,7 @@ def fmt-group [p] {
 
 def "nu-complete ssh" [] {
     let cache = $'($env.HOME)/.cache/nu-complete/ssh.json'
-    let ts = do -i { ls ~/.ssh/**/* | sort-by modified | reverse | get 0.modified }
-    if ($ts | is-empty) { return [] }
-    let tc = do -i { ls $cache | get 0.modified }
-    if not (($cache | path exists) and ($ts < $tc)) {
-        mkdir (dirname $cache)
+    if index-need-update ~/.ssh $cache {
         ssh-list
         | each {|x|
             let uri = ($"($x.User)@($x.HostName):($x.Port)" | str rpad -l 30 -c ' ')

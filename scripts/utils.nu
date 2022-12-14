@@ -32,3 +32,13 @@ export def "parse cmd" [] {
     | reject sw
 }
 
+export def index-need-update [dir index] {
+    let ts = do -i { ls $"($dir)/**/*" | sort-by modified | reverse | get 0.modified }
+    if ($ts | is-empty) { return false }
+    let tc = do -i { ls $index | get 0.modified }
+    if not (($index | path exists) and ($ts < $tc)) {
+        mkdir (dirname $index)
+        return true
+    }
+    return false
+}
