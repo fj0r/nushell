@@ -33,20 +33,36 @@ export def kk [p: path] {
 }
 
 ### ctx
-def "kube-config" [] {
+export def "kube-config" [] {
     let file = if 'KUBECONFIG' in (env).name { $env.KUBECONFIG } else { $"($env.HOME)/.kube/config" }
     { path: $file, data: (cat $file | from yaml)}
 }
 
 def "nu-complete kube ctx" [] {
-    let data = (kube-config).data
-    let clusters = ($data | get clusters | select name cluster.server)
-    $data
-    | get contexts
-    | each {|x|
-        let ns = (if ('namespace' in ($x.context|columns)) { $x.context.namespace } else { '' } | str rpad -l 20 -c ' ')
-        let cluster = ($"($x.context.user)@($clusters | where name == $x.context.cluster | get cluster_server.0)" | str lpad -l 35 -c ' ')
-        {value: $x.name, description: $"($ns)\t($cluster)"}
+    let k = (kube-config)
+    let cache = $'($env.HOME)/.cache/nu-complete/k8s.json'
+    if index-need-update $cache $k.path {
+        let clusters = ($k.data | get clusters | select name cluster.server)
+        let data = ( $k.data
+            | get contexts
+            | reduce -f {completion:[], mx_ns: 0, mx_cl: 0} {|x, a|
+                let ns = (if ('namespace' in ($x.context|columns)) { $x.context.namespace } else { '' })
+                let max_ns = ($ns | str length)
+                let cluster = ($"($x.context.user)@($clusters | where name == $x.context.cluster | get cluster_server.0)")
+                let max_cl = ($cluster | str length)
+                $a
+                | upsert mx_ns (if $max_ns > $a.mx_ns { $max_ns } else $a.mx_ns)
+                | upsert mx_cl (if $max_cl > $a.mx_cl { $max_cl } else $a.mx_cl)
+                | upsert completion ($a.completion | append {value: $x.name, ns: $ns, cluster: $cluster})
+            })
+        {completion: $data.completion, max: {ns: $data.mx_ns, cluster: $data.mx_cl}} | save $cache
+    }
+
+    let data = (cat $cache | from json)
+    $data.completion | each {|x|
+        let ns = ($x.ns | str rpad -l $data.max.ns -c ' ')
+        let cl = ($x.cluster | str lpad -l $data.max.cluster -c ' ')
+        {value: $x.value, description: $"\t($ns) ($cl)"}
     }
 }
 

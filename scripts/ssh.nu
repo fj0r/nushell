@@ -31,7 +31,7 @@ def fmt-group [p] {
 
 def "nu-complete ssh" [] {
     let cache = $'($env.HOME)/.cache/nu-complete/ssh.json'
-    if index-need-update $cache ~/.ssh {
+    if index-need-update $cache ~/.ssh/**/* {
         let data = (ssh-list | each {|x|
                 let uri = $"($x.User)@($x.HostName):($x.Port)"
                 {
@@ -57,9 +57,9 @@ def "nu-complete ssh" [] {
     $d
     | get completion
     | each { |x|
-        let uri = ($x.uri | str rpad -l $d.max.uri -c ' ')
+        let uri = ($x.uri | str lpad -l $d.max.uri -c ' ')
         let group = ($x.group | str rpad -l $d.max.group -c ' ')
-        let id = ($x.identfile | str lpad -l $d.max.identfile -c ' ') 
+        let id = ($x.identfile | str rpad -l $d.max.identfile -c ' ')
         {value: $x.value, description: $"\t($uri) ($group) ($id)" }
     }
 }
