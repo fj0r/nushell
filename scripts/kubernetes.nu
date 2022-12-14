@@ -34,12 +34,14 @@ export def kk [p: path] {
 
 ### ctx
 def "nu-complete kube ctx" [] {
-    cat ~/.kube/config
-    | from yaml
+    let data = (cat ~/.kube/config | from yaml)
+    let clusters = ($data | get clusters | select name cluster.server)
+    $data
     | get contexts
     | each {|x|
-        let ns = if ('namespace' in ($x.context|columns)) { $x.context.namespace } else { 'none' }
-        {value: $x.name, description: $"($ns)\t($x.context.user)@($x.context.cluster)"}
+        let ns = if ('namespace' in ($x.context|columns)) { $x.context.namespace } else { '' }
+        let cluster = ($clusters | where name == $x.context.cluster | get cluster_server.0)
+        {value: $x.name, description: $"($ns)\t($x.context.user)@($cluster)"}
     }
 }
 
