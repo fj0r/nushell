@@ -33,20 +33,29 @@ export def kk [p: path] {
 }
 
 ### ctx
+def "kube-config" [] {
+    let file = if 'KUBECONFIG' in (env).name { $env.KUBECONFIG } else { $"($env.HOME)/.kube/config" }
+    { path: $file, data: (cat $file | from yaml)}
+}
+
 def "nu-complete kube ctx" [] {
-    let data = (cat ~/.kube/config | from yaml)
+    let data = (kube-config).data
     let clusters = ($data | get clusters | select name cluster.server)
     $data
     | get contexts
     | each {|x|
-        let ns = if ('namespace' in ($x.context|columns)) { $x.context.namespace } else { '' }
+        let ns = (if ('namespace' in ($x.context|columns)) { $x.context.namespace } else { '' } | str rpad -l 30 -c ' ')
         let cluster = ($clusters | where name == $x.context.cluster | get cluster_server.0)
         {value: $x.name, description: $"($ns)\t($x.context.user)@($cluster)"}
     }
 }
 
 def "nu-complete kube ns" [] {
-    kubectl get namespaces | from ssv -a | each {|x| {value: $x.NAME, description: $"($x.AGE)\t($x.STATUS)"}}
+    kubectl get namespaces
+    | from ssv -a
+    | each {|x|
+        {value: $x.NAME, description: $"($x.AGE)\t($x.STATUS)"}
+    }
 }
 
 export def kcc [ctx: string@"nu-complete kube ctx"] {
@@ -55,6 +64,14 @@ export def kcc [ctx: string@"nu-complete kube ctx"] {
 
 export def kn [ns: string@"nu-complete kube ns"] {
     kubectl config set-context --current $"--namespace=($ns)"
+}
+
+export def 'kconf import' [name: string, path: string] {
+    let k = (kube-config)
+}
+
+export def 'kconf export' [name: string, path: string] {
+    let k = (kube-config)
 }
 
 ### common

@@ -37,7 +37,13 @@ def "nu-complete ssh" [] {
     if not (($cache | path exists) and ($ts < $tc)) {
         mkdir (dirname $cache)
         ssh-list
-        | each {|x| {value: $x.Host, description: $"($x.User)@($x.HostName):($x.Port)\t(fmt-group $x.Group)<($x.IdentityFile)>" } }
+        | each {|x|
+            let uri = ($"($x.User)@($x.HostName):($x.Port)" | str rpad -l 30 -c ' ')
+            {
+                value: $x.Host,
+                description: $"($uri)\t(fmt-group $x.Group)<($x.IdentityFile)>"
+            }
+        }
         | save $cache
     }
     cat $cache | from json
