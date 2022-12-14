@@ -31,18 +31,37 @@ def fmt-group [p] {
 
 def "nu-complete ssh" [] {
     let cache = $'($env.HOME)/.cache/nu-complete/ssh.json'
-    if index-need-update ~/.ssh $cache {
-        ssh-list
-        | each {|x|
-            let uri = ($"($x.User)@($x.HostName):($x.Port)" | str rpad -l 30 -c ' ')
-            {
-                value: $x.Host,
-                description: $"($uri)\t(fmt-group $x.Group)<($x.IdentityFile)>"
-            }
+    if index-need-update $cache ~/.ssh {
+        let data = (ssh-list | each {|x|
+                let uri = $"($x.User)@($x.HostName):($x.Port)"
+                {
+                    value: $x.Host,
+                    uri: $uri,
+                    group: $"(fmt-group $x.Group)",
+                    identfile: $x.IdentityFile,
+                }
+        })
+
+        let max = {
+            value: ($data.value | str max-length),
+            uri: ($data.uri | str max-length),
+            group: ($data.group | str max-length),
+            identfile: ($data.identfile | str max-length),
         }
-        | save $cache
+
+        {max: $max, completion: $data} | save $cache
     }
-    cat $cache | from json
+
+    let d = (cat $cache | from json)
+
+    $d
+    | get completion
+    | each { |x|
+        let uri = ($x.uri | str rpad -l $d.max.uri -c ' ')
+        let group = ($x.group | str rpad -l $d.max.group -c ' ')
+        let id = ($x.identfile | str lpad -l $d.max.identfile -c ' ') 
+        {value: $x.value, description: $"\t($uri) ($group) ($id)" }
+    }
 }
 
 export extern ssh [

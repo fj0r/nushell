@@ -32,7 +32,7 @@ export def "parse cmd" [] {
     | reject sw
 }
 
-export def index-need-update [dir index] {
+export def index-need-update [index dir] {
     let ts = do -i { ls $"($dir)/**/*" | sort-by modified | reverse | get 0.modified }
     if ($ts | is-empty) { return false }
     let tc = do -i { ls $index | get 0.modified }
@@ -41,4 +41,12 @@ export def index-need-update [dir index] {
         return true
     }
     return false
+}
+
+export def 'str max-length' [] {
+    $in | reduce -f 0 {|x, a|
+        if ($x|is-empty) { return $a }
+        let l = ($x | str length)
+        if $l > $a { $l } else { $a }
+    }
 }

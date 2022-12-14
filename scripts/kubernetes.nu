@@ -44,9 +44,9 @@ def "nu-complete kube ctx" [] {
     $data
     | get contexts
     | each {|x|
-        let ns = (if ('namespace' in ($x.context|columns)) { $x.context.namespace } else { '' } | str rpad -l 30 -c ' ')
-        let cluster = ($clusters | where name == $x.context.cluster | get cluster_server.0)
-        {value: $x.name, description: $"($ns)\t($x.context.user)@($cluster)"}
+        let ns = (if ('namespace' in ($x.context|columns)) { $x.context.namespace } else { '' } | str rpad -l 20 -c ' ')
+        let cluster = ($"($x.context.user)@($clusters | where name == $x.context.cluster | get cluster_server.0)" | str lpad -l 35 -c ' ')
+        {value: $x.name, description: $"($ns)\t($cluster)"}
     }
 }
 
