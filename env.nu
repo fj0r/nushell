@@ -74,7 +74,7 @@ let-env LD_LIBRARY_PATH = do -i {
         )
 }
 
-let-env TERM = 'screen-256color'
+let-env TERM = 'tmux-256color'
 
 let-env EDITOR = 'nvim' # 'nuedit'
 let-env SHELL = 'nu' # for zellij
