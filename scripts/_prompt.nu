@@ -75,7 +75,7 @@ export def "my_git dir" [] {
   let dir_comp = if ($dir_comp | length) > 0 and ($dir_comp | get 0) == '~' {
       $dir_comp | str join (char separator)
   } else {
-      $"/($dir_comp | str join (char separator))"
+      $"($dir_comp | str join (char separator))"
   }
 
   $dir_comp
