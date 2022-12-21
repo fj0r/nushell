@@ -252,10 +252,10 @@ def "nu-complete registry list" [cmd: string, offset: int] {
     let reg = do -i { $cmd | get 3 }
     let tag = do -i { $cmd | get 4 }
     if ($reg|is-empty) {
-        if (do -i { $env.REGISTRY_TOKEN } | is-empty) {
-            fetch $"($url)/v2/_catalog"
-        } else {
+        if ('REGISTRY_TOKEN' in (env).name) {
             fetch -H [authorization $"Basic ($env.REGISTRY_TOKEN)"] $"($url)/v2/_catalog"
+        } else {
+            fetch $"($url)/v2/_catalog"
         }
         | get repositories
     } else if ($tag|is-empty) {
@@ -273,10 +273,10 @@ export def "registry list" [
     url: string
     reg: string@"nu-complete registry list"
 ] {
-    if (do -i { $env.REGISTRY_TOKEN } | is-empty) {
-        fetch $"($url)/v2/($reg)/tags/list"
-    } else {
+    if ('REGISTRY_TOKEN' in (env).name) {
         fetch -H [authorization $"Basic ($env.REGISTRY_TOKEN)"] $"($url)/v2/($reg)/tags/list"
+    } else {
+        fetch $"($url)/v2/($reg)/tags/list"
     }
     | get tags
 }
