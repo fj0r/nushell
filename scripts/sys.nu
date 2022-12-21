@@ -12,7 +12,7 @@ def "nu-complete proxys" [] {
 }
 
 export def-env "toggle proxy" [proxy?:string@"nu-complete proxys"] {
-    let has_set = not (do -i { $env.http_proxy } | is-empty)
+    let has_set = ($env | has 'http_proxy')
     let no_val = ($proxy | is-empty)
     let proxy = if $has_set and $no_val {
                 echo 'hide proxy'

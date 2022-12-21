@@ -50,3 +50,7 @@ export def 'str max-length' [] {
         if $l > $a { $l } else { $a }
     }
 }
+
+export def has [name] {
+    $name in ($in | columns) and (not ($in | get $name | is-empty))
+}

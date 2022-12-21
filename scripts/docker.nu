@@ -252,14 +252,14 @@ def "nu-complete registry list" [cmd: string, offset: int] {
     let reg = do -i { $cmd | get 3 }
     let tag = do -i { $cmd | get 4 }
     if ($reg|is-empty) {
-        if ('REGISTRY_TOKEN' in (env).name) {
+        if ($env | has 'REGISTRY_TOKEN') {
             fetch -H [authorization $"Basic ($env.REGISTRY_TOKEN)"] $"($url)/v2/_catalog"
         } else {
             fetch $"($url)/v2/_catalog"
         }
         | get repositories
     } else if ($tag|is-empty) {
-        if (do -i { $env.REGISTRY_TOKEN } | is-empty) {
+        if ($env | has 'REGISTRY_TOKEN') {
             fetch $"($url)/v2/($reg)/tags/list"
         } else {
             fetch -H [authorization $"Basic ($env.REGISTRY_TOKEN)"] $"($url)/v2/($reg)/tags/list"
