@@ -55,7 +55,7 @@ def "nu-complete kube ctx" [] {
                 | upsert mx_cl (if $max_cl > $a.mx_cl { $max_cl } else $a.mx_cl)
                 | upsert completion ($a.completion | append {value: $x.name, ns: $ns, cluster: $cluster})
             })
-        {completion: $data.completion, max: {ns: $data.mx_ns, cluster: $data.mx_cl}} | save $cache
+        {completion: $data.completion, max: {ns: $data.mx_ns, cluster: $data.mx_cl}} | save -f $cache
     }
 
     let data = (cat $cache | from json)
@@ -120,7 +120,7 @@ export def 'kconf export' [name: string@"nu-complete kube ctx"] {
 export def-env kcconf [name: string@"nu-complete kube ctx"] {
     let dist = $"($env.HOME)/.kube/config.d"
     mkdir $dist
-    kconf export $name | save -r $"($dist)/($name)"
+    kconf export $name | save -fr $"($dist)/($name)"
     let-env KUBECONFIG = $"($dist)/($name)"
 }
 

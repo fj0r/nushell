@@ -49,7 +49,7 @@ def "nu-complete ssh" [] {
             identfile: ($data.identfile | str max-length),
         }
 
-        {max: $max, completion: $data} | save $cache
+        {max: $max, completion: $data} | save -f $cache
     }
 
     let data = (cat $cache | from json)
