@@ -73,7 +73,7 @@ let-env LD_LIBRARY_PATH = if 'LD_LIBRARY_PATH' in (env).name { $env.LD_LIBRARY_P
 let-env LD_LIBRARY_PATH = do -i {
     $env.LD_LIBRARY_PATH
     | prepend (
-        ls ((ghc --print-libdir) | str trim)
+        ls ((stack ghc -- --print-libdir) | str trim)
         | where type == dir
         | get name
         )
