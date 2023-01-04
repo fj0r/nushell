@@ -386,6 +386,21 @@ export def ksd [
         kubectl scale $n deployments $d --replicas $num
     }
 }
+export def ksdr [
+    d: string@"nu-complete kube deployments"
+    num: int@"nu-complete num9"
+    -n: string@"nu-complete kube ns"
+] {
+    if $num > 9 {
+        "too large"
+    } else if $num <= 0 {
+        "too small"
+    } else {
+        let n = if ($n|is-empty) { [] } else { [-n $n] }
+        kubectl scale $n deployments $d --replicas 0
+        kubectl scale $n deployments $d --replicas $num
+    }
+}
 
 export alias krsd = kubectl rollout status deployment
 export alias kgrs = kubectl get rs
@@ -402,7 +417,7 @@ export def kru [-n: string@"nu-complete kube ns", --revision (-v): int, dpl: str
 export alias ksss = kubectl scale statefulset
 export alias krsss = kubectl rollout status statefulset
 
-### kubecto top pod
+### kubectl top pod
 export def ktp [-n: string@"nu-complete kube ns"] {
     let n = if ($n|is-empty) { [] } else { [-n $n] }
     kubectl top pod $n | from ssv -a | rename name cpu mem
