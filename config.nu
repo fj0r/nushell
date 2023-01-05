@@ -414,12 +414,11 @@ use kubernetes.nu *
 use docker.nu *
 #use timeit.nu *
 use sh.nu *
-use webhook.nu *
 #use pwd-overlay.nu * (just)
 use nvim.nu *
 #use ime.nu *
 
 use _prompt.nu *
 ####use starship.nu *
-use web.nu *
+use network.nu *
 source zoxide.nu
