@@ -29,7 +29,7 @@ def fmt-group [p] {
     $p | str replace $"($env.HOME)/.ssh/" ''
 }
 
-def "nu-complete ssh" [] {
+def "ssh-hosts" [] {
     let cache = $'($env.HOME)/.cache/nu-complete/ssh.json'
     if index-need-update $cache ~/.ssh/**/* {
         let data = (ssh-list | each {|x|
@@ -52,8 +52,11 @@ def "nu-complete ssh" [] {
         {max: $max, completion: $data} | save -f $cache
     }
 
-    let data = (cat $cache | from json)
+    cat $cache | from json
+}
 
+def "nu-complete ssh" [] {
+    let data = (ssh-hosts)
     $data.completion
     | each { |x|
         let uri = ($x.uri | str lpad -l $data.max.uri -c ' ')
@@ -77,3 +80,31 @@ export extern ssh [
     -J: string                          # j
     -W: string                          # w
 ]
+
+
+def "nu-complete scp" [cmd: string, offset: int] {
+    let argv = ($cmd | str substring [0 $offset] | split row ' ')
+    let p = if ($argv | length) > 2 { $argv | get 2 } else { $argv | get 1 }
+    let ssh = (ssh-hosts | get completion
+        | each {|x| {value: $"($x.value):" description: $x.uri} }
+    )
+    let n = ($p | split row ':')
+    if $"($n | get 0):" in ($ssh | get value) {
+        ^ssh ($n | get 0) $"sh -c 'ls -dp ($n | get 1)*'"
+        | lines
+        | each {|x| $"($n | get 0):($x)"}
+    } else {
+        let files = do -i {
+            ls -a $"($p)*"
+            | each {|x| if $x.type == dir { $"($x.name)/"} else { $x.name }}
+        }
+        $files | append $ssh
+    }
+}
+
+export def scp [
+    lhs: string@"nu-complete scp",
+    rhs: string@"nu-complete scp"
+] {
+    ^scp -r $lhs $rhs
+}

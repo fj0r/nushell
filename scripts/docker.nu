@@ -60,22 +60,22 @@ export def da [
 def "nu-complete docker cp" [cmd: string, offset: int] {
     let argv = ($cmd | str substring [0 $offset] | split row ' ')
     let p = if ($argv | length) > 2 { $argv | get 2 } else { $argv | get 1 }
-    let files = (
-        ls -a $"($p)*"
-        | each {|x| if $x.type == dir { $"($x.name)/"} else { $x.name }}
-    )
-    let images = (
+    let ctn = (
         docker ps
         | from ssv -a
         | each {|x| {description: $x.'CONTAINER ID' value: $"($x.NAMES):" }}
     )
     let n = ($p | split row ':')
-    if $"($n | get 0):" in ($images | get value) {
+    if $"($n | get 0):" in ($ctn | get value) {
         docker exec ($n | get 0) sh -c $"ls -dp ($n | get 1)*"
         | lines
         | each {|x| $"($n | get 0):($x)"}
     } else {
-        $files | append $images
+        let files = do -i {
+            ls -a $"($p)*"
+            | each {|x| if $x.type == dir { $"($x.name)/"} else { $x.name }}
+        }
+        $files | append $ctn
     }
 }
 

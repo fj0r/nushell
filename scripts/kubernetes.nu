@@ -320,9 +320,33 @@ export def kpf [
     kubectl port-forward $n $"($res)/($target)" $port
 }
 
+def "nu-complete kube cp" [cmd: string, offset: int] {
+    let ctx = ($cmd | str substring [0 $offset] | parse cmd)
+    let p = if ($ctx.args | length) > 1 { $ctx | get 1 } else { $ctx | get 0 }
+    let p = if ($p|is-empty) {''}
+    let ns = do -i { $ctx | get '-n' }
+    let ns = if ($ns|is-empty) { [] } else { [-n $ns] }
+    let c = do -i { $ctx | get '-c' }
+    let c = if ($c|is-empty) { [] } else { [-c $c] }
+    let ctn = ( kgp
+        | each {|x| {description: $x.ready value: $"($x.name):" }}
+    )
+    let n = ($p | split row ':')
+    if $"($n | get 0):" in ($ctn | get value) {
+        kubectl exec $ns ($n | get 0) $c -- sh -c $"ls -dp ($n | get 1)*"
+        | lines
+        | each {|x| $"($n | get 0):($x)"}
+    } else {
+        let files = do -i { ls -a $"($p)*"
+            | each {|x| if $x.type == dir { $"($x.name)/"} else { $x.name }}
+        }
+        $files | append $ctn
+    }
+}
 export def kcp [
-    lhs: string@"nu-complete kube pods"
-    rhs: string@"nu-complete kube pods"
+    lhs: string@"nu-complete kube cp"
+    rhs: string@"nu-complete kube cp"
+    -c: string@"nu-complete kube ctns"
     -n: string@"nu-complete kube ns"
 ] {
     let n = if ($n|is-empty) { [] } else { [-n $n] }
