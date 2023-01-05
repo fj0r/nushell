@@ -322,15 +322,12 @@ export def kpf [
 
 def "nu-complete kube cp" [cmd: string, offset: int] {
     let ctx = ($cmd | str substring [0 $offset] | parse cmd)
-    let p = if ($ctx.args | length) > 1 { $ctx | get 1 } else { $ctx | get 0 }
-    let p = if ($p|is-empty) {''}
+    let p = ($ctx.args | get (($ctx.args | length) - 1))
     let ns = do -i { $ctx | get '-n' }
     let ns = if ($ns|is-empty) { [] } else { [-n $ns] }
     let c = do -i { $ctx | get '-c' }
     let c = if ($c|is-empty) { [] } else { [-c $c] }
-    let ctn = ( kgp
-        | each {|x| {description: $x.ready value: $"($x.name):" }}
-    )
+    let ctn = (kubectl get pod $ns | from ssv -a | each {|x| {description: $x.READY value: $"($x.NAME):" }})
     let n = ($p | split row ':')
     if $"($n | get 0):" in ($ctn | get value) {
         kubectl exec $ns ($n | get 0) $c -- sh -c $"ls -dp ($n | get 1)*"
@@ -350,7 +347,8 @@ export def kcp [
     -n: string@"nu-complete kube ns"
 ] {
     let n = if ($n|is-empty) { [] } else { [-n $n] }
-    kubectl cp $n $lhs $rhs
+    let c = if ($c|is-empty) { [] } else { [-c $c] }
+    kubectl cp $n $lhs $c $rhs
 }
 
 ### service
