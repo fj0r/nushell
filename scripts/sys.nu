@@ -108,12 +108,12 @@ def "nu-complete systemctl services inactive" [] {
 }
 
 def "nu-complete systemctl x" [context: string, offset: int] {
-    let args = ($context | split row ' ')
-    let cmd = ($args | get 1)
+    let argv = ($context | split row ' ')
+    let cmd = ($argv | get 1)
     if $cmd in [start stop restart status enable disable] {
         let input = ''
-        if ($args | length) > 2 {
-            let input = $"( $args | get 2 )*"
+        if ($argv | length) > 2 {
+            let input = $"( $argv | get 2 )*"
         }
         let services = (ssc services $input)
         if $cmd == 'status' {

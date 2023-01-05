@@ -57,9 +57,31 @@ export def da [
     }
 }
 
+def "nu-complete docker cp" [cmd: string, offset: int] {
+    let argv = ($cmd | str substring [0 $offset] | split row ' ')
+    let p = if ($argv | length) > 2 { $argv | get 2 } else { $argv | get 1 }
+    let files = (
+        ls -a $"($p)*"
+        | each {|x| if $x.type == dir { $"($x.name)/"} else { $x.name }}
+    )
+    let images = (
+        docker ps
+        | from ssv -a
+        | each {|x| {description: $x.'CONTAINER ID' value: $"($x.NAMES):" }}
+    )
+    let n = ($p | split row ':')
+    if $"($n | get 0):" in ($images | get value) {
+        docker exec ($n | get 0) sh -c $"ls -dp ($n | get 1)*"
+        | lines
+        | each {|x| $"($n | get 0):($x)"}
+    } else {
+        $files | append $images
+    }
+}
+
 export def dcp [
-    lhs: string@"nu-complete docker container",
-    rhs: string@"nu-complete docker container"
+    lhs: string@"nu-complete docker cp",
+    rhs: string@"nu-complete docker cp"
 ] {
     docker cp $lhs $rhs
 }
