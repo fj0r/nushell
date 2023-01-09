@@ -9,6 +9,30 @@ export def 'filter index' [...idx] {
 }
 
 export def "parse cmd" [] {
+    let argv = ($in | split row ' ')
+    mut pos = []
+    mut opt = {}
+    mut sw = ''
+    for i in $argv {
+        if ($i | str starts-with '-') {
+            if not ($sw | is-empty) {
+                $opt = ($opt | upsert $sw true)
+            }
+            $sw = $i
+        } else {
+            if ($sw | is-empty) {
+                $pos ++= [$i]
+            } else {
+                $opt = ($opt | upsert $sw $i)
+                $sw = ''
+            }
+        }
+    }
+    $opt.args = $pos
+    return $opt
+}
+
+export def "parse cmd1" [] {
     $in
     | split row ' '
     | reduce -f { args: [], sw: '' } {|it, acc|
