@@ -42,8 +42,9 @@ def "nu-complete docker images" [] {
     | each {|x| $"($x.REPOSITORY):($x.TAG)"}
 }
 
-export def dl [ctn: string@"nu-complete docker container"] {
-    docker logs -f $ctn
+export def dl [ctn: string@"nu-complete docker container" -n: int = 100] {
+    let n = if $n == 0 { [] } else { [--tail $n] }
+    docker logs -f $n $ctn
 }
 
 export def da [
