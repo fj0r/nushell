@@ -81,7 +81,7 @@ let-env LD_LIBRARY_PATH = do -i {
 
 let-env TERM = 'tmux-256color'
 
-let-env EDITOR = 'nvim' # 'nuedit'
+let-env EDITOR = 'nuedit' # 'nvim'
 let-env SHELL = 'nu' # for zellij
 let-env NVIM_PRESET = if 'NVIM_PRESET' in (env).name { $env.NVIM_PRESET } else { 'x' }
 
