@@ -36,6 +36,7 @@ def edit [action file] {
     }
 }
 
+# nvim tcd
 export def tcd [path?: string] {
     let after = if ($path|is-empty) {
         $env.PWD
@@ -77,6 +78,7 @@ export def x [...file: string] {
     }
 }
 
+# drop stdout to nvim buf
 export def drop [] {
     if 'NVIM' in (env).name {
         let c = $in
@@ -88,7 +90,7 @@ export def drop [] {
     }
 }
 
-export def nvim_lua [...expr: string] {
+export def nvim-lua [...expr: string] {
     if 'NVIM' in (env).name {
         nvim --headless --noplugin --server $env.NVIM --remote-send $'<cmd>lua vim.g.remote_expr_lua = ($expr|str join " ")<cr>'
         do -i { nvim --headless --noplugin --server $env.NVIM --remote-expr 'g:remote_expr_lua' } | complete | get stderr
@@ -98,5 +100,13 @@ export def nvim_lua [...expr: string] {
 }
 
 export def opwd [] {
-    nvim_lua 'OppositePwd()'
+    nvim-lua 'OppositePwd()'
+}
+
+export def nvim-srv [port: int=1111] {
+    nvim --headless --listen $"0.0.0.0:($port)"
+}
+
+export def nvide-conn [addr: string] {
+    neovide --multigrid --maximized --remote-tcp addr
 }
