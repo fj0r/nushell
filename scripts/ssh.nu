@@ -66,7 +66,7 @@ def "nu-complete ssh" [] {
     }
 }
 
-export extern ssh [
+export extern main [
     host: string@"nu-complete ssh"      # host
     ...cmd                              # cmd
     -v                                  # verbose
