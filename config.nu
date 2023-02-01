@@ -414,7 +414,7 @@ use kubernetes.nu *
 use docker.nu *
 #use timeit.nu *
 use sh.nu *
-#use pwd-overlay.nu * (just)
+#use pwd-overlay.nu *
 use nvim.nu *
 #use ime.nu *
 

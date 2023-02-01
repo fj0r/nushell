@@ -17,9 +17,9 @@ def pwd_overlay [] {
             code: "
                 overlay use -r ./.nu as cwd
                 # :XXX: workaround for `overlay use -r .nu --keep-env [ PWD ]`
-                if not (($before | is-empty) or ($before | path join .nu | path exists)) {
-                    cd $after
-                }
+                #if not (($before | is-empty) or ($before | path join .nu | path exists)) {
+                #    cd $after
+                #}
             "
         }
     ]
