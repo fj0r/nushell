@@ -276,16 +276,16 @@ def "nu-complete registry list" [cmd: string, offset: int] {
     let tag = do -i { $cmd | get 4 }
     if ($reg|is-empty) {
         if ($env | has 'REGISTRY_TOKEN') {
-            fetch -H [authorization $"Basic ($env.REGISTRY_TOKEN)"] $"($url)/v2/_catalog"
+            http get -H [authorization $"Basic ($env.REGISTRY_TOKEN)"] $"($url)/v2/_catalog"
         } else {
-            fetch $"($url)/v2/_catalog"
+            http get $"($url)/v2/_catalog"
         }
         | get repositories
     } else if ($tag|is-empty) {
         if ($env | has 'REGISTRY_TOKEN') {
-            fetch $"($url)/v2/($reg)/tags/list"
+            http get $"($url)/v2/($reg)/tags/list"
         } else {
-            fetch -H [authorization $"Basic ($env.REGISTRY_TOKEN)"] $"($url)/v2/($reg)/tags/list"
+            http get -H [authorization $"Basic ($env.REGISTRY_TOKEN)"] $"($url)/v2/($reg)/tags/list"
         }
         | get tags
     }
@@ -297,9 +297,9 @@ export def "registry list" [
     reg: string@"nu-complete registry list"
 ] {
     if ('REGISTRY_TOKEN' in (env).name) {
-        fetch -H [authorization $"Basic ($env.REGISTRY_TOKEN)"] $"($url)/v2/($reg)/tags/list"
+        http get -H [authorization $"Basic ($env.REGISTRY_TOKEN)"] $"($url)/v2/($reg)/tags/list"
     } else {
-        fetch $"($url)/v2/($reg)/tags/list"
+        http get $"($url)/v2/($reg)/tags/list"
     }
     | get tags
 }
