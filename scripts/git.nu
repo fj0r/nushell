@@ -80,6 +80,7 @@ export def glgv [
 }
 
 export def gpp! [] {
+    git pull
     git add --all
     git commit -v -a --no-edit --amend
     git push --force

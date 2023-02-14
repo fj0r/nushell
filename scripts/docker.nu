@@ -15,7 +15,20 @@ export def di [] {
     docker images
     | from ssv -a
     | rename repo tag id created size
-    | upsert size { |i| $i.size | into filesize }
+    | each {|x|
+        let size = ($x.size | into filesize)
+        let path = ($x.repo | split row '/')
+        let image = ($path | last)
+        let repo = ($path | range ..(($path|length) - 2) | str join '/')
+        {
+            repo: $repo
+            image: $image
+            tag: $x.tag
+            id: $x.id
+            created: $x.created
+            size: $size
+        }
+    }
 }
 
 def "nu-complete docker ps" [] {
