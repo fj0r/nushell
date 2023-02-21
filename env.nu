@@ -79,7 +79,7 @@ let-env LD_LIBRARY_PATH = do -i {
         )
 }
 
-let-env TERM = 'tmux-256color'
+let-env TERM = 'screen-256color'
 
 let-env EDITOR = 'nuedit' # 'nvim'
 if ($env.EDITOR == 'nuedit') and (not ($'($env.HOME)/.local/bin/nuedit' | path exists)) {
