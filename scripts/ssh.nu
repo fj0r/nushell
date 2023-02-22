@@ -60,8 +60,8 @@ def "nu-complete ssh" [] {
     $data.completion
     | each { |x|
         let uri = ($x.uri | fill -a l -w $data.max.uri -c ' ')
-        let group = ($x.group | fill -a r -w $data.max.group -c ' ')
-        let id = ($x.identfile | fill -a r -w $data.max.identfile -c ' ')
+        let group = ($x.group | fill -a l -w $data.max.group -c ' ')
+        let id = ($x.identfile | fill -a l -w $data.max.identfile -c ' ')
         {value: $x.value, description: $"\t($uri) ($group) ($id)" }
     }
 }
