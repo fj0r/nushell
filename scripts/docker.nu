@@ -257,7 +257,7 @@ export def dx [
     let __dx_cache = {
             hs: 'stack:/opt/stack'
             rs: 'cargo:/opt/cargo'
-            go: 'gopkg:/opt/gopkg'
+            go: 'gopkg:/opt/go/pkg'
             ng: 'ng:/srv'
             pg: 'pg:/var/lib/postgresql/data'
         }
