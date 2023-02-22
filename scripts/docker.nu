@@ -219,7 +219,7 @@ export def dr [
     let netadmin = if $netadmin { [--cap-add=NET_ADMIN --device /dev/net/tun] } else { [] }
     let clip = if $with_x { [-e DISPLAY -v /tmp/.X11-unix:/tmp/.X11-unix] } else { [] }
     let ssh = if ($ssh|is-empty) { [] } else {
-        let sshkey = (cat ([~/.ssh $ssh] | path join) | split row ' ' | get 1)
+        let sshkey = (cat ([$env.HOME .ssh $ssh] | path join) | split row ' ' | get 1)
         [-e $"ed25519_($sshuser)=($sshkey)"]
     }
     let proxy = if ($proxy|is-empty) { [] } else {
@@ -255,23 +255,25 @@ export def dx [
     ...cmd                                              # command args
 ] {
     let __dx_cache = {
-        hs: 'stack:/opt/stack'
-        rs: 'cargo:/opt/cargo'
-        go: 'gopkg:/opt/gopkg'
-        ng: 'ng:/srv'
-        pg: 'pg:/var/lib/postgresql/data'
-    }
+            hs: 'stack:/opt/stack'
+            rs: 'cargo:/opt/cargo'
+            go: 'gopkg:/opt/gopkg'
+            ng: 'ng:/srv'
+            pg: 'pg:/var/lib/postgresql/data'
+        }
     let c = do -i {$__dx_cache | transpose k v | where {|x| $dx | str contains $x.k} | get v.0}
-    let c = if ($c|is-empty) { '' } else if $mount_cache {
-        let c = ( $c
-                | split row ':'
-                | each -n {|x| if $x.index == 1 { $"/cache($x.item)" } else { $x.item } }
-                | str join ':'
-                )
-        $"($env.HOME)/.cache/($c)"
-    } else {
-        $"($env.HOME)/.cache/($c)"
-    }
+    let c = if ($c|is-empty) {
+            ''
+        } else if $mount_cache {
+            let c = ( $c
+                    | split row ':'
+                    | each {|x i| if $i == 1 { $"/cache($x)" } else { $x } }
+                    | str join ':'
+                    )
+            $"($env.HOME)/.cache/($c)"
+        } else {
+            $"($env.HOME)/.cache/($c)"
+        }
     let proxy = if ($proxy|is-empty) { [] } else { [--proxy $proxy] }
     if $dry_run {
         print $"cache: ($c)"

@@ -32,7 +32,3 @@ export def-env "toggle proxy" [proxy?:string@"nu-complete proxys"] {
     let-env https_proxy = $proxy
 }
 
-export def mattermost [msg: string] {
-    let url = (cat $"($env.HOME)/.config/webhook/mattermost" | str trim)
-   curl -X POST $url -H 'content-type: application/json' -d ({text: $msg} | to json -r)
-}

@@ -59,9 +59,9 @@ def "nu-complete ssh" [] {
     let data = (ssh-hosts)
     $data.completion
     | each { |x|
-        let uri = ($x.uri | str lpad -l $data.max.uri -c ' ')
-        let group = ($x.group | str rpad -l $data.max.group -c ' ')
-        let id = ($x.identfile | str rpad -l $data.max.identfile -c ' ')
+        let uri = ($x.uri | fill -a l -w $data.max.uri -c ' ')
+        let group = ($x.group | fill -a r -w $data.max.group -c ' ')
+        let id = ($x.identfile | fill -a r -w $data.max.identfile -c ' ')
         {value: $x.value, description: $"\t($uri) ($group) ($id)" }
     }
 }
