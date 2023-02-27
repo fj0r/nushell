@@ -3,3 +3,7 @@ export alias j = just
 export alias k = kubectl
 export alias r = rg
 export alias s = shells
+export alias ll = ls -l
+export alias lla = ls -al
+export alias diff = diff -u
+export alias l = tail -f
