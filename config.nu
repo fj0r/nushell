@@ -415,6 +415,7 @@ use docker.nu *
 #use timeit.nu *
 use sh.nu *
 #use pwd-overlay.nu *
+use dynamic-load.nu *
 use nvim.nu *
 #use ime.nu *
 
