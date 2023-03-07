@@ -422,3 +422,4 @@ use _prompt.nu *
 ####use starship.nu *
 use network.nu *
 source zoxide.nu
+
