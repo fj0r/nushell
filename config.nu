@@ -418,6 +418,7 @@ use sh.nu *
 use dynamic-load.nu *
 use nvim.nu *
 #use ime.nu *
+use zellij.nu *
 
 use _prompt.nu *
 ####use starship.nu *
