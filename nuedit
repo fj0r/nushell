@@ -1,7 +1,7 @@
 #!/usr/bin/env nu
 
 def main [file: string] {
-    if 'NVIM' in (env).name {
+    if 'NVIM' in ($env | columns) {
         #nvim --headless --noplugin --server $env.NVIM --remote-wait $file
         nvim --cmd 'let g:unception_block_while_host_edits=1' $file
     } else {

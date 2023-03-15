@@ -69,7 +69,7 @@ let-env PATH = ($env.PATH
     | prepend $'($env.HOME)/.local/bin'
     )
 
-let-env LD_LIBRARY_PATH = if 'LD_LIBRARY_PATH' in (env).name { $env.LD_LIBRARY_PATH } else { [] }
+let-env LD_LIBRARY_PATH = if 'LD_LIBRARY_PATH' in ($env | columns) { $env.LD_LIBRARY_PATH } else { [] }
 let-env LD_LIBRARY_PATH = do -i {
     $env.LD_LIBRARY_PATH
     | prepend (

@@ -517,7 +517,7 @@ export def "kube prompt" [] {
 
 ### proxy
 export def "proxy prompt" [] {
-    if ('https_proxy' in (env).name) and (not ($env.https_proxy | is-empty)) {
+    if ('https_proxy' in ($env | columns)) and (not ($env.https_proxy | is-empty)) {
         $"(ansi blue)|"
     } else {
         ""
