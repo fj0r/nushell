@@ -112,11 +112,6 @@ export def gm [branch:string@"nu-complete git branches"] {
     git merge $branch
 }
 
-extern "git reset" [
-    sha?:string@"nu-complete git log"
-    --hard:bool
-]
-
 export alias gp = git push
 export alias gpf! = git push --force
 export alias gl = git pull
