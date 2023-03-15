@@ -401,7 +401,7 @@ let-env config = {
     }
   ]
 }
-use utils.nu *
+#use utils.nu *
 use zoxide-menu.nu *
 use nushell.nu *
 use sys.nu *

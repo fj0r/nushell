@@ -1,3 +1,7 @@
+export def has [name] {
+    $name in ($in | columns) and (not ($in | get $name | is-empty))
+}
+
 export alias site-mirror = wget -m -k -E -p -np -e robots=off
 
 export def ns [] {

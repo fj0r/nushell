@@ -1,3 +1,38 @@
+export def "parse cmd" [] {
+    $in
+    | split row ' '
+    | reduce -f { args: [], sw: '' } {|it, acc|
+        if ($acc.sw|is-empty) {
+            if ($it|str starts-with '-') {
+                $acc | upsert sw $it
+            } else {
+                let args = ($acc.args | append $it)
+                $acc | upsert args $args
+            }
+        } else {
+            if ($it|str starts-with '-') {
+                $acc
+                | upsert $acc.sw true
+                | upsert sw $it
+            } else {
+                $acc | upsert $acc.sw $it | upsert sw ''
+            }
+        }
+    }
+    | reject sw
+}
+
+export def index-need-update [index path] {
+    let ts = do -i { ls $path | sort-by modified | reverse | get 0.modified }
+    if ($ts | is-empty) { return false }
+    let tc = do -i { ls $index | get 0.modified }
+    if not (($index | path exists) and ($ts < $tc)) {
+        mkdir (dirname $index)
+        return true
+    }
+    return false
+}
+
 export-env {
     let-env KUBERNETES_SCHEMA_URL = $"file:///($env.HOME)/.config/kubernetes-json-schema/all.json"
 }
@@ -34,7 +69,7 @@ export def kk [p: path] {
 
 ### ctx
 export def "kube-config" [] {
-    let file = if 'KUBECONFIG' in (env).name { $env.KUBECONFIG } else { $"($env.HOME)/.kube/config" }
+    let file = if 'KUBECONFIG' in ($env | columns) { $env.KUBECONFIG } else { $"($env.HOME)/.kube/config" }
     { path: $file, data: (cat $file | from yaml)}
 }
 
@@ -137,7 +172,7 @@ def "nu-complete kube def" [] {
 
 def "nu-complete kube res" [context: string, offset: int] {
     let ctx = ($context | parse cmd)
-    let def = ($ctx | get args | get 1)
+    let def = ($ctx | get args.1)
     let ns = do -i { $ctx | get '-n' }
     let ns = if ($ns|is-empty) { [] } else { [-n $ns] }
     kubectl get $ns $def | from ssv -a | get NAME
