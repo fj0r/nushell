@@ -12,6 +12,8 @@ def "nu-complete ps" [] {
     ps | each {|x| { value: $x.pid, description: $x.name } }
 }
 
-export def af [pid: string@"nu-complete ps"] {
-    tail --pid $pid -f /dev/null
+# after xxx { ls }
+export def after [pid: string@"nu-complete ps" fn ] {
+    do -i { tail --pid $pid -f /dev/null }
+    do $fn
 }
