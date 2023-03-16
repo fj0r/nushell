@@ -9,7 +9,7 @@ export alias lla = ls -al
 export alias l = tail -f
 
 def "nu-complete ps" [] {
-    ps | each {|x| { value: $x.pid, description: $x.name } }
+    ps -l | each {|x| { value: $x.pid, description: $x.command } }
 }
 
 # after <pid> { do something ... }
