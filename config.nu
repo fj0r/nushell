@@ -1,18 +1,44 @@
 # Nushell Config File
 
-# for more information on themes see
+# For more information on defining custom themes, see
 # https://www.nushell.sh/book/coloring_and_theming.html
+# And here is the theme collection
+# https://github.com/nushell/nu_scripts/tree/main/themes
 let dark_theme = {
     # color for nushell primitives
     separator: white
     leading_trailing_space_bg: { attr: n } # no fg, no bg, attr none effectively turns this off
     header: green_bold
     empty: blue
-    bool: white
+    # Closures can be used to choose colors for specific values.
+    # The value (in this case, a bool) is piped into the closure.
+    bool: { if $in { 'light_cyan' } else { 'light_gray' } }
     int: white
-    filesize: white
+    filesize: {|e|
+      if $e == 0b {
+        'white'
+      } else if $e < 1mb {
+        'cyan'
+      } else { 'blue' }
+    }
     duration: white
-    date: white
+    date: { (date now) - $in |
+      if $in < 1hr {
+        'red3b'
+      } else if $in < 6hr {
+        'orange3'
+      } else if $in < 1day {
+        'yellow3b'
+      } else if $in < 3day {
+        'chartreuse2b'
+      } else if $in < 1wk {
+        'green3b'
+      } else if $in < 6wk {
+        'darkturquoise'
+      } else if $in < 52wk {
+        'deepskyblue3b'
+      } else { 'dark_gray' }
+    }
     range: white
     float: white
     string: white
@@ -25,34 +51,38 @@ let dark_theme = {
     block: white
     hints: dark_gray
 
-    # shapes are used to change the cli syntax highlighting
-    shape_garbage: { fg: "#FFFFFF" bg: "#FF0000" attr: b}
+    shape_and: purple_bold
     shape_binary: purple_bold
+    shape_block: blue_bold
     shape_bool: light_cyan
-    shape_int: purple_bold
-    shape_float: purple_bold
-    shape_range: yellow_bold
-    shape_internalcall: cyan_bold
+    shape_custom: green
+    shape_datetime: cyan_bold
+    shape_directory: cyan
     shape_external: cyan
     shape_externalarg: green_bold
+    shape_filepath: cyan
+    shape_flag: blue_bold
+    shape_float: purple_bold
+    # shapes are used to change the cli syntax highlighting
+    shape_garbage: { fg: "#FFFFFF" bg: "#FF0000" attr: b}
+    shape_globpattern: cyan_bold
+    shape_int: purple_bold
+    shape_internalcall: cyan_bold
+    shape_list: cyan_bold
     shape_literal: blue
+    shape_matching_brackets: { attr: u }
+    shape_nothing: light_cyan
     shape_operator: yellow
+    shape_or: purple_bold
+    shape_pipe: purple_bold
+    shape_range: yellow_bold
+    shape_record: cyan_bold
+    shape_redirection: purple_bold
     shape_signature: green_bold
     shape_string: green
     shape_string_interpolation: cyan_bold
-    shape_datetime: cyan_bold
-    shape_list: cyan_bold
     shape_table: blue_bold
-    shape_record: cyan_bold
-    shape_block: blue_bold
-    shape_filepath: cyan
-    shape_directory: cyan
-    shape_globpattern: cyan_bold
     shape_variable: purple
-    shape_flag: blue_bold
-    shape_custom: green
-    shape_nothing: light_cyan
-    shape_matching_brackets: { attr: u }
 }
 
 let light_theme = {
@@ -61,11 +91,35 @@ let light_theme = {
     leading_trailing_space_bg: { attr: n } # no fg, no bg, attr none effectively turns this off
     header: green_bold
     empty: blue
-    bool: dark_gray
+    # Closures can be used to choose colors for specific values.
+    # The value (in this case, a bool) is piped into the closure.
+    bool: { if $in { 'dark_cyan' } else { 'dark_gray' } }
     int: dark_gray
-    filesize: dark_gray
+    filesize: {|e|
+      if $e == 0b {
+        'dark_gray'
+      } else if $e < 1mb {
+        'cyan_bold'
+      } else { 'blue_bold' }
+    }
     duration: dark_gray
-    date: dark_gray
+  date: { (date now) - $in |
+    if $in < 1hr {
+      'red3b'
+    } else if $in < 6hr {
+      'orange3'
+    } else if $in < 1day {
+      'yellow3b'
+    } else if $in < 3day {
+      'chartreuse2b'
+    } else if $in < 1wk {
+      'green3b'
+    } else if $in < 6wk {
+      'darkturquoise'
+    } else if $in < 52wk {
+      'deepskyblue3b'
+    } else { 'dark_gray' }
+  }
     range: dark_gray
     float: dark_gray
     string: dark_gray
@@ -78,34 +132,38 @@ let light_theme = {
     block: white
     hints: dark_gray
 
-    # shapes are used to change the cli syntax highlighting
-    shape_garbage: { fg: "#FFFFFF" bg: "#FF0000" attr: b}
+    shape_and: purple_bold
     shape_binary: purple_bold
+    shape_block: blue_bold
     shape_bool: light_cyan
-    shape_int: purple_bold
-    shape_float: purple_bold
-    shape_range: yellow_bold
-    shape_internalcall: cyan_bold
+    shape_custom: green
+    shape_datetime: cyan_bold
+    shape_directory: cyan
     shape_external: cyan
     shape_externalarg: green_bold
+    shape_filepath: cyan
+    shape_flag: blue_bold
+    shape_float: purple_bold
+    # shapes are used to change the cli syntax highlighting
+    shape_garbage: { fg: "#FFFFFF" bg: "#FF0000" attr: b}
+    shape_globpattern: cyan_bold
+    shape_int: purple_bold
+    shape_internalcall: cyan_bold
+    shape_list: cyan_bold
     shape_literal: blue
+    shape_matching_brackets: { attr: u }
+    shape_nothing: light_cyan
     shape_operator: yellow
+    shape_or: purple_bold
+    shape_pipe: purple_bold
+    shape_range: yellow_bold
+    shape_record: cyan_bold
+    shape_redirection: purple_bold
     shape_signature: green_bold
     shape_string: green
     shape_string_interpolation: cyan_bold
-    shape_datetime: cyan_bold
-    shape_list: cyan_bold
     shape_table: blue_bold
-    shape_record: cyan_bold
-    shape_block: blue_bold
-    shape_filepath: cyan
-    shape_directory: cyan
-    shape_globpattern: cyan_bold
     shape_variable: purple
-    shape_flag: blue_bold
-    shape_custom: green
-    shape_nothing: light_cyan
-    shape_matching_brackets: { attr: u }
 }
 
 # External completer example
@@ -135,9 +193,67 @@ let-env config = {
       truncating_suffix: "..." # A suffix used by the 'truncating' methodology
     }
   }
+
+  explore: {
+    help_banner: true
+    exit_esc: true
+
+    command_bar_text: '#C4C9C6'
+    # command_bar: {fg: '#C4C9C6' bg: '#223311' }
+
+    status_bar_background: {fg: '#1D1F21' bg: '#C4C9C6' }
+    # status_bar_text: {fg: '#C4C9C6' bg: '#223311' }
+
+    highlight: {bg: 'yellow' fg: 'black' }
+
+    status: {
+      # warn: {bg: 'yellow', fg: 'blue'}
+      # error: {bg: 'yellow', fg: 'blue'}
+      # info: {bg: 'yellow', fg: 'blue'}
+    }
+
+    try: {
+      # border_color: 'red'
+      # highlighted_color: 'blue'
+
+      # reactive: false
+    }
+
+    table: {
+      split_line: '#404040'
+
+      cursor: true
+
+      line_index: true
+      line_shift: true
+      line_head_top: true
+      line_head_bottom: true
+
+      show_head: true
+      show_index: true
+
+      # selected_cell: {fg: 'white', bg: '#777777'}
+      # selected_row: {fg: 'yellow', bg: '#C1C2A3'}
+      # selected_column: blue
+
+      # padding_column_right: 2
+      # padding_column_left: 2
+
+      # padding_index_left: 2
+      # padding_index_right: 1
+    }
+
+    config: {
+      cursor_color: {bg: 'yellow' fg: 'black' }
+
+      # border_color: white
+      # list_color: green
+    }
+  }
+
   history: {
     max_size: 10000 # Session has to be reloaded for this to take effect
-    sync_on_enter: false # Enable to share history between multiple sessions, else you have to close the session to write history to file
+    sync_on_enter: true # Enable to share history between multiple sessions, else you have to close the session to write history to file
     file_format: "sqlite" # "sqlite" or "plaintext"
   }
   completions: {
@@ -155,25 +271,34 @@ let-env config = {
     metric: true # true => KB, MB, GB (ISO standard), false => KiB, MiB, GiB (Windows standard)
     format: "auto" # b, kb, kib, mb, mib, gb, gib, tb, tib, pb, pib, eb, eib, zb, zib, auto
   }
+  cursor_shape: {
+    emacs: underscore # block, underscore, line (line is the default)
+    vi_insert: line # block, underscore, line (block is the default)
+    vi_normal: block # block, underscore, line  (underscore is the default)
+  }
   color_config: $dark_theme   # if you want a light theme, replace `$dark_theme` to `$light_theme`
   use_grid_icons: true
   footer_mode: "25" # always, never, number_of_rows, auto
-  float_precision: 2
+  float_precision: 2 # the precision for displaying floats in tables
   # buffer_editor: "emacs" # command that will be used to edit the current line buffer with ctrl+o, if unset fallback to $env.EDITOR and $env.VISUAL
   use_ansi_coloring: true
   edit_mode: emacs # emacs, vi
   shell_integration: true # enables terminal markers and a workaround to arrow keys stop working issue
-  show_banner: false # true or false to enable or disable the banner
+  # true or false to enable or disable the welcome banner at startup
+  show_banner: false
   render_right_prompt_on_last_line: false # true or false to enable or disable right prompt to be rendered on last line of the prompt.
+
   hooks: {
     pre_prompt: [{
-      $nothing  # replace with source code to run before the prompt is shown
+      null  # replace with source code to run before the prompt is shown
     }]
     pre_execution: [{
-      $nothing  # replace with source code to run before the repl input is run
+      null  # replace with source code to run before the repl input is run
     }]
     env_change: {
-      PWD: []
+      PWD: [{|before, after|
+        null  # replace with source code to run if the PWD environment is different since the last repl input
+      }]
     }
     display_output: {
       if (term size).columns >= 100 { table -e } else { table }
@@ -181,7 +306,7 @@ let-env config = {
   }
   menus: [
       # Configuration for default nushell menus
-      # Note the lack of souce parameter
+      # Note the lack of source parameter
       {
         name: completion_menu
         only_buffer_difference: false
@@ -250,8 +375,8 @@ let-env config = {
         }
         source: { |buffer, position|
             $nu.scope.commands
-            | where command =~ $buffer
-            | each { |it| {value: $it.command description: $it.usage} }
+            | where name =~ $buffer
+            | each { |it| {value: $it.name description: $it.usage} }
         }
       }
       {
@@ -293,8 +418,8 @@ let-env config = {
         }
         source: { |buffer, position|
             $nu.scope.commands
-            | where command =~ $buffer
-            | each { |it| {value: $it.command description: $it.usage} }
+            | where name =~ $buffer
+            | each { |it| {value: $it.name description: $it.usage} }
         }
       }
   ]
@@ -303,7 +428,7 @@ let-env config = {
       name: completion_menu
       modifier: none
       keycode: tab
-      mode: emacs # Options: emacs vi_normal vi_insert
+      mode: [emacs vi_normal vi_insert]
       event: {
         until: [
           { send: menu name: completion_menu }
@@ -401,6 +526,7 @@ let-env config = {
     }
   ]
 }
+
 #use utils.nu *
 use zoxide-menu.nu *
 use nushell.nu *
