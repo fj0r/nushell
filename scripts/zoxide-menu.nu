@@ -35,7 +35,7 @@ def __edit_keybinding [] {
     {
       name: edit
       modifier: alt
-      keycode: char_o
+      keycode: char_e
       mode: [emacs, vi_normal, vi_insert]
       event: [
         { send: OpenEditor }
