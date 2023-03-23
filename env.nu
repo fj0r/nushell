@@ -1,4 +1,7 @@
 # Nushell Environment Config File
+if $nu.os-info.name == "windows" {
+    let-env HOME = $"($env.HOMEDRIVE)($env.HOMEPATH)"
+}
 
 def create_left_prompt [] {
     mut home = ""
@@ -80,7 +83,6 @@ let-env NU_PLUGIN_DIRS = [
 # let-env PATH = ($env.PATH | split row (char esep) | prepend '/some/path')
 let-env PATH = ($env.PATH
     | split row (char esep)
-    | prepend (ls /opt/*/bin | get name)
     | prepend $'($env.HOME)/.local/bin'
     )
 
@@ -99,6 +101,6 @@ let-env TERM = 'screen-256color'
 let-env EDITOR = 'nuedit' # 'nvim'
 if ($env.EDITOR == 'nuedit') and (not ($'($env.HOME)/.local/bin/nuedit' | path exists)) {
     mkdir $'($env.HOME)/.local/bin/'
-    cp $'(dirname $nu.config-path)/nuedit' $'($env.HOME)/.local/bin/nuedit'
+    cp $'($nu.config-path | path dirname)/nuedit' $'($env.HOME)/.local/bin/nuedit'
 }
 
