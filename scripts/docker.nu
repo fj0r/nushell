@@ -15,7 +15,7 @@ export def dp [] {
         | lines
         | each {|x|
             let r = ($x | from json)
-            let t = ($r.created | str substring ',25' | into datetime -f '%Y-%m-%d %H:%M:%S %z' ) - 8hr
+            let t = ($r.created | str substring ',25' | into datetime -f '%Y-%m-%d %H:%M:%S %z' )
             $r | upsert created $t
         }
     } else if $cli == 'podman' {
@@ -23,7 +23,7 @@ export def dp [] {
         | lines
         | each {|x|
             let r = ($x | from json)
-            let t = ($r.created | str substring ',32' | into datetime ) - 8hr
+            let t = ($r.created | str substring ',32' | into datetime )
             $r | upsert created $t
         }
     } else {
