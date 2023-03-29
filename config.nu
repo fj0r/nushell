@@ -542,6 +542,7 @@ use docker.nu *
 use sh.nu *
 #use pwd-overlay.nu *
 use dynamic-load.nu *
+use dir-env.nu *
 use nvim.nu *
 #use ime.nu *
 use zellij.nu *
