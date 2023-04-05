@@ -1,4 +1,7 @@
 # Nushell Environment Config File
+#
+# version = 0.78.0
+
 if $nu.os-info.name == "windows" {
     let-env HOME = $"($env.HOMEDRIVE)($env.HOMEPATH)"
 }
@@ -36,15 +39,15 @@ def create_right_prompt [] {
 }
 
 # Use nushell functions to define your right and left prompt
-let-env PROMPT_COMMAND = { create_left_prompt }
-let-env PROMPT_COMMAND_RIGHT = { create_right_prompt }
+let-env PROMPT_COMMAND = {|| create_left_prompt }
+let-env PROMPT_COMMAND_RIGHT = {|| create_right_prompt }
 
 # The prompt indicators are environmental variables that represent
 # the state of the prompt
-let-env PROMPT_INDICATOR = { "> " }
-let-env PROMPT_INDICATOR_VI_INSERT = { ": " }
-let-env PROMPT_INDICATOR_VI_NORMAL = { "> " }
-let-env PROMPT_MULTILINE_INDICATOR = { "::: " }
+let-env PROMPT_INDICATOR = {|| "> " }
+let-env PROMPT_INDICATOR_VI_INSERT = {|| ": " }
+let-env PROMPT_INDICATOR_VI_NORMAL = {|| "> " }
+let-env PROMPT_MULTILINE_INDICATOR = {|| "::: " }
 
 # Specifies how environment variables are:
 # - converted from a string to a value on Nushell startup (from_string)
@@ -92,14 +95,14 @@ if not ((do -i {ls /opt/*/bin }) | is-empty) {
 }
 
 let-env LD_LIBRARY_PATH = if 'LD_LIBRARY_PATH' in ($env | columns) { $env.LD_LIBRARY_PATH } else { [] }
-let-env LD_LIBRARY_PATH = do -i {
+let-env LD_LIBRARY_PATH = ( do -i {
     $env.LD_LIBRARY_PATH
     | prepend (
         ls ((stack ghc -- --print-libdir) | str trim)
         | where type == dir
         | get name
         )
-}
+} )
 
 let-env TERM = 'screen-256color'
 

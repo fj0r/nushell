@@ -4,7 +4,7 @@ export def _git_stat [n]  {
         | lines
         | reduce -f { c: '', r: [] } {|it, acc|
             if ($it | str starts-with '»¦«') {
-                $acc | upsert c ($it | str substring '6,')
+                $acc | upsert c ($it | str substring 6.. )
             } else if ($it | find -r '[0-9]+ file.+change' | is-empty) {
                 $acc
             } else {
@@ -20,7 +20,7 @@ export def _git_stat [n]  {
                         let col = if ($i.col | str starts-with 'file') {
                                 'file'
                             } else {
-                                $i.col | str substring ',3'
+                                $i.col | str substring ..3
                             }
                         let num = ($i.num | into int)
                         $a | upsert $col $num
@@ -37,14 +37,14 @@ export def _git_log [v num] {
     let stat = if $v {
         _git_stat $num
     } else { {} }
-    let r = do -i {
+    let r = ( do -i {
         git log -n $num --pretty=%h»¦«%s»¦«%aN»¦«%aE»¦«%aD
         | lines
         | split column "»¦«" sha message author email date
         | each {|x| ($x| upsert date ($x.date | into datetime))}
-    }
+    } )
     if $v {
-        $r | merge { $stat } | reverse
+        $r | merge $stat | reverse
     } else {
         $r | reverse
     }

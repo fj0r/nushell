@@ -66,7 +66,7 @@ export def "my_git dir" [] {
       let body = (
           $dir_comp
           |range 1..-2
-          |each {|x| $x | str substring ',2' }
+          |each {|x| $x | str substring ..2 }
           )
       [$first $body $last] | flatten
   } else {
@@ -117,7 +117,7 @@ export def "my_git structured" [] {
     | split column ' ' col1 col2 full_hash
     | get full_hash
     | first
-    | str substring [0 7]
+    | str substring 0..7
   } else {
     ''
   })
@@ -499,7 +499,7 @@ def "kube ctx" [] {
 }
 
 export def "kube prompt" [] {
-    let ctx = kube ctx
+    let ctx = (kube ctx)
     if ($ctx | is-empty) {
         ""
     } else {
@@ -536,7 +536,7 @@ def host_abbr [] {
 
 
 def right_prompt [] {
-    {
+    { ||
         let time_segment = ([
             (date now | date format '%m/%d/%Y %r')
         ] | str join)
@@ -547,12 +547,12 @@ def right_prompt [] {
 
 # An opinionated Git prompt for Nushell, styled after posh-git
 def my_prompt [] {
-    {
+    { ||
         $"(host_abbr)(my_git dir)(my_git styled)"
     }
 }
 
 export-env {
-    let-env PROMPT_COMMAND = my_prompt
-    let-env PROMPT_COMMAND_RIGHT = right_prompt
+    let-env PROMPT_COMMAND = (my_prompt)
+    let-env PROMPT_COMMAND_RIGHT = (right_prompt)
 }
