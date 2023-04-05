@@ -37,12 +37,12 @@ export def _git_log [v num] {
     let stat = if $v {
         _git_stat $num
     } else { {} }
-    let r = ( do -i {
+    let r = (do -i {
         git log -n $num --pretty=%h»¦«%s»¦«%aN»¦«%aE»¦«%aD
         | lines
         | split column "»¦«" sha message author email date
         | each {|x| ($x| upsert date ($x.date | into datetime))}
-    } )
+    })
     if $v {
         $r | merge $stat | reverse
     } else {
@@ -54,6 +54,7 @@ def "nu-complete git log" [] {
     git log -n 32 --pretty=%h»¦«%s
     | lines
     | split column "»¦«" value description
+    | each {|x| $x | update value $"`($x.value)`"}
 }
 
 export def glg [
@@ -112,9 +113,29 @@ export def gm [branch:string@"nu-complete git branches"] {
     git merge $branch
 }
 
+def git_main_branch [] {
+    git remote show origin
+    | lines
+    | str trim
+    | find --regex 'HEAD .*?[：: ].+'
+    | first
+    | str replace 'HEAD .*?[：: ](.+)' '$1'
+}
+
+def git_current_branch [] {
+    git rev-parse --abbrev-ref HEAD | str trim -c "\n"
+}
+
+export def gmom [] {
+    let main = (git_main_branch)
+    git merge $"origin/($main)"
+}
+
 export alias gp = git push
 export alias gpf! = git push --force
+export alias gpsup = git push --set-upstream origin (git_current_branch)
 export alias gl = git pull
+export alias glo = git log --oneline
 export alias ga = git add
 export alias gaa = git add --all
 export alias gapa = git add --patch

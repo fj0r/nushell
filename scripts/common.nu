@@ -8,11 +8,13 @@ export alias lla = ls -al
 export alias l = tail -f
 
 def "nu-complete ps" [] {
-    ps -l | each {|x| { value: $x.pid, description: $x.command } }
+    ps -l | each {|x| { value: $"`($x.pid)`", description: $x.command } }
 }
 
 # after { do something ... } <pid>
-export def after [action pid: string@"nu-complete ps"] {
+# :FIXME: ksd (glg)
+export def after [action, pid: string@"nu-complete ps"] {
     do -i { tail --pid $pid -f /dev/null }
     do $action
 }
+

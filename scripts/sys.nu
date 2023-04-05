@@ -147,3 +147,6 @@ export extern "ssc disable" [
     svc: string@"nu-complete systemctl services active"
 ]
 
+export def sleeping [] {
+    bash -c "echo mem | sudo tee /sys/power/state > /dev/null"
+}

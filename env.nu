@@ -95,14 +95,14 @@ if not ((do -i {ls /opt/*/bin }) | is-empty) {
 }
 
 let-env LD_LIBRARY_PATH = if 'LD_LIBRARY_PATH' in ($env | columns) { $env.LD_LIBRARY_PATH } else { [] }
-let-env LD_LIBRARY_PATH = ( do -i {
+let-env LD_LIBRARY_PATH = (do -i {
     $env.LD_LIBRARY_PATH
     | prepend (
         ls ((stack ghc -- --print-libdir) | str trim)
         | where type == dir
         | get name
         )
-} )
+})
 
 let-env TERM = 'screen-256color'
 

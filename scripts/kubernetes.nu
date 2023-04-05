@@ -23,9 +23,9 @@ export def "parse cmd" [] {
 }
 
 export def ensure-index [index path action] {
-    let ts = ( do -i { ls $path | sort-by modified | reverse | get 0.modified } )
+    let ts = (do -i { ls $path | sort-by modified | reverse | get 0.modified })
     if ($ts | is-empty) { return false }
-    let tc = ( do -i { ls $index | get 0.modified } )
+    let tc = (do -i { ls $index | get 0.modified })
     if not (($index | path exists) and ($ts < $tc)) {
         mkdir (dirname $index)
         do $action
@@ -77,7 +77,7 @@ def "nu-complete kube ctx" [] {
     let cache = $'($env.HOME)/.cache/nu-complete/k8s/(basename $k.path).json'
     ensure-index $cache $k.path { ||
         let clusters = ($k.data | get clusters | select name cluster.server)
-        let data = ( $k.data
+        let data = ($k.data
             | get contexts
             | reduce -f {completion:[], mx_ns: 0, mx_cl: 0} {|x, a|
                 let ns = (if ('namespace' in ($x.context|columns)) { $x.context.namespace } else { '' })
@@ -172,7 +172,7 @@ def "nu-complete kube def" [] {
 def "nu-complete kube res" [context: string, offset: int] {
     let ctx = ($context | parse cmd)
     let def = ($ctx | get args.1)
-    let ns = ( do -i { $ctx | get '-n' } )
+    let ns = (do -i { $ctx | get '-n' })
     let ns = if ($ns|is-empty) { [] } else { [-n $ns] }
     kubectl get $ns $def | from ssv -a | get NAME
 }
