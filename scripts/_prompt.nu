@@ -39,28 +39,16 @@ def red [] {
   each { |it| $"(ansi red)($it)(ansi reset)" }
 }
 
-# Internal commands for building up the my_git shell prompt
-def DIR_COMP_ABBR [] { 5 }
-
 # Get the current directory with home abbreviated
 export def "my_git dir" [] {
   let current_dir = ($env.PWD)
 
-  let current_dir_abbreviated = if ($current_dir == $nu.home-path) {
-      "~"
-  } else {
-      let current_dir_relative_to_home = (
-          do --ignore-errors { $current_dir | path relative-to $nu.home-path }
-      )
-      if ($current_dir_relative_to_home | is-empty) {
-          $current_dir
-      } else {
-          $'~(char separator)($current_dir_relative_to_home)'
-      }
-  }
+  mut dir_comp = ($env.PWD
+    | str replace $nu.home-path '~'
+    | split row (char separator)
+    )
 
-  let dir_comp = ($current_dir_abbreviated | split row (char separator))
-  let dir_comp = if ($dir_comp | length) > (DIR_COMP_ABBR) {
+  if ($dir_comp | length) > 5 {
       let first = ($dir_comp | first)
       let last = ($dir_comp | last)
       let body = (
@@ -68,17 +56,10 @@ export def "my_git dir" [] {
           |range 1..-2
           |each {|x| $x | str substring ..2 }
           )
-      [$first $body $last] | flatten
-  } else {
-      $dir_comp
-  }
-  let dir_comp = if ($dir_comp | length) > 0 and ($dir_comp | get 0) == '~' {
-      $dir_comp | str join (char separator)
-  } else {
-      $"($dir_comp | str join (char separator))"
+      $dir_comp = ([$first $body $last] | flatten)
   }
 
-  $dir_comp
+  $dir_comp | str join (char separator)
 }
 
 # Get repository status as structured data
@@ -493,7 +474,6 @@ def "kube ctx" [] {
        kubectl config get-contexts
        | from ssv -a
        | where CURRENT == '*'
-       | rename curr name cluster authinfo namespace
        | get 0
     }
 }
@@ -505,12 +485,12 @@ export def "kube prompt" [] {
     } else {
         let left_bracket = ('' | bright_yellow)
         let right_bracket = ('|' | bright_yellow)
-        let c = if $ctx.authinfo == $ctx.cluster {
-                    $ctx.cluster
+        let c = if $ctx.AUTHINFO == $ctx.CLUSTER {
+                    $ctx.CLUSTER
                 } else {
-                    $"($ctx.authinfo)@($ctx.cluster)"
+                    $"($ctx.AUTHINFO)@($ctx.CLUSTER)"
                 }
-        let p = $"(ansi red)($c)(ansi yellow)/(ansi cyan_bold)($ctx.namespace)"
+        let p = $"(ansi red)($c)(ansi yellow)/(ansi cyan_bold)($ctx.NAMESPACE)"
         $"($left_bracket)($p)($right_bracket)" | str trim
     }
 }
