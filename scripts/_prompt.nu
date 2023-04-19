@@ -369,24 +369,40 @@ def host_abbr [] {
         } else {
             (ansi dark_gray)
         }
-    $"($ucl)($n)(ansi reset)(ansi dark_gray_bold):(ansi light_green_bold)"
+    $"($ucl)($n)(ansi reset)('|' | bright_yellow)"
 }
 
 
 def right_prompt [] {
     { ||
         let time_segment = ([
-            (date now | date format '%m/%d/%Y %r')
+            (date now | date format '%y-%m-%d %H:%M:%S')
         ] | str join)
 
-        $"(proxy prompt)(kube prompt)(ansi purple_bold)($time_segment)"
+        $"(proxy prompt)(kube prompt)(host_abbr)(ansi purple_bold)($time_segment)"
     }
 }
 
 # An opinionated Git prompt for Nushell, styled after posh-git
 def left_prompt [] {
     { ||
-        $"(host_abbr)(git_status dir)(git_status styled)"
+        $"(git_status dir)(git_status styled)"
+    }
+}
+
+def up_prompt [] {
+    { ||
+        let time_segment = ([
+            (date now | date format '%m/%d/%Y %r')
+        ] | str join)
+        let left = $"(host_abbr)(git_status dir)(git_status styled)"
+        let right = $"(proxy prompt)(kube prompt)(ansi purple_bold)($time_segment)"
+        # TODO: length of unicode char is 3
+        let fl = ((term size).columns
+            - ($left  | ansi strip | str length)
+            - ($right | ansi strip | str length)
+            )
+        $"($left)(ansi xterm_grey)('' | fill -c '-' -w $fl)(ansi reset)($right)"
     }
 }
 
