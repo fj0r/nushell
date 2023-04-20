@@ -23,26 +23,53 @@ def red [] {
 }
 
 # Get the current directory with home abbreviated
-export def "git_status dir" [] {
-  let current_dir = ($env.PWD)
+def related [sub dir] {
+    if $sub == $dir {
+        return { related: '=', path: '' }
+    }
+    let suffix = (do --ignore-errors { $sub | path relative-to $dir })
+    if ($suffix | is-empty) {
+        return { related: '>', path: '' }
+    } else {
+        return { related: '<', path: $suffix}
+    }
+}
 
-  mut dir_comp = ($env.PWD
+export def "pwd_abbr" [] {
+  let pwd = ($env.PWD)
+
+  let to_home = (related $pwd $nu.home-path)
+
+  let cwd = if $to_home.related == '=' {
+      "~"
+  } else if $to_home.related == '>' {
+      $pwd
+  } else {
+      $'~(char separator)($to_home.path)'
+  }
+
+  mut dir_comp = ($cwd
     | str replace $nu.home-path '~'
     | split row (char separator)
     )
 
   if ($dir_comp | length) > 5 {
-      let first = ($dir_comp | first)
-      let last = ($dir_comp | last)
-      let body = (
-          $dir_comp
-          |range 1..-2
-          |each {|x| $x | str substring ..2 }
-          )
-      $dir_comp = ([$first $body $last] | flatten)
+    let first = ($dir_comp | first)
+    let last = ($dir_comp | last)
+    let body = (
+      $dir_comp
+      |range 1..-2
+      |each {|x| $x | str substring ..2 }
+      )
+    $dir_comp = ([$first $body $last] | flatten)
   }
 
-  $dir_comp | str join (char separator)
+  let style = if $to_home.related == '>' {
+    (ansi xterm_gold3b)
+  } else {
+    ''
+  }
+  $"($style)($dir_comp | str join (char separator))"
 }
 
 # Get repository status as structured data
@@ -375,10 +402,7 @@ def host_abbr [] {
 
 def right_prompt [] {
     { ||
-        let time_segment = ([
-            (date now | date format '%y-%m-%d %H:%M:%S')
-        ] | str join)
-
+        let time_segment = (date now | date format '%y-%m-%d %H:%M:%S')
         $"(proxy prompt)(kube prompt)(host_abbr)(ansi purple_bold)($time_segment)"
     }
 }
@@ -386,16 +410,14 @@ def right_prompt [] {
 # An opinionated Git prompt for Nushell, styled after posh-git
 def left_prompt [] {
     { ||
-        $"(git_status dir)(git_status styled)"
+        $"(pwd_abbr)(git_status styled)"
     }
 }
 
 def up_prompt [] {
     { ||
-        let time_segment = ([
-            (date now | date format '%m/%d/%Y %r')
-        ] | str join)
-        let left = $"(host_abbr)(git_status dir)(git_status styled)"
+        let time_segment = (date now | date format '%m/%d/%Y %r')
+        let left = $"(host_abbr)(pwd_abbr)(gsdfit_status styled)"
         let right = $"(proxy prompt)(kube prompt)(ansi purple_bold)($time_segment)"
         # TODO: length of unicode char is 3
         let fl = ((term size).columns
