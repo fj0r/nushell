@@ -257,6 +257,15 @@ def "nu-complete docker run proxy" [] {
     [$"http://($hostaddr):7890" $"http://localhost:7890"]
 }
 
+def relative-to-pwd [path] {
+    match ($path | str substring ..1) {
+        '/' => { $path }
+        '~' => { [ $nu.home-path ($path | str substring 2..) ] | path join }
+        '$' => { ($env | get ($path | str substring 1..)) }
+        _   => { [ $env.PWD $path ] | path join }
+    }
+}
+
 export def dr [
     --debug(-x): bool
     --appimage: bool
@@ -265,7 +274,8 @@ export def dr [
     --ssh(-s): string@"nu-complete docker run sshkey"   # specify ssh key
     --sshuser: string=root                              # default root
     --cache(-c): string                                 # cache
-    --vol(-v): string@"nu-complete docker run vol"      # volume
+    --mnt(-m): string@"nu-complete docker run vol"      # mnt
+    --vols(-v): any                                     # { relate: to }
     --port(-p): any                                     # { 8080: 80 }
     --envs(-e): any                                     # { FOO: BAR }
     --daemon(-d): bool
@@ -273,14 +283,15 @@ export def dr [
     --entrypoint: string                                # entrypoint
     --dry-run: bool
     --with-x: bool
+    --namespace(-n): string@"nu-complete docker ns"
     img: string@"nu-complete docker images"             # image
-    -n: string@"nu-complete docker ns"
     ...cmd                                              # command args
 ] {
-    let ns = if ($n|is-empty) { [] } else { [-n $n] }
+    let ns = if ($namespace|is-empty) { [] } else { [-n $namespace] }
     let entrypoint = if ($entrypoint|is-empty) { [] } else { [--entrypoint $entrypoint] }
     let daemon = if $daemon { [-d] } else { [--rm -it] }
-    let mnt = if ($vol|is-empty) { [] } else { [-v $vol] }
+    let mnt = if ($mnt|is-empty) { [] } else { [-v $mnt] }
+    let vols = if ($vols|is-empty) { [] } else { $vols | transpose k v | each {|x| $"-v (relative-to-pwd $x.k):($x.v)"} }
     let envs = if ($envs|is-empty) { [] } else { $envs | transpose k v | each {|x| $"-e ($x.k)=($x.v)"} }
     let port = if ($port|is-empty) { [] } else { $port | transpose k v | each {|x|[-p $"($x.k):($x.v)"]} | flatten }
     let debug = if $debug { [--cap-add=SYS_ADMIN --cap-add=SYS_PTRACE --security-opt seccomp=unconfined] } else { [] }
@@ -300,61 +311,14 @@ export def dr [
         [--uts $c --ipc $c --pid $c --network $c]
     }
     let cache = if ($cache|is-empty) { [] } else { [-v $cache] }
-    let args = ([$entrypoint $attach $daemon $envs $ssh $proxy $debug $appimage $netadmin $clip $mnt $port $cache] | flatten)
+    let args = ([$entrypoint $attach $daemon $envs $ssh $proxy $debug $appimage $netadmin $clip $mnt $vols $port $cache] | flatten)
     let name = $"($img | split row '/' | last | str replace ':' '-')_(date now | date format %m%d%H%M)"
     if $dry_run {
-        echo $"docker ($ns) run --name ($name) ($args|str join ' ') ($img) ($cmd | flatten)"
+        echo $"docker ($ns | str join ' ') run --name ($name) ($args|str join ' ') ($img) ($cmd | flatten)"
     } else {
         ^$env.docker-cli $ns run --name $name $args $img ($cmd | flatten)
     }
 }
-
-def "nu-complete docker dev env" [] {
-    [ io io:rs io:hs io:jpl io:go ng ng:pg ]
-}
-
-
-export def dx [
-    --dry-run(-v): bool
-    --mount-cache: bool
-    --attach(-a): string@"nu-complete docker container" # attach
-    --proxy: string@"nu-complete docker run proxy"      # proxy
-    dx: string@"nu-complete docker images"              # image
-    --envs(-e): any                                     # { FOO: BAR }
-    --port(-p): any                                     # { 8080: 80 } # todo: multiple specify parameters(-p 8080:80 -p 8181:81)
-    -n: string@"nu-complete docker ns"
-    ...cmd                                              # command args
-] {
-    let ns = if ($n|is-empty) { [] } else { [-n $n] }
-    let __dx_cache = {
-            hs: 'stack:/opt/stack'
-            rs: 'cargo:/opt/cargo'
-            go: 'gopkg:/opt/go/pkg'
-            ng: 'ng:/srv'
-            pg: 'pg:/var/lib/postgresql/data'
-        }
-    let c = (do -i {$__dx_cache | transpose k v | where {|x| $dx | str contains $x.k} | get v.0})
-    let c = if ($c|is-empty) {
-            ''
-        } else if $mount_cache {
-            let c = ( $c
-                    | split row ':'
-                    | each {|x i| if $i == 1 { $"/cache($x)" } else { $x } }
-                    | str join ':'
-                    )
-            $"($env.HOME)/.cache/($c)"
-        } else {
-            $"($env.HOME)/.cache/($c)"
-        }
-    let proxy = if ($proxy|is-empty) { [] } else { [--proxy $proxy] }
-    if $dry_run {
-        print $"cache: ($c)"
-        dr $ns --dry-run --attach $attach --port $port --envs $envs --cache $c -v $"($env.PWD):/world" --debug --proxy $proxy --ssh id_ed25519.pub $dx $cmd
-    } else {
-        dr $ns --attach $attach --port $port --envs $envs --cache $c -v $"($env.PWD):/world" --debug --proxy $proxy --ssh id_ed25519.pub $dx $cmd
-    }
-}
-
 
 def "nu-complete registry list" [cmd: string, offset: int] {
     let cmd = ($cmd | split row ' ')
