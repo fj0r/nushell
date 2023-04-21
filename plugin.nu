@@ -886,6 +886,252 @@ register /usr/local/bin/nu_plugin_inc  {
   "examples": []
 }
 
+register /usr/local/bin/nu_plugin_example  {
+  "sig": {
+    "name": "nu-example-1",
+    "usage": "PluginSignature test 1 for plugin. Returns Value::Nothing",
+    "extra_usage": "",
+    "search_terms": [],
+    "required_positional": [
+      {
+        "name": "a",
+        "desc": "required integer value",
+        "shape": "Int",
+        "var_id": null,
+        "default_value": null
+      },
+      {
+        "name": "b",
+        "desc": "required string value",
+        "shape": "String",
+        "var_id": null,
+        "default_value": null
+      }
+    ],
+    "optional_positional": [
+      {
+        "name": "opt",
+        "desc": "Optional number",
+        "shape": "Int",
+        "var_id": null,
+        "default_value": null
+      }
+    ],
+    "rest_positional": {
+      "name": "rest",
+      "desc": "rest value string",
+      "shape": "String",
+      "var_id": null,
+      "default_value": null
+    },
+    "vectorizes_over_list": false,
+    "named": [
+      {
+        "long": "help",
+        "short": "h",
+        "arg": null,
+        "required": false,
+        "desc": "Display the help message for this command",
+        "var_id": null,
+        "default_value": null
+      },
+      {
+        "long": "flag",
+        "short": "f",
+        "arg": null,
+        "required": false,
+        "desc": "a flag for the signature",
+        "var_id": null,
+        "default_value": null
+      },
+      {
+        "long": "named",
+        "short": "n",
+        "arg": "String",
+        "required": false,
+        "desc": "named string",
+        "var_id": null,
+        "default_value": null
+      }
+    ],
+    "input_type": "Any",
+    "output_type": "Any",
+    "input_output_types": [],
+    "allow_variants_without_examples": false,
+    "is_filter": false,
+    "creates_scope": false,
+    "allows_unknown_args": false,
+    "category": "Experimental"
+  },
+  "examples": [
+    {
+      "example": "nu-example-1 3 bb",
+      "description": "running example with an int value and string value",
+      "result": null
+    }
+  ]
+}
+
+register /usr/local/bin/nu_plugin_example  {
+  "sig": {
+    "name": "nu-example-2",
+    "usage": "PluginSignature test 2 for plugin. Returns list of records",
+    "extra_usage": "",
+    "search_terms": [],
+    "required_positional": [
+      {
+        "name": "a",
+        "desc": "required integer value",
+        "shape": "Int",
+        "var_id": null,
+        "default_value": null
+      },
+      {
+        "name": "b",
+        "desc": "required string value",
+        "shape": "String",
+        "var_id": null,
+        "default_value": null
+      }
+    ],
+    "optional_positional": [
+      {
+        "name": "opt",
+        "desc": "Optional number",
+        "shape": "Int",
+        "var_id": null,
+        "default_value": null
+      }
+    ],
+    "rest_positional": {
+      "name": "rest",
+      "desc": "rest value string",
+      "shape": "String",
+      "var_id": null,
+      "default_value": null
+    },
+    "vectorizes_over_list": false,
+    "named": [
+      {
+        "long": "help",
+        "short": "h",
+        "arg": null,
+        "required": false,
+        "desc": "Display the help message for this command",
+        "var_id": null,
+        "default_value": null
+      },
+      {
+        "long": "flag",
+        "short": "f",
+        "arg": null,
+        "required": false,
+        "desc": "a flag for the signature",
+        "var_id": null,
+        "default_value": null
+      },
+      {
+        "long": "named",
+        "short": "n",
+        "arg": "String",
+        "required": false,
+        "desc": "named string",
+        "var_id": null,
+        "default_value": null
+      }
+    ],
+    "input_type": "Any",
+    "output_type": "Any",
+    "input_output_types": [],
+    "allow_variants_without_examples": false,
+    "is_filter": false,
+    "creates_scope": false,
+    "allows_unknown_args": false,
+    "category": "Experimental"
+  },
+  "examples": []
+}
+
+register /usr/local/bin/nu_plugin_example  {
+  "sig": {
+    "name": "nu-example-3",
+    "usage": "PluginSignature test 3 for plugin. Returns labeled error",
+    "extra_usage": "",
+    "search_terms": [],
+    "required_positional": [
+      {
+        "name": "a",
+        "desc": "required integer value",
+        "shape": "Int",
+        "var_id": null,
+        "default_value": null
+      },
+      {
+        "name": "b",
+        "desc": "required string value",
+        "shape": "String",
+        "var_id": null,
+        "default_value": null
+      }
+    ],
+    "optional_positional": [
+      {
+        "name": "opt",
+        "desc": "Optional number",
+        "shape": "Int",
+        "var_id": null,
+        "default_value": null
+      }
+    ],
+    "rest_positional": {
+      "name": "rest",
+      "desc": "rest value string",
+      "shape": "String",
+      "var_id": null,
+      "default_value": null
+    },
+    "vectorizes_over_list": false,
+    "named": [
+      {
+        "long": "help",
+        "short": "h",
+        "arg": null,
+        "required": false,
+        "desc": "Display the help message for this command",
+        "var_id": null,
+        "default_value": null
+      },
+      {
+        "long": "flag",
+        "short": "f",
+        "arg": null,
+        "required": false,
+        "desc": "a flag for the signature",
+        "var_id": null,
+        "default_value": null
+      },
+      {
+        "long": "named",
+        "short": "n",
+        "arg": "String",
+        "required": false,
+        "desc": "named string",
+        "var_id": null,
+        "default_value": null
+      }
+    ],
+    "input_type": "Any",
+    "output_type": "Any",
+    "input_output_types": [],
+    "allow_variants_without_examples": false,
+    "is_filter": false,
+    "creates_scope": false,
+    "allows_unknown_args": false,
+    "category": "Experimental"
+  },
+  "examples": []
+}
+
 register /usr/local/bin/nu_plugin_query  {
   "sig": {
     "name": "query",

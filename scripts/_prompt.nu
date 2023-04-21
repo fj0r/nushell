@@ -1,17 +1,17 @@
 def bright_cyan [] {
-  each { |it| $"(ansi -e '96m')($it)(ansi reset)" }
+  each { |it| $"(ansi light_cyan)($it)(ansi reset)" }
 }
 
 def bright_green [] {
-  each { |it| $"(ansi -e '92m')($it)(ansi reset)" }
+  each { |it| $"(ansi light_green)($it)(ansi reset)" }
 }
 
 def bright_red [] {
-  each { |it| $"(ansi -e '91m')($it)(ansi reset)" }
+  each { |it| $"(ansi light_red)($it)(ansi reset)" }
 }
 
 def bright_yellow [] {
-  each { |it| $"(ansi -e '93m')($it)(ansi reset)" }
+  each { |it| $"(ansi light_yellow)($it)(ansi reset)" }
 }
 
 def green [] {
@@ -72,133 +72,82 @@ export def "pwd_abbr" [] {
   $"($style)($dir_comp | str join (char separator))"
 }
 
-# Get repository status as structured data
-export def "git_status" [] {
-  mut status = {
-    in_git_repo                     : false
-    tracking_upstream_branch        : false
-    on_named_branch                 : false
-    commits_ahead                   : 0
-    commits_behind                  : 0
-    upstream_exists_on_remote       : false
-    has_staging_or_worktree_changes : false
-    has_untracked_files             : false
-    has_unresolved_merge_conflicts  : false
-    staging_added_count             : 0
-    staging_modified_count          : 0
-    staging_deleted_count           : 0
-    untracked_count                 : 0
-    worktree_modified_count         : 0
-    worktree_deleted_count          : 0
-    merge_conflict_count            : 0
-  }
-
-  let in_git_repo = (not (do --ignore-errors { git rev-parse --abbrev-ref HEAD } | is-empty))
-
-  if not $in_git_repo {
-    return $status
-  }
-
-  $status.in_git_repo = true
-
-  let raw_status = (git --no-optional-locks status --porcelain=2 --branch | lines)
-
-  for s in $raw_status {
-    let r = ($s | split row ' ')
-    match $r.0 {
-      '#' => {
-        match ($r.1 | str substring 7..) {
-          'oid' => {
-            $status.commit_hash = ($r.2 | str substring 0..8)
-          }
-          'head' => {
-            $status.branch_name = $r.2
-            # not contains '(detached)'
-            if ($r | length) == 3 {
-              $status.on_named_branch = true
-            }
-          }
-          'upstream' => {
-            $status.tracking_upstream_branch = true
-          }
-          'ab' => {
-            $status.upstream_exists_on_remote = true
-            $status.commits_ahead = ($r.2 | into int)
-            $status.commits_behind = ($r.3 | into int | math abs)
-          }
-        }
-      }
-      '1'|'2' => {
-        $status.has_staging_or_worktree_changes = true
-        match ($r.1 | str substring 0..1) {
-          'A' => {
-            $status.staging_added_count += 1
-          }
-          'M'|'R' => {
-            $status.staging_modified_count += 1
-          }
-          'D' => {
-            $status.staging_deleted_count += 1
-          }
-        }
-        match ($r.1 | str substring 1..2) {
-          'M'|'R' => {
-            $status.worktree_modified_count += 1
-          }
-          'D' => {
-            $status.worktree_deleted_count += 1
-          }
-        }
-      }
-      '?' => {
-        $status.has_untracked_files = true
-        $status.untracked_count += 1
-      }
-      'u' => {
-        $status.has_unresolved_merge_conflicts = true
-        $status.merge_conflict_count += 1
-      }
-    }
-  }
-
-  return $status
+def branch_local_only [
+  branch: string
+] {
+  $branch | bright_cyan
 }
 
+def branch_upstream_deleted [
+  branch: string
+] {
+  $'($branch)(char failed)' | bright_cyan
+}
+
+def branch_up_to_date [
+  branch: string
+] {
+  $'($branch)(char identical_to)' | bright_cyan
+}
+
+def branch_ahead [
+  branch: string
+  ahead: int
+] {
+  $'($branch)(char branch_ahead)($ahead)' | bright_green
+}
+
+def branch_behind [
+  branch: string
+  behind: int
+] {
+  $'($branch)(char branch_behind)($behind)' | bright_red
+}
+
+def branch_ahead_and_behind [
+  branch: string
+  ahead: int
+  behind: int
+] {
+  $'($branch)(char branch_behind)($behind)(char branch_ahead)($ahead)' | bright_yellow
+}
+
+def staging_changes [
+  added: int
+  modified: int
+  deleted: int
+] {
+  $'+($added)~($modified)-($deleted)' | green
+}
+
+def worktree_changes [
+  added: int
+  modified: int
+  deleted: int
+] {
+  $'+($added)~($modified)-($deleted)' | red
+}
+
+def unresolved_conflicts [
+  conflicts: int
+] {
+  $'!($conflicts)' | red
+}
 # Get repository status as a styled string
 export def "git_status styled" [] {
-  let status = (git_status)
+  let status = (gstat)
 
-  if not $status.in_git_repo { return '' }
+  if $status.repo_name == 'no_repository' { return '' }
 
-  let is_local_only = ($status.tracking_upstream_branch != true)
+  let is_local_only = ($status.remote | is-empty)
 
-  let upstream_deleted = (
-    $status.tracking_upstream_branch and
-    $status.upstream_exists_on_remote != true
-  )
+  let is_up_to_date = ($status.ahead == 0 and $status.behind == 0)
+  
+  let is_ahead = ($status.ahead > 0 and $status.behind == 0)
 
-  let is_up_to_date = (
-    $status.upstream_exists_on_remote and
-    $status.commits_ahead == 0 and
-    $status.commits_behind == 0
-  )
+  let is_behind = ($status.ahead == 0 and $status.behind > 0)
 
-  let is_ahead = (
-    $status.upstream_exists_on_remote and
-    $status.commits_ahead > 0 and
-    $status.commits_behind == 0
-  )
-
-  let is_behind = (
-    $status.upstream_exists_on_remote and
-    $status.commits_ahead == 0 and
-    $status.commits_behind > 0
-  )
-
-  let is_ahead_and_behind = (
-    $status.upstream_exists_on_remote and
-    $status.commits_ahead > 0 and
-    $status.commits_behind > 0
+  let is_ahead_and_behind = ($status.ahead > 0 and $status.behind > 0
   )
 
   let branch_name = (if $status.on_named_branch {
@@ -291,67 +240,6 @@ def nope [] {
 }
 
 
-def branch_local_only [
-  branch: string
-] {
-  $branch | bright_cyan
-}
-
-def branch_upstream_deleted [
-  branch: string
-] {
-  $'($branch)(char failed)' | bright_cyan
-}
-
-def branch_up_to_date [
-  branch: string
-] {
-  $'($branch)(char identical_to)' | bright_cyan
-}
-
-def branch_ahead [
-  branch: string
-  ahead: int
-] {
-  $'($branch)(char branch_ahead)($ahead)' | bright_green
-}
-
-def branch_behind [
-  branch: string
-  behind: int
-] {
-  $'($branch)(char branch_behind)($behind)' | bright_red
-}
-
-def branch_ahead_and_behind [
-  branch: string
-  ahead: int
-  behind: int
-] {
-  $'($branch)(char branch_behind)($behind)(char branch_ahead)($ahead)' | bright_yellow
-}
-
-def staging_changes [
-  added: int
-  modified: int
-  deleted: int
-] {
-  $'+($added)~($modified)-($deleted)' | green
-}
-
-def worktree_changes [
-  added: int
-  modified: int
-  deleted: int
-] {
-  $'+($added)~($modified)-($deleted)' | red
-}
-
-def unresolved_conflicts [
-  conflicts: int
-] {
-  $'!($conflicts)' | red
-}
 
 ### kubernetes
 def "kube ctx" [] {

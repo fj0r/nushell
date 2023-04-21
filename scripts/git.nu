@@ -57,6 +57,13 @@ def "nu-complete git log" [] {
     | each {|x| $x | update value $"`($x.value)`"}
 }
 
+def "nu-complete git branch" [] {
+    git branch
+    | lines
+    | filter {|x| not ($x | str starts-with '*')}
+    | each {|x| $"'($x|str trim)'"}
+}
+
 export def gl [
     commit?: string@"nu-complete git log"
     --verbose(-v):bool
@@ -78,6 +85,10 @@ export def glv [
     } else {
         git log --stat -p -n 1 $commit
     }
+}
+
+export def gbD [branch: string@"nu-complete git branch"] {
+    git branch -D $branch
 }
 
 export def gpp! [] {
@@ -123,7 +134,7 @@ def git_main_branch [] {
 }
 
 def git_current_branch [] {
-    git rev-parse --abbrev-ref HEAD | str trim -c "\n"
+    (gstat).branch
 }
 
 export def gmom [] {
@@ -148,7 +159,6 @@ export alias gb = git branch
 export alias gba = git branch -a
 export alias gbd = git branch -d
 export alias gbda = 'git branch --no-color --merged | command grep -vE "^(\+|\*|\s*($(git_main_branch)|development|develop|devel|dev)\s*$)" | command xargs -n 1 git branch -d'
-export alias gbD = git branch -D
 export alias gbl = git blame -b -w
 export alias gbnm = git branch --no-merged
 export alias gbr = git branch --remote
