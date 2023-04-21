@@ -120,6 +120,11 @@ def "nu-complete git remotes" [] {
   ^git remote | lines | each { |line| $line | str trim }
 }
 
+export def gr [remote?: string@"nu-complete git remotes"] {
+    let remote = if ($remote|is-empty) { 'origin' } else { $remote }
+    git remote show $remote
+}
+
 export def gm [branch:string@"nu-complete git branches"] {
     git merge $branch
 }
@@ -203,7 +208,6 @@ export alias gds = git diff --staged
 export alias gdt = git diff-tree --no-commit-id --name-only -r
 export alias gdw = git diff --word-diff
 
-export alias gr = git remote
 export alias gra = git remote add
 export alias grba = git rebase --abort
 export alias grbc = git rebase --continue

@@ -1,4 +1,3 @@
-# Get the current directory with home abbreviated
 def related [sub dir] {
     if $sub == $dir {
         return { related: '=', path: '' }
@@ -48,7 +47,7 @@ export def "pwd_abbr" [] {
   $"($style)($dir_comp | str join (char separator))"
 }
 
-def bright_yellow [] {
+def light_yellow [] {
   each { |it| $"(ansi light_yellow)($it)(ansi reset)" }
 }
 
@@ -58,41 +57,39 @@ export def "git_status styled" [] {
   if $status.repo_name == 'no_repository' { return '' }
 
   let fmt = [
-        [ahead (char branch_ahead) light_yellow]
-        [behind (char branch_behind) light_red]
-        [idx_added_staged + green]
-        [idx_modified_staged ~ green]
-        [idx_deleted_staged - green]
-        [idx_renamed R green]
-        [idx_type_changed T green]
-        [wt_untracked + red]
-        [wt_modified ~ red]
-        [wt_deleted - red]
-        [wt_renamed R red]
-        [wt_type_changed T red]
-        [ignored i grey]
-        [conflicts ! light_red]
-        [stashes = light_green]
+    $'(ansi blue)($status.branch)(ansi reset)'
+    [behind (char branch_behind) green]
+    [ahead (char branch_ahead) green]
+    [idx_added_staged + yellow]
+    [idx_modified_staged ~ yellow]
+    [idx_deleted_staged - yellow]
+    [idx_renamed R yellow]
+    [idx_type_changed T yellow]
+    [wt_untracked + red]
+    [wt_modified ~ red]
+    [wt_deleted - red]
+    [wt_renamed R red]
+    [wt_type_changed T red]
+    [ignored i grey]
+    [conflicts ! red]
+    [stashes = green]
   ]
 
-  let name = $'(ansi blue)($status.branch)(ansi reset)'
   let summary = ($fmt
-    | filter {|x| ($status | get $x.0) > 0 }
-    | each {|x| $"(ansi $x.2)($x.1)($status | get $x.0)(ansi reset)" }
+    | reduce -f [] {|it, acc|
+        if ($it | describe) == 'string' {
+            $acc | append $it
+        } else if ($status | get $it.0) > 0 {
+            $acc | append $"(ansi $it.2)($it.1)($status | get $it.0)(ansi reset)"
+        } else {
+            $acc
+        }
+      }
     | str join
     )
 
-
-  $'(ansi yellow)|(ansi reset)($name)($summary)'
+  $'(ansi yellow)|(ansi reset)($summary)'
 }
-
-# Helper commands to encapsulate style and make everything else more readable
-
-def nope [] {
-  each { |it| $it == false }
-}
-
-
 
 ### kubernetes
 def "kube ctx" [] {
@@ -109,8 +106,8 @@ export def "kube prompt" [] {
     if ($ctx | is-empty) {
         ""
     } else {
-        let left_bracket = ('' | bright_yellow)
-        let right_bracket = ('|' | bright_yellow)
+        let left_bracket = ('' | light_yellow)
+        let right_bracket = ('|' | light_yellow)
         let c = if $ctx.AUTHINFO == $ctx.CLUSTER {
                     $ctx.CLUSTER
                 } else {
@@ -137,7 +134,7 @@ def host_abbr [] {
         } else {
             (ansi dark_gray)
         }
-    $"($ucl)($n)(ansi reset)('|' | bright_yellow)"
+    $"($ucl)($n)(ansi reset)('|' | light_yellow)"
 }
 
 
