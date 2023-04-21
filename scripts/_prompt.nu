@@ -1,27 +1,3 @@
-def bright_cyan [] {
-  each { |it| $"(ansi light_cyan)($it)(ansi reset)" }
-}
-
-def bright_green [] {
-  each { |it| $"(ansi light_green)($it)(ansi reset)" }
-}
-
-def bright_red [] {
-  each { |it| $"(ansi light_red)($it)(ansi reset)" }
-}
-
-def bright_yellow [] {
-  each { |it| $"(ansi light_yellow)($it)(ansi reset)" }
-}
-
-def green [] {
-  each { |it| $"(ansi green)($it)(ansi reset)" }
-}
-
-def red [] {
-  each { |it| $"(ansi red)($it)(ansi reset)" }
-}
-
 # Get the current directory with home abbreviated
 def related [sub dir] {
     if $sub == $dir {
@@ -72,165 +48,42 @@ export def "pwd_abbr" [] {
   $"($style)($dir_comp | str join (char separator))"
 }
 
-def branch_local_only [
-  branch: string
-] {
-  $branch | bright_cyan
+def bright_yellow [] {
+  each { |it| $"(ansi light_yellow)($it)(ansi reset)" }
 }
 
-def branch_upstream_deleted [
-  branch: string
-] {
-  $'($branch)(char failed)' | bright_cyan
-}
-
-def branch_up_to_date [
-  branch: string
-] {
-  $'($branch)(char identical_to)' | bright_cyan
-}
-
-def branch_ahead [
-  branch: string
-  ahead: int
-] {
-  $'($branch)(char branch_ahead)($ahead)' | bright_green
-}
-
-def branch_behind [
-  branch: string
-  behind: int
-] {
-  $'($branch)(char branch_behind)($behind)' | bright_red
-}
-
-def branch_ahead_and_behind [
-  branch: string
-  ahead: int
-  behind: int
-] {
-  $'($branch)(char branch_behind)($behind)(char branch_ahead)($ahead)' | bright_yellow
-}
-
-def staging_changes [
-  added: int
-  modified: int
-  deleted: int
-] {
-  $'+($added)~($modified)-($deleted)' | green
-}
-
-def worktree_changes [
-  added: int
-  modified: int
-  deleted: int
-] {
-  $'+($added)~($modified)-($deleted)' | red
-}
-
-def unresolved_conflicts [
-  conflicts: int
-] {
-  $'!($conflicts)' | red
-}
-# Get repository status as a styled string
 export def "git_status styled" [] {
   let status = (gstat)
 
   if $status.repo_name == 'no_repository' { return '' }
 
-  let is_local_only = ($status.remote | is-empty)
+  let fmt = [
+        [ahead (char branch_ahead) light_yellow]
+        [behind (char branch_behind) light_red]
+        [idx_added_staged + green]
+        [idx_modified_staged ~ green]
+        [idx_deleted_staged - green]
+        [idx_renamed R green]
+        [idx_type_changed T green]
+        [wt_untracked + red]
+        [wt_modified ~ red]
+        [wt_deleted - red]
+        [wt_renamed R red]
+        [wt_type_changed T red]
+        [ignored i grey]
+        [conflicts ! light_red]
+        [stashes = light_green]
+  ]
 
-  let is_up_to_date = ($status.ahead == 0 and $status.behind == 0)
-  
-  let is_ahead = ($status.ahead > 0 and $status.behind == 0)
+  let name = $'(ansi blue)($status.branch)(ansi reset)'
+  let summary = ($fmt
+    | filter {|x| ($status | get $x.0) > 0 }
+    | each {|x| $"(ansi $x.2)($x.1)($status | get $x.0)(ansi reset)" }
+    | str join
+    )
 
-  let is_behind = ($status.ahead == 0 and $status.behind > 0)
 
-  let is_ahead_and_behind = ($status.ahead > 0 and $status.behind > 0
-  )
-
-  let branch_name = (if $status.on_named_branch {
-      $status.branch_name
-    } else {
-      ['(' $status.commit_hash '...)'] | str join
-    })
-
-  let branch_styled = (if $is_local_only {
-      (branch_local_only $branch_name)
-    } else if $is_up_to_date {
-      (branch_up_to_date $branch_name)
-    } else if $is_ahead {
-      (branch_ahead $branch_name $status.commits_ahead)
-    } else if $is_behind {
-      (branch_behind $branch_name $status.commits_behind)
-    } else if $is_ahead_and_behind {
-      (branch_ahead_and_behind $branch_name $status.commits_ahead $status.commits_behind)
-    } else if $upstream_deleted {
-      (branch_upstream_deleted $branch_name)
-    } else {
-      $branch_name
-    })
-
-  let has_staging_changes = (
-    $status.staging_added_count > 0 or
-    $status.staging_modified_count > 0 or
-    $status.staging_deleted_count > 0
-  )
-
-  let has_worktree_changes = (
-    $status.untracked_count > 0 or
-    $status.worktree_modified_count > 0 or
-    $status.worktree_deleted_count > 0 or
-    $status.merge_conflict_count > 0
-  )
-
-  let has_merge_conflicts = $status.merge_conflict_count > 0
-
-  let staging_summary = (if $has_staging_changes {
-    (staging_changes $status.staging_added_count $status.staging_modified_count $status.staging_deleted_count)
-  } else {
-    ''
-  })
-
-  let worktree_summary = (if $has_worktree_changes {
-    (worktree_changes $status.untracked_count $status.worktree_modified_count $status.worktree_deleted_count)
-  } else {
-    ''
-  })
-
-  let merge_conflict_summary = (if $has_merge_conflicts {
-    (unresolved_conflicts $status.merge_conflict_count)
-  } else {
-    ''
-  })
-
-  let delimiter = (if ($has_staging_changes and $has_worktree_changes) {
-    ('|' | bright_yellow)
-  } else {
-    ''
-  })
-
-  let local_summary = (
-    $'($staging_summary) ($delimiter) ($worktree_summary) ($merge_conflict_summary)' | str trim
-  )
-
-  let local_indicator = (if $has_worktree_changes {
-      ('!' | red)
-    } else if $has_staging_changes {
-      ('~' | bright_cyan)
-    } else {
-      ''
-    })
-
-  let repo_summary = (
-    $'($branch_styled) ($local_summary) ($local_indicator)' | str trim
-  )
-
-  let left_bracket = ('|' | bright_yellow)
-  let right_bracket = ('' | bright_yellow)
-
-  $'($left_bracket)($repo_summary)($right_bracket)'
+  $'(ansi yellow)|(ansi reset)($name)($summary)'
 }
 
 # Helper commands to encapsulate style and make everything else more readable
