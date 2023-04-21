@@ -402,8 +402,8 @@ def host_abbr [] {
 
 def right_prompt [] {
     { ||
-        let time_segment = (date now | date format '%y-%m-%d %H:%M:%S')
-        $"(proxy prompt)(kube prompt)(host_abbr)(ansi purple_bold)($time_segment)"
+        let time_segment = (date now | date format '%y-%m-%d/%H:%M:%S')
+        $"(proxy prompt)(host_abbr)(kube prompt)(ansi purple_bold)($time_segment)"
     }
 }
 
@@ -416,7 +416,7 @@ def left_prompt [] {
 
 def up_prompt [] {
     { ||
-        let time_segment = (date now | date format '%m/%d/%Y %r')
+        let time_segment = (date now | date format '%y-%m-%d/%H:%M:%S')
         let left = $"(host_abbr)(pwd_abbr)(gsdfit_status styled)"
         let right = $"(proxy prompt)(kube prompt)(ansi purple_bold)($time_segment)"
         # TODO: length of unicode char is 3
