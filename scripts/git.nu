@@ -125,6 +125,10 @@ export def gr [remote?: string@"nu-complete git remotes"] {
     git remote show $remote
 }
 
+export def grh [commit: string@"nu-complete git log"] {
+    git reset $commit
+}
+
 export def gm [branch:string@"nu-complete git branches"] {
     git merge $branch
 }
@@ -217,7 +221,6 @@ export alias grbm = git rebase (git_main_branch)
 export alias grbo = git rebase --onto
 export alias grbs = git rebase --skip
 export alias grev = git revert
-export alias grh = git reset
 export alias grhh = git reset --hard
 export alias groh = git reset origin/$(git_current_branch) --hard
 export alias grm = git rm

@@ -56,8 +56,8 @@ export def "git_status styled" [] {
 
   if $status.repo_name == 'no_repository' { return '' }
 
+  let branch = $'(ansi blue)($status.branch)(ansi reset)'
   let fmt = [
-    $'(ansi blue)($status.branch)(ansi reset)'
     [behind (char branch_behind) green]
     [ahead (char branch_ahead) green]
     [idx_added_staged + yellow]
@@ -76,19 +76,12 @@ export def "git_status styled" [] {
   ]
 
   let summary = ($fmt
-    | reduce -f [] {|it, acc|
-        if ($it | describe) == 'string' {
-            $acc | append $it
-        } else if ($status | get $it.0) > 0 {
-            $acc | append $"(ansi $it.2)($it.1)($status | get $it.0)(ansi reset)"
-        } else {
-            $acc
-        }
-      }
+    | filter {|x| ($status | get $x.0) > 0 }
+    | each {|x| $"(ansi $x.2)($x.1)($status | get $x.0)(ansi reset)" }
     | str join
     )
 
-  $'(ansi yellow)|(ansi reset)($summary)'
+  $'(ansi yellow)|(ansi reset)($branch)($summary)'
 }
 
 ### kubernetes
