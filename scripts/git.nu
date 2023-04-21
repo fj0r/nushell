@@ -57,7 +57,7 @@ def "nu-complete git log" [] {
     | each {|x| $x | update value $"`($x.value)`"}
 }
 
-def "nu-complete git branch" [] {
+def "nu-complete git branches" [] {
     git branch
     | lines
     | filter {|x| not ($x | str starts-with '*')}
@@ -87,7 +87,11 @@ export def glv [
     }
 }
 
-export def gbD [branch: string@"nu-complete git branch"] {
+export def gco [branch: string@"nu-complete git branches"] {
+    git checkout $branch
+}
+
+export def gbD [branch: string@"nu-complete git branches"] {
     git branch -D $branch
 }
 
@@ -112,16 +116,16 @@ export def gsq [] {
     git gc --prune=now --aggressive
 }
 
-def "nu-complete git branches" [] {
-  ^git branch | lines | each { |line| $line | str replace '[\*\+] ' '' | str trim }
-}
-
 def "nu-complete git remotes" [] {
   ^git remote | lines | each { |line| $line | str trim }
 }
 
 export def gm [branch:string@"nu-complete git branches"] {
     git merge $branch
+}
+
+export def grb [branch:string@"nu-complete git branches"] {
+    git rebase (gstat).branch $branch
 }
 
 def git_main_branch [] {
@@ -185,7 +189,6 @@ export alias gclean = git clean -id
 export alias gcm = git checkout (git_main_branch)
 export alias gcd = git checkout develop
 export alias gcmsg = git commit -m
-export alias gco = git checkout
 export alias gcount = git shortlog -sn
 export alias gcp = git cherry-pick
 export alias gcpa = git cherry-pick --abort
@@ -202,7 +205,6 @@ export alias gdw = git diff --word-diff
 
 export alias gr = git remote
 export alias gra = git remote add
-export alias grb = git rebase
 export alias grba = git rebase --abort
 export alias grbc = git rebase --continue
 export alias grbd = git rebase develop
