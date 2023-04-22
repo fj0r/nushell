@@ -277,7 +277,7 @@ def up_prompt [] {
 export-env {
     let-env PROMPT_COMMAND = (left_prompt)
     let-env PROMPT_COMMAND_RIGHT = (right_prompt)
-    let-env PROMPT_INDICATOR = {|| $"> " }
+    let-env PROMPT_INDICATOR = {|| if ($env.NU_POWERLINE? | is-empty) { $"> " } else { $'(char nf_left_segment) ' } }
     let-env PROMPT_INDICATOR_VI_INSERT = {|| ": " }
     let-env PROMPT_INDICATOR_VI_NORMAL = {|| "> " }
     let-env PROMPT_MULTILINE_INDICATOR = {|| "::: " }
