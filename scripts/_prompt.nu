@@ -1,16 +1,11 @@
-def sep0 [
-    direction?: string
-    fg?: string = 'light_yellow'
-    bg?: string = ''
-] {
-    $"($fg)|"
-}
-
 def sep [
     direction?: string
     fg?: string = 'light_yellow'
     bg?: string = ''
 ] {
+    if ($env.NU_POWERLINE? | is-empty) {
+        return $"($fg)|"
+    }
     let bg = if ($bg | is-empty) {
         ''
     } else {
@@ -98,7 +93,7 @@ export def git_status [] {
     repo_name           : no_repository
     tag                 : no_tag
     branch              : no_branch
-    remote              : no_remote
+    remote              : ''
   }
 
   if ($raw_status | is-empty) { return $status }
@@ -172,8 +167,12 @@ export def "git_status styled" [] {
 
   if $status.branch == 'no_branch' { return '' }
 
+  let branch = if ($status.remote | is-empty) {
+    $'(ansi red)($status.branch)'
+  } else {
+    $'(ansi blue)($status.branch)'
+  }
 
-  let branch = $'(ansi blue)($status.branch)'
   let fmt = [
     [behind              (char branch_behind) yellow]
     [ahead               (char branch_ahead) yellow]
