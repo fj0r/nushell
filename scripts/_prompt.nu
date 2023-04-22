@@ -1,19 +1,16 @@
-def sep [
+def _sep [
     direction?: string
-    fg?: string = 'light_yellow'
-    bg?: string = ''
+    color?: string = 'light_yellow'
+    fg?: string
 ] {
+    let s = $in
     if ($env.NU_POWERLINE? | is-empty) {
-        return $"($fg)|"
+        return $"($s)(ansi light_yellow)|"
     }
-    let bg = if ($bg | is-empty) {
-        ''
-    } else {
-        ansi $"bg_($bg)"
-    }
+    let fg = if ($fg | is-empty) { $color } else { $fg }
     match $direction {
-        '>' => { $'(ansi $fg)($bg)(char nf_left_segment)' }
-        '<' => { $'(ansi $fg)(char nf_right_segment)($bg)' }
+        '>' => { $'(ansi $"bg_($fg)")($s)(ansi $fg)(ansi $'bg_($color)')(char nf_left_segment)' }
+        '<' => { $'($s)(ansi $color)(char nf_right_segment)(ansi $"bg_($color)")' }
         _ => { '|' }
     }
 }
@@ -58,11 +55,11 @@ export def "pwd_abbr" [] {
   }
 
   let style = if $to_home.related == '>' {
-    (ansi xterm_gold3b)
+    $'(ansi xterm_gold3b)'
   } else {
-    ''
+    $'(ansi light_green_bold)'
   }
-  $"($style)($dir_comp | str join (char separator))"
+  $"($style)($dir_comp | str join (char separator) | _sep '>' dark_gray light_magenta)"
 }
 
 ### git
@@ -197,7 +194,7 @@ export def "git_status styled" [] {
     | str join
     )
 
-  $'(sep '>' yellow dark_gray)($branch)($summary)(ansi reset)'
+  $'($branch)($summary)(ansi reset)'
 }
 
 ### kubernetes
@@ -221,14 +218,14 @@ export def "kube prompt" [] {
                     $"($ctx.AUTHINFO)@($ctx.CLUSTER)"
                 }
         let p = $"(ansi red)($c)(ansi yellow)/(ansi cyan_bold)($ctx.NAMESPACE)"
-        $"($p)(sep '<')" | str trim
+        $"($p)" | str trim | _sep '<' light_gray
     }
 }
 
 ### proxy
 export def "proxy prompt" [] {
     if not (($env.https_proxy? | is-empty) and ($env.http_proxy? | is-empty)) {
-        sep '<' blue red
+        '' | _sep '<' blue
     } else {
         ""
     }
@@ -242,7 +239,7 @@ def host_abbr [] {
         } else {
             (ansi dark_gray)
         }
-    $"($ucl)($n)(ansi reset)(sep '<')"
+    $"($ucl)($n | _sep '<' dark_gray)"
 }
 
 
@@ -277,7 +274,7 @@ def up_prompt [] {
 export-env {
     let-env PROMPT_COMMAND = (left_prompt)
     let-env PROMPT_COMMAND_RIGHT = (right_prompt)
-    let-env PROMPT_INDICATOR = {|| if ($env.NU_POWERLINE? | is-empty) { $"> " } else { $'(char nf_left_segment) ' } }
+    let-env PROMPT_INDICATOR = {|| if ($env.NU_POWERLINE? | is-empty) { $"> " } else { $'(ansi grey)(char nf_left_segment)' } }
     let-env PROMPT_INDICATOR_VI_INSERT = {|| ": " }
     let-env PROMPT_INDICATOR_VI_NORMAL = {|| "> " }
     let-env PROMPT_MULTILINE_INDICATOR = {|| "::: " }
