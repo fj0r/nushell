@@ -13,7 +13,6 @@ def "nu-complete ps" [] {
 }
 
 # after { do something ... } <pid>
-# :FIXME: ksd (glg)
 export def after [action, pid: string@"nu-complete ps"] {
     do -i { tail --pid $pid -f /dev/null }
     do $action
