@@ -1,6 +1,26 @@
-def sep [color?: string] {
-    let color = if ($color | is-empty) { 'light_yellow' } else { $color }
-    $"(ansi $color)|(ansi reset)"
+def sep0 [
+    direction?: string
+    fg?: string = 'light_yellow'
+    bg?: string = ''
+] {
+    $"($fg)|"
+}
+
+def sep [
+    direction?: string
+    fg?: string = 'light_yellow'
+    bg?: string = ''
+] {
+    let bg = if ($bg | is-empty) {
+        ''
+    } else {
+        ansi $"bg_($bg)"
+    }
+    match $direction {
+        '>' => { $'(ansi $fg)($bg)(char nf_left_segment)' }
+        '<' => { $'(ansi $fg)(char nf_right_segment)($bg)' }
+        _ => { '|' }
+    }
 }
 
 ### pwd
@@ -153,7 +173,7 @@ export def "git_status styled" [] {
   if $status.branch == 'no_branch' { return '' }
 
 
-  let branch = $'(ansi blue)($status.branch)(ansi reset)'
+  let branch = $'(ansi blue)($status.branch)'
   let fmt = [
     [behind              (char branch_behind) yellow]
     [ahead               (char branch_ahead) yellow]
@@ -178,7 +198,7 @@ export def "git_status styled" [] {
     | str join
     )
 
-  $'(sep)($branch)($summary)(ansi reset)'
+  $'(sep '>' yellow dark_gray)($branch)($summary)(ansi reset)'
 }
 
 ### kubernetes
@@ -202,14 +222,14 @@ export def "kube prompt" [] {
                     $"($ctx.AUTHINFO)@($ctx.CLUSTER)"
                 }
         let p = $"(ansi red)($c)(ansi yellow)/(ansi cyan_bold)($ctx.NAMESPACE)"
-        $"($p)(sep)" | str trim
+        $"($p)(sep '<')" | str trim
     }
 }
 
 ### proxy
 export def "proxy prompt" [] {
     if not (($env.https_proxy? | is-empty) and ($env.http_proxy? | is-empty)) {
-        sep blue
+        sep '<' blue red
     } else {
         ""
     }
@@ -223,7 +243,7 @@ def host_abbr [] {
         } else {
             (ansi dark_gray)
         }
-    $"($ucl)($n)(ansi reset)(sep)"
+    $"($ucl)($n)(ansi reset)(sep '<')"
 }
 
 
