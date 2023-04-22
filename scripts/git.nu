@@ -129,6 +129,14 @@ export def grh [commit: string@"nu-complete git log"] {
     git reset $commit
 }
 
+export def gf [
+    remote: string@"nu-complete git remotes"
+    branch: string@"nu-complete git branches"
+] {
+    let remote = if ($remote|is-empty) { 'origin' } else { $remote }
+    git fetch $remote $branch
+}
+
 export def gm [branch:string@"nu-complete git branches"] {
     git merge $branch
 }
