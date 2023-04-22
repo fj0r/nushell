@@ -24,7 +24,7 @@ export def-env "toggle proxy" [proxy?:string@"nu-complete proxys"] {
                 echo 'hide proxy'
                 $nothing
             } else {
-                let p = if ($proxy|is-empty) {
+                let p = if ($proxy | is-empty) {
                             'http://localhost:7890'
                         } else {
                             $proxy

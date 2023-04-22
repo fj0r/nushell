@@ -94,7 +94,7 @@ if not ((do -i {ls /opt/*/bin }) | is-empty) {
     let-env PATH = ($o | prepend (ls /opt/*/bin | get name | where {|n| not ($n in $o)}))
 }
 
-let-env LD_LIBRARY_PATH = if 'LD_LIBRARY_PATH' in ($env | columns) { $env.LD_LIBRARY_PATH } else { [] }
+let-env LD_LIBRARY_PATH = if ($env.LD_LIBRARY_PATH? | is-empty) { [] } else { $env.LD_LIBRARY_PATH }
 let-env LD_LIBRARY_PATH = (do -i {
     $env.LD_LIBRARY_PATH
     | prepend (
