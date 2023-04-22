@@ -47,8 +47,9 @@ export def "pwd_abbr" [] {
   $"($style)($dir_comp | str join (char separator))"
 }
 
-def light_yellow [] {
-  each { |it| $"(ansi light_yellow)($it)(ansi reset)" }
+def sep [color?: string] {
+    let color = if ($color | is-empty) { 'light_yellow' } else { $color }
+    $"(ansi $color)|(ansi reset)"
 }
 
 export def git_status [] {
@@ -57,7 +58,7 @@ export def git_status [] {
       return $status
   }
 
-  let raw_status = (git --no-optional-locks status --porcelain=2 --branch | lines)
+  let raw_status = (do -i { git --no-optional-locks status --porcelain=2 --branch | lines })
 
   mut status = {
     idx_added_staged    : 0
@@ -80,6 +81,8 @@ export def git_status [] {
     branch              : no_branch
     remote              : no_remote
   }
+
+  if ($raw_status | is-empty) { return $status }
 
   for s in $raw_status {
     let r = ($s | split row ' ')
@@ -176,7 +179,7 @@ export def "git_status styled" [] {
     | str join
     )
 
-  $'(ansi yellow)|(ansi reset)($branch)($summary)'
+  $'(sep)($branch)($summary)'
 }
 
 ### kubernetes
@@ -194,22 +197,20 @@ export def "kube prompt" [] {
     if ($ctx | is-empty) {
         ""
     } else {
-        let left_bracket = ('' | light_yellow)
-        let right_bracket = ('|' | light_yellow)
         let c = if $ctx.AUTHINFO == $ctx.CLUSTER {
                     $ctx.CLUSTER
                 } else {
                     $"($ctx.AUTHINFO)@($ctx.CLUSTER)"
                 }
         let p = $"(ansi red)($c)(ansi yellow)/(ansi cyan_bold)($ctx.NAMESPACE)"
-        $"($left_bracket)($p)($right_bracket)" | str trim
+        $"($p)(sep)" | str trim
     }
 }
 
 ### proxy
 export def "proxy prompt" [] {
     if not ($env.https_proxy? | is-empty) {
-        $"(ansi blue)|"
+        sep blue
     } else {
         ""
     }
@@ -222,7 +223,7 @@ def host_abbr [] {
         } else {
             (ansi dark_gray)
         }
-    $"($ucl)($n)(ansi reset)('|' | light_yellow)"
+    $"($ucl)($n)(ansi reset)(sep)"
 }
 
 
