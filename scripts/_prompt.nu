@@ -10,6 +10,7 @@ def _sep [
     let fg = if ($fg | is-empty) { $color } else { $fg }
     match $direction {
         '>' => { $'(ansi $"bg_($fg)")($s)(ansi $fg)(ansi $'bg_($color)')(char nf_left_segment)' }
+        '>>' => { $'(ansi $"bg_($fg)")($s)(ansi reset)(ansi $fg)(char nf_left_segment)' }
         '<' => { $'($s)(ansi $color)(char nf_right_segment)(ansi $"bg_($color)")' }
         _ => { '|' }
     }
@@ -28,7 +29,7 @@ def related [sub dir] {
     }
 }
 
-export def "pwd_abbr" [] {
+export def "pwd_abbr" [sep: string = '>'] {
   let pwd = ($env.PWD)
 
   let to_home = (related $pwd $nu.home-path)
@@ -59,7 +60,7 @@ export def "pwd_abbr" [] {
   } else {
     $'(ansi light_green_bold)'
   }
-  $"($style)($dir_comp | str join (char separator) | _sep '>' dark_gray light_magenta)"
+  $"($style)($dir_comp | str join (char separator) | _sep $sep $env.NU_POWERLINE_GIT $env.NU_POWERLINE_PATH)"
 }
 
 ### git
@@ -194,7 +195,7 @@ export def "git_status styled" [] {
     | str join
     )
 
-  $'($branch)($summary)(ansi reset)'
+  $'($branch)($summary)' | _sep '>>' $env.NU_POWERLINE_GIT
 }
 
 ### kubernetes
@@ -218,14 +219,14 @@ export def "kube prompt" [] {
                     $"($ctx.AUTHINFO)@($ctx.CLUSTER)"
                 }
         let p = $"(ansi red)($c)(ansi yellow)/(ansi cyan_bold)($ctx.NAMESPACE)"
-        $"($p)" | str trim | _sep '<' light_gray
+        $"($p)" | str trim | _sep '<' $env.NU_POWERLINE_KUBE
     }
 }
 
 ### proxy
 export def "proxy prompt" [] {
     if not (($env.https_proxy? | is-empty) and ($env.http_proxy? | is-empty)) {
-        '' | _sep '<' blue
+        '' | _sep '<' $env.NU_POWERLINE_PROXY
     } else {
         ""
     }
@@ -239,7 +240,7 @@ def host_abbr [] {
         } else {
             (ansi dark_gray)
         }
-    $"($ucl)($n | _sep '<' dark_gray)"
+    $"($ucl)($n | _sep '<' $env.NU_POWERLINE_HOST)"
 }
 
 
@@ -253,14 +254,24 @@ def right_prompt [] {
 
 def left_prompt [] {
     { ||
-        $"(pwd_abbr)(git_status styled)"
+        let gs = (git_status styled)
+        if ($gs | is-empty) {
+            $"(pwd_abbr '>>')"
+        } else {
+            $"(pwd_abbr)($gs)"
+        }
     }
 }
 
 def up_prompt [] {
     { ||
         let time_segment = (date now | date format '%y-%m-%d/%H:%M:%S')
-        let left = $"(host_abbr)(pwd_abbr)(git_status styled)"
+        let gs = (git_status styled)
+        let left = if ($gs | is-empty) {
+            $"(host_abbr)(pwd_abbr '>>')"
+        } else {
+            $"(host_abbr)(pwd_abbr)($gs)"
+        }
         let right = $"(proxy prompt)(kube prompt)(ansi purple_bold)($time_segment)"
         # TODO: length of unicode char is 3
         let fl = ((term size).columns
@@ -272,9 +283,15 @@ def up_prompt [] {
 }
 
 export-env {
+    let-env NU_POWERLINE_PATH = 'dark_gray'
+    let-env NU_POWERLINE_GIT = 'white'
+    let-env NU_POWERLINE_HOST = 'dark_gray'
+    let-env NU_POWERLINE_KUBE = 'yellow'
+    let-env NU_POWERLINE_TIME = 'dark_gray'
+    let-env NU_POWERLINE_PROXY = 'blue'
     let-env PROMPT_COMMAND = (left_prompt)
     let-env PROMPT_COMMAND_RIGHT = (right_prompt)
-    let-env PROMPT_INDICATOR = {|| if ($env.NU_POWERLINE? | is-empty) { $"> " } else { $'(ansi grey)(char nf_left_segment)' } }
+    let-env PROMPT_INDICATOR = {|| if ($env.NU_POWERLINE? | is-empty) { $"> " } else { $'' } }
     let-env PROMPT_INDICATOR_VI_INSERT = {|| ": " }
     let-env PROMPT_INDICATOR_VI_NORMAL = {|| "> " }
     let-env PROMPT_MULTILINE_INDICATOR = {|| "::: " }
