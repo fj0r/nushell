@@ -393,7 +393,7 @@ use nvim.nu *
 #use ime.nu *
 use zellij.nu *
 
-use _prompt.nu *
+use power.nu *
 ####use starship.nu *
 use network.nu *
 source zoxide.nu
