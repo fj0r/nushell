@@ -253,10 +253,10 @@ def left_prompt [segment] {
         let stop = ($segment | length) - 1
         let vs = ($segment
             | each {|x|
-                $x | upsert value (do ($env.NU_PROMPT_COMPONENTS | get $x.source))
+                $x | insert value (do ($env.NU_PROMPT_COMPONENTS | get $x.source))
             })
         let cs = ($vs | each {|x| $x.power})
-        let cs = ($cs | prepend 'black')
+        let cs = ($cs | prepend $cs.1?)
         $vs
         | zip $cs
         | enumerate
@@ -274,7 +274,7 @@ def left_prompt [segment] {
 def right_prompt [segment] {
     {||
         $segment
-        | each {|x| $x | upsert value (do ($env.NU_PROMPT_COMPONENTS | get $x.source))}
+        | each {|x| $x | insert value (do ($env.NU_PROMPT_COMPONENTS | get $x.source))}
         | filter {|x| not ($x.value | is-empty)}
         | enumerate
         | each {|x|
@@ -303,39 +303,53 @@ def up_prompt [segment] {
     }
 }
 
+def default_env [name value] {
+    if ($name in ($env | columns)) {
+        $env | get $name
+    } else {
+        $value
+    }
+}
+
 export-env {
-    let-env NU_PROMPT_SCHEMA = [
+    let-env NU_PROMPT_SCHEMA = (default_env
+        NU_PROMPT_SCHEMA
         [
-            {source: pwd,   power: '#504945'}
-            {source: git,   power: '#504945'}
+            [
+                {source: pwd,   power: '#353230'}
+                {source: git,   power: '#504945'}
+            ]
+            [
+                {source: proxy, power: dark_gray}
+                {source: host,  power: '#353230'}
+                {source: kube,  power: '#504945'}
+                {source: time,  power: '#666560'}
+            ]
         ]
+    )
+
+    let-env NU_PROMPT_GIT_FORMATTER = (default_env
+        NU_PROMPT_GIT_FORMATTER
         [
-            {source: proxy, power: dark_gray}
-            {source: host,  power: '#353230'}
-            {source: kube,  power: '#504945'}
-            {source: time,  power: '#666560'}
+            [behind              (char branch_behind) yellow]
+            [ahead               (char branch_ahead) yellow]
+            [stashes             = blue]
+            [conflicts           ! red]
+            [ignored             _ purple]
+            [idx_added_staged    + green]
+            [idx_modified_staged ~ green]
+            [idx_deleted_staged  - green]
+            [idx_renamed         % green]
+            [idx_type_changed    * green]
+            [wt_untracked        + red]
+            [wt_modified         ~ red]
+            [wt_deleted          - red]
+            [wt_renamed          % red]
+            [wt_type_changed     * red]
         ]
-    ]
+    )
 
-    let-env NU_PROMPT_GIT_FORMATTER = [
-        [behind              (char branch_behind) yellow]
-        [ahead               (char branch_ahead) yellow]
-        [stashes             = blue]
-        [conflicts           ! red]
-        [ignored             _ purple]
-        [idx_added_staged    + green]
-        [idx_modified_staged ~ green]
-        [idx_deleted_staged  - green]
-        [idx_renamed         % green]
-        [idx_type_changed    * green]
-        [wt_untracked        + red]
-        [wt_modified         ~ red]
-        [wt_deleted          - red]
-        [wt_renamed          % red]
-        [wt_type_changed     * red]
-    ]
-
-    let-env NU_POWERLINE = true
+    let-env NU_POWERLINE = (default_env NU_POWERLINE true)
 
     let-env NU_PROMPT_COMPONENTS = {
         pwd: (pwd_abbr)
