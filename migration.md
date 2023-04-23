@@ -1,13 +1,22 @@
 ## todo
 - [x] kubernetes independent kubectx & kubens
+- [ ] powerline
+    - [ ] proxy stat no effects in plain mode
+    - [ ] env hooks for regenerate thunks (def-env)
+        - [ ] NU_POWERLINE
+        - [ ] NU_UPPROMPT
+        - [ ] NU_PROMPT_SCHEMA
+        - [ ] MENU_MARKER_SCHEMA
+        - [ ] NU_PROMPT_GIT_FORMATTER
+
 
 ## migrate
-- [ ] Nullability, null coalescing, null-safe calls, null-safe piping #4188
+- [x] Nullability, null coalescing, null-safe calls, null-safe piping #4188
 - [ ] Bash Braces Expansion #2317
 - [ ] Status of equivalents of BASH history expansion #5011
 - [ ] implementation special variables and background jobs? #4564
 - [ ] Pasting multi-line command (with backslash) doesn't work #4044
-- [ ] source .env (/etc/os-release)
+- [x] source .env (/etc/os-release)
 
 
 - config
