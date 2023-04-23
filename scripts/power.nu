@@ -302,12 +302,15 @@ def up_prompt [segment] {
 
 export-env {
     let-env NU_PROMPT_SCHEMA = [
-        [pwd git]
+        [
+            {type: pwd, bg:'#504945'}
+            {type: git, bg:'#504945'}
+        ]
         [proxy host kube time]
     ]
 
     let-env NU_POWERLINE_THEME = {
-        left: ['#504945' '#353230' '#504945' '#353230' '#504945']
+        left: [ '#353230' '#504945' '#353230' '#504945']
         right: [dark_gray '#353230' '#504945' '#666560' '#504945']
     }
 
