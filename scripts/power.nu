@@ -213,7 +213,12 @@ export def-env init [] {
     }
     let-env PROMPT_INDICATOR_VI_INSERT = {|| ": " }
     let-env PROMPT_INDICATOR_VI_NORMAL = {|| "> " }
-    let-env PROMPT_MULTILINE_INDICATOR = {|| "::: " }
+    let-env PROMPT_MULTILINE_INDICATOR = {||
+        match $env.NU_POWER_DECORATOR {
+            'plain' => { "::: " }
+            _ => { $"(char haze) " }
+        }
+    }
 
     let-env config = ( $env.config | update menus ($env.config.menus
         | each {|x|
