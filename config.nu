@@ -397,7 +397,7 @@ use zellij.nu *
 use network.nu *
 source zoxide.nu
 
-use power.nu *
+use power.nu
     use power_git.nu
     power inject 0 1 {source: git,   power: '#504945'}
     use power_kube.nu
