@@ -208,9 +208,11 @@ export def-env "power init" [] {
             $x | upsert marker $'(ansi -e {fg: $c})(char nf_left_segment_thin) '
         }
         ))
+
+    power hook
 }
 
-export def-env "power reg" [name source] {
+export def-env "power register" [name source] {
     let-env NU_PROMPT_COMPONENTS = (
         $env.NU_PROMPT_COMPONENTS | upsert $name {|| $source }
     )
@@ -218,7 +220,7 @@ export def-env "power reg" [name source] {
 
 export def-env "power inject" [pos idx define] {
     let prev = ($env.NU_PROMPT_SCHEMA | get $pos)
-    let next = if idx == 0 {
+    let next = if $idx == 0 {
         $prev | prepend $define
     } else {
         [
@@ -235,11 +237,18 @@ export def-env "power inject" [pos idx define] {
 }
 
 export def-env "power eject" [] {
-
+    "power eject not implement"
 }
 
 export def-env "power hook" [] {
-
+    let-env config = ( $env.config | upsert hooks.env_change { |config|
+        let init = [{|| power init }]
+        $config.hooks.env_change
+        | upsert NU_UPPROMPT $init
+        | upsert NU_POWERLINE $init
+        | upsert NU_PROMPT_SCHEMA $init
+        | upsert MENU_MARKER_SCHEMA $init
+    })
 }
 
 export-env {
