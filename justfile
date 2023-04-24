@@ -8,3 +8,4 @@ export:
   for s in [power power_git power_kube] {
     cp $"scripts/($s).nu" $"($dest)/($prt)/($s).nu"
   }
+  cp $"scripts/power.md" $"($dest)/($prt)/README.md"
