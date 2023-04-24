@@ -247,7 +247,6 @@ export def-env "power hook" [] {
         | upsert NU_UPPROMPT $init
         | upsert NU_POWERLINE $init
         | upsert NU_PROMPT_SCHEMA $init
-        | upsert MENU_MARKER_SCHEMA $init
     })
 }
 
