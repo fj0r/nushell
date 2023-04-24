@@ -204,11 +204,16 @@ export def-env "power init" [] {
 
     let-env config = ( $env.config | update menus ($env.config.menus
         | each {|x|
-            let c = ($env.MENU_MARKER_SCHEMA | get $x.marker)
-            $x | upsert marker $'(ansi -e {fg: $c})(char nf_left_segment_thin) '
+            if ($x.marker in ($env.MENU_MARKER_SCHEMA | columns)) {
+                let c = ($env.MENU_MARKER_SCHEMA | get $x.marker)
+                $x | upsert marker $'(ansi -e {fg: $c})(char nf_left_segment_thin) '
+            } else {
+                $x
+            }
         }
         ))
 
+    #$'(date now)(char newline)' | save -af ~/.cache/nushell/power_init
     power hook
 }
 
@@ -247,6 +252,7 @@ export def-env "power hook" [] {
         | upsert NU_UPPROMPT $init
         | upsert NU_POWERLINE $init
         | upsert NU_PROMPT_SCHEMA $init
+        | upsert MENU_MARKER_SCHEMA $init
     })
 }
 
