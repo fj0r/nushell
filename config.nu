@@ -396,5 +396,9 @@ use zellij.nu *
 ####use starship.nu *
 use network.nu *
 source zoxide.nu
-use power.nu *
 
+use power.nu *
+use power_kube.nu *
+power inject 1 2 {source: kube power: '#504945'}
+
+power init

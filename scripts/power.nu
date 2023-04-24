@@ -167,33 +167,6 @@ export def "git_stat" [] {
     }
 }
 
-### kubernetes
-def "kube ctx" [] {
-    do -i {
-        kubectl config get-contexts
-        | from ssv -a
-        | where CURRENT == '*'
-        | get 0
-    }
-}
-
-export def kube_stat [] {
-    {||
-        let ctx = (kube ctx)
-        if ($ctx | is-empty) {
-            ""
-        } else {
-            let c = if $ctx.AUTHINFO == $ctx.CLUSTER {
-                    $ctx.CLUSTER
-                } else {
-                    $"($ctx.AUTHINFO)@($ctx.CLUSTER)"
-                }
-            let p = $"(ansi red)($c)(ansi yellow)/(ansi cyan_bold)($ctx.NAMESPACE)"
-            $"($p)" | str trim
-        }
-    }
-}
-
 ### proxy
 export def proxy_stat [] {
     {||
@@ -337,6 +310,58 @@ def default_env [name value] {
     }
 }
 
+export def-env "power init" [] {
+    if ($env.NU_UPPROMPT? | is-empty) {
+        let-env PROMPT_COMMAND = (left_prompt $env.NU_PROMPT_SCHEMA.0)
+        let-env PROMPT_COMMAND_RIGHT = (right_prompt $env.NU_PROMPT_SCHEMA.1)
+    } else {
+        let-env PROMPT_COMMAND = (up_prompt $env.NU_PROMPT_SCHEMA)
+    }
+    let-env PROMPT_INDICATOR = {|| if not $env.NU_POWERLINE { "> " } else { " " } }
+    let-env PROMPT_INDICATOR_VI_INSERT = {|| ": " }
+    let-env PROMPT_INDICATOR_VI_NORMAL = {|| "> " }
+    let-env PROMPT_MULTILINE_INDICATOR = {|| "::: " }
+
+    let-env config = ( $env.config | update menus ($env.config.menus
+        | each {|x|
+            let c = ($env.MENU_MARKER_SCHEMA | get $x.marker)
+            $x | upsert marker $'(ansi -e {fg: $c})(char nf_left_segment_thin) '
+        }
+        ))
+}
+
+export def-env "power reg" [name source] {
+    let-env NU_PROMPT_COMPONENTS = (
+        $env.NU_PROMPT_COMPONENTS | upsert $name {|| $source }
+    )
+}
+
+export def-env "power inject" [pos idx define] {
+    let prev = ($env.NU_PROMPT_SCHEMA | get $pos)
+    let next = if idx == 0 {
+        $prev | prepend $define
+    } else {
+        [
+            ($prev | range 0..($idx - 1))
+            $define
+            ($prev | range $idx..)
+        ] | flatten
+    }
+
+    let-env NU_PROMPT_SCHEMA = (
+        $env.NU_PROMPT_SCHEMA
+        | update $pos $next
+    )
+}
+
+export def-env "power eject" [] {
+
+}
+
+export def-env "power hook" [] {
+
+}
+
 export-env {
     let-env NU_PROMPT_SCHEMA = (default_env
         NU_PROMPT_SCHEMA
@@ -346,9 +371,8 @@ export-env {
                 {source: git,   power: '#504945'}
             ]
             [
-                {source: proxy, power: dark_gray}
+                {source: proxy, power: 'dark_gray'}
                 {source: host,  power: '#353230'}
-                {source: kube,  power: '#504945'}
                 {source: time,  power: '#666560'}
             ]
         ]
@@ -393,25 +417,7 @@ export-env {
         git: (git_stat)
         proxy: (proxy_stat)
         host: (host_abbr)
-        kube: (kube_stat)
         time: (time_segment)
     }
-
-    if ($env.NU_UPPROMPT? | is-empty) {
-        let-env PROMPT_COMMAND = (left_prompt $env.NU_PROMPT_SCHEMA.0)
-        let-env PROMPT_COMMAND_RIGHT = (right_prompt $env.NU_PROMPT_SCHEMA.1)
-    } else {
-        let-env PROMPT_COMMAND = (up_prompt $env.NU_PROMPT_SCHEMA)
-    }
-    let-env PROMPT_INDICATOR = {|| if not $env.NU_POWERLINE { "> " } else { " " } }
-    let-env PROMPT_INDICATOR_VI_INSERT = {|| ": " }
-    let-env PROMPT_INDICATOR_VI_NORMAL = {|| "> " }
-    let-env PROMPT_MULTILINE_INDICATOR = {|| "::: " }
-
-    let-env config = ( $env.config | update menus ($env.config.menus
-        | each {|x|
-            let c = ($env.MENU_MARKER_SCHEMA | get $x.marker)
-            $x | upsert marker $'(ansi -e {fg: $c})(char nf_left_segment_thin) '
-        }
-        ))
 }
+
