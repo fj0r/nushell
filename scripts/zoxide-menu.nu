@@ -2,7 +2,7 @@ def __zoxide_menu [] {
     {
       name: zoxide_menu
       only_buffer_difference: true
-      marker: "┊ "
+      marker: "| "
       type: {
           layout: columnar
           page_size: 20
