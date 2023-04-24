@@ -1,5 +1,7 @@
 ## todo
 - [x] kubernetes independent kubectx & kubens
+- [ ] docker
+    - [ ] -v
 - [ ] powerline
     - [ ] proxy stat no effects in plain mode
     - [ ] env hooks for regenerate thunks (def-env)
