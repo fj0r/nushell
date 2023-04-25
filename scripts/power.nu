@@ -78,7 +78,7 @@ def host_abbr [] {
 def time_segment [] {
     {||
         let theme = $env.NU_POWER_THEME.time
-        $"($theme.now)(date now | date format '%y-%m-%d/%H:%M:%S')"
+        $"($theme.now)(date now | date format '%y-%m-%d_%H:%M:%S')"
     }
 }
 
