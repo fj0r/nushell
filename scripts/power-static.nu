@@ -83,108 +83,99 @@ def time_segment [] {
 }
 
 ### prompt
-def decorator [ ] {
+def decorator [
+    direction?: string
+    color?: string = 'light_yellow'
+    fg?: string
+] {
     match $env.NU_POWER_DECORATOR {
         'plain' => {
-            {|s, direction?: string, color?: string = 'light_yellow', fg?: string|
-                match $direction {
-                    '>' => {
-                        let r = $'(ansi light_yellow)|'
-                        $"($s)($r)"
-                    }
-                    '>>'|'<<' => {
-                        $s
-                    }
-                    '<' => {
-                        let l = $'(ansi light_yellow)|'
-                        $"($l)($s)"
-                    }
+            match $direction {
+                '>' => {
+                    let r = $'(ansi light_yellow)|'
+                    {|s| $"($s)($r)" }
+                }
+                '>>' => {
+                    {|s| $s }
+                }
+                '<'|'<<' => {
+                    let l = $'(ansi light_yellow)|'
+                    {|s| $"($l)($s)" }
                 }
             }
         }
         'power' => {
-            {|s, direction?: string, color?: string = 'light_yellow', fg?: string|
-                match $direction {
-                    '>' => {
-                        let l = (ansi -e {bg: $fg})
-                        let r = $'(ansi -e {fg: $fg, bg: $color})(char nf_left_segment)'
-                        $'($l)($s)($r)'
-                    }
-                    '>>' => {
-                        let l = (ansi -e {bg: $fg})
-                        let r = $'(ansi reset)(ansi -e {fg: $fg})(char nf_left_segment)'
-                        $'($l)($s)($r)'
-                    }
-                    '<'|'<<' => {
-                        let l = $'(ansi -e {fg: $color})(char nf_right_segment)(ansi -e {bg: $color})'
-                        $'($l)($s)'
-                    }
+            match $direction {
+                '>' => {
+                    let l = (ansi -e {bg: $fg})
+                    let r = $'(ansi -e {fg: $fg, bg: $color})(char nf_left_segment)'
+                    {|s| $'($l)($s)($r)' }
+                }
+                '>>' => {
+                    let l = (ansi -e {bg: $fg})
+                    let r = $'(ansi reset)(ansi -e {fg: $fg})(char nf_left_segment)'
+                    {|s| $'($l)($s)($r)' }
+                }
+                '<'|'<<' => {
+                    let l = $'(ansi -e {fg: $color})(char nf_right_segment)(ansi -e {bg: $color})'
+                    {|s| $'($l)($s)' }
                 }
             }
         }
         'dynamic' => {
-            {|s, direction?: string, color?: string = 'light_yellow', fg?: string|
-                match $direction {
-                    '>' => {
-                    }
-                    '>>' => {
-                    }
-                    '<'|'<<' => {
-                    }
+            match $direction {
+                '>' => {
+                }
+                '>>' => {
+                }
+                '<'|'<<' => {
                 }
             }
         }
     }
 }
 
+def squash [thunk] {
+    mut r = ""
+    for t in $thunk {
+        let v = (do $t.0)
+        if ($v != $nothing) {
+            $r += (do $t.1 $v)
+        }
+    }
+    $r
+}
+
 def left_prompt [segment] {
-    let decorator = (decorator)
-    let segment = ($segment
-        | each {|x|
-            [$x.color ($env.NU_PROMPT_COMPONENTS | get $x.source)]
-        })
-    {||
-        let segment = ($segment
-            | each {|x| [$x.0 (do $x.1)] }
-            | filter {|x| $x.1 != $nothing }
-            )
-        let stop = ($segment | length) - 1
-        let cs = ($segment | each {|x| $x.0 })
-        let cs = ($cs | prepend $cs.1?)
-        $segment
+    let stop = ($segment | length) - 1
+    let vs = ($segment | each {|x| [$x.color ($env.NU_PROMPT_COMPONENTS | get $x.source)]})
+    let cs = ($vs | each {|x| $x.0})
+    let cs = ($cs | prepend $cs.1?)
+    let thunk = ($vs
         | zip $cs
         | enumerate
         | each {|x|
             if $x.index == $stop {
-                do $decorator $x.item.0.1 '>>' $x.item.0.0 $x.item.1
+                [$x.item.0.1 (decorator '>>' $x.item.0.0 $x.item.1)]
             } else {
-                do $decorator $x.item.0.1 '>' $x.item.0.0 $x.item.1
+                [$x.item.0.1 (decorator '>' $x.item.0.0 $x.item.1)]
             }
-        }
-        | str join
-    }
+        })
+    {|| squash $thunk }
 }
 
 def right_prompt [segment] {
-    let decorator = (decorator)
-    let segment = ($segment
-        | each {|x|
-            [$x.color ($env.NU_PROMPT_COMPONENTS | get $x.source)]
-        })
-    {||
-        $segment
-        | each {|x| [$x.0 (do $x.1)] }
-        | filter {|x| $x.1 != $nothing }
+    let thunk = ( $segment
+        | each {|x| [$x.color ($env.NU_PROMPT_COMPONENTS | get $x.source)]}
         | enumerate
         | each {|x|
             if $x.index == 0 {
-                do $decorator $x.item.1 '<<' $x.item.0
+                [$x.item.1 (decorator '<<' $x.item.0)]
             } else {
-                do $decorator $x.item.1 '<' $x.item.0
+                [$x.item.1 (decorator '<' $x.item.0)]
             }
-        }
-        | str join
-    }
+        })
+    {|| squash $thunk }
 }
 
 def up_prompt [segment] {
