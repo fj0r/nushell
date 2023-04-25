@@ -150,3 +150,14 @@ export extern "ssc disable" [
 export def sleeping [] {
     bash -c "echo mem | sudo tee /sys/power/state > /dev/null"
 }
+
+export def timelog [tag code] {
+    let start = (date now)
+    let result = (do $code)
+    let period = (date now) - $start
+
+    echo $'($tag)|($start | date format '%y-%m-%d_%H:%M:%S')|($period)(char newline)'
+    | save -a ~/.cache/nushell/time.log
+
+    return $result
+}
