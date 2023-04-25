@@ -90,18 +90,19 @@ def decorator [
 ] {
     match $env.NU_POWER_DECORATOR {
         'plain' => {
-            let r = match $direction {
+            match $direction {
                 '>' => {
                     let r = $'(ansi light_yellow)|'
                     {|s| $"($s)($r)" }
                 }
-                '<' => {
+                '>>' => {
+                    {|s| $s }
+                }
+                '<'|'<<' => {
                     let l = $'(ansi light_yellow)|'
                     {|s| $"($l)($s)" }
                 }
-                '<<'|'>>' => {{|s| $s }}
             }
-            return $r
         }
         'power' => {
             match $direction {
@@ -118,6 +119,16 @@ def decorator [
                 '<'|'<<' => {
                     let l = $'(ansi -e {fg: $color})(char nf_right_segment)(ansi -e {bg: $color})'
                     {|s| $'($l)($s)' }
+                }
+            }
+        }
+        'dynamic' => {
+            match $direction {
+                '>' => {
+                }
+                '>>' => {
+                }
+                '<'|'<<' => {
                 }
             }
         }
