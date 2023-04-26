@@ -82,6 +82,40 @@ def time_segment [] {
     }
 }
 
+### utils
+def logtime [msg act] {
+    let start = (date now)
+    let result = (do $act)
+    let period = ((date now) - $start
+        | into duration -c ns
+        | into string
+        | str replace ' ' '')
+
+    echo $'($start | date format '%Y-%m-%d_%H:%M:%S%z')(char tab)($period)(char tab)($msg)(char newline)'
+    | save -a ~/.cache/nushell/time.log
+
+    return $result
+}
+
+def-env wraptime [message action] {
+    if $env.NU_POWER_BENCHMARK? == true {
+        {|| logtime $message $action }
+    } else {
+        $action
+    }
+}
+
+export def timelog [] {
+    open ~/.cache/nushell/time.log
+    | from tsv -n
+    | rename start duration message
+    | each {|x|
+        $x
+        | update start ($x.start | into datetime -f '%Y-%m-%d_%H:%M:%S%z')
+        | update duration ($x.duration | into duration)
+    }
+}
+
 ### prompt
 def decorator [ ] {
     match $env.NU_POWER_DECORATOR {
@@ -313,12 +347,24 @@ export def-env init [] {
         'default' => {
             match $env.NU_POWER_MODE {
                 'default' => {
-                    let-env PROMPT_COMMAND = (left_prompt $env.NU_POWER_SCHEMA.0)
-                    let-env PROMPT_COMMAND_RIGHT = (right_prompt $env.NU_POWER_SCHEMA.1)
+                    let-env PROMPT_COMMAND = (wraptime
+                        'power dynamic left'
+                        (left_prompt $env.NU_POWER_SCHEMA.0)
+                    )
+                    let-env PROMPT_COMMAND_RIGHT = (wraptime
+                        'power dynamic right'
+                        (right_prompt $env.NU_POWER_SCHEMA.1)
+                    )
                 }
                 'fast' => {
-                    let-env PROMPT_COMMAND = (left_prompt_gen $env.NU_POWER_SCHEMA.0)
-                    let-env PROMPT_COMMAND_RIGHT = (right_prompt_gen $env.NU_POWER_SCHEMA.1)
+                    let-env PROMPT_COMMAND = (wraptime
+                        'power static left'
+                        (left_prompt_gen $env.NU_POWER_SCHEMA.0)
+                    )
+                    let-env PROMPT_COMMAND_RIGHT = (wraptime
+                        'power static right'
+                        (right_prompt_gen $env.NU_POWER_SCHEMA.1)
+                    )
                 }
             }
         }
@@ -412,11 +458,14 @@ export def-env hook [] {
         | upsert NU_POWER_FRAME $init
         | upsert NU_POWER_DECORATOR $init
         | upsert NU_POWER_MENU_MARKER $init
+        | upsert NU_POWER_BENCHMARK $init
         # NU_POWER_THEME
     })
 }
 
 export-env {
+    let-env NU_POWER_BENCHMARK = false
+
     let-env NU_POWER_MODE = (default_env
         NU_POWER_MODE
         'fast' # default | fast

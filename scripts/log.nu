@@ -1,4 +1,4 @@
-export def logtime [msg act] {
+def logtime [msg act] {
     let start = (date now)
     let result = (do $act)
     let period = ((date now) - $start
