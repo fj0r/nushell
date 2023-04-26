@@ -7,9 +7,8 @@ export alias la = ls -a
 export alias lla = ls -al
 export alias l = tail -f
 
-# FIXME: number-like
 def "nu-complete ps" [] {
-    ps -l | each {|x| { value: $"`($x.pid)`", description: $x.command } }
+    ps -l | each {|x| { value: $"($x.pid)", description: $x.command } }
 }
 
 # after { do something ... } <pid>
