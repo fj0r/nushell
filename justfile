@@ -1,19 +1,32 @@
 export:
   #!/usr/local/bin/nu
-  let dest = $"($env.HOME)/world/nu_scripts"
-  for n in [docker kubernetes git nvim after] {
-    cp $"scripts/($n).nu" $"($dest)/modules/($n)/($n).nu"
-  }
-  for n in [ssh] {
-    cp $"scripts/($n).nu" $"($dest)/modules/network/($n).nu"
-  }
-  for n in [just] {
-    cp $"scripts/($n).nu" $"($dest)/custom-completions/($n)/($n).nu"
+
+  let manifest = {
+    ssh.nu:          modules/network
+    docker.nu:       modules/docker
+    kubernetes.nu:   modules/kubernetes
+    git.nu:          modules/git
+    nvim.nu:         modules/nvim
+    after.nu:        modules/after
+    log.nu:          modules/log
+
+    just.nu:         custom-completions/just
+
+    power.nu:        modules/prompt/powerline
+    power_git.nu:    modules/prompt/powerline
+    power_kube.nu:   modules/prompt/powerline
+    power.md:        modules/prompt/powerline/README.md
+
+    direnv.nu:       hooks/direnv
+    dynamic-load.nu: hooks/dynamic-load
+    zoxide-menu.nu:  custom-menus
   }
 
-  let prt = 'prompt/powerline'
-  for s in [power power_git power_kube] {
-    cp $"scripts/($s).nu" $"($dest)/modules/($prt)/($s).nu"
+  let dest = $"($env.HOME)/world/nu_scripts"
+
+  $manifest
+  | transpose k v
+  | each {|x|
+    cp $'{{invocation_directory()}}/scripts/($x.k)' $'($dest)/($x.v)'
   }
-  cp $"scripts/power.md" $"($dest)/modules/($prt)/README.md"
 

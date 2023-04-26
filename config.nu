@@ -374,6 +374,7 @@ let-env config = {
 }
 
 #use utils.nu *
+use after.nu *
 use log.nu *
 use zoxide-menu.nu *
 use nushell.nu *
@@ -389,7 +390,7 @@ use docker.nu *
 use sh.nu *
 #use pwd-overlay.nu *
 use dynamic-load.nu *
-use dir-env.nu *
+use direnv.nu *
 use nvim.nu *
 #use ime.nu *
 use zellij.nu *
