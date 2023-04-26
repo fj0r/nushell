@@ -1,38 +1,19 @@
 export:
   #!/usr/local/bin/nu
   let dest = $"($env.HOME)/world/nu_scripts"
-  for s in [docker kubernetes ssh git just nvim] {
-    cp $"scripts/($s).nu" $"($dest)/($s)/($s).nu"
+  for n in [docker kubernetes git nvim after] {
+    cp $"scripts/($n).nu" $"($dest)/modules/($n)/($n).nu"
   }
+  for n in [ssh] {
+    cp $"scripts/($n).nu" $"($dest)/modules/network/($n).nu"
+  }
+  for n in [just] {
+    cp $"scripts/($n).nu" $"($dest)/custom-completions/($n)/($n).nu"
+  }
+
   let prt = 'prompt/powerline'
   for s in [power power_git power_kube] {
-    cp $"scripts/($s).nu" $"($dest)/($prt)/($s).nu"
+    cp $"scripts/($s).nu" $"($dest)/modules/($prt)/($s).nu"
   }
-  cp $"scripts/power.md" $"($dest)/($prt)/README.md"
+  cp $"scripts/power.md" $"($dest)/modules/($prt)/README.md"
 
-test:
-  #!/usr/local/bin/nu
-  let theme = { context: white }
-  let kind = 'kube'
-  let-env NU_POWER_THEME = {
-    kube: {
-        context: red
-        separator: yello
-        namespace: cyan
-    }
-  }
-
-  let prev_theme = ($env.NU_POWER_THEME | get $kind)
-  let prev_cols = ($prev_theme | columns)
-  let next_theme = ($theme | transpose k v)
-  for n in $next_theme {
-      if $n.k in $prev_cols {
-          let-env NU_POWER_THEME = (
-              $env.NU_POWER_THEME | update $kind {|conf|
-                $conf | get $kind | update $n.k $n.v
-              }
-          )
-      }
-  }
-
-  echo $env.NU_POWER_THEME | to json

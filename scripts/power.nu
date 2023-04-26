@@ -156,18 +156,6 @@ def decorator [ ] {
                 }
             }
         }
-        'dynamic' => {
-            {|s, direction?: string, color?: string = 'light_yellow', fg?: string|
-                match $direction {
-                    '>' => {
-                    }
-                    '>>' => {
-                    }
-                    '<'|'<<' => {
-                    }
-                }
-            }
-        }
     }
 }
 
@@ -257,16 +245,6 @@ def decorator_gen [
                 '<'|'<<' => {
                     let l = $'(ansi -e {fg: $color})(char nf_right_segment)(ansi -e {bg: $color})'
                     {|s| $'($l)($s)' }
-                }
-            }
-        }
-        'dynamic' => {
-            match $direction {
-                '>' => {
-                }
-                '>>' => {
-                }
-                '<'|'<<' => {
                 }
             }
         }
