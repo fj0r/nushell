@@ -324,7 +324,7 @@ export def-env init [] {
     match $env.NU_POWER_FRAME {
         'default' => {
             match $env.NU_POWER_MODE {
-                'default' => {
+                'power' => {
                     let-env PROMPT_COMMAND = (wraptime
                         'power dynamic left'
                         (left_prompt $env.NU_POWER_SCHEMA.0)
@@ -446,7 +446,7 @@ export-env {
 
     let-env NU_POWER_MODE = (default_env
         NU_POWER_MODE
-        'fast' # default | fast
+        'fast' # power | fast
     )
 
     let-env NU_POWER_SCHEMA = (default_env
