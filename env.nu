@@ -84,14 +84,16 @@ let-env NU_PLUGIN_DIRS = [
 
 # To add entries to PATH (on Windows you might use Path), you can use the following pattern:
 # let-env PATH = ($env.PATH | split row (char esep) | prepend '/some/path')
-let-env PATH = ($env.PATH
-    | split row (char esep)
-    | prepend $'($env.HOME)/.local/bin'
-    )
 
-if not ((do -i {ls /opt/*/bin }) | is-empty) {
-    let o = ($env.PATH | split row (char esep))
-    let-env PATH = ($o | prepend (ls /opt/*/bin | get name | where {|n| not ($n in $o)}))
+for path in [
+    [$'($env.HOME)/.local/bin']
+    (do -i {ls '/opt/*/bin' | get name})
+    (do -i {ls $'($env.LS_ROOT)/*/bin' | get name})
+] {
+    if not ($path | is-empty) {
+        let-env PATH = ($env.PATH
+        | prepend ($path | where $it not-in ($env.PATH | split row (char esep))))
+    }
 }
 
 let-env LD_LIBRARY_PATH = if ($env.LD_LIBRARY_PATH? | is-empty) { [] } else { $env.LD_LIBRARY_PATH }
