@@ -407,5 +407,5 @@ use power.nu
         context: purple
     }
     use power_utils.nu
-    power inject 1 1 {source: atuin, color: '#123456'}
+    power inject 0 1 {source: atuin, color: '#678067'}
 power init

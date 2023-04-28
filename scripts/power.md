@@ -38,6 +38,7 @@ power init
 
 ## todo
 - [x] source return `$nothing` for hiding
+- [ ] in fast mode, there is still a problem with hideable components on the left
 - [x] proxy stat invalid in plain mode
     - '<<' not longer hide separator in `fast` mode
 - [ ] implement `power eject`
