@@ -174,13 +174,14 @@ def left_prompt [segment] {
         | zip $cs
         | enumerate
         | each {|x|
-            if $x.index == $stop {
+            if $x.index == 0 and $env.NU_POWER_DECORATOR == 'power' {
+                $'(ansi -e {bg: $segment.0.0})(do $decorator $x.item.0.1 '>' $x.item.0.0 $x.item.1)'
+            } else if $x.index == $stop {
                 do $decorator $x.item.0.1 '>>' $x.item.0.0 $x.item.1
             } else {
                 do $decorator $x.item.0.1 '>' $x.item.0.0 $x.item.1
             }
         }
-        | prepend (ansi -e {bg: $segment.0.0})
         | str join
     }
 }
@@ -266,8 +267,8 @@ def left_prompt_gen [segment] {
         | zip $cs
         | enumerate
         | each {|x|
-            if $x.index == 0 {
-                let o = (decorator_gen '>>' $x.item.0.0 $x.item.1)
+            if $x.index == 0 and $env.NU_POWER_DECORATOR == 'power' {
+                let o = (decorator_gen '>' $x.item.0.0 $x.item.1)
                 [$x.item.0.1 {|x| $'(ansi -e {bg: $segment.0.color})(do $o $x)' }]
             } else if $x.index == $stop {
                 [$x.item.0.1 (decorator_gen '>>' $x.item.0.0 $x.item.1)]
