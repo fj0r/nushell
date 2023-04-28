@@ -15,6 +15,7 @@ export:
     power.nu:        modules/prompt/powerline
     power_git.nu:    modules/prompt/powerline
     power_kube.nu:   modules/prompt/powerline
+    power_utils.nu:  modules/prompt/powerline
     power.md:        modules/prompt/powerline/README.md
 
     direnv.nu:       hooks/direnv
@@ -27,6 +28,6 @@ export:
   $manifest
   | transpose k v
   | each {|x|
-    cp $'{{invocation_directory()}}/scripts/($x.k)' $'($dest)/($x.v)'
+    cp -v $'{{invocation_directory()}}/scripts/($x.k)' $'($dest)/($x.v)'
   }
 
