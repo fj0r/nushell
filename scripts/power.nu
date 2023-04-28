@@ -92,13 +92,14 @@ def logtime [msg act] {
         | str replace ' ' '')
 
     echo $'($start | date format '%Y-%m-%d_%H:%M:%S%z')(char tab)($period)(char tab)($msg)(char newline)'
-    | save -a ~/.cache/nushell/time.log
+    | save -a ~/.cache/nushell/power_time.log
 
     return $result
 }
 
 def wraptime [message action] {
     if $env.NU_POWER_BENCHMARK? == true {
+        rm -f ~/.cache/nushell/power_time.log
         {|| logtime $message $action }
     } else {
         $action
@@ -106,7 +107,7 @@ def wraptime [message action] {
 }
 
 export def timelog [] {
-    open ~/.cache/nushell/time.log
+    open ~/.cache/nushell/power_time.log
     | from tsv -n
     | rename start duration message
     | each {|x|
@@ -114,6 +115,13 @@ export def timelog [] {
         | update start ($x.start | into datetime -f '%Y-%m-%d_%H:%M:%S%z')
         | update duration ($x.duration | into duration)
     }
+}
+
+export def analyze [] {
+    timelog
+    | group-by message
+    | transpose k v
+    | each {|x| $x | upsert v ($x.v | get duration | math avg)}
 }
 
 ### prompt
