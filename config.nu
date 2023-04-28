@@ -375,7 +375,7 @@ let-env config = {
 
 #use utils.nu *
 use after.nu *
-use log.nu *
+use timelog.nu *
 use zoxide-menu.nu *
 use nushell.nu *
 use sys.nu *

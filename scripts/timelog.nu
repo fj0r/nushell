@@ -1,4 +1,4 @@
-def logtime [msg act] {
+def log [msg act] {
     let start = (date now)
     let result = (do $act)
     let period = ((date now) - $start
@@ -12,7 +12,7 @@ def logtime [msg act] {
     return $result
 }
 
-export def timelog [] {
+export def analyze [] {
     open ~/.cache/nushell/time.log
     | from tsv -n
     | rename start duration message
