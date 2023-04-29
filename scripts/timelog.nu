@@ -1,4 +1,4 @@
-def log [msg act] {
+export def log [msg act] {
     let start = (date now)
     let result = (do $act)
     let period = ((date now) - $start
@@ -12,7 +12,7 @@ def log [msg act] {
     return $result
 }
 
-export def analyze [] {
+export def result [] {
     open ~/.cache/nushell/time.log
     | from tsv -n
     | rename start duration message
@@ -21,4 +21,11 @@ export def analyze [] {
         | update start ($x.start | into datetime -f '%Y-%m-%d_%H:%M:%S%z')
         | update duration ($x.duration | into duration)
     }
+}
+
+export def analyze [] {
+    result
+    | group-by message
+    | transpose component metrics
+    | each {|x| $x | upsert metrics ($x.metrics | get duration | math avg)}
 }

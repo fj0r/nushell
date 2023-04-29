@@ -105,6 +105,15 @@ def wraptime [message action] {
     }
 }
 
+def get_component [schema] {
+    let component = ($env.NU_PROMPT_COMPONENTS | get $schema.source)
+    if $env.NU_POWER_BENCHMARK? == true {
+        {|| logtime $'component ($schema.source)' $component }
+    } else {
+        $component
+    }
+}
+
 export def timelog [] {
     open ~/.cache/nushell/power_time.log
     | from tsv -n
@@ -173,7 +182,7 @@ def left_prompt [segment] {
     let decorator = (decorator)
     let segment = ($segment
         | each {|x|
-            [$x.color ($env.NU_PROMPT_COMPONENTS | get $x.source)]
+            [$x.color (get_component $x)]
         })
     {||
         let segment = ($segment
@@ -202,7 +211,7 @@ def right_prompt [segment] {
     let decorator = (decorator)
     let segment = ($segment
         | each {|x|
-            [$x.color ($env.NU_PROMPT_COMPONENTS | get $x.source)]
+            [$x.color (get_component $x)]
         })
     {||
         $segment
@@ -278,7 +287,7 @@ def squash [thunk] {
 
 def left_prompt_gen [segment] {
     let stop = ($segment | length) - 1
-    let vs = ($segment | each {|x| [$x.color ($env.NU_PROMPT_COMPONENTS | get $x.source)]})
+    let vs = ($segment | each {|x| [$x.color (get_component $x)]})
     let cs = ($segment | each {|x| $x.color } | append $segment.0.color | range 1..)
     let thunk = ($vs
         | zip $cs
@@ -297,7 +306,7 @@ def left_prompt_gen [segment] {
 
 def right_prompt_gen [segment] {
     let thunk = ( $segment
-        | each {|x| [$x.color ($env.NU_PROMPT_COMPONENTS | get $x.source)]}
+        | each {|x| [$x.color (get_component $x)]}
         | enumerate
         | each {|x|
             if $x.index == 0 {
@@ -311,7 +320,7 @@ def right_prompt_gen [segment] {
 
 def up_prompt [segment] {
     let thunk = ($segment
-        | each {|y| $y | each {|x| $env.NU_PROMPT_COMPONENTS | get $x.source}
+        | each {|y| $y | each {|x| get_component $x }
         })
     { ||
         let ss = ($thunk
