@@ -9,7 +9,7 @@ export def log [msg act] {
     echo $'($start | date format '%Y-%m-%d_%H:%M:%S%z')(char tab)($period)(char tab)($msg)(char newline)'
     | save -a ~/.cache/nushell/time.log
 
-    return $result
+    $result
 }
 
 export def result [] {

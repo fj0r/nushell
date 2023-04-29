@@ -29,7 +29,7 @@ export def "parse cmd" [] {
         }
     }
     $opt.args = $pos
-    return $opt
+    $opt
 }
 
 export def "parse cmd1" [] {
@@ -64,7 +64,7 @@ export def index-need-update [index path] {
         mkdir (dirname $index)
         return true
     }
-    return false
+    false
 }
 
 export def 'str max-length' [] {
