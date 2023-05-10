@@ -55,26 +55,3 @@ export def "parse cmd1" [] {
     }
     | reject sw
 }
-
-export def index-need-update [index path] {
-    let ts = do -i { ls $path | sort-by modified | reverse | get 0.modified }
-    if ($ts | is-empty) { return false }
-    let tc = do -i { ls $index | get 0.modified }
-    if not (($index | path exists) and ($ts < $tc)) {
-        mkdir (dirname $index)
-        return true
-    }
-    false
-}
-
-export def 'str max-length' [] {
-    $in | reduce -f 0 {|x, a|
-        if ($x|is-empty) { return $a }
-        let l = ($x | str length)
-        if $l > $a { $l } else { $a }
-    }
-}
-
-export def has [name] {
-    $name in ($in | columns) and (not ($in | get $name | is-empty))
-}

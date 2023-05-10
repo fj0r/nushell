@@ -373,7 +373,7 @@ let-env config = {
   ]
 }
 
-#use utils.nu *
+#use utils.nu
 use after.nu *
 use timelog.nu *
 use zoxide-menu.nu *
@@ -409,3 +409,10 @@ use power.nu
     use power_utils.nu
     power inject 0 1 {source: atuin, color: '#3B4E32'}
 power init
+
+def update-config [ ] {
+    cd (dirname $nu.config-path)
+    git pull
+    #git log -1 --date=iso
+}
+
