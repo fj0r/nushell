@@ -1,5 +1,6 @@
 # Source this in your ~/.config/nushell/config.nu
-let-env ATUIN_SESSION = (atuin uuid)
+let has_atuin = not (which atuin | is-empty)
+let-env ATUIN_SESSION = (if $has_atuin { atuin uuid } else { $nothing })
 
 # Magic token to make sure we don't record commands run by keybindings
 let ATUIN_KEYBINDING_TOKEN = $"# (random uuid)"
@@ -35,15 +36,15 @@ def _atuin_search_cmd [...flags: string] {
     ] | str join "\n"
 }
 
-let-env config = (
+let-env config = (if $has_atuin {
     $env.config | upsert hooks (
         $env.config.hooks
         | upsert pre_execution ($env.config.hooks.pre_execution | append $_atuin_pre_execution)
         | upsert pre_prompt ($env.config.hooks.pre_prompt | append $_atuin_pre_prompt)
     )
-)
+} else { $env.config })
 
-let-env config = (
+let-env config = (if $has_atuin {
     $env.config | upsert keybindings (
         $env.config.keybindings
         | append {
@@ -54,9 +55,9 @@ let-env config = (
             event: { send: executehostcommand cmd: (_atuin_search_cmd) }
         }
     )
-)
+} else { $env.config })
 
-let-env config = (
+let-env config = (if $has_atuin {
     $env.config | upsert keybindings (
         $env.config.keybindings
         | append {
@@ -67,5 +68,5 @@ let-env config = (
             event: { send: executehostcommand cmd: (_atuin_search_cmd '--shell-up-key-binding') }
         }
     )
-)
+} else { $env.config })
 
