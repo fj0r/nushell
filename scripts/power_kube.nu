@@ -39,8 +39,8 @@ def kube_stat [] {
 
 export-env {
     power register kube (kube_stat) {
-        context: red
+        context: cyan
         separator: yellow
-        namespace: cyan
+        namespace: purple
     }
 }
