@@ -414,5 +414,6 @@ def update-config [ ] {
     cd (dirname $nu.config-path)
     git pull
     #git log -1 --date=iso
+    #source '($nu.config-path)'
 }
 
