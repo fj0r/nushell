@@ -410,6 +410,8 @@ use power.nu
     power inject 0 1 {source: atuin, color: '#404040'}
 power init
 
+source atuin.nu
+
 def update-config [ ] {
     cd (dirname $nu.config-path)
     git pull
