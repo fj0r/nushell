@@ -407,7 +407,7 @@ use power.nu
         context: cyan
     }
     use power_utils.nu
-    power inject 0 1 {source: atuin, color: '#3B4E32'}
+    power inject 0 1 {source: atuin, color: '#7b9695'}
 power init
 
 def update-config [ ] {
