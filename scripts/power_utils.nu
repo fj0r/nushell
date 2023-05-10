@@ -4,7 +4,7 @@ export def atuin_stat [] {
         if not ($env.ATUIN_SESSION? | is-empty) {
             [$bg '']
         } else {
-            ['#666560' '']
+            ['#504945' '']
         }
     }
 }
