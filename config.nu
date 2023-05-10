@@ -411,6 +411,7 @@ use power.nu
     }
     use power_utils.nu
     power inject 0 1 {source: atuin, color: '#404040'}
+    power set time $nothing { short: true }
 power init
 
 source atuin.nu
