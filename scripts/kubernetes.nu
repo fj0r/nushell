@@ -171,13 +171,7 @@ export def "nu-complete kube kind" [] {
     let cache = $'($env.HOME)/.cache/nu-complete/k8s-api-resources/($ctx.data.current-context).json'
     ensure-cache $cache $ctx.path {||
         kubectl api-resources | from ssv -a
-        | reduce -f [] {|it, a|
-            if ($it.SHORTNAMES | is-empty) {
-                $a | append {value: $it.NAME}
-            } else {
-                $a | append {value: $it.NAME description: $it.SHORTNAMES}
-            }
-        }
+        | each {|x| {value: $x.NAME description: $x.SHORTNAMES} }
         | append (kubectl get crd | from ssv -a | each {|x| {$x.NAME} })
     }
 }
