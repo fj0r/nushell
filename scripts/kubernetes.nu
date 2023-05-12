@@ -443,20 +443,20 @@ export def kcp [
     kubectl cp $n $lhs $c $rhs
 }
 
-# get services
+# kubectl get services
 export def kgs [-n: string@"nu-complete kube ns"] {
     let n = if ($n|is-empty) { [] } else { [-n $n] }
     kubectl get $n services | from ssv -a
     | rename name type cluster-ip external-ip ports age selector
 }
 
-# edit service
+# kubectl edit service
 export def kes [svc: string@"nu-complete kube res via name", -n: string@"nu-complete kube ns"] {
     let n = if ($n|is-empty) { [] } else { [-n $n] }
     kubectl edit $n service $svc
 }
 
-# delete service
+# kubectl delete service
 export def kdels [svc: string@"nu-complete kube res via name", -n: string@"nu-complete kube ns"] {
     let n = if ($n|is-empty) { [] } else { [-n $n] }
     kubectl delete $n service $svc
