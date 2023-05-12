@@ -175,12 +175,18 @@ export def gb [
     let bs = (git branch | lines | each {|x| $x | str substring 2..})
     if $branch in $bs {
         if $delete {
-            git branch -D $branch
+            let y = (input 'branch will be delete! ')
+            if $y in ['y', 'yes', 'ok', 't', '1'] {
+                git branch -D $branch
+            }
         } else {
             git checkout $branch
         }
     } else {
-        git checkout -b $branch
+        let y = (input 'create new branch? ')
+        if $y in ['y', 'yes', 'ok', 't', '1'] {
+            git checkout -b $branch
+        }
     }
 }
 
