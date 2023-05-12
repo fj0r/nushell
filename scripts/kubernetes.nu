@@ -47,6 +47,7 @@ export-env {
     let-env KUBERNETES_RESOURCE_ABBR = {
         s: services
         d: deployments
+        p: pods
     }
 }
 
@@ -218,21 +219,23 @@ def "nu-complete kube path" [context: string, offset: int] {
 export def kg [
     k: string@"nu-complete kube kind"
     r?: string@"nu-complete kube res"
-    -n: string@"nu-complete kube ns"
-    -p: string@"nu-complete kube path"
+    --namespace (-n): string@"nu-complete kube ns"
+    --jsonpath (-p): string@"nu-complete kube path"
     --all (-A):bool
 ] {
     let n = if $all {
                 [-A]
-            } else if ($n | is-empty) {
+            } else if ($namespace | is-empty) {
                 []
             } else {
-                [-n $n]
+                [-n $namespace]
             }
-    let p = if ($p | is-empty) { [] } else { [-o $"jsonpath='{($p)}'"] }
     let r = if ($r | is-empty) { [] } else { [$r] }
-    print $'-n ($n), -p ($p)'
-    kubectl get $n $k $p $r | from ssv -a
+    if ($jsonpath | is-empty) {
+        kubectl get $n $k $r | from ssv -a
+    } else {
+        kubectl get $n $k $r $"--output=jsonpath={($jsonpath)}" | from yaml
+    }
 }
 
 # kubectl create
@@ -336,12 +339,12 @@ export def kgpa [] {
 }
 
 # kubectl get pods
-export def kgp [-n: string@"nu-complete kube ns"] {
-    let n = if ($n|is-empty) { [] } else { [-n $n] }
-    kubectl get pods $n -o wide | from ssv -a
-    | rename name ready status restarts age ip node
-    | each {|x| ($x| upsert restarts ($x.restarts|split row ' '| get 0 | into int)) }
-    | reject 'NOMINATED NODE' 'READINESS GATES'
+export def kgp [
+    r?: string@"nu-complete kube res via name"
+    --namespace (-n): string@"nu-complete kube ns"
+    --jsonpath (-p): string@"nu-complete kube path"
+] {
+    kg pods -n $namespace -p $jsonpath $r
 }
 
 # kubectl get pods --watch
@@ -350,13 +353,13 @@ export def kgpw [] {
 }
 
 # kubectl edit pod
-export def kep [-n: string@"nu-complete kube ns", pod: string@"nu-complete kube pods"] {
+export def kep [-n: string@"nu-complete kube ns", pod: string@"nu-complete kube res via name"] {
     let n = if ($n|is-empty) { [] } else { [-n $n] }
     kubectl edit pod $n $pod
 }
 
 # kubectl describe pod
-export def kdp [-n: string@"nu-complete kube ns", pod: string@"nu-complete kube pods"] {
+export def kdp [-n: string@"nu-complete kube ns", pod: string@"nu-complete kube res via name"] {
     let n = if ($n|is-empty) { [] } else { [-n $n] }
     kubectl describe pod $n $pod
 }
@@ -442,16 +445,17 @@ export def kcp [
 }
 
 # kubectl get services
-export def kgs [-n: string@"nu-complete kube ns"] {
-    let n = if ($n|is-empty) { [] } else { [-n $n] }
-    kubectl get $n services | from ssv -a
-    | rename name type cluster-ip external-ip ports age selector
+export def kgs [
+    r?: string@"nu-complete kube res via name"
+    --namespace (-n): string@"nu-complete kube ns"
+    --jsonpath (-p): string@"nu-complete kube path"
+] {
+    kg services -n $namespace -p $jsonpath $r
 }
 
 # kubectl edit service
 export def kes [svc: string@"nu-complete kube res via name", -n: string@"nu-complete kube ns"] {
-    let n = if ($n|is-empty) { [] } else { [-n $n] }
-    kubectl edit $n service $svc
+    ke -n $n service $svc
 }
 
 # kubectl delete service
@@ -460,31 +464,24 @@ export def kdels [svc: string@"nu-complete kube res via name", -n: string@"nu-co
     kubectl delete $n service $svc
 }
 
-def "nu-complete kube deployments" [context: string, offset: int] {
-    let ctx = ($context | parse cmd)
-    let ns = (do -i { $ctx | get '-n' })
-    let ns = if ($ns|is-empty) { [] } else { [-n $ns] }
-    kubectl get $ns deployments | from ssv -a | get NAME
-}
-
 # kubectl get deployments
-export def kgd [-n: string@"nu-complete kube ns"] {
-    let n = if ($n|is-empty) { [] } else { [-n $n] }
-    kubectl get $n deployments -o wide | from ssv -a
-    | rename name ready up-to-date available age containers images selector
-    | reject selector
+export def kgd [
+    r?: string@"nu-complete kube res via name"
+    --namespace (-n): string@"nu-complete kube ns"
+    --jsonpath (-p): string@"nu-complete kube path"
+] {
+    kg deployments -n $namespace -p $jsonpath $r
 }
 
 # kubectl edit deployment
-export def ked [d: string@"nu-complete kube deployments", -n: string@"nu-complete kube ns"] {
-    let n = if ($n|is-empty) { [] } else { [-n $n] }
-    kubectl edit $n deployments $d
+export def ked [d: string@"nu-complete kube res via name", -n: string@"nu-complete kube ns"] {
+    ke -n $n deployments $d
 }
 
 def "nu-complete num9" [] { [1 2 3] }
 # kubectl scale deployment
 export def ksd [
-    d: string@"nu-complete kube deployments"
+    d: string@"nu-complete kube res via name"
     num: string@"nu-complete num9"
     -n: string@"nu-complete kube ns"
 ] {
@@ -497,7 +494,7 @@ export def ksd [
 }
 # kubectl scale deployment with reset
 export def ksdr [
-    d: string@"nu-complete kube deployments"
+    d: string@"nu-complete kube res via name"
     num: int@"nu-complete num9"
     -n: string@"nu-complete kube ns"
 ] {
@@ -518,14 +515,14 @@ export alias krsd = kubectl rollout status deployment
 export alias kgrs = kubectl get rs
 
 # kubectl rollout history
-export def krh [-n: string@"nu-complete kube ns", --revision (-v): int, dpl: string@"nu-complete kube deployments"] {
+export def krhd [-n: string@"nu-complete kube ns", --revision (-v): int, dpl: string@"nu-complete kube res via name"] {
     let n = if ($n|is-empty) { [] } else { [-n $n] }
     let v = if ($revision|is-empty) { [] } else { [ $"--revision=($revision)" ] }
     kubectl $n rollout history $"deployment/($dpl)" $v
 }
 
 # kubectl rollout undo
-export def kru [-n: string@"nu-complete kube ns", --revision (-v): int, dpl: string@"nu-complete kube deployments"] {
+export def krud [-n: string@"nu-complete kube ns", --revision (-v): int, dpl: string@"nu-complete kube res via name"] {
     let n = if ($n|is-empty) { [] } else { [-n $n] }
     let v = if ($revision|is-empty) { [] } else { [ $"--to-revision=($revision)" ] }
     kubectl $n rollout undo $"deployment/($dpl)" $v
