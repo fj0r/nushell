@@ -169,8 +169,10 @@ def "nu-complete git remotes" [] {
   ^git remote | lines | each { |line| $line | str trim }
 }
 
-# git status
-export def gs [] {
+# git status, switch and stash
+export def gs [
+
+] {
     git status
 }
 
@@ -226,11 +228,23 @@ export def gp [
     --set-upstream (-u): bool
     --override:          bool
     --clone (-c):        string
+    --submodule (-s):    bool
+    --init (-i):         bool
     --rebase (-r):       bool
-    --autostash (-s):    bool
+    --autostash (-a):    bool
 ] {
     if not ($clone | is-empty) {
-        git clone --recurse-submodules $clone
+        let s = if $submodule { [--recurse-submodules] } else { [] }
+        git clone $s $clone
+    } else if $submodule {
+        if $init {
+            git submodule init
+        } else {
+            git submodule update
+        }
+    } else if $init {
+        let repo = $branch
+        git init $repo
     } else if $force {
         git push --force
     } else if not ($branch | is-empty) {
@@ -249,14 +263,15 @@ export def gp [
         let s = (_git_status)
         if $s.behind > 0 {
             let r = if $rebase { [--rebase] } else { [] }
-            let s = if $autostash { [--autostash] } else { [] }
-            git pull $r $s -v
+            let a = if $autostash { [--autostash] } else { [] }
+            git pull $r $a -v
         } else if $s.ahead > 0 {
             git push
         }
     }
 }
 
+# git add and rm
 export def ga [
     file?:          path
     --all (-a):     bool
@@ -350,12 +365,6 @@ export def gr [
 
 }
 
-# git stash
-export def gst [
-
-] {
-
-}
 
 # git remote
 export def grmt [
@@ -456,8 +465,6 @@ export alias gsh = git show
 export alias gsi = git submodule init
 export alias gsps = git show --pretty=short --show-signature
 export alias gsr = git svn rebase
-export alias gss = git status -s
-export alias gs = git status
 
 
 export alias gstaa = git stash apply
@@ -468,7 +475,6 @@ export alias gstp = git stash pop
 export alias gsts = git stash show --text
 export alias gstu = gsta --include-untracked
 export alias gstall = git stash --all
-export alias gsu = git submodule update
 export alias gsw = git switch
 export alias gswc = git switch -c
 
