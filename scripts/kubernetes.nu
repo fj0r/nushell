@@ -557,7 +557,7 @@ export def ktpa [] {
     } }
 }
 
-# kube top node
+# kubectl top node
 export def ktn [] {
     kubectl top node | from ssv -a | rename name cpu pcpu mem pmem
     | each {|x| {
