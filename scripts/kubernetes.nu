@@ -222,7 +222,8 @@ export def kg [
     --namespace (-n): string@"nu-complete kube ns"
     --jsonpath (-p): string@"nu-complete kube path"
     --selector (-l): string
-    --wide (-w): bool
+    --verbose (-v): bool
+    --watch (-w): bool
     --all (-A): bool
 ] {
     let n = if $all {
@@ -235,7 +236,7 @@ export def kg [
     let r = if ($r | is-empty) { [] } else { [$r] }
     let l = if ($selector | is-empty) { [] } else { [-l $selector] }
     if ($jsonpath | is-empty) {
-        if ($wide) {
+        if ($verbose) {
             kubectl get -o json $n $k $r | from json | get items
             | each {|x|
                 {
@@ -247,6 +248,8 @@ export def kg [
                     spec: $x.spec
                 }
             }
+        } else if $watch {
+            kubectl get $n $k $r --watch
         } else {
             kubectl get $n $k $r | from ssv -a
         }
@@ -339,11 +342,6 @@ export def kgp [
     --selector (-l): string
 ] {
     kg pods -n $namespace -p $jsonpath -l $selector $r
-}
-
-# kubectl get pods --watch
-export def kgpw [] {
-    kubectl get pods --watch
 }
 
 # kubectl edit pod
