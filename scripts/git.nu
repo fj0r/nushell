@@ -169,6 +169,11 @@ def "nu-complete git remotes" [] {
   ^git remote | lines | each { |line| $line | str trim }
 }
 
+# git status
+export def gs [] {
+    git status
+}
+
 # git log
 export def gl [
     commit?: string@"nu-complete git log"
@@ -184,11 +189,21 @@ export def gl [
 
 # git branch
 export def gb [
-    branch: string@"nu-complete git branches"
-    --delete (-d) :bool
+    branch?:          string@"nu-complete git branches"
+    --delete (-d):    bool
+    --remote (-r):    bool
+    --no-merged (-n): bool
 ] {
     let bs = (git branch | lines | each {|x| $x | str substring 2..})
-    if $branch in $bs {
+    if ($branch | is-empty) {
+        if $remote {
+            git branch --remote
+        } else if $no_merged {
+            git branch --no-merged
+        } else {
+            git branch
+        }
+    } else if $branch in $bs {
         if $delete {
             if (agree 'branch will be delete!') {
                 git branch -D $branch
@@ -203,13 +218,20 @@ export def gb [
     }
 }
 
+# git pull and push
 export def gp [
-    branch?: string@"nu-complete git branches"
-    remote?: string@"nu-complete git remotes"
-    --force (-f): bool
+    branch?:             string@"nu-complete git branches"
+    remote?:             string@"nu-complete git remotes"
+    --force (-f):        bool
     --set-upstream (-u): bool
+    --override:          bool
+    --clone (-c):        string
+    --rebase (-r):       bool
+    --autostash (-s):    bool
 ] {
-    if $force {
+    if not ($clone | is-empty) {
+        git clone --recurse-submodules $clone
+    } else if $force {
         git push --force
     } else if not ($branch | is-empty) {
         let remote = if ($remote|is-empty) { 'origin' } else { $remote }
@@ -218,30 +240,145 @@ export def gp [
         } else {
             git fetch $remote $branch
         }
+    } else if $override {
+        git pull
+        git add --all
+        git commit -v -a --no-edit --amend
+        git push --force
     } else {
         let s = (_git_status)
         if $s.behind > 0 {
-            git pull
-        }
-        if $s.ahead > 0 {
+            let r = if $rebase { [--rebase] } else { [] }
+            let s = if $autostash { [--autostash] } else { [] }
+            git pull $r $s -v
+        } else if $s.ahead > 0 {
             git push
         }
     }
 }
 
-export def gr [
-    remote?: string@"nu-complete git remotes"
+export def ga [
+    file?:          path
+    --all (-a):     bool
+    --patch (-p):   bool
+    --update (-u):  bool
+    --verbose (-v): bool
+    --rm (-r):      bool
+    --cached (-c):  bool
+    --force (-f):   bool
 ] {
-    let remote = if ($remote|is-empty) { 'origin' } else { $remote }
-    git remote show $remote
+    if $rm {
+        let c = if $cached { [--cached] } else { [] }
+        let f = if $force { [--force] } else { [] }
+        git rm $c $file
+    } else {
+        let a = if $all { [--all] } else { [] }
+        let p = if $patch { [--patch] } else { [] }
+        let u = if $update { [--update] } else { [] }
+        let v = if $verbose { [--verbose] } else { [] }
+        let file = if ($file | is-empty) { [.] } else { [$file] }
+        git add $a $p $u $v $file
+    }
+
 }
 
-export def gpp! [] {
-    git pull
-    git add --all
-    git commit -v -a --no-edit --amend
-    git push --force
+# git commit
+export def gc [
+    --message (-m): string
+    --all (-a):     bool
+    --amend (-n):   bool
+    --keep (-k):    bool
+] {
+    let m = if ($message | is-empty) { [] } else { [-m $message] }
+    let a = if $all { [--all] } else { [] }
+    let n = if $amend { [--amend] } else { [] }
+    let k = if $keep { [--no-edit] } else { [] }
+    git commit -v $m $a $n $k
 }
+
+# git diff
+export def gd [
+    --cached (-c):    bool # cached
+    --word-diff (-w): bool # word-diff
+    --staged (-s):    bool # staged
+] {
+    let w = if $word_diff { [--word-diff] } else { [] }
+    let c = if $cached { [--cached] } else { [] }
+    let s = if $staged { [--staged] } else { [] }
+    git diff $c $s $w
+}
+
+# git merge and rebase
+export def gm [
+    branch?:         string@"nu-complete git branches"
+    --rebase (-r):   bool
+    --onto (-o):     string
+    --abort (-a):    bool
+    --continue (-c): bool
+    --skip (-s):     bool
+    --quit (-q):     bool
+] {
+    if $rebase {
+        if $abort {
+            git rebase --abort
+        } else if $continue {
+            git rebase --continue
+        } else if $skip {
+            git rebase --skip
+        } else if $quit {
+            git rebase --quit
+        } else if $onto {
+            git rebase --onto $branch
+        } else {
+            if ($branch | is-empty) {
+                git rebase (git_main_branch)
+            } else {
+                git rebase $branch
+            }
+        }
+    } else if ($branch | is-empty) {
+        git merge $"origin/(git_main_branch)"
+    } else {
+        git merge $branch
+    }
+}
+
+# git reset
+export def gr [
+
+] {
+
+}
+
+# git stash
+export def gst [
+
+] {
+
+}
+
+# git remote
+export def grmt [
+    remote?:       string@"nu-complete git remotes"
+    uri?:          string
+    --add (-a):    bool
+    --rename (-r): bool
+    --delete (-d): bool
+] {
+    let remote = if ($remote|is-empty) { 'origin' } else { $remote }
+    if $add {
+        git remote add $remote $uri
+    } else if $rename {
+        let old = $remote
+        let new = $uri
+        git remote rename $old $new
+    } else if $delete {
+        git remote remove $remote
+    } else {
+        git remote show $remote
+    }
+}
+
 
 export def gha [] {
     git log --pretty=%h»¦«%aN»¦«%s»¦«%aD
@@ -261,10 +398,6 @@ export def grh [commit: string@"nu-complete git log"] {
     git reset $commit
 }
 
-export def gm [branch:string@"nu-complete git branches"] {
-    git merge $branch
-}
-
 export def grb [branch:string@"nu-complete git branches"] {
     git rebase (gstat).branch $branch
 }
@@ -282,79 +415,30 @@ def git_current_branch [] {
     (gstat).branch
 }
 
-export def gmom [] {
-    let main = (git_main_branch)
-    git merge $"origin/($main)"
-}
-
-export alias gps = git push
-export alias gpf! = git push --force
-export alias gpsup = git push --set-upstream origin (git_current_branch)
-export alias gpl = git pull
-export alias glo = git log --oneline
-export alias ga = git add
-export alias gaa = git add --all
-export alias gapa = git add --patch
-export alias gau = git add --update
-export alias gav = git add --verbose
 export alias gap = git apply
 export alias gapt = git apply --3way
 
-export alias gba = git branch -a
-export alias gbd = git branch -d
 export alias gbl = git blame -b -w
-export alias gbnm = git branch --no-merged
-export alias gbr = git branch --remote
 export alias gbs = git bisect
 export alias gbsb = git bisect bad
 export alias gbsg = git bisect good
 export alias gbsr = git bisect reset
 export alias gbss = git bisect start
 
-export alias gc = git commit -v
-export alias gc! = git commit -v --amend
-export alias gcn! = git commit -v --no-edit --amend
-export alias gca = git commit -v -a
-export alias gca! = git commit -v -a --amend
-export alias gcan! = git commit -v -a --no-edit --amend
-export alias gcans! = git commit -v -a -s --no-edit --amend
-export alias gcam = git commit -a -m
-export alias gcsm = git commit -s -m
-export alias gcb = ^git checkout -b
 export alias gcf = git config --list
-export alias gcl = git clone --recurse-submodules
 export alias gclean = git clean -id
 # export alias gpristine = git reset --hard and git clean -dffx
-export alias gcm = git checkout (git_main_branch)
-export alias gcd = git checkout develop
-export alias gcmsg = git commit -m
 export alias gcount = git shortlog -sn
 export alias gcp = git cherry-pick
 export alias gcpa = git cherry-pick --abort
 export alias gcpc = git cherry-pick --continue
-export alias gcs = git commit -S
 
-export alias gd = git diff
-export alias gdca = git diff --cached
-export alias gdcw = git diff --cached --word-diff
-export alias gdct = git describe --tags (git rev-list --tags --max-count=1)
-export alias gds = git diff --staged
-export alias gdt = git diff-tree --no-commit-id --name-only -r
-export alias gdw = git diff --word-diff
+#export alias gdct = git describe --tags (git rev-list --tags --max-count=1)
+#export alias gdt = git diff-tree --no-commit-id --name-only -r
 
-export alias gra = git remote add
-export alias grba = git rebase --abort
-export alias grbc = git rebase --continue
-export alias grbd = git rebase develop
-export alias grbi = git rebase -i
-export alias grbm = git rebase (git_main_branch)
-export alias grbo = git rebase --onto
-export alias grbs = git rebase --skip
 export alias grev = git revert
 export alias grhh = git reset --hard
 export alias groh = git reset origin/$(git_current_branch) --hard
-export alias grm = git rm
-export alias grmc = git rm --cached
 export alias grmv = git remote rename
 export alias grrm = git remote remove
 export alias grs = git restore
