@@ -149,7 +149,7 @@ def "nu-complete git log" [] {
     | each {|x| $x | update value $"($x.value)"}
 }
 
-def "nu-complete git branches" [] {
+export def "nu-complete git branches" [] {
     git branch
     | lines
     | filter {|x| not ($x | str starts-with '*')}
@@ -168,14 +168,25 @@ export def gl [
     }
 }
 
-export def gc [
+export def gb [
     branch: string@"nu-complete git branches"
     --delete (-d) :bool
 ] {
-    if $delete {
-        git branch -D $branch
+    let bs = (git branch | lines | each {|x| $x | str substring 2..})
+    if $branch in $bs {
+        if $delete {
+            let y = (input 'branch will be delete! ')
+            if $y in ['y', 'yes', 'ok', 't', '1'] {
+                git branch -D $branch
+            }
+        } else {
+            git checkout $branch
+        }
     } else {
-        git checkout $branch
+        let y = (input 'create new branch? ')
+        if $y in ['y', 'yes', 'ok', 't', '1'] {
+            git checkout -b $branch
+        }
     }
 }
 
@@ -273,7 +284,6 @@ export alias gav = git add --verbose
 export alias gap = git apply
 export alias gapt = git apply --3way
 
-export alias gb = git branch
 export alias gba = git branch -a
 export alias gbd = git branch -d
 export alias gbl = git blame -b -w
