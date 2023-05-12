@@ -142,6 +142,15 @@ export def _git_log [v num] {
     }
 }
 
+def agree [prompt] {
+    let prompt = if ($prompt | str ends-with '!') {
+        $'(ansi red)($prompt)(ansi reset) '
+    } else {
+        $'($prompt) '
+    }
+    (input $prompt | str downcase) in ['y', 'yes', 'ok', 't', 'true', '1']
+}
+
 def "nu-complete git log" [] {
     git log -n 32 --pretty=%h»¦«%s
     | lines
@@ -156,6 +165,11 @@ export def "nu-complete git branches" [] {
     | each {|x| $"($x|str trim)"}
 }
 
+def "nu-complete git remotes" [] {
+  ^git remote | lines | each { |line| $line | str trim }
+}
+
+# git log
 export def gl [
     commit?: string@"nu-complete git log"
     --verbose(-v):bool
@@ -168,6 +182,7 @@ export def gl [
     }
 }
 
+# git branch
 export def gb [
     branch: string@"nu-complete git branches"
     --delete (-d) :bool
@@ -175,16 +190,14 @@ export def gb [
     let bs = (git branch | lines | each {|x| $x | str substring 2..})
     if $branch in $bs {
         if $delete {
-            let y = (input 'branch will be delete! ')
-            if $y in ['y', 'yes', 'ok', 't', '1'] {
+            if (agree 'branch will be delete!') {
                 git branch -D $branch
             }
         } else {
             git checkout $branch
         }
     } else {
-        let y = (input 'create new branch? ')
-        if $y in ['y', 'yes', 'ok', 't', '1'] {
+        if (agree 'create new branch?') {
             git checkout -b $branch
         }
     }
@@ -194,12 +207,17 @@ export def gp [
     branch?: string@"nu-complete git branches"
     remote?: string@"nu-complete git remotes"
     --force (-f): bool
+    --set-upstream (-u): bool
 ] {
     if $force {
         git push --force
     } else if not ($branch | is-empty) {
         let remote = if ($remote|is-empty) { 'origin' } else { $remote }
-        git fetch $remote $branch
+        if $set_upstream {
+            git push -u $remote $branch
+        } else {
+            git fetch $remote $branch
+        }
     } else {
         let s = (_git_status)
         if $s.behind > 0 {
@@ -209,6 +227,13 @@ export def gp [
             git push
         }
     }
+}
+
+export def gr [
+    remote?: string@"nu-complete git remotes"
+] {
+    let remote = if ($remote|is-empty) { 'origin' } else { $remote }
+    git remote show $remote
 }
 
 export def gpp! [] {
@@ -230,15 +255,6 @@ export def gha [] {
 export def gsq [] {
     git reflog expire --all --expire=now
     git gc --prune=now --aggressive
-}
-
-def "nu-complete git remotes" [] {
-  ^git remote | lines | each { |line| $line | str trim }
-}
-
-export def gr [remote?: string@"nu-complete git remotes"] {
-    let remote = if ($remote|is-empty) { 'origin' } else { $remote }
-    git remote show $remote
 }
 
 export def grh [commit: string@"nu-complete git log"] {
