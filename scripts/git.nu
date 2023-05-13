@@ -360,9 +360,11 @@ export def gm [
 
 # git reset
 export def gr [
-
+    commit?:     string@"nu-complete git log"
+    --hard (-h): bool
 ] {
-
+    let h = if $hard { [--hard] } else { [] }
+    git reset $h $commit
 }
 
 
@@ -401,10 +403,6 @@ export def gha [] {
 export def gsq [] {
     git reflog expire --all --expire=now
     git gc --prune=now --aggressive
-}
-
-export def grh [commit: string@"nu-complete git log"] {
-    git reset $commit
 }
 
 export def grb [branch:string@"nu-complete git branches"] {
@@ -446,10 +444,6 @@ export alias gcpc = git cherry-pick --continue
 #export alias gdt = git diff-tree --no-commit-id --name-only -r
 
 export alias grev = git revert
-export alias grhh = git reset --hard
-export alias groh = git reset origin/$(git_current_branch) --hard
-export alias grmv = git remote rename
-export alias grrm = git remote remove
 export alias grs = git restore
 export alias grset = git remote set-url
 export alias grss = git restore --source
