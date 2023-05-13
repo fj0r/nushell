@@ -11,9 +11,13 @@ and the parameters can be automatically completed.
 In the most common scenarios, it is even possible to omit the parameter.
 
 In contrast, the behavior of commands requires fine-tuning to be intuitive.
+(there may still be some unreasonable places that need to be adjusted)
 
 I tried to tidy part of it, and it is basically usable.
 (The goal is to organize all aliases to where they should go)
+
+### gs
+Git status and stash.
 
 ### gb
 About the branch.

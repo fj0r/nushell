@@ -169,11 +169,35 @@ def "nu-complete git remotes" [] {
   ^git remote | lines | each { |line| $line | str trim }
 }
 
-# git status, switch and stash
+# git status and stash
 export def gs [
-
+    --apply (-a):             bool
+    --clear (-c):             bool
+    --drop (-d):              bool
+    --list (-l):              bool
+    --pop (-p):               bool
+    --show (-s):              bool
+    --all (-A):               bool
+    --include-untracked (-i): bool
 ] {
-    git status
+    if $apply {
+        git stash apply
+    } else if $clear {
+        git stash clear
+    } else if $drop {
+        git stash drop
+    } else if $list {
+        git stash list
+    } else if $pop {
+        git stash pop
+    } else if $show {
+        git stash show --text
+    } else if $all {
+        let iu = if $include_untracked { [--include-untracked] } else { [] }
+        git stash --all $iu
+    } else {
+        git status
+    }
 }
 
 # git log
@@ -220,7 +244,7 @@ export def gb [
     }
 }
 
-# git pull and push
+# git pull, push and switch
 export def gp [
     branch?:             string@"nu-complete git branches"
     remote?:             string@"nu-complete git remotes"
@@ -404,16 +428,23 @@ export def grmt [
     --add (-a):    bool
     --rename (-r): bool
     --delete (-d): bool
+    --update (-u): bool
+    --set (-s):    bool
 ] {
-    let remote = if ($remote|is-empty) { 'origin' } else { $remote }
-    if $add {
+    if ($remote | is-empty) {
+        git remote -v
+    } else if $add {
         git remote add $remote $uri
+    } else if $set {
+        git remote set-url $remote $uri
     } else if $rename {
         let old = $remote
         let new = $uri
         git remote rename $old $new
     } else if $delete {
         git remote remove $remote
+    } else if $update {
+        git remote update $remote
     } else {
         git remote show $remote
     }
@@ -482,39 +513,16 @@ export alias gcount = git shortlog -sn
 #export alias gdt = git diff-tree --no-commit-id --name-only -r
 
 export alias grev = git revert
-export alias grs = git restore
-export alias grset = git remote set-url
-export alias grss = git restore --source
-export alias grst = git restore --staged
 export alias grt = cd "$(git rev-parse --show-toplevel or echo .)"
-# export alias gru = git reset --
-export alias grup = git remote update
-export alias grv = git remote -v
 
-export alias gsb = git status -sb
-export alias gsd = git svn dcommit
 export alias gsh = git show
-export alias gsi = git submodule init
 export alias gsps = git show --pretty=short --show-signature
 export alias gsr = git svn rebase
 
-
-export alias gstaa = git stash apply
-export alias gstc = git stash clear
-export alias gstd = git stash drop
-export alias gstl = git stash list
-export alias gstp = git stash pop
-export alias gsts = git stash show --text
-export alias gstu = gsta --include-untracked
-export alias gstall = git stash --all
 export alias gsw = git switch
 export alias gswc = git switch -c
 
 export alias gts = git tag -s
 
 export alias gunignore = git update-index --no-assume-unchanged
-export alias gpr = git pull --rebase
-export alias gprv = git pull --rebase -v
-export alias gpra = git pull --rebase --autostash
-export alias gprav = git pull --rebase --autostash -v
 export alias glum = git pull upstream (git_main_branch)
