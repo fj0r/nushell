@@ -5,7 +5,7 @@ export:
     ssh.nu:          modules/network
     docker.nu:       modules/docker
     kubernetes.nu:   modules/kubernetes
-    git.nu:          modules/git/gitx.nu
+    git.nu:          modules/git/git-comb.nu
     nvim.nu:         modules/nvim
     after.nu:        modules/after
     log.nu:          modules/log

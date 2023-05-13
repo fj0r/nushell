@@ -364,7 +364,8 @@ export def gr [
     --hard (-h): bool
 ] {
     let h = if $hard { [--hard] } else { [] }
-    git reset $h $commit
+    let c = if ($commit | is-empty) { [] } else { [$commit] }
+    git reset $h $c
 }
 
 
@@ -480,5 +481,3 @@ export alias gprv = git pull --rebase -v
 export alias gpra = git pull --rebase --autostash
 export alias gprav = git pull --rebase --autostash -v
 export alias glum = git pull upstream (git_main_branch)
-
-# cat ($nu.config-path | path dirname | path join 'scripts' | path join 'a.nu' )
