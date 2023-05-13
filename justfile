@@ -6,7 +6,7 @@ export:
     docker.nu:       modules/docker
     kubernetes.nu:   modules/kubernetes
     git.nu:          modules/git
-    git.md:          modules/git
+    git.md:          modules/git/README.md
     nvim.nu:         modules/nvim
     after.nu:        modules/after
     log.nu:          modules/log
