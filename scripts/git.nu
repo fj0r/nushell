@@ -358,10 +358,31 @@ export def gm [
     }
 }
 
+# git cherry-pick
+export def gpc [
+    commit?:         string@"nu-complete git log"
+    --abort (-a):    bool
+    --continue (-c): bool
+    --skip (-s):     bool
+    --quit (-q):     bool
+] {
+    if $abort {
+        git cherry-pick --abort
+    } else if $continue {
+        git cherry-pick --continue
+    } else if $skip {
+        git cherry-pick --skip
+    } else if $quit {
+        git cherry-pick --quit
+    } else {
+        git cherry-pick $commit
+    }
+}
+
 # git reset
 export def gr [
-    commit?:     string@"nu-complete git log"
-    --hard (-h): bool
+    commit?:         string@"nu-complete git log"
+    --hard (-h):     bool
 ] {
     let h = if $hard { [--hard] } else { [] }
     let c = if ($commit | is-empty) { [] } else { [$commit] }
@@ -391,6 +412,25 @@ export def grmt [
     }
 }
 
+# git bisect
+export def gbs [
+    --bad (-b):   bool
+    --good (-g):  bool
+    --reset (-r): bool
+    --start (-s): bool
+] {
+    if $good {
+        git bisect good
+    } else if $bad {
+        git bisect bad
+    } else if $reset {
+        git bisect reset
+    } else if $start {
+        git bisect start
+    } else {
+        git bisect
+    }
+}
 
 export def gha [] {
     git log --pretty=%h»¦«%aN»¦«%s»¦«%aD
@@ -426,20 +466,10 @@ def git_current_branch [] {
 export alias gap = git apply
 export alias gapt = git apply --3way
 
-export alias gbl = git blame -b -w
-export alias gbs = git bisect
-export alias gbsb = git bisect bad
-export alias gbsg = git bisect good
-export alias gbsr = git bisect reset
-export alias gbss = git bisect start
-
 export alias gcf = git config --list
 export alias gclean = git clean -id
 # export alias gpristine = git reset --hard and git clean -dffx
 export alias gcount = git shortlog -sn
-export alias gcp = git cherry-pick
-export alias gcpa = git cherry-pick --abort
-export alias gcpc = git cherry-pick --continue
 
 #export alias gdct = git describe --tags (git rev-list --tags --max-count=1)
 #export alias gdt = git diff-tree --no-commit-id --name-only -r
