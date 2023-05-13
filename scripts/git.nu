@@ -271,21 +271,28 @@ export def gp [
     }
 }
 
-# git add and rm
+# git add, rm and restore
 export def ga [
     file?:          path
     --all (-a):     bool
     --patch (-p):   bool
     --update (-u):  bool
     --verbose (-v): bool
-    --rm (-r):      bool
+    --delete (-d):  bool
     --cached (-c):  bool
     --force (-f):   bool
+    --restore (-r): bool
+    --staged (-s):  bool
+    --source (-o):  string
 ] {
-    if $rm {
+    if $delete {
         let c = if $cached { [--cached] } else { [] }
         let f = if $force { [--force] } else { [] }
         git rm $c $file
+    } else if $restore {
+        let o = if ($source | is-empty) { [] } else { [--source $source] }
+        let s = if $staged { [--staged] } else { [] }
+        git restore $o $s $file
     } else {
         let a = if $all { [--all] } else { [] }
         let p = if $patch { [--patch] } else { [] }
