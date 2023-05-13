@@ -122,6 +122,7 @@ export def gp [
             git fetch $remote $branch
         }
     } else {
+        git fetch
         let s = (_git_status)
         if $s.behind > 0 {
             let r = if $rebase { [--rebase] } else { [] }
@@ -129,11 +130,6 @@ export def gp [
             git pull $r $a -v
         } else if $s.ahead > 0 {
             git push
-        } else {
-            # if a local git repository has never executed pull, push, etc.
-            # then both ahead and behind are 0
-            # and there will never be any response if you execute gp directly.
-            git fetch
         }
     }
 }
