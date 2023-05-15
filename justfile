@@ -11,7 +11,7 @@ export:
     after.nu:        modules/after
     log.nu:          modules/log
 
-    just.nu:         custom-completions/just
+    just.nu:         modules/just
 
     power.nu:        modules/prompt/powerline
     power_git.nu:    modules/prompt/powerline
