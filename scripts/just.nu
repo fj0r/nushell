@@ -6,16 +6,17 @@ def "nu-complete just recipes" [] {
         | each {|x|
             {
                 value: $x.k,
-                description: ( $x.v.parameters
-                             | each {|y|
-                                    if ($y.default|is-empty) {
-                                        $y.name
-                                    } else {
-                                        $'($y.name)="($y.default)"'
-                                    }
-                                }
-                             | str join ' '
-                             )
+                description: (
+                    $x.v.parameters
+                    | each {|y|
+                        if ($y.default|is-empty) {
+                            $y.name
+                        } else {
+                            $'($y.name)="($y.default)"'
+                        }
+                    }
+                    | str join ' '
+                )
             }
         }
 }
@@ -29,7 +30,6 @@ def "nu-complete just args" [context: string, offset: int] {
         | get body
         | each {|x| {description: ($x | get 0) }}
         | prepend ''
-
 }
 
 export def j [
