@@ -1,4 +1,4 @@
-export def "nu-complete just recipes" [] {
+def "nu-complete just recipes" [] {
     ^just --unstable --unsorted --dump --dump-format json
         | from json
         | get recipes
@@ -20,7 +20,7 @@ export def "nu-complete just recipes" [] {
         }
 }
 
-export def "nu-complete just args" [context: string, offset: int] {
+def "nu-complete just args" [context: string, offset: int] {
     let r = ($context | split row ' ')
     ^just --unstable -u --dump --dump-format json
         | from json
