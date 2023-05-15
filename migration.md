@@ -1,4 +1,7 @@
 ## todo
+- [ ] parse completions with `$nu.scope.commands`
+    - `$nu.scope.commands | where name == ke | get signatures`
+    - cache
 - [x] kubernetes independent kubectx & kubens
 - [ ] docker
     - [ ] -v
