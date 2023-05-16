@@ -32,5 +32,3 @@ export:
     cp -v $'{{invocation_directory()}}/scripts/($x.k)' $'($dest)/($x.v)'
   }
 
-test:
-    echo 1
