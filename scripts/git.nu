@@ -7,6 +7,28 @@ def agree [prompt] {
     ([yes no] | input list $prompt) in [yes]
 }
 
+def sprb [flag, args] {
+    if $flag {
+        $args
+    } else {
+        []
+    }
+}
+
+def spr [args] {
+    let lst = ($args | last)
+    if ($lst | is-empty) {
+        []
+    } else {
+        let init = ($args | range ..-2)
+        if ($init | is-empty) {
+            [ $lst ]
+        } else {
+            $init | append $lst
+        }
+    }
+}
+
 # git status and stash
 export def gs [
     --apply (-a):             bool
@@ -31,8 +53,7 @@ export def gs [
     } else if $show {
         git stash show --text
     } else if $all {
-        let iu = if $include_untracked { [--include-untracked] } else { [] }
-        git stash --all $iu
+        git stash --all (sprb $include_untracked '--include-untracked')
     } else {
         git status
     }
@@ -96,8 +117,7 @@ export def gp [
     --autostash (-a):    bool     # git pull --autostash
 ] {
     if not ($clone | is-empty) {
-        let s = if $submodule { [--recurse-submodules] } else { [] }
-        git clone $s $clone
+        git clone (sprb $submodule [--recurse-submodules]) $clone
     } else if $submodule {
         if $init {
             git submodule init
@@ -122,8 +142,8 @@ export def gp [
             git fetch $remote $branch
         }
     } else {
-        let r = if $rebase { [--rebase] } else { [] }
-        let a = if $autostash { [--autostash] } else { [] }
+        let r = (sprb $rebase [--rebase])
+        let a = (sprb $autostash [--autostash])
         git pull $r $a -v
         let s = (_git_status)
         if $s.ahead > 0 {
@@ -147,18 +167,18 @@ export def ga [
     --source (-o):  string
 ] {
     if $delete {
-        let c = if $cached { [--cached] } else { [] }
-        let f = if $force { [--force] } else { [] }
-        git rm $c $file
+        let c = (sprb $cached [--cached])
+        let f = (sprb $force [--force])
+        git rm $c $f $file
     } else if $restore {
-        let o = if ($source | is-empty) { [] } else { [--source $source] }
-        let s = if $staged { [--staged] } else { [] }
+        let o = (spr [--source $source])
+        let s = (sprb $staged [--staged])
         git restore $o $s $file
     } else {
-        let a = if $all { [--all] } else { [] }
-        let p = if $patch { [--patch] } else { [] }
-        let u = if $update { [--update] } else { [] }
-        let v = if $verbose { [--verbose] } else { [] }
+        let a = (sprb $all [--all])
+        let p = (sprb $patch [--patch])
+        let u = (sprb $update [--update])
+        let v = (sprb $verbose [--verbose])
         let file = if ($file | is-empty) { [.] } else { [$file] }
         git add $a $p $u $v $file
     }
@@ -172,10 +192,10 @@ export def gc [
     --amend (-a):   bool
     --keep (-k):    bool
 ] {
-    let m = if ($message | is-empty) { [] } else { [-m $message] }
-    let a = if $all { [--all] } else { [] }
-    let n = if $amend { [--amend] } else { [] }
-    let k = if $keep { [--no-edit] } else { [] }
+    let m = (spr [-m $message])
+    let a = (sprb $all [--all])
+    let n = (sprb $amend [--amend])
+    let k = (sprb $keep [--no-edit])
     git commit -v $m $a $n $k
 }
 
@@ -185,9 +205,9 @@ export def gd [
     --word-diff (-w): bool # word-diff
     --staged (-s):    bool # staged
 ] {
-    let w = if $word_diff { [--word-diff] } else { [] }
-    let c = if $cached { [--cached] } else { [] }
-    let s = if $staged { [--staged] } else { [] }
+    let w = (sprb $word_diff [--word-diff])
+    let c = (sprb $cached [--cached])
+    let s = (sprb $staged [--staged])
     git diff $c $s $w
 }
 
@@ -254,8 +274,8 @@ export def gr [
     commit?:         string@"nu-complete git log"
     --hard (-h):     bool
 ] {
-    let h = if $hard { [--hard] } else { [] }
-    let c = if ($commit | is-empty) { [] } else { [$commit] }
+    let h = (sprb $hard [--hard])
+    let c = (spr [$commit])
     git reset $h $c
 }
 
