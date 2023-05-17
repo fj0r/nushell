@@ -53,7 +53,7 @@ export def gs [
     } else if $show {
         git stash show --text
     } else if $all {
-        git stash --all (sprb $include_untracked '--include-untracked')
+        git stash --all (sprb $include_untracked [--include-untracked])
     } else {
         git status
     }

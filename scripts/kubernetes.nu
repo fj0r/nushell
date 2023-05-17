@@ -289,7 +289,7 @@ export def kg [
             } else {
                 [-n $namespace]
             }
-    let r = (spr $r)
+    let r = (spr [$r])
     let l = (spr [-l $selector])
     if ($jsonpath | is-empty) {
         let wide = (sprb $wide [-o wide])
