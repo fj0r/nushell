@@ -486,7 +486,7 @@ export def kcp [
     -c: string@"nu-complete kube ctns"
     -n: string@"nu-complete kube ns"
 ] {
-    kubectl cp (spr [-n $n]) $lhs (spread '-c' $c) $rhs
+    kubectl cp (spr [-n $n]) $lhs (spr [-c $c]) $rhs
 }
 
 # kubectl get services
