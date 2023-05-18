@@ -80,3 +80,10 @@ Git remote
 
 ### gbs
 Git bisect
+
+## changelog
+
+#### 2023-05-18
+- `gp -u` can omit branch
+- delete `grb`
+- improve the premise in the description
