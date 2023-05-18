@@ -134,13 +134,13 @@ export def gp [
         git add --all
         git commit -v -a --no-edit --amend
         git push --force
+    } else if $set_upstream {
+        let remote = if ($remote | is-empty) { 'origin' } else { $remote }
+        let branch = if ($branch | is-empty) { (_git_status).branch } else { $branch }
+        git push -u $remote $branch
     } else if not ($branch | is-empty) {
         let remote = if ($remote|is-empty) { 'origin' } else { $remote }
-        if $set_upstream {
-            git push -u $remote $branch
-        } else {
-            git fetch $remote $branch
-        }
+        git fetch $remote $branch
     } else {
         let r = (sprb $rebase [--rebase])
         let a = (sprb $autostash [--autostash])
@@ -343,11 +343,6 @@ export def gsq [] {
     git gc --prune=now --aggressive
 }
 
-export def grb [branch:string@"nu-complete git branches"] {
-    git rebase (gstat).branch $branch
-}
-
-
 export alias gcf = git config --list
 export alias gsw = git switch
 export alias gswc = git switch -c
@@ -524,6 +519,3 @@ def git_main_branch [] {
     | str replace 'HEAD .*?[：: ](.+)' '$1'
 }
 
-def git_current_branch [] {
-    (gstat).branch
-}
