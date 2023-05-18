@@ -114,9 +114,11 @@ export def kgh [
     name?: string@"nu-complete helm list"
     --namespace (-n): string@"nu-complete kube ns"
     --manifest (-m): bool
+    --all (-a): bool
 ] {
     if ($name | is-empty) {
-        helm list (spr [-n $namespace]) --output json
+        let ns = if $all { [--all] } else { (spr [-n $namespace]) }
+        helm list $ns --output json
         | from json
         | update updated {|x|
             $x.updated
