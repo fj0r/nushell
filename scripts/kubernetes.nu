@@ -109,45 +109,80 @@ export def kk [p: path] {
     kubectl kustomize $p
 }
 
-# helm list
-export def hls [
+# helm list and get
+export def kgh [
+    name?: string@"nu-complete helm list"
     --namespace (-n): string@"nu-complete kube ns"
+    --manifest (-m): bool
 ] {
-    helm list (spr [-n $namespace]) --output json
-    | from json
-    | update updated {|x| 
-        $x.updated
-        | str substring ..-4
-        | into datetime -f '%Y-%m-%d %H:%M:%S.%f %z'
+    if ($name | is-empty) {
+        helm list (spr [-n $namespace]) --output json
+        | from json
+        | update updated {|x|
+            $x.updated
+            | str substring ..-4
+            | into datetime -f '%Y-%m-%d %H:%M:%S.%f %z'
+        }
+    } else {
+        if $manifest {
+            helm get manifest $name (spr [-n $namespace])
+        } else {
+            helm get notes $name (spr [-n $namespace])
+            helm get values $name (spr [-n $namespace])
+        }
     }
 }
 
-# helm install or update
-export def hiu [
-    name: string
-    chart: string
+def "nu-complete helm list" [context: string, offset: int] {
+    let ctx = ($context | parse cmd)
+    kgh -n $ctx.-n? | each {|x| {value: $x.name  description: $x.updated} }
+}
+
+def "nu-complete helm charts" [context: string, offset: int] {
+    let ctx = ($context | parse cmd)
+}
+
+# helm install or upgrade via values file
+export def kah [
+    name: string@"nu-complete helm list"
+    chart: string@"nu-complete helm charts"
     values: path
     --namespace (-n): string@"nu-complete kube ns"
 ] {
-    kubectl install $name $chart -f $values
+    let update = $name in (
+        helm list (spr [-n $namespace]) --output json
+        | from json | get name
+    )
+    let act = if $update { [upgrade] } else { [install] }
+    helm $act $name $chart -f $values (spr [-n $namespace])
+}
+
+# helm install or upgrade via values file
+export def kdh [
+    name: string@"nu-complete helm list"
+    chart: string@"nu-complete helm charts"
+    values: path
+    --namespace (-n): string@"nu-complete kube ns"
+] {
+    helm diff upgrade $name $chart -f $values (spr [-n $namespace])
 }
 
 # helm delete
-export def hdel [
-    name: string
+export def kdelh [
+    name: string@"nu-complete helm list"
     --namespace (-n): string@"nu-complete kube ns"
 ] {
-    kubectl delete -f $name
+    helm uninstall $name (spr [-n $namespace])
 }
 
 # helm template
-export def ht [
+export def kh [
     name: string
-    chart: string
+    chart: string@"nu-complete helm charts"
     values: path
     --namespace (-n): string@"nu-complete kube ns"
 ] {
-    kubectl template $name $chart -f $values
+    kubectl template $name $chart -f $values (spr [-n $namespace])
 }
 
 ### ctx
