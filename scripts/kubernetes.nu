@@ -89,17 +89,17 @@ export def kdelf [p: path] {
     kubectl delete -f $p
 }
 
-# kubectl apply -k
+# kubectl apply -k (kustomize)
 export def kak [p: path] {
     kubectl apply -k $p
 }
 
-# kubectl diff -k
+# kubectl diff -k (kustomize)
 export def kdk [p: path] {
     kubectl diff -k $p
 }
 
-# kubectl delete -k
+# kubectl delete -k (kustomize)
 export def kdelk [p: path] {
     kubectl delete -k $p
 }
@@ -107,6 +107,47 @@ export def kdelk [p: path] {
 # kubectl kustomize (template)
 export def kk [p: path] {
     kubectl kustomize $p
+}
+
+# helm list
+export def hls [
+    --namespace (-n): string@"nu-complete kube ns"
+] {
+    helm list (spr [-n $namespace]) --output json
+    | from json
+    | update updated {|x| 
+        $x.updated
+        | str substring ..-4
+        | into datetime -f '%Y-%m-%d %H:%M:%S.%f %z'
+    }
+}
+
+# helm install or update
+export def hiu [
+    name: string
+    chart: string
+    values: path
+    --namespace (-n): string@"nu-complete kube ns"
+] {
+    kubectl install $name $chart -f $values
+}
+
+# helm delete
+export def hdel [
+    name: string
+    --namespace (-n): string@"nu-complete kube ns"
+] {
+    kubectl delete -f $name
+}
+
+# helm template
+export def ht [
+    name: string
+    chart: string
+    values: path
+    --namespace (-n): string@"nu-complete kube ns"
+] {
+    kubectl template $name $chart -f $values
 }
 
 ### ctx
@@ -448,14 +489,33 @@ export def kl [
 def "nu-complete port forward type" [] {
     [pod svc]
 }
+
+def "nu-complete kube port" [context: string, offset: int] {
+    let ctx = ($context | parse cmd)
+    let kind = ($ctx | get args.1)
+    let ns = if ($ctx.-n? | is-empty) { [] } else { [-n $ctx.-n] }
+    let res = ($ctx | get args.2)
+    if ($kind | str starts-with 's') {
+        kubectl get $ns svc $res --output=jsonpath="{.spec.ports}"
+        | from json
+        | each {|x| {value: $x.port  description: $x.name} }
+    } else {
+        kubectl get $ns pods $res --output=jsonpath="{.spec.containers[].ports}"
+        | from json
+        | each {|x| {value: $x.containerPort description: $x.name?} }
+    }
+}
+
 # kubectl port-forward
 export def kpf [
     res: string@"nu-complete port forward type"
     target: string@"nu-complete kube res"
+    port: string@"nu-complete kube port"
+    --local (-l): string
     -n: string@"nu-complete kube ns"
-    port: string    ### reflect port num
 ] {
     let n = (spr [-n $n])
+    let port = if ($local | is-empty) { $port } else { $"($local):($port)" }
     kubectl port-forward $n $"($res)/($target)" $port
 }
 
@@ -524,7 +584,7 @@ export def ked [d: string@"nu-complete kube res via name", -n: string@"nu-comple
     ke -n $n deployments $d
 }
 
-def "nu-complete num9" [] { [1 2 3] }
+def "nu-complete num9" [] { [0 1 2 3] }
 # kubectl scale deployment
 export def ksd [
     d: string@"nu-complete kube res via name"
