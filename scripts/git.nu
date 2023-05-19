@@ -132,12 +132,12 @@ export def gp [
     branch?:             string@"nu-complete git branches"
     remote?:             string@"nu-complete git remotes"
     --force (-f):        bool     # git push -f
-    --set-upstream (-u): bool     # git push -u
     --override:          bool
     --submodule (-s):    bool     # git submodule
     --init (-i):         bool     # git init
     --rebase (-r):       bool     # git pull --rebase
     --autostash (-a):    bool     # git pull --autostash
+    --set-upstream (-u): bool     # git push -u
 ] {
     if $submodule {
         git submodule update
@@ -151,7 +151,9 @@ export def gp [
     } else if $set_upstream {
         let remote = if ($remote | is-empty) { 'origin' } else { $remote }
         let branch = if ($branch | is-empty) { (_git_status).branch } else { $branch }
-        git push -u $remote $branch
+        let force = (sprb $force [--force])
+        git branch -u $'($remote)/($branch)' $branch
+        git push $force
     } else if not ($branch | is-empty) {
         let remote = if ($remote|is-empty) { 'origin' } else { $remote }
         git fetch $remote $branch
