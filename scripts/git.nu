@@ -103,6 +103,30 @@ export def gb [
     }
 }
 
+# git clone, init
+export def-env gn [
+    repo?:            string@"nu-complete git branches"
+    local?:           path
+    --submodule (-s): bool     # git submodule
+    --init (-i):      bool     # git init
+] {
+     if $init {
+        git init $repo
+        cd $repo
+        if $submodule {
+            git submodule init
+        }
+    } else {
+        let local = if ($local | is-empty) {
+            $repo | path basename | split row '.' | get 0
+        } else {
+            $local
+        }
+        git clone (sprb $submodule [--recurse-submodules]) $repo $local
+        cd $local
+    }
+}
+
 # git pull, push and switch
 export def gp [
     branch?:             string@"nu-complete git branches"
@@ -110,23 +134,13 @@ export def gp [
     --force (-f):        bool     # git push -f
     --set-upstream (-u): bool     # git push -u
     --override:          bool
-    --clone (-c):        string   # git clone
     --submodule (-s):    bool     # git submodule
     --init (-i):         bool     # git init
     --rebase (-r):       bool     # git pull --rebase
     --autostash (-a):    bool     # git pull --autostash
 ] {
-    if not ($clone | is-empty) {
-        git clone (sprb $submodule [--recurse-submodules]) $clone
-    } else if $submodule {
-        if $init {
-            git submodule init
-        } else {
-            git submodule update
-        }
-    } else if $init {
-        let repo = $branch
-        git init $repo
+    if $submodule {
+        git submodule update
     } else if $force {
         git push --force
     } else if $override {
