@@ -217,6 +217,7 @@ export def gc [
 
 # git diff
 export def gd [
+    file?:            path
     --cached (-c):    bool # cached
     --word-diff (-w): bool # word-diff
     --staged (-s):    bool # staged
@@ -224,7 +225,7 @@ export def gd [
     let w = (sprb $word_diff [--word-diff])
     let c = (sprb $cached [--cached])
     let s = (sprb $staged [--staged])
-    git diff $c $s $w
+    git diff $c $s $w (spr [$file])
 }
 
 # git merge and rebase
