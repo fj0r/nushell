@@ -184,7 +184,7 @@ export def kh [
     values: path
     --namespace (-n): string@"nu-complete kube ns"
 ] {
-    kubectl template $name $chart -f $values (spr [-n $namespace])
+    helm template $name $chart -f $values (spr [-n $namespace])
 }
 
 ### ctx
