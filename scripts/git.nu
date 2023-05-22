@@ -200,6 +200,7 @@ export def ga [
     } else if $restore {
         let o = (spr [--source $source])
         let s = (sprb $staged [--staged])
+        let file = if ($file | is-empty) { [.] } else { [$file] }
         git restore $o $s $file
     } else {
         let a = (sprb $all [--all])
@@ -301,10 +302,15 @@ export def gcp [
 export def gr [
     commit?:         string@"nu-complete git log"
     --hard (-h):     bool
+    --soft (-s):     bool
 ] {
-    let h = (sprb $hard [--hard])
-    let c = (spr [$commit])
-    git reset $h $c
+    if $soft {
+        git clean -fxd
+    } else {
+        let h = (sprb $hard [--hard])
+        let c = (spr [$commit])
+        git reset $h $c
+    }
 }
 
 
