@@ -144,11 +144,18 @@ def "nu-complete helm charts" [context: string, offset: int] {
     let ctx = ($context | parse cmd)
 }
 
+def record-to-set-json [value] {
+    $value | transpose k v
+    | each {|x| $"($x.k)=($x.v | to json -r)"}
+    | str join ','
+}
+
 # helm install or upgrade via values file
 export def kah [
     name: string@"nu-complete helm list"
     chart: string@"nu-complete helm charts"
-    values: path
+    valuefile: path
+    --values (-v): any
     --namespace (-n): string@"nu-complete kube ns"
 ] {
     let update = $name in (
@@ -156,7 +163,8 @@ export def kah [
         | from json | get name
     )
     let act = if $update { [upgrade] } else { [install] }
-    helm $act $name $chart -f $values (spr [-n $namespace])
+    let values = if ($values | is-empty) { [] } else { [--set-json (record-to-set-json $values)] }
+    helm $act $name $chart -f $valuefile $values (spr [-n $namespace])
 }
 
 # helm install or upgrade via values file
@@ -181,10 +189,12 @@ export def kdelh [
 export def kh [
     name: string
     chart: string@"nu-complete helm charts"
-    values: path
+    valuefile: path
+    --values (-v): any
     --namespace (-n): string@"nu-complete kube ns"
 ] {
-    helm template $name $chart -f $values (spr [-n $namespace])
+    let values = if ($values | is-empty) { [] } else { [--set-json (record-to-set-json $values)] }
+    helm template $name $chart -f $valuefile $values (spr [-n $namespace])
 }
 
 ### ctx
