@@ -129,7 +129,7 @@ export def-env gn [
 
 # git pull, push and switch
 export def gp [
-    branch?:             string@"nu-complete git branches"
+    branch?:             string@"nu-complete git remote branches"
     remote?:             string@"nu-complete git remote branches"
     --force (-f):        bool     # git push -f
     --override:          bool
@@ -149,7 +149,6 @@ export def gp [
         git commit -v -a --no-edit --amend
         git push --force
     } else if $set_upstream {
-        #TODO: nu-complete git remote branches
         let remote = if ($remote | is-empty) { 'origin' } else { $remote }
         let branch = if ($branch | is-empty) { (_git_status).branch } else { $branch }
         let force = (sprb $force [--force])
@@ -540,11 +539,20 @@ def "nu-complete git branches" [] {
     | each {|x| $"($x|str trim)"}
 }
 
-def "nu-complete git remote branches" [] {
-    git branch -r
-    | lines
-    | str trim
-    | filter {|x| not ($x | str starts-with 'origin/HEAD') }
+export def "nu-complete git remote branches" [context: string, offset: int] {
+    let ctx = ($context | split row ' ')
+    let rb = (
+        git branch -r
+        | lines
+        | str trim
+        | filter {|x| not ($x | str starts-with 'origin/HEAD') }
+        | each {|x| $x | split row '/'}
+    )
+    if ($ctx | length) < 3 {
+        $rb | each {|x| {value: $x.1, description: $x.0} }
+    } else {
+        $rb | filter {|x| $x.1 == $ctx.1 } | each {|x| $x.0}
+    }
 }
 
 def "nu-complete git remotes" [] {
