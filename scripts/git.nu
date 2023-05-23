@@ -137,7 +137,6 @@ export def gp [
     --init (-i):         bool     # git init
     --rebase (-r):       bool     # git pull --rebase
     --autostash (-a):    bool     # git pull --autostash
-    --set-upstream (-u): bool     # git push -u
 ] {
     if $submodule {
         git submodule update
@@ -148,29 +147,34 @@ export def gp [
         git add --all
         git commit -v -a --no-edit --amend
         git push --force
-    } else if $set_upstream {
-        let remote = if ($remote | is-empty) { 'origin' } else { $remote }
-        let branch = if ($branch | is-empty) { (_git_status).branch } else { $branch }
-        let force = (sprb $force [--force])
-        git branch -u $'($remote)/($branch)' $branch
-        git push $force
     } else {
         let r = (sprb $rebase [--rebase])
         let a = (sprb $autostash [--autostash])
-        if ($branch | is-empty) {
-            git pull $r $a -v
+        let branch = if ($branch | is-empty) { (_git_status).branch } else { $branch }
+        let lbs = (git branch | lines | each {|x| $x | str substring 2..})
+        if ($branch in $lbs) {
+            let rbs = (
+                git branch -r
+                | lines
+                | str trim
+                | filter {|x| not ($x | str starts-with 'origin/HEAD') }
+                | each {|x| $x | split row '/' | get 1}
+            )
+            if $branch in $rbs {
+                git checkout $branch
+                git pull $r $a -v
+            } else {
+                let force = (sprb $force [--force])
+                let remote = if ($remote|is-empty) { 'origin' } else { $remote }
+                git branch -u $'($remote)/($branch)' $branch
+                git push $force
+            }
         } else {
             let remote = if ($remote|is-empty) { 'origin' } else { $remote }
-            let bs = (git branch | lines | each {|x| $x | str substring 2..})
-            if ($branch in $bs) {
-                git checkout $branch
-                git pull
-            } else {
-                git checkout -b $branch
-                git fetch $remote $branch
-                git branch -u $'($remote)/($branch)' $branch
-                git pull
-            }
+            git checkout -b $branch
+            git fetch $remote $branch
+            git branch -u $'($remote)/($branch)' $branch
+            git pull
         }
         let s = (_git_status)
         if $s.ahead > 0 {
