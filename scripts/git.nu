@@ -140,8 +140,6 @@ export def gp [
 ] {
     if $submodule {
         git submodule update
-    } else if $force {
-        git push --force
     } else if $override {
         git pull
         git add --all
@@ -152,30 +150,41 @@ export def gp [
         let a = (sprb $autostash [--autostash])
         let branch = if ($branch | is-empty) { (_git_status).branch } else { $branch }
         let lbs = (git branch | lines | each {|x| $x | str substring 2..})
-        if ($branch in $lbs) {
-            let rbs = (
-                git branch -r
-                | lines
-                | str trim
-                | filter {|x| not ($x | str starts-with 'origin/HEAD') }
-                | each {|x| $x | split row '/' | get 1}
-            )
-            if $branch in $rbs {
-                git checkout $branch
-                git pull $r $a -v
+        let rbs = (
+            git branch -r
+            | lines
+            | str trim
+            | filter {|x| not ($x | str starts-with 'origin/HEAD') }
+            | each {|x| $x | split row '/' | get 1}
+        )
+        if $branch in $rbs {
+            if $branch in $lbs {
+                if $force {
+                    git push --force
+                } else {
+                    if (_git_status).branch != $branch {
+                        git checkout $branch
+                    }
+                    git pull $r $a -v
+                }
             } else {
-                let force = (sprb $force [--force])
                 let remote = if ($remote|is-empty) { 'origin' } else { $remote }
+                git checkout -b $branch
+                git fetch $remote $branch
                 git branch -u $'($remote)/($branch)' $branch
-                git push $force
+                git pull
             }
         } else {
+            let force = (sprb $force [--force])
             let remote = if ($remote|is-empty) { 'origin' } else { $remote }
-            git checkout -b $branch
-            git fetch $remote $branch
-            git branch -u $'($remote)/($branch)' $branch
-            git pull
+            if $branch in $lbs {
+                git checkout $branch
+            } else {
+                git checkout -b $branch
+            }
+            git push $force --set-upstream $remote $branch
         }
+
         let s = (_git_status)
         if $s.ahead > 0 {
             git push
