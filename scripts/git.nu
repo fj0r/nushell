@@ -300,16 +300,15 @@ export def gcp [
 
 # git reset
 export def gr [
-    commit?:         string@"nu-complete git log"
-    --hard (-h):     bool
-    --soft (-s):     bool
+    commit?:      string@"nu-complete git log"
+    --hard (-h):  bool
+    --clean (-c): bool
 ] {
-    if $soft {
+    let h = (sprb $hard [--hard])
+    let cm = (spr [$commit])
+    git reset $h $cm
+    if $clean {
         git clean -fxd
-    } else {
-        let h = (sprb $hard [--hard])
-        let c = (spr [$commit])
-        git reset $h $c
     }
 }
 
