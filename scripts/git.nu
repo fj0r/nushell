@@ -154,23 +154,24 @@ export def gp [
         let force = (sprb $force [--force])
         git branch -u $'($remote)/($branch)' $branch
         git push $force
-    } else if not ($branch | is-empty) {
-        #TODO: nu-complete git remote branches
-        let remote = if ($remote|is-empty) { 'origin' } else { $remote }
-        let bs = (git branch | lines | each {|x| $x | str substring 2..})
-        if ($branch in $bs) {
-            git checkout $branch
-            git pull
-        } else {
-            git checkout -b $branch
-            git fetch $remote $branch
-            git branch -u $'($remote)/($branch)' $branch
-            git pull
-        }
     } else {
         let r = (sprb $rebase [--rebase])
         let a = (sprb $autostash [--autostash])
-        git pull $r $a -v
+        if ($branch | is-empty) {
+            git pull $r $a -v
+        } else {
+            let remote = if ($remote|is-empty) { 'origin' } else { $remote }
+            let bs = (git branch | lines | each {|x| $x | str substring 2..})
+            if ($branch in $bs) {
+                git checkout $branch
+                git pull
+            } else {
+                git checkout -b $branch
+                git fetch $remote $branch
+                git branch -u $'($remote)/($branch)' $branch
+                git pull
+            }
+        }
         let s = (_git_status)
         if $s.ahead > 0 {
             git push
