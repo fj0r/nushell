@@ -93,6 +93,9 @@ export def gb [
             if (agree 'branch will be delete!') {
                 git branch -D $branch
             }
+            if $branch in (remote_braches | each {|x| $x.1}) and (agree 'delete remote branch?!') {
+                git push origin -d $branch
+            }
         } else {
             git checkout $branch
         }
@@ -150,13 +153,7 @@ export def gp [
         let a = (sprb $autostash [--autostash])
         let branch = if ($branch | is-empty) { (_git_status).branch } else { $branch }
         let lbs = (git branch | lines | each {|x| $x | str substring 2..})
-        let rbs = (
-            git branch -r
-            | lines
-            | str trim
-            | filter {|x| not ($x | str starts-with 'origin/HEAD') }
-            | each {|x| $x | split row '/' | get 1}
-        )
+        let rbs = (remote_braches | each {|x| $x.0})
         if $branch in $rbs {
             if $branch in $lbs {
                 if $force {
@@ -552,15 +549,17 @@ def "nu-complete git branches" [] {
     | each {|x| $"($x|str trim)"}
 }
 
-export def "nu-complete git remote branches" [context: string, offset: int] {
+def remote_braches [] {
+    git branch -r
+    | lines
+    | str trim
+    | filter {|x| not ($x | str starts-with 'origin/HEAD') }
+    | each {|x| $x | split row '/'}
+}
+
+def "nu-complete git remote branches" [context: string, offset: int] {
     let ctx = ($context | split row ' ')
-    let rb = (
-        git branch -r
-        | lines
-        | str trim
-        | filter {|x| not ($x | str starts-with 'origin/HEAD') }
-        | each {|x| $x | split row '/'}
-    )
+    let rb = (remote_braches)
     if ($ctx | length) < 3 {
         $rb | each {|x| {value: $x.1, description: $x.0} }
     } else {
