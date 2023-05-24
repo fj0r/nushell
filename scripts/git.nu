@@ -78,6 +78,7 @@ export def gl [
 # git branch
 export def gb [
     branch?:          string@"nu-complete git branches"
+    remote?:          string@"nu-complete git remote branches"
     --delete (-d):    bool
     --remote (-r):    bool
     --no-merged (-n): bool
@@ -97,7 +98,8 @@ export def gb [
                 git branch -D $branch
             }
             if $branch in (remote_braches | each {|x| $x.1}) and (agree -n 'delete remote branch?!') {
-                git push origin -d $branch
+                let remote = if ($remote|is-empty) { 'origin' } else { $remote }
+                git push $remote -d $branch
             }
         } else {
             git checkout $branch
