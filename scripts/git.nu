@@ -156,15 +156,20 @@ export def gp [
         let rbs = (remote_braches | each {|x| $x.0})
         if $branch in $rbs {
             if $branch in $lbs {
+                let bmsg = 'both local and remote have the branch'
                 if $force {
+                    print '($bmsg), with --force, push'
                     git push --force
                 } else {
+                    print $'($bmsg), pull'
                     if (_git_status).branch != $branch {
+                        print $'switch to ($branch)'
                         git checkout $branch
                     }
                     git pull $r $a -v
                 }
             } else {
+                print "local doesn't have that branch, fetch"
                 let remote = if ($remote|is-empty) { 'origin' } else { $remote }
                 git checkout -b $branch
                 git fetch $remote $branch
@@ -172,11 +177,14 @@ export def gp [
                 git pull
             }
         } else {
+            let bmsg = "remote doesn't have that branch"
             let force = (sprb $force [--force])
             let remote = if ($remote|is-empty) { 'origin' } else { $remote }
             if $branch in $lbs {
+                print $'($bmsg), set upstream and push'
                 git checkout $branch
             } else {
+                print $'($bmsg), create and push'
                 git checkout -b $branch
             }
             git push $force --set-upstream $remote $branch
@@ -184,6 +192,7 @@ export def gp [
 
         let s = (_git_status)
         if $s.ahead > 0 {
+            print 'remote is behind, push'
             git push
         }
     }
