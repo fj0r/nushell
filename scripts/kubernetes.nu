@@ -385,7 +385,7 @@ export def kg [
     if ($jsonpath | is-empty) {
         let wide = (sprb $wide [-o wide])
         if ($verbose) {
-            kubectl get -o json $n $k $r | from json | get items
+            kubectl get -o json $n $k $r $l | from json | get items
             | each {|x|
                 {
                     name: $x.metadata.name
@@ -398,13 +398,22 @@ export def kg [
                 }
             }
         } else if $watch {
-            kubectl get $n $k $r $wide --watch
+            kubectl get $n $k $r $l $wide --watch
         } else {
-            kubectl get $n $k $r $wide | from ssv -a
+            kubectl get $n $k $r $l $wide | from ssv -a
         }
     } else {
         kubectl get $n $k $r $"--output=jsonpath={($jsonpath)}" | from json
     }
+}
+
+# kubectl describe
+export def kd [
+    r: string@"nu-complete kube kind"
+    i: string@"nu-complete kube res"
+    -n: string@"nu-complete kube ns"
+] {
+    kubectl describe (spr [-n $n]) $r $i
 }
 
 # kubectl create
@@ -423,15 +432,6 @@ export def ky [
     -n: string@"nu-complete kube ns"
 ] {
     kubectl get (spr [-n $n]) -o yaml $r $i
-}
-
-# kubectl describe
-export def kd [
-    r: string@"nu-complete kube kind"
-    i: string@"nu-complete kube res"
-    -n: string@"nu-complete kube ns"
-] {
-    kubectl describe (spr [-n $n]) $r $i
 }
 
 # kubectl edit
