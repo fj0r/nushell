@@ -250,39 +250,48 @@ export def gd [
     git diff $c $s $w (spr [$file])
 }
 
-# git merge and rebase
+# git merge
 export def gm [
-    branch?:         string@"nu-complete git branches"
-    --rebase (-r):   bool      # git rebase
-    --onto (-o):     string
-    --abort (-a):    bool
-    --continue (-c): bool
-    --skip (-s):     bool
-    --quit (-q):     bool
+    branch?:            string@"nu-complete git branches"
+    --abort (-a):       bool
+    --continue (-c):    bool
+    --quit (-q):        bool
+    --squash (-s):      bool
 ] {
-    if $rebase {
-        if $abort {
-            git rebase --abort
-        } else if $continue {
-            git rebase --continue
-        } else if $skip {
-            git rebase --skip
-        } else if $quit {
-            git rebase --quit
-        } else if $onto {
-            git rebase --onto $branch
-        } else {
-            if ($branch | is-empty) {
-                git rebase (git_main_branch)
-            } else {
-                git rebase $branch
-            }
-        }
+    let x = (sprb $squash [--squash])
+    if ($branch | is-empty) {
+        git merge $x $"origin/(git_main_branch)"
     } else {
+        git merge $x $branch
+    }
+}
+
+# git rebase
+export def gr [
+    branch?:            string@"nu-complete git branches"
+    --interactive (-i): bool
+    --onto (-o):        string
+    --abort (-a):       bool
+    --continue (-c):    bool
+    --skip (-s):        bool
+    --quit (-q):        bool
+] {
+    if $abort {
+        git rebase --abort
+    } else if $continue {
+        git rebase --continue
+    } else if $skip {
+        git rebase --skip
+    } else if $quit {
+        git rebase --quit
+    } else if $onto {
+        git rebase --onto $branch
+    } else {
+        let i = (sprb $interactive [--interactive])
         if ($branch | is-empty) {
-            git merge $"origin/(git_main_branch)"
+            git rebase $i (git_main_branch)
         } else {
-            git merge $branch
+            git rebase $i $branch
         }
     }
 }
@@ -309,7 +318,7 @@ export def gcp [
 }
 
 # git reset
-export def gr [
+export def grs [
     commit?:      string@"nu-complete git log"
     --hard (-h):  bool
     --clean (-c): bool
@@ -324,7 +333,7 @@ export def gr [
 
 
 # git remote
-export def grmt [
+export def grm [
     remote?:       string@"nu-complete git remotes"
     uri?:          string
     --add (-a):    bool
@@ -381,7 +390,7 @@ export def gha [] {
     | reverse
 }
 
-export def gsq [] {
+export def ggc [] {
     git reflog expire --all --expire=now
     git gc --prune=now --aggressive
 }
