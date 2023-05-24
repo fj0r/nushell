@@ -513,13 +513,33 @@ export def kdp [-n: string@"nu-complete kube ns", pod: string@"nu-complete kube 
 
 # kubectl attach (exec -it)
 export def ka [
-    pod: string@"nu-complete kube pods"
+    pod?: string@"nu-complete kube pods"
     -n: string@"nu-complete kube ns"
     --container(-c): string@"nu-complete kube ctns"
+    --selector(-l): string
     ...args
 ] {
     let n = (spr [-n $n])
-    let c = (spr [-c $container])
+    let pod = if ($selector | is-empty) { $pod } else {
+        let pods = (kgp -n $n -l $selector | each {|x| $x.NAME})
+        if ($pods | length) == 1 {
+            $pods.0
+        } else {
+            $pods | input list 'select pod '
+        }
+    }
+    let c = if ($container | is-empty) {
+        if ($selector | is-empty)  { [] } else {
+            let container = (
+                kgp -n $n $pod -p '.spec.containers[*].name'
+                | split row ' '
+                | input list 'select container '
+            )
+            [-c $container]
+        }
+    } else {
+        [-c $container]
+    }
     kubectl exec $n -it $pod $c -- (if ($args|is-empty) { 'bash' } else { $args })
 }
 
