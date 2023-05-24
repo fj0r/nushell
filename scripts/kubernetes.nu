@@ -530,12 +530,13 @@ export def ka [
     }
     let c = if ($container | is-empty) {
         if ($selector | is-empty)  { [] } else {
-            let container = (
-                kgp -n $n $pod -p '.spec.containers[*].name'
-                | split row ' '
-                | input list 'select container '
-            )
-            [-c $container]
+            let cs = (kgp -n $n $pod -p '.spec.containers[*].name' | split row ' ')
+            let ctn = if ($cs | length) == 1 {
+                $cs.0
+            } else {
+                $cs | input list 'select container '
+            }
+            [-c $ctn]
         }
     } else {
         [-c $container]
