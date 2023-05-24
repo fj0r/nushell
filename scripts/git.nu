@@ -156,12 +156,12 @@ export def gp [
         let a = (sprb $autostash [--autostash])
         let branch = if ($branch | is-empty) { (_git_status).branch } else { $branch }
         let lbs = (git branch | lines | each {|x| $x | str substring 2..})
-        let rbs = (remote_braches | each {|x| $x.0})
+        let rbs = (remote_braches | each {|x| $x.1})
         if $branch in $rbs {
             if $branch in $lbs {
                 let bmsg = 'both local and remote have the branch'
                 if $force {
-                    print '($bmsg), with --force, push'
+                    print $'($bmsg), with --force, push'
                     git push --force
                 } else {
                     print $'($bmsg), pull'
@@ -169,7 +169,7 @@ export def gp [
                         print $'switch to ($branch)'
                         git checkout $branch
                     }
-                    git pull $r $a -v
+                    git pull
                 }
             } else {
                 print "local doesn't have that branch, fetch"
@@ -177,7 +177,7 @@ export def gp [
                 git checkout -b $branch
                 git fetch $remote $branch
                 git branch -u $'($remote)/($branch)' $branch
-                git pull
+                git pull $r $a -v
             }
         } else {
             let bmsg = "remote doesn't have that branch"
@@ -573,8 +573,8 @@ def "nu-complete git branches" [] {
 export def remote_braches [] {
     git branch -r
     | lines
-    | range 1..
     | str trim
+    | filter {|x| not ($x | str starts-with 'origin/HEAD') }
     | each {|x| $x | split row '/'}
 }
 
