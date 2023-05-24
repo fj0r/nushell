@@ -1,10 +1,13 @@
-def agree [prompt] {
+def agree [
+    prompt
+    --default-not (-n): bool
+] {
     let prompt = if ($prompt | str ends-with '!') {
         $'(ansi red)($prompt)(ansi reset)'
     } else {
         $'($prompt)'
     }
-    ([yes no] | input list $prompt) in [yes]
+    ( if $default_not { [no yes] } else { [yes no] } | input list $prompt) in [yes]
 }
 
 def sprb [flag, args] {
@@ -93,7 +96,7 @@ export def gb [
             if (agree 'branch will be delete!') {
                 git branch -D $branch
             }
-            if $branch in (remote_braches | each {|x| $x.1}) and (agree 'delete remote branch?!') {
+            if $branch in (remote_braches | each {|x| $x.1}) and (agree -n 'delete remote branch?!') {
                 git push origin -d $branch
             }
         } else {
@@ -567,11 +570,11 @@ def "nu-complete git branches" [] {
     | each {|x| $"($x|str trim)"}
 }
 
-def remote_braches [] {
+export def remote_braches [] {
     git branch -r
     | lines
+    | range 1..
     | str trim
-    | filter {|x| not ($x | str starts-with 'origin/HEAD') }
     | each {|x| $x | split row '/'}
 }
 

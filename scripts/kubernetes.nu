@@ -187,14 +187,17 @@ export def kdelh [
 
 # helm template
 export def kh [
-    name: string
     chart: string@"nu-complete helm charts"
     valuefile: path
     --values (-v): any
-    --namespace (-n): string@"nu-complete kube ns"
+    --namespace (-n): string@"nu-complete kube ns"='test'
+    --app (-a): string='test'
 ] {
     let values = if ($values | is-empty) { [] } else { [--set-json (record-to-set-json $values)] }
-    helm template $name $chart -f $valuefile $values (spr [-n $namespace])
+    let target = ($valuefile | split row '.' | range ..-2 | append [out yaml] | str join '.')
+    if (not ($target | path exists)) and (([yes no] | input list $'create ($target)?') in [no]) { return }
+    helm template $app $chart -f $valuefile $values (spr [-n $namespace])
+    | save -f $target
 }
 
 ### ctx
