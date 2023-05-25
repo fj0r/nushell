@@ -251,23 +251,36 @@ export def kn [ns: string@"nu-complete kube ns"] {
     kubectl config set-context --current $"--namespace=($ns)"
 }
 
+def upsert_row [table col id value] {
+    if $id in ($table | get $col) {
+        $table | each {|x|
+            if ($x | get $col) == $id {
+                $value
+            } else {
+                $x
+            }
+        }
+    } else {
+        $table | append $value
+    }
+}
+
 export def 'kconf import' [name: string, path: string] {
     let k = (kube-config)
-    let d = $k.data
+    mut d = $k.data
     let i = (cat $path | from yaml)
     let c = {
-        name: $name,
         context: {
             cluster: $name,
             namespace: default,
             user: $name
         }
+        name: $name,
     }
+    $d.clusters = (upsert_row $d.clusters name $name ($i.clusters.0 | upsert name $name))
+    $d.users = (upsert_row $d.users name $name ($i.users.0 | upsert name $name))
+    $d.contexts = (upsert_row $d.contexts name $name $c)
     $d
-    | upsert contexts ($d.contexts | append $c)
-    | upsert clusters ($d.clusters | append ($i.clusters.0 | upsert name $name))
-    | upsert users ($d.users | append ($i.users.0 | upsert name $name))
-    | to yaml
 }
 
 export def 'kconf export' [name: string@"nu-complete kube ctx"] {
