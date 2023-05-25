@@ -280,7 +280,7 @@ export def 'kconf import' [name: string, path: string] {
     $d.clusters = (upsert_row $d.clusters name $name ($i.clusters.0 | upsert name $name))
     $d.users = (upsert_row $d.users name $name ($i.users.0 | upsert name $name))
     $d.contexts = (upsert_row $d.contexts name $name $c)
-    $d
+    $d | to yaml
 }
 
 export def 'kconf export' [name: string@"nu-complete kube ctx"] {
