@@ -157,6 +157,7 @@ export def gp [
         let r = (sprb $rebase [--rebase])
         let a = (sprb $autostash [--autostash])
         let branch = if ($branch | is-empty) { (_git_status).branch } else { $branch }
+        let remote = if ($remote|is-empty) { 'origin' } else { $remote }
         let lbs = (git branch | lines | each {|x| $x | str substring 2..})
         let rbs = (remote_braches | each {|x| $x.1})
         if $branch in $rbs {
@@ -164,6 +165,7 @@ export def gp [
                 let bmsg = '* both local and remote have the branch'
                 if $force {
                     print $'($bmsg), with --force, push'
+                    git branch -u $'($remote)/($branch)' $branch
                     git push --force
                 } else {
                     print $'($bmsg), pull'
@@ -175,7 +177,6 @@ export def gp [
                 }
             } else {
                 print "* local doesn't have that branch, fetch"
-                let remote = if ($remote|is-empty) { 'origin' } else { $remote }
                 git checkout -b $branch
                 git fetch $remote $branch
                 git branch -u $'($remote)/($branch)' $branch
@@ -184,7 +185,6 @@ export def gp [
         } else {
             let bmsg = "* remote doesn't have that branch"
             let force = (sprb $force [--force])
-            let remote = if ($remote|is-empty) { 'origin' } else { $remote }
             if $branch in $lbs {
                 print $'($bmsg), set upstream and push'
                 git checkout $branch

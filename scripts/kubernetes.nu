@@ -283,6 +283,9 @@ export def 'kconf import' [name: string, path: string] {
     $d | to yaml
 }
 
+export def 'kconf delete' [name: string@"nu-complete kube ctx"] {
+}
+
 export def 'kconf export' [name: string@"nu-complete kube ctx"] {
     let d = (kube-config).data
     let ctx = ($d | get contexts | where name == $name | get 0)
