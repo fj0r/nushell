@@ -80,30 +80,26 @@ export def gb [
     branch?:          string@"nu-complete git branches"
     remote?:          string@"nu-complete git remote branches"
     --delete (-d):    bool
-    --remote (-r):    bool
     --no-merged (-n): bool
 ] {
     let bs = (git branch | lines | each {|x| $x | str substring 2..})
     if ($branch | is-empty) {
-        if $remote {
-            git branch --remote
-        } else if $no_merged {
-            git branch --no-merged
-        } else {
-            git branch
+        print ('local' | fill -a l -c '-' -w 30)
+        git branch
+        print ('remote' | fill -a l -c '-' -w 30)
+        git branch --remote
+        print ('no-merged' | fill -a l -c '-' -w 30)
+        git branch --no-merged
+    } else if $delete {
+        if $branch in $bs and (agree 'branch will be delete!') {
+                git branch -D $branch
+        }
+        if $branch in (remote_braches | each {|x| $x.1}) and (agree -n 'delete remote branch?!') {
+            let remote = if ($remote|is-empty) { 'origin' } else { $remote }
+            git push $remote -d $branch
         }
     } else if $branch in $bs {
-        if $delete {
-            if (agree 'branch will be delete!') {
-                git branch -D $branch
-            }
-            if $branch in (remote_braches | each {|x| $x.1}) and (agree -n 'delete remote branch?!') {
-                let remote = if ($remote|is-empty) { 'origin' } else { $remote }
-                git push $remote -d $branch
-            }
-        } else {
-            git checkout $branch
-        }
+        git checkout $branch
     } else {
         if (agree 'create new branch?') {
             git checkout -b $branch
