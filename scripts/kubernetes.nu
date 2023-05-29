@@ -253,6 +253,9 @@ export def kn [ns: string@"nu-complete kube ns"] {
     kubectl config set-context --current $"--namespace=($ns)"
 }
 
+def get_path [record path] {
+    ($path | split row '.') | reduce -f $record {|it, acc| $acc | get $it }
+}
 def update_path [record path value] {
     let path = ($path | split row '.')
 }
@@ -285,9 +288,9 @@ export def 'kconf import' [name: string, path: string] {
         }
         name: $name,
     }
-    $d.clusters = (upsert_row $d.clusters [] name $name ($i.clusters.0 | upsert name $name))
+    $d.clusters = (upsert_row $d.clusters name [] $name ($i.clusters.0 | upsert name $name))
     $d.users = (upsert_row $d.users name [] $name ($i.users.0 | upsert name $name))
-    $d.contexts = (upsert_row $d.contexts [] name $name $c)
+    $d.contexts = (upsert_row $d.contexts name [] $name $c)
     $d | to yaml
 }
 
