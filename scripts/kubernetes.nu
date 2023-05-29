@@ -114,6 +114,7 @@ export def kgh [
     name?: string@"nu-complete helm list"
     --namespace (-n): string@"nu-complete kube ns"
     --manifest (-m): bool
+    --values(-v): bool
     --all (-a): bool
 ] {
     if ($name | is-empty) {
@@ -128,9 +129,10 @@ export def kgh [
     } else {
         if $manifest {
             helm get manifest $name (spr [-n $namespace])
+        } else if $values {
+            helm get values $name (spr [-n $namespace])
         } else {
             helm get notes $name (spr [-n $namespace])
-            helm get values $name (spr [-n $namespace])
         }
     }
 }
@@ -251,7 +253,13 @@ export def kn [ns: string@"nu-complete kube ns"] {
     kubectl config set-context --current $"--namespace=($ns)"
 }
 
-def upsert_row [table col id value] {
+def update_path [record path value] {
+    let path = ($path | split row '.')
+}
+def upsert_row [table col mask id value] {
+    # let value = ($mask | reduce -f $value {|it, acc|
+    #     update_path $value $it (get_path $table)
+    # })
     if $id in ($table | get $col) {
         $table | each {|x|
             if ($x | get $col) == $id {
@@ -277,9 +285,9 @@ export def 'kconf import' [name: string, path: string] {
         }
         name: $name,
     }
-    $d.clusters = (upsert_row $d.clusters name $name ($i.clusters.0 | upsert name $name))
-    $d.users = (upsert_row $d.users name $name ($i.users.0 | upsert name $name))
-    $d.contexts = (upsert_row $d.contexts name $name $c)
+    $d.clusters = (upsert_row $d.clusters [] name $name ($i.clusters.0 | upsert name $name))
+    $d.users = (upsert_row $d.users name [] $name ($i.users.0 | upsert name $name))
+    $d.contexts = (upsert_row $d.contexts [] name $name $c)
     $d | to yaml
 }
 
