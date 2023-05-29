@@ -2,17 +2,18 @@
 - [ ] parse completions with `$nu.scope.commands`
     - `$nu.scope.commands | where name == ke | get signatures`
     - cache
+- [ ] kconf import : mask
 - [x] kubernetes independent kubectx & kubens
-- [ ] docker
-    - [ ] -v
-- [ ] powerline
-    - [ ] proxy stat no effects in plain mode
-    - [ ] env hooks for regenerate thunks (def-env)
-        - [ ] NU_POWERLINE
-        - [ ] NU_UPPROMPT
-        - [ ] NU_PROMPT_SCHEMA
-        - [ ] MENU_MARKER_SCHEMA
-        - [ ] NU_PROMPT_GIT_FORMATTER
+- [x] docker
+    - [x] -v
+- [x] powerline
+    - [x] proxy stat no effects in plain mode
+    - [x] env hooks for regenerate thunks (def-env)
+        - [x] NU_POWERLINE
+        - [x] NU_UPPROMPT
+        - [x] NU_PROMPT_SCHEMA
+        - [x] MENU_MARKER_SCHEMA
+        - [x] NU_PROMPT_GIT_FORMATTER
 
 
 ## migrate
