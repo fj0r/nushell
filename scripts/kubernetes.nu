@@ -253,15 +253,34 @@ export def kn [ns: string@"nu-complete kube ns"] {
     kubectl config set-context --current $"--namespace=($ns)"
 }
 
-def get_path [record path] {
-    ($path | split row '.') | reduce -f $record {|it, acc| $acc | get $it }
+def parse_cellpath [path] {
+    $path | split row '.' | each {|x|
+        if ($x | find --regex "^[0-9]+$" | is-empty) {
+            $x
+        } else {
+            $x | into int
+        }
+    }
 }
-def update_path [record path value] {
-    let path = ($path | split row '.')
+
+def get_cellpath [record path] {
+    $path | reduce -f $record {|it, acc| $acc | get $it }
 }
+
+def set_cellpath [record path value] {
+    if ($path | length) > 1 {
+        $record | upsert ($path | first) {|it|
+            set_cellpath ($it | get ($path | first)) ($path | range 1..) $value
+        }
+    } else {
+        $record | upsert ($path | last) $value
+    }
+}
+
 def upsert_row [table col mask id value] {
     # let value = ($mask | reduce -f $value {|it, acc|
-    #     update_path $value $it (get_path $table)
+    #     let path = (parse_cellpath $it)
+    #     set_cellpath $value $path (get_cellpath $table $path)
     # })
     if $id in ($table | get $col) {
         $table | each {|x|
