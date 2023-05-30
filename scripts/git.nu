@@ -300,7 +300,7 @@ export def gr [
         git rebase --skip
     } else if $quit {
         git rebase --quit
-    } else if $onto {
+    } else if not ($onto | is-empty) {
         git rebase --onto $branch
     } else {
         let i = (sprb $interactive [--interactive])
