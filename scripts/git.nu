@@ -33,12 +33,12 @@ def spr [args] {
 }
 
 # git status
-export def gst [] {
+export def gs [] {
     git status
 }
 
 # git stash
-export def gs [
+export def gst [
     --apply (-a):             bool
     --clear (-c):             bool
     --drop (-d):              bool
