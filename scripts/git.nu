@@ -32,7 +32,12 @@ def spr [args] {
     }
 }
 
-# git status and stash
+# git status
+export def gst [] {
+    git status
+}
+
+# git stash
 export def gs [
     --apply (-a):             bool
     --clear (-c):             bool
@@ -58,7 +63,7 @@ export def gs [
     } else if $all {
         git stash --all (sprb $include_untracked [--include-untracked])
     } else {
-        git status
+        git stash
     }
 }
 
