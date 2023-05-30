@@ -144,7 +144,7 @@ export def gp [
     --override:          bool
     --submodule (-s):    bool     # git submodule
     --init (-i):         bool     # git init
-    --rebase (-r):       bool     # git pull --rebase
+    --merge (-m):        bool     # git pull (no)--rebase
     --autostash (-a):    bool     # git pull --autostash
 ] {
     if $submodule {
@@ -155,7 +155,7 @@ export def gp [
         git commit -v -a --no-edit --amend
         git push --force
     } else {
-        let r = (sprb $rebase [--rebase])
+        let m = if $merge { [] } else { [--rebase] }
         let a = (sprb $autostash [--autostash])
         let branch = if ($branch | is-empty) { (_git_status).branch } else { $branch }
         let remote = if ($remote|is-empty) { 'origin' } else { $remote }
@@ -181,7 +181,7 @@ export def gp [
                 git checkout -b $branch
                 git fetch $remote $branch
                 git branch -u $'($remote)/($branch)' $branch
-                git pull $r $a -v
+                git pull $m $a -v
             }
         } else {
             let bmsg = "* remote doesn't have that branch"
