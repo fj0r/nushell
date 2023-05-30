@@ -279,6 +279,9 @@ export def gm [
     } else {
         git merge $x $branch
     }
+    if not $no_squash {
+        git commit
+    }
 }
 
 # git rebase
