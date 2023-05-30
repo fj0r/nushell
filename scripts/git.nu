@@ -150,7 +150,7 @@ export def gp [
     if $submodule {
         git submodule update
     } else if $override {
-        git pull
+        git pull --rebase
         git add --all
         git commit -v -a --no-edit --amend
         git push --force
@@ -174,7 +174,7 @@ export def gp [
                         print $'* switch to ($branch)'
                         git checkout $branch
                     }
-                    git pull
+                    git pull $m $a
                 }
             } else {
                 print "* local doesn't have that branch, fetch"
