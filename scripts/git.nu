@@ -346,7 +346,7 @@ export def grs [
     let cm = (spr [$commit])
     git reset $h $cm
     if $clean {
-        git clean -fxd
+        git clean -fd
     }
 }
 
