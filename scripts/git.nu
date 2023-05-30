@@ -271,9 +271,9 @@ export def gm [
     --abort (-a):       bool
     --continue (-c):    bool
     --quit (-q):        bool
-    --squash (-s):      bool
+    --no-squash (-n):   bool # git merge (no)--squash
 ] {
-    let x = (sprb $squash [--squash])
+    let x = if $no_squash { [] } else { [--squash] }
     if ($branch | is-empty) {
         git merge $x $"origin/(git_main_branch)"
     } else {
@@ -282,7 +282,7 @@ export def gm [
 }
 
 # git rebase
-# TODO: commit?
+# TODO: --onto: (commit_id)
 export def gr [
     branch?:            string@"nu-complete git branches"
     --interactive (-i): bool
