@@ -84,12 +84,12 @@ export def gb [
 ] {
     let bs = (git branch | lines | each {|x| $x | str substring 2..})
     if ($branch | is-empty) {
-        print ('local' | fill -a l -c '-' -w 30)
-        git branch
-        print ('remote' | fill -a l -c '-' -w 30)
-        git branch --remote
-        print ('no-merged' | fill -a l -c '-' -w 30)
-        git branch --no-merged
+        let d = {
+            local: (git branch | lines)
+            remote: (git branch --remote | lines)
+            no-merged: (git branch --no-merged | lines)
+        }
+        print ($d | table -n 1 -e)
     } else if $delete {
         if $branch in $bs and (agree 'branch will be delete!') {
                 git branch -D $branch
