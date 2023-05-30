@@ -240,10 +240,10 @@ export def ga [
 
 # git commit
 export def gc [
-    --message (-m): string
-    --all (-A):     bool
-    --amend (-a):   bool
-    --keep (-k):    bool
+    message?:     string
+    --all (-A):   bool
+    --amend (-a): bool
+    --keep (-k):  bool
 ] {
     let m = (spr [-m $message])
     let a = (sprb $all [--all])
@@ -280,7 +280,7 @@ export def gm [
         git merge $x $branch
     }
     if not $no_squash {
-        git commit
+        git commit -v
     }
 }
 
