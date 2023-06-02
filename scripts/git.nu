@@ -147,6 +147,7 @@ export def gp [
     --init (-i):         bool     # git init
     --merge (-m):        bool     # git pull (no)--rebase
     --autostash (-a):    bool     # git pull --autostash
+    --back-to-prev (-b): bool     # back to branch
 ] {
     if $submodule {
         git submodule update
@@ -170,21 +171,30 @@ export def gp [
                     git branch -u $'($remote)/($branch)' $branch
                     git push --force
                 } else {
+                    let prev = (_git_status).branch
                     print $'($bmsg), pull'
-                    if (_git_status).branch != $branch {
+                    if $prev != $branch {
                         print $'* switch to ($branch)'
                         git checkout $branch
                     }
                     git pull $m $a
+                    if $back_to_prev {
+                        git checkout $prev
+                    }
                 }
             } else {
+                let prev = (_git_status).branch
                 print "* local doesn't have that branch, fetch"
                 git checkout -b $branch
                 git fetch $remote $branch
                 git branch -u $'($remote)/($branch)' $branch
                 git pull $m $a -v
+                if $back_to_prev {
+                    git checkout $prev
+                }
             }
         } else {
+            let prev = (_git_status).branch
             let bmsg = "* remote doesn't have that branch"
             let force = (sprb $force [--force])
             if $branch in $lbs {
@@ -195,6 +205,9 @@ export def gp [
                 git checkout -b $branch
             }
             git push $force --set-upstream $remote $branch
+            if $back_to_prev {
+                git checkout $prev
+            }
         }
 
         let s = (_git_status)
