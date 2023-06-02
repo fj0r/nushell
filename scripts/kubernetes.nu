@@ -494,10 +494,22 @@ export def ky [
 # kubectl edit
 export def ke [
     k: string@"nu-complete kube kind"
-    r: string@"nu-complete kube res"
+    r?: string@"nu-complete kube res"
     -n: string@"nu-complete kube ns"
+    --selector(-l): string
 ] {
-    kubectl edit (spr [-n $n]) $k $r
+    let n = (spr [-n $n])
+    let r = if ($selector | is-empty) { $r } else {
+        let res = (kubectl get $k $n -l $selector | from ssv -a | each {|x| $x.NAME})
+        if ($res | length) == 1 {
+            $res.0
+        } else if ($res | length) == 0 {
+            return
+        } else {
+            $res | input list $'select ($k) '
+        }
+    }
+    kubectl edit $n $k $r
 }
 
 # kubectl delete
@@ -559,8 +571,12 @@ export def kgpw [
 }
 
 # kubectl edit pod
-export def kep [-n: string@"nu-complete kube ns", pod: string@"nu-complete kube res via name"] {
-    ke -n $n pod $pod
+export def kep [
+    -n: string@"nu-complete kube ns"
+    pod?: string@"nu-complete kube res via name"
+    --selector (-l): string
+] {
+    ke -n $n pod -l $selector $pod
 }
 
 # kubectl describe pod
@@ -578,9 +594,11 @@ export def ka [
 ] {
     let n = (spr [-n $n])
     let pod = if ($selector | is-empty) { $pod } else {
-        let pods = (kgp -n $n -l $selector | each {|x| $x.name})
+        let pods = (kubectl get pods $n -l $selector | from ssv -a | each {|x| $x.NAME})
         if ($pods | length) == 1 {
             $pods.0
+        } else if ($pods | length) == 0 {
+            return
         } else {
             $pods | input list 'select pod '
         }
@@ -688,8 +706,12 @@ export def kgs [
 }
 
 # kubectl edit service
-export def kes [svc: string@"nu-complete kube res via name", -n: string@"nu-complete kube ns"] {
-    ke -n $n service $svc
+export def kes [
+    svc?: string@"nu-complete kube res via name"
+    -n: string@"nu-complete kube ns"
+    --selector (-l): string
+] {
+    ke -n $n service -l $selector $svc
 }
 
 # kubectl delete service
@@ -708,8 +730,12 @@ export def kgd [
 }
 
 # kubectl edit deployment
-export def ked [d: string@"nu-complete kube res via name", -n: string@"nu-complete kube ns"] {
-    ke -n $n deployments $d
+export def ked [
+    d?: string@"nu-complete kube res via name"
+    -n: string@"nu-complete kube ns"
+    --selector (-l): string
+] {
+    ke -n $n deployments -l $selector $d
 }
 
 def "nu-complete num9" [] { [0 1 2 3] }
