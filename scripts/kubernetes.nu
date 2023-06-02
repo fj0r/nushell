@@ -578,7 +578,7 @@ export def ka [
 ] {
     let n = (spr [-n $n])
     let pod = if ($selector | is-empty) { $pod } else {
-        let pods = (kgp -n $n -l $selector | each {|x| $x.NAME})
+        let pods = (kgp -n $n -l $selector | each {|x| $x.name})
         if ($pods | length) == 1 {
             $pods.0
         } else {
