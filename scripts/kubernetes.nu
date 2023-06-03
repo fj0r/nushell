@@ -1,25 +1,43 @@
-export def "parse cmd" [] {
-    $in
-    | split row ' '
-    | reduce -f { args: [], sw: '' } {|it, acc|
-        if ($acc.sw|is-empty) {
-            if ($it|str starts-with '-') {
-                $acc | upsert sw $it
-            } else {
-                let args = ($acc.args | append $it)
-                $acc | upsert args $args
+def get-switch [cmd] {
+    let x = ($nu.scope.commands | where name == $cmd).signatures?.0?.any?
+    mut r = []
+    for it in $x {
+        if $it.parameter_type == 'switch' {
+            if not ($it.parameter_name | is-empty) {
+                $r = ($r | append $it.parameter_name)
             }
-        } else {
-            if ($it|str starts-with '-') {
-                $acc
-                | upsert $acc.sw true
-                | upsert sw $it
-            } else {
-                $acc | upsert $acc.sw $it | upsert sw ''
+            if not ($it.short_flag | is-empty) {
+                $r = ($r | append $it.short_flag)
             }
         }
     }
-    | reject sw
+    $r
+}
+
+export def "parse cmd" [] {
+    let cmd = ($in | split row ' ')
+    let switch = (get-switch $cmd.0)
+    mut sw = ''
+    mut pos = []
+    mut opt = {}
+    for c in $cmd {
+        if ($sw | is-empty) {
+            if ($c | str starts-with '-') {
+                if ($c | str replace -a '-' '') in $switch {
+                    $opt = ($opt | upsert $c true)
+                } else {
+                    $sw = $c
+                }
+            } else {
+                $pos ++= [$c]
+            }
+        } else {
+            $opt = ($opt | upsert $sw $c)
+            $sw = ''
+        }
+    }
+    $opt.args = $pos
+    $opt
 }
 
 export def ensure-cache-by-lines [cache path action] {

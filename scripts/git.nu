@@ -32,6 +32,48 @@ def spr [args] {
     }
 }
 
+def get-switch [cmd] {
+    let x = ($nu.scope.commands | where name == $cmd).signatures?.0?.any?
+    mut r = []
+    for it in $x {
+        if $it.parameter_type == 'switch' {
+            if not ($it.parameter_name | is-empty) {
+                $r = ($r | append $it.parameter_name)
+            }
+            if not ($it.short_flag | is-empty) {
+                $r = ($r | append $it.short_flag)
+            }
+        }
+    }
+    $r
+}
+
+def "parse cmd" [] {
+    let cmd = ($in | split row ' ')
+    let switch = (get-switch $cmd.0)
+    mut sw = ''
+    mut pos = []
+    mut opt = {}
+    for c in $cmd {
+        if ($sw | is-empty) {
+            if ($c | str starts-with '-') {
+                if ($c | str replace -a '-' '') in $switch {
+                    $opt = ($opt | upsert $c true)
+                } else {
+                    $sw = $c
+                }
+            } else {
+                $pos ++= [$c]
+            }
+        } else {
+            $opt = ($opt | upsert $sw $c)
+            $sw = ''
+        }
+    }
+    $opt.args = $pos
+    $opt
+}
+
 # git status
 export def gs [] {
     git status
@@ -600,7 +642,7 @@ export def remote_braches [] {
 }
 
 def "nu-complete git remote branches" [context: string, offset: int] {
-    let ctx = ($context | split row ' ')
+    let ctx = ($context | parse cmd)
     let rb = (remote_braches)
     if ($ctx | length) < 3 {
         $rb | each {|x| {value: $x.1, description: $x.0} }
