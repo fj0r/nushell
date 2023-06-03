@@ -594,13 +594,19 @@ export def ka [
 ] {
     let n = (spr [-n $n])
     let pod = if ($selector | is-empty) { $pod } else {
-        let pods = (kubectl get pods $n -l $selector | from ssv -a | each {|x| $x.NAME})
+        let pods = (
+            kubectl get pods $n -o wide -l $selector
+            | from ssv -a
+            | where STATUS == Running
+            | select NAME IP NODE
+            | rename name ip node
+        )
         if ($pods | length) == 1 {
-            $pods.0
+            ($pods.0).name
         } else if ($pods | length) == 0 {
             return
         } else {
-            $pods | input list 'select pod '
+            ($pods | input list 'select pod ').name
         }
     }
     let c = if ($container | is-empty) {
