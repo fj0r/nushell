@@ -1,4 +1,4 @@
-def get-switch [cmd] {
+def get-sign [cmd] {
     let x = ($nu.scope.commands | where name == $cmd).signatures?.0?.any?
     mut r = []
     for it in $x {
@@ -11,12 +11,12 @@ def get-switch [cmd] {
             }
         }
     }
-    $r
+    { switch: $r }
 }
 
 export def "parse cmd" [] {
     let cmd = ($in | split row ' ')
-    let switch = (get-switch $cmd.0)
+    let switch = (get-sign $cmd.0).switch
     mut sw = ''
     mut pos = []
     mut opt = {}

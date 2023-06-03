@@ -32,7 +32,7 @@ def spr [args] {
     }
 }
 
-def get-switch [cmd] {
+def get-sign [cmd] {
     let x = ($nu.scope.commands | where name == $cmd).signatures?.0?.any?
     mut r = []
     for it in $x {
@@ -45,12 +45,12 @@ def get-switch [cmd] {
             }
         }
     }
-    $r
+    { switch: $r }
 }
 
-def "parse cmd" [] {
+export def "parse cmd" [] {
     let cmd = ($in | split row ' ')
-    let switch = (get-switch $cmd.0)
+    let switch = (get-sign $cmd.0).switch
     mut sw = ''
     mut pos = []
     mut opt = {}
@@ -644,7 +644,7 @@ export def remote_braches [] {
 def "nu-complete git remote branches" [context: string, offset: int] {
     let ctx = ($context | parse cmd)
     let rb = (remote_braches)
-    if ($ctx | length) < 3 {
+    if ($ctx.args | length) < 3 {
         $rb | each {|x| {value: $x.1, description: $x.0} }
     } else {
         $rb | filter {|x| $x.1 == $ctx.1 } | each {|x| $x.0}
