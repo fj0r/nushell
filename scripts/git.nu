@@ -36,6 +36,7 @@ def get-sign [cmd] {
     let x = ($nu.scope.commands | where name == $cmd).signatures?.0?.any?
     mut s = []
     mut n = {}
+    mut p = []
     for it in $x {
         if $it.parameter_type in ['switch' 'named'] {
             let name = $it.parameter_name
@@ -48,9 +49,11 @@ def get-sign [cmd] {
                     $s = ($s | append $it.short_flag)
                 }
             }
+        } else if $it.parameter_type == 'positional' {
+            $p = ($p | append $it.parameter_name)
         }
     }
-    { switch: $s, name: $n }
+    { switch: $s, name: $n, positional: $p }
 }
 
 def "parse cmd" [] {
@@ -85,7 +88,8 @@ def "parse cmd" [] {
             $sw = ''
         }
     }
-    $opt.args = $pos
+    $opt._args = $pos
+    $opt._pos = ( $pos | range 1.. | enumerate | reduce -f {} {|it, acc| $acc | upsert ($sign.positional | get $it.index) $it.item } )
     $opt
 }
 
@@ -659,7 +663,7 @@ export def remote_braches [] {
 def "nu-complete git remote branches" [context: string, offset: int] {
     let ctx = ($context | parse cmd)
     let rb = (remote_braches)
-    if ($ctx.args | length) < 3 {
+    if ($ctx._args | length) < 3 {
         $rb | each {|x| {value: $x.1, description: $x.0} }
     } else {
         $rb | filter {|x| $x.1 == $ctx.1 } | each {|x| $x.0}
