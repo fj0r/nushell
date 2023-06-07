@@ -495,7 +495,8 @@ export alias gswc = git switch -c
 export alias gts = git tag -s
 
 export def _git_status [] {
-    let raw_status = (do -i { git --no-optional-locks status --porcelain=2 --branch | lines })
+    # TODO: show-stash
+    let raw_status = (do -i { git --no-optional-locks status --porcelain=2 --branch --show-stash | lines })
 
     mut status = {
         idx_added_staged    : 0
