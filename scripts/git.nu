@@ -162,8 +162,8 @@ export def gb [
         }
         if $branch in (remote_braches | each {|x| $x.1}) and (agree -n 'delete remote branch?!') {
             let remote = if ($remote|is-empty) { 'origin' } else { $remote }
-            git push $remote -d $branch
             git branch -D -r $'($remote)/($branch)'
+            git push $remote -d $branch
         }
     } else if $branch in $bs {
         git checkout $branch
