@@ -250,7 +250,7 @@ export def kh [
     let values = if ($values | is-empty) { [] } else { [--set-json (record-to-set-json $values)] }
     let target = ($valuefile | split row '.' | range ..-2 | append [out yaml] | str join '.')
     if (not ($target | path exists)) and (([yes no] | input list $'create ($target)?') in [no]) { return }
-    helm template $app $chart -f $valuefile $values (spr [-n $namespace])
+    helm template --debug $app $chart -f $valuefile $values (spr [-n $namespace])
     | save -f $target
 }
 
