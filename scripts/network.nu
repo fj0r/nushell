@@ -12,9 +12,7 @@ export def ns [] {
 
 def "nu-complete proxys" [context: string, offset: int] {
     let cl = ('toggle proxy ' | str length)
-    if $offset == $cl {
-        ['socks5://' 'http://'  'https://']
-    } else if ($context | str ends-with ':') {
+    if ($context | str ends-with ':') {
         [7890 7891 1080] | each {|x| $"($context | str substring $cl..)($x)"}
     } else if ($context | str ends-with '/') {
         [
@@ -24,6 +22,8 @@ def "nu-complete proxys" [context: string, offset: int] {
         ] | flatten | each {|x|
             {value: $"($context | str substring $cl..)($x.value):", description: $x.description}
         }
+    } else {
+        ['socks5://' 'http://'  'https://']
     }
 }
 
