@@ -10,11 +10,21 @@ export def ns [] {
     | parse -r '(?P<proto>\w+) +(?P<recv>[0-9]+) +(?P<send>[0-9]+) +(?P<local>[0-9.]+):(?P<port>[0-9]+) +(?P<foreign>[0-9.:]+):(?P<f_port>[0-9]+) +(?P<state>\w+) +(?P<user>[0-9]+) +(?P<inode>[0-9]+) +(?P<program>.+)'
 }
 
-def "nu-complete proxys" [] {
-    [
-        'http://localhost:7890'
-        $"http://(hostname -I | split row ' ' | get 0):7890"
-    ]
+def "nu-complete proxys" [context: string, offset: int] {
+    let cl = ('toggle proxy ' | str length)
+    if $offset == $cl {
+        ['socks5://' 'http://'  'https://']
+    } else if ($context | str ends-with ':') {
+        [7890 7891 1080] | each {|x| $"($context | str substring $cl..)($x)"}
+    } else if ($context | str ends-with '/') {
+        [
+            {value: 'localhost', description: 'loopback'}
+            {value: (ip route | lines | get 0 | split row ' ' | get 2), description: 'gateway'}
+            (hostname -I | split row ' ' | filter {|x| ($x | str length) > 1} | each {|x| {value: $x, description: 'local'} })
+        ] | flatten | each {|x|
+            {value: $"($context | str substring $cl..)($x.value):", description: $x.description}
+        }
+    }
 }
 
 export def-env "toggle proxy" [proxy?:string@"nu-complete proxys"] {
