@@ -676,11 +676,13 @@ export def kl [
     --namespace(-n): string@"nu-complete kube ns"
     --container(-c): string@"nu-complete kube ctns"
     --follow(-f): bool
+    --previous(-p): bool
 ] {
     let n = (spr [-n $namespace])
     let c = (spr [-c $container])
     let f = (sprb $follow [-f])
-    kubectl logs $n $f $pod $c
+    let p = (sprb $previous [-p])
+    kubectl logs $n $f $p $pod $c
 }
 
 def "nu-complete port forward type" [] {
