@@ -1,5 +1,5 @@
 def get-sign [cmd] {
-    let x = ($nu.scope.commands | where name == $cmd).signatures?.0?.any?
+    let x = (scope commands | where name == $cmd).signatures?.0?.any?
     mut s = []
     mut n = {}
     mut p = []
