@@ -138,6 +138,10 @@ export def nvim-srv [port: int=1111] {
     nvim --headless --listen $"0.0.0.0:($port)"
 }
 
+export def nvc [addr: string] {
+    nvim --remote-ui --server $addr
+}
+
 export def nvdc [addr: string] {
-    neovide --multigrid --maximized --remote-tcp $addr
+    neovide --multigrid --maximized --server $addr
 }
