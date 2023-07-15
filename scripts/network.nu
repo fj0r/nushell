@@ -42,7 +42,7 @@ export def-env "toggle proxy" [proxy?:string@"nu-complete proxys"] {
                 echo $'set proxy ($p)'
                 $p
             }
-    let-env http_proxy = $proxy
-    let-env https_proxy = $proxy
+    $env.http_proxy = $proxy
+    $env.https_proxy = $proxy
 }
 
