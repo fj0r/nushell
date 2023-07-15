@@ -134,7 +134,7 @@ export def opwd [] {
     nvim-lua 'OppositePwd()'
 }
 
-export def nvim-srv [port: int=1111] {
+export def nvim-srv [port: int=9999] {
     nvim --headless --listen $"0.0.0.0:($port)"
 }
 
