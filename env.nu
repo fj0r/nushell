@@ -44,21 +44,21 @@ def create_right_prompt [] {
 }
 
 # Use nushell functions to define your right and left prompt
-let-env PROMPT_COMMAND = {|| create_left_prompt }
-let-env PROMPT_COMMAND_RIGHT = {|| create_right_prompt }
+$env.PROMPT_COMMAND = {|| create_left_prompt }
+$env.PROMPT_COMMAND_RIGHT = {|| create_right_prompt }
 
 # The prompt indicators are environmental variables that represent
 # the state of the prompt
-let-env PROMPT_INDICATOR = {|| "> " }
-let-env PROMPT_INDICATOR_VI_INSERT = {|| ": " }
-let-env PROMPT_INDICATOR_VI_NORMAL = {|| "> " }
-let-env PROMPT_MULTILINE_INDICATOR = {|| "::: " }
+$env.PROMPT_INDICATOR = {|| "> " }
+$env.PROMPT_INDICATOR_VI_INSERT = {|| ": " }
+$env.PROMPT_INDICATOR_VI_NORMAL = {|| "> " }
+$env.PROMPT_MULTILINE_INDICATOR = {|| "::: " }
 
 # Specifies how environment variables are:
 # - converted from a string to a value on Nushell startup (from_string)
 # - converted from a value back to a string when running external commands (to_string)
 # Note: The conversions happen *after* config.nu is loaded
-let-env ENV_CONVERSIONS = {
+$env.ENV_CONVERSIONS = {
   "PATH": {
     from_string: { |s| $s | split row (char esep) | path expand --no-symlink }
     to_string: { |v| $v | path expand --no-symlink | str join (char esep) }
@@ -76,19 +76,19 @@ let-env ENV_CONVERSIONS = {
 # Directories to search for scripts when calling source or use
 #
 # By default, <nushell-config-dir>/scripts is added
-let-env NU_LIB_DIRS = [
+$env.NU_LIB_DIRS = [
     ($nu.default-config-dir | path join 'scripts')
 ]
 
 # Directories to search for plugin binaries when calling register
 #
 # By default, <nushell-config-dir>/plugins is added
-let-env NU_PLUGIN_DIRS = [
+$env.NU_PLUGIN_DIRS = [
     ($nu.default-config-dir | path join 'plugins')
 ]
 
 # To add entries to PATH (on Windows you might use Path), you can use the following pattern:
-# let-env PATH = ($env.PATH | split row (char esep) | prepend '/some/path')
+# $env.PATH = ($env.PATH | split row (char esep) | prepend '/some/path')
 
 for path in [
     [$'($env.HOME)/.local/bin']
@@ -96,13 +96,13 @@ for path in [
     (do -i {ls $'($env.LS_ROOT)/*/bin' | get name})
 ] {
     if not ($path | is-empty) {
-        let-env PATH = ($env.PATH
+        $env.PATH = ($env.PATH
         | prepend ($path | where $it not-in ($env.PATH | split row (char esep))))
     }
 }
 
-let-env LD_LIBRARY_PATH = if ($env.LD_LIBRARY_PATH? | is-empty) { [] } else { $env.LD_LIBRARY_PATH }
-let-env LD_LIBRARY_PATH = (do -i {
+$env.LD_LIBRARY_PATH = (if ($env.LD_LIBRARY_PATH? | is-empty) { [] } else { $env.LD_LIBRARY_PATH })
+$env.LD_LIBRARY_PATH = (do -i {
     $env.LD_LIBRARY_PATH
     | prepend (
         ls ((stack ghc -- --print-libdir) | str trim)
@@ -111,10 +111,10 @@ let-env LD_LIBRARY_PATH = (do -i {
         )
 })
 
-let-env TERM = 'screen-256color'
-let-env SHELL = 'nu'
+$env.TERM = 'screen-256color'
+$env.SHELL = 'nu'
 
-let-env EDITOR = 'nuedit' # 'nvim'
+$env.EDITOR = 'nuedit' # 'nvim'
 if ($env.EDITOR == 'nuedit') and (not ($'($env.HOME)/.local/bin/nuedit' | path exists)) {
     mkdir $'($env.HOME)/.local/bin/'
     cp $'($nu.config-path | path dirname)/nuedit' $'($env.HOME)/.local/bin/nuedit'
