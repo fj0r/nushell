@@ -79,7 +79,7 @@ use zellij.nu *
 ####use starship.nu *
 use network.nu *
 use setup.nu *
-#source zoxide.nu
+source zoxide.nu
 
 use power.nu
     use power_git.nu
