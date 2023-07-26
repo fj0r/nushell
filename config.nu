@@ -808,4 +808,4 @@ $env.config = {
     ]
 }
 
-source my.nu
+source __.nu
