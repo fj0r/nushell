@@ -55,6 +55,7 @@ $env.config.table.mode = light
 # config.nu
 
 #use utils.nu
+use nvim.nu *
 use after.nu *
 use timelog.nu *
 use zoxide-menu.nu *
@@ -72,7 +73,6 @@ use sh.nu *
 #use pwd-overlay.nu *
 use dynamic-load.nu *
 use direnv.nu *
-use nvim.nu *
 #use ime.nu *
 use zellij.nu *
 

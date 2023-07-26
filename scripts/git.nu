@@ -202,6 +202,11 @@ export def-env gn [
     }
 }
 
+# edit .gitignore
+export def gig [] {
+    e $"(git rev-parse --show-toplevel)/.gitignore"
+}
+
 # git pull, push and switch
 export def gp [
     branch?:             string@"nu-complete git remote branches"
