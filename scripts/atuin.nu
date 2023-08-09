@@ -50,7 +50,7 @@ $env.config = (if $has_atuin {
         | append {
             name: atuin
             modifier: control
-            keycode: char_r
+            keycode: char_s
             mode: [emacs, vi_normal, vi_insert]
             event: { send: executehostcommand cmd: (_atuin_search_cmd) }
         }
