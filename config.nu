@@ -365,7 +365,7 @@ $env.config = {
         {
             name: history_menu
             modifier: control
-            keycode: char_r
+            keycode: char_s
             mode: [emacs, vi_insert, vi_normal]
             event: { send: menu name: history_menu }
         }

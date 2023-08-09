@@ -24,7 +24,7 @@ use docker.nu *
 #use timeit.nu *
 use sh.nu *
 #use pwd-overlay.nu *
-use dynamic-load.nu *
+#use dynamic-load.nu *
 use direnv.nu *
 #use ime.nu *
 use zellij.nu *
@@ -49,5 +49,12 @@ use power.nu
     power set time $nothing { short: false }
 power init
 
-source atuin.nu
 
+if not (which atuin | is-empty) {
+    source atuin.nu
+}
+
+const ucf = '~/.nu'
+if ($ucf | path expand | path exists) {
+    #source $ucf
+}
