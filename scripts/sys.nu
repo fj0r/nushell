@@ -130,22 +130,20 @@ def "nu-complete systemctl x" [context: string, offset: int] {
 
 export def ssc [
     cmd: string@"nu-complete systemctl cmd"
+    --dry-run
+    --now # Start or stop unit after enabling or disabling it
+    --force(-f) # When enabling unit files, override existing symlinks
     ...x: string@"nu-complete systemctl x"
 ] {
-    sudo systemctl $cmd $x
+    mut args = []
+    if $now { $args = ($args | append [--now]) }
+    if $force { $args = ($args | append [--force]) }
+    if $dry_run {
+        echo $"systemctl ($cmd) ($args) ($x)"
+    } else {
+        sudo systemctl $cmd $args $x
+    }
 }
-
-export extern "ssc enable" [
-    --now # Start or stop unit after enabling or disabling it
-    --force(-f) # When enabling unit files, override existing symlinks
-    svc: string@"nu-complete systemctl services inactive"
-]
-
-export extern "ssc disable" [
-    --now # Start or stop unit after enabling or disabling it
-    --force(-f) # When enabling unit files, override existing symlinks
-    svc: string@"nu-complete systemctl services active"
-]
 
 export def sleeping [] {
     bash -c "echo mem | sudo tee /sys/power/state > /dev/null"
