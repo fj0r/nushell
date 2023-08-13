@@ -92,6 +92,7 @@ def time_segment [] {
 def logtime [msg act] {
     let start = (date now)
     let result = (do $act)
+    # HACK: serialization
     let period = ($"((date now) - $start | into duration -c ns)" | str replace ' ' '')
 
     echo $'($start | date format '%Y-%m-%d_%H:%M:%S%z')(char tab)($period)(char tab)($msg)(char newline)'
