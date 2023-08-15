@@ -305,7 +305,7 @@ export def ga [
     if $delete {
         let c = (sprb $cached [--cached])
         let f = (sprb $force [--force])
-        git rm $c $f $file
+        git rm $c $f -r $file
     } else if $restore {
         let o = (spr [--source $source])
         let s = (sprb $staged [--staged])
