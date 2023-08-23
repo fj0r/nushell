@@ -1,7 +1,7 @@
 export def log [msg act] {
     let start = (date now)
     let result = (do $act)
-    let period = ($"((date now) - $start) | into duration -c ns" | str replace ' ' '')
+    let period = ((date now) - $start | format duration ns | str replace ' ' '')
 
     echo $'($start | format date '%Y-%m-%d_%H:%M:%S%z')(char tab)($period)(char tab)($msg)(char newline)'
     | save -a ~/.cache/nushell/time.log

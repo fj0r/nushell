@@ -1,6 +1,6 @@
 # Nushell Environment Config File
 #
-# version = 0.82.1
+# version = "0.84.0"
 
 def create_left_prompt [] {
     mut home = ""
@@ -48,9 +48,9 @@ $env.PROMPT_COMMAND = {|| create_left_prompt }
 
 # The prompt indicators are environmental variables that represent
 # the state of the prompt
-$env.PROMPT_INDICATOR = {|| " > " }
-$env.PROMPT_INDICATOR_VI_INSERT = {|| " : " }
-$env.PROMPT_INDICATOR_VI_NORMAL = {|| " > " }
+$env.PROMPT_INDICATOR = {|| "> " }
+$env.PROMPT_INDICATOR_VI_INSERT = {|| ": " }
+$env.PROMPT_INDICATOR_VI_NORMAL = {|| "> " }
 $env.PROMPT_MULTILINE_INDICATOR = {|| "::: " }
 
 # Specifies how environment variables are:
@@ -84,4 +84,3 @@ $env.NU_PLUGIN_DIRS = [
 
 # To add entries to PATH (on Windows you might use Path), you can use the following pattern:
 # $env.PATH = ($env.PATH | split row (char esep) | prepend '/some/path')
-

@@ -3,8 +3,9 @@
 $env.config.show_banner = false
 $env.config.history.file_format = "sqlite"
 $env.config.history.isolation = true
-$env.config.table.mode = light
+$env.config.table.mode = light #light compact
 $env.config.table.header_on_separator = true
+$env.config.table.padding = 1
 
 # config.nu
 
