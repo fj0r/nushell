@@ -23,7 +23,7 @@ def "nu-complete proxys" [context: string, offset: int] {
             {value: $"($context | str substring $cl..)($x.value):", description: $x.description}
         }
     } else {
-        ['socks5://' 'http://'  'https://']
+        ['socks5://' 'socks5h://' 'http://'  'https://']
     }
 }
 
