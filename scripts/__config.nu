@@ -56,7 +56,8 @@ if not (which atuin | is-empty) {
     source atuin.nu
 }
 
-const ucf = '~/.nu'
-if ($ucf | path expand | path exists) {
-    #source $ucf
-}
+const USRCFG = '~/.nu'
+const USRCFG = if ($USRCFG | path expand | path exists) {
+    $USRCFG
+} else { 'dummy.nu' }
+source $USRCFG
