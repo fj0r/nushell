@@ -60,3 +60,6 @@ const USRCFG = if ($USRCFG | path expand | path exists) {
     $USRCFG
 } else { 'dummy.nu' }
 source $USRCFG
+
+const plugin_query = ($nu.current-exe | path dirname | path join 'nu_plugin_query')
+register $plugin_query
