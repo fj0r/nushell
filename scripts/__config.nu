@@ -18,6 +18,7 @@ use nushell.nu *
 use sys.nu *
 use common.nu *
 use just.nu *
+use mask.nu *
 use git-cmp.nu *
 use git.nu *
 use ssh.nu *

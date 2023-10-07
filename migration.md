@@ -1,8 +1,9 @@
 ## todo
-- [ ] parse completions with `$nu.scope.commands`
+- [ ] history-path
+- [x] parse completions with `$nu.scope.commands`
     - `$nu.scope.commands | where name == ke | get signatures`
     - cache
-- [ ] kconf import : mask
+- [x] kconf import : mask
 - [x] kubernetes independent kubectx & kubens
 - [x] docker
     - [x] -v
