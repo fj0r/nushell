@@ -33,7 +33,7 @@ def "nu-complete just args" [context: string, offset: int] {
 
 }
 
-export def j [
+export def main [
     recipes?: string@"nu-complete just recipes"
     ...args: any@"nu-complete just args"
 ] {
