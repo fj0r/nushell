@@ -47,14 +47,14 @@ use power.nu
         separator: '@'
     }
     use power_utils.nu
-    power inject 0 1 {source: atuin, color: '#404040'}
-    power set time null { short: false }
+    # power inject 0 1 {source: atuin, color: '#404040'}
+    power set time null { short: true }
 power init
 
 
-if not (which atuin | is-empty) {
-    source atuin.nu
-}
+# if not (which atuin | is-empty) {
+#     source atuin.nu
+# }
 
 const USRCFG = '~/.nu'
 const USRCFG = if ($USRCFG | path expand | path exists) {
