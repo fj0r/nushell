@@ -5,7 +5,7 @@ $env.config.use_kitty_protocol = true
 $env.config.history.file_format = "sqlite"
 $env.config.history.isolation = true
 $env.config.table.header_on_separator = true
-$env.config.table.mode = light #light compact
+$env.config.table.mode = compact #light compact
 $env.config.table.padding.left = 0
 
 # config.nu
