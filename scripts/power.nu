@@ -82,7 +82,7 @@ def time_segment [] {
         let format = match $config.style {
             "compact" => { $'($theme.fst)%y%m%d($theme.snd)%w($theme.fst)%H%M%S' }
             "rainbow" => {
-                let fmt = [w y m d H M S] 
+                let fmt = [w y m d H M S]
                 let color = ['1;93m' '1;35m' '1;34m' '1;36m' '1;32m' '1;33m' '1;91m']
                 $fmt
                 | enumerate
