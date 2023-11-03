@@ -23,7 +23,7 @@ def "nu-complete just recipes" [] {
 
 def "nu-complete just args" [context: string, offset: int] {
     let r = ($context | split row ' ')
-    ^just --unstable -u --dump --dump-format json
+    ^just -u --dump --dump-format json
         | from json
         | get recipes
         | get ($r.1)
