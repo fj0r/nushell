@@ -30,3 +30,16 @@ export def 'config reset' [] {
     echo $"(char newline)source __config.nu" | save -a $nu.config-path
     config env --default | save -f $nu.env-path
 }
+
+# backup history
+export def 'history backup' [] {
+    $'.output ($env.HOME)/Documents/history.sql
+    (char newline).dump
+    (char newline).quit' | sqlite3 $nu.history-path
+}
+
+# restore history
+export def 'history restore' [] {
+    rm -f $nu.history-path
+    cat $'($env.HOME)/Documents/history.sql' | sqlite3 $nu.history-path
+}
