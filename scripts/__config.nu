@@ -14,7 +14,7 @@ $env.config.table.padding.left = 0
 use nvim.nu *
 use after.nu *
 use timelog.nu *
-use zoxide-menu.nu *
+use cwdhist.nu *
 use nushell.nu *
 use sys.nu *
 use common.nu *
@@ -35,7 +35,6 @@ use zellij.nu *
 ####use starship.nu *
 use network.nu *
 use setup.nu *
-source zoxide.nu
 
 use power.nu
     use power_git.nu
