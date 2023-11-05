@@ -23,6 +23,8 @@ let manifest = {
   power_utils.nu:  modules/prompt/powerline
   power.md:        modules/prompt/powerline/README.md
 
+  cwdhist.nu:      modules/cwdhist
+
   direnv.nu:       hooks/direnv
   dynamic-load.nu: hooks/dynamic-load
   zoxide-menu.nu:  custom-menus

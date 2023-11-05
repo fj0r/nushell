@@ -1,5 +1,5 @@
 def "nu-complete just recipes" [] {
-    ^just --unstable --unsorted --dump --dump-format json
+    ^just --unsorted --dump --dump-format json
         | from json
         | get recipes
         | transpose k v
