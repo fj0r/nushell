@@ -13,16 +13,12 @@ def __cwdhist_menu [] {
             description_text: yellow
         }
         source: { |buffer, position|
-            let cwd = if ($buffer | is-empty) {
-                ""
-            } else {
-                $buffer
-            }
+            #$"[($position)]($buffer);(char newline)" | save -a ~/.cache/cwdhist.log
             if 'cwd_history_full' in $env {
                 open $nu.history-path | query db $"
                     select cwd as value, count\(*) as description
                     from history
-                    where cwd like '%($cwd)%'
+                    where cwd like '%($buffer)%'
                     group by cwd
                     order by description desc
                     limit 20
@@ -31,11 +27,12 @@ def __cwdhist_menu [] {
                 open $env.cwd_history_file | query db $"
                     select cwd as value, count as description
                     from cwd_history
-                    where cwd like '%($cwd)%'
+                    where cwd like '%($buffer)%'
                     order by count desc
                     limit 20
                     ;"
             }
+            | append { value: ' ' }
         }
     }
 }
@@ -70,12 +67,10 @@ export-env {
 
     if not ($env.cwd_history_file | path exists) {
         "create table if not exists cwd_history (
-          cwd text primary key,
-          count int default 1,
-          recent datetime default (datetime('now', 'localtime'))
-        );
-        insert into cwd_history(cwd, count) values ('.', 0)
-        on conflict (cwd) do update set count = 0;"
+                cwd text primary key,
+                count int default 1,
+                recent datetime default (datetime('now', 'localtime'))
+            );"
         | sqlite3 ~/.cache/nu_cwd_history.sqlite
     }
 
@@ -90,11 +85,11 @@ export-env {
         open $env.cwd_history_file
         | query db $"
             insert into cwd_history\(cwd)
-              values \('($path)')
+                values \('($path)')
             on conflict\(cwd)
             do update set
-               count = count + 1,
-               recent = datetime\('now', 'localtime');"
+                count = count + 1,
+                recent = datetime\('now', 'localtime');"
     }
 
     $env.config = ($env.config
