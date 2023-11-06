@@ -4,8 +4,8 @@ def __cwdhist_menu [] {
         only_buffer_difference: false
         marker: "| "
         type: {
-            layout: columnar
-            page_size: 20
+            layout: list
+            page_size: 10
         }
         style: {
             text: green
@@ -16,23 +16,22 @@ def __cwdhist_menu [] {
             #$"[($position)]($buffer);(char newline)" | save -a ~/.cache/cwdhist.log
             if 'cwd_history_full' in $env {
                 open $nu.history-path | query db $"
-                    select cwd as value, count\(*) as description
+                    select cwd as value, count\(*) as cnt
                     from history
                     where cwd like '%($buffer)%'
                     group by cwd
-                    order by description desc
-                    limit 20
+                    order by cnt desc
+                    limit 50
                     ;"
             } else {
                 open $env.cwd_history_file | query db $"
-                    select cwd as value, count as description
+                    select cwd as value, count
                     from cwd_history
                     where cwd like '%($buffer)%'
                     order by count desc
-                    limit 20
+                    limit 50
                     ;"
             }
-            | append { value: ' ' }
         }
     }
 }
