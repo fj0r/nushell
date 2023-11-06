@@ -31,15 +31,23 @@ export def 'config reset' [] {
     config env --default | save -f $nu.env-path
 }
 
+
+export-env {
+    $env.history_backup_dir = $'($env.HOME)/.cache/nu-history-backup'
+}
 # backup history
 export def 'history backup' [] {
-    $'.output ($env.HOME)/Documents/history.sql
+    ^mkdir [-p $env.history_backup_dir]
+    $'.output ($env.history_backup_dir)/(date now | format date "%y%m%d%H%M%S").sql
     (char newline).dump
     (char newline).quit' | sqlite3 $nu.history-path
 }
 
+def "nu-complete history_backup_file" [] {
+    ls $env.history_backup_dir | each {|x| $x.name | path parse } | get stem | reverse
+}
 # restore history
-export def 'history restore' [] {
+export def 'history restore' [name: string@"nu-complete history_backup_file"] {
     rm -f $nu.history-path
-    cat $'($env.HOME)/Documents/history.sql' | sqlite3 $nu.history-path
+    cat ([$env.history_backup_dir, $"($name).sql"] | path join) | sqlite3 $nu.history-path
 }
