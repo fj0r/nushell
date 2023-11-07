@@ -228,6 +228,7 @@ export def kdh [
     valuefile: path
     --values (-v): any
     --namespace (-n): string@"nu-complete kube ns"
+    --ignore-image (-i)
     --has-plugin (-h)
 ] {
     if $has_plugin {
@@ -245,6 +246,9 @@ export def kdh [
         let values = if ($values | is-empty) { [] } else { [--set-json (record-to-set-json $values)] }
         let target = $'/tmp/($chart | path basename).($name).out.yaml'
         helm template --debug $name $chart -f $valuefile $values (spr [-n $namespace]) | save -f $target
+        if $ignore_image {
+            do -i { yq -i ea 'del(.spec.template.spec.containers.[].image)' $target }
+        }
         kubectl diff -f $target
     }
 }
