@@ -78,13 +78,13 @@ def "nu-complete systemctl cmd" [] {
     ]
 }
 
-export def "ssc services" [kw?: string] {
+export def "ssc services" [user, kw?: string] {
     let kw = if ($kw|is-empty) {
         []
     } else {
         [ $"($kw)*" ]
     }
-    systemctl list-units --all $kw
+    systemctl list-units --all (if $user {[--user]} else {[]}) $kw
     | head -n -5
     | from ssv -a
     | reduce -f [] {|x, a|
@@ -99,23 +99,13 @@ export def "ssc services" [kw?: string] {
     }
 }
 
-def "nu-complete systemctl services active" [] {
-    ssc services | where active == true
-}
-
-def "nu-complete systemctl services inactive" [] {
-    ssc services | where active == false
-}
-
 def "nu-complete systemctl x" [context: string, offset: int] {
-    let argv = ($context | split row ' ')
-    let cmd = ($argv | get 1)
+    let ctx = ($context | cmd parse)
+    let cmd = $ctx._args.1
+    let input = $ctx._args.2?
+    let user = ('user' in $ctx)
     if $cmd in [start stop restart status enable disable] {
-        let input = ''
-        if ($argv | length) > 2 {
-            let input = $"( $argv | get 2 )*"
-        }
-        let services = (ssc services $input)
+        let services = (ssc services $user $input)
         if $cmd == 'status' {
             $services
         } else if $cmd in [start enable] {
@@ -133,6 +123,7 @@ export def ssc [
     --dry-run
     --now # Start or stop unit after enabling or disabling it
     --force(-f) # When enabling unit files, override existing symlinks
+    --user(-u)
     ...x: string@"nu-complete systemctl x"
 ] {
     mut args = []
@@ -141,7 +132,7 @@ export def ssc [
     if $dry_run {
         echo $"systemctl ($cmd) ($args) ($x)"
     } else {
-        sudo systemctl $cmd $args $x
+        sudo systemctl (if $user {[--user]} else {[]}) $cmd $args $x
     }
 }
 
