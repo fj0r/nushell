@@ -29,7 +29,8 @@ use docker.nu *
 #use timeit.nu *
 use sh.nu *
 #use pwd-overlay.nu *
-use direnv.nu *
+use pwd-module.nu *
+#use direnv.nu *
 #use ime.nu *
 use zellij.nu *
 

@@ -1,18 +1,18 @@
 def pwd_overlay [] {
     [
         {
-            condition: {|before, after| ($before != $after) and ('cwd' in (overlay list)) }
+            condition: {|_, after| 'cwd' in (overlay list) }
             code: "
                 overlay hide cwd --keep-env [ PWD ]
             "
         }
         {
-            condition: {|before, after| ($before != $after) and ($after | path join .nu | path exists) }
+            condition: {|_, after| $after | path join ,.nu | path exists }
             code: "
-                overlay use -r ./.nu as cwd
-                # :XXX: workaround for `overlay use -r .nu --keep-env [ PWD ]`
-                #if not (($before | is-empty) or ($before | path join .nu | path exists)) {
-                #    cd $after
+                overlay use -r ,.nu as cwd
+                # :XXX: workaround for `overlay use -r ,.nu --keep-env [ PWD ]`
+                #if not (($before | is-empty) or ($before | path join ,.nu | path exists)) {
+                cd $after
                 #}
             "
         }
