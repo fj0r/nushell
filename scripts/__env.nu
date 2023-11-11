@@ -14,6 +14,10 @@ $env.ENV_CONVERSIONS = {
     }
 }
 
+if $nu.os-info.family == 'windows'  {
+    $env.HOME = $env.HOMEPATH
+    $env.PATH = $env.Path
+}
 
 for path in [
     [$'($env.HOME)/.local/bin']
