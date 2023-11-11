@@ -70,18 +70,23 @@ def __cwdhist_switching [] {
     }
 }
 
+export def empty-sqlite [] {
+    # pre-created empty sqlite database
+    'H4sIAAAAAAAAA+3LQQpAYBiE4fn+bMURvhPYuIAD2MgJLChKSv9BrZ1GSrHD/n1qmtlM29Rj7H1Y1rmLXiqXmSp3SeERuzrRzfQuqJi29Fy5lO0fHgAAAAAAAAAAAAAA4LcDzTELuwAgAAA='
+    | decode base64 --binary | gzip -d
+}
 
 export-env {
     $env.cwd_history_full = false
     $env.cwd_history_file = '~/.cache/nu_cwd_history.sqlite'
 
     if not ($env.cwd_history_file | path exists) {
-        "create table if not exists cwd_history (
+        empty-sqlite | save -f $env.cwd_history_file
+        open $env.cwd_history_file | query db "create table if not exists cwd_history (
             cwd text primary key,
             count int default 1,
             recent datetime default (datetime('now', 'localtime'))
         );"
-        | sqlite3 ~/.cache/nu_cwd_history.sqlite
     }
 
     let __cwdhist_hook = {|_, dir|
