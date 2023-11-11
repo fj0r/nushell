@@ -16,7 +16,6 @@ $env.ENV_CONVERSIONS = {
 
 if $nu.os-info.family == 'windows'  {
     $env.HOME = $env.HOMEPATH
-    $env.PATH = $env.Path
 }
 
 for path in [
@@ -25,8 +24,13 @@ for path in [
     (do -i {ls $'($env.LS_ROOT)/*/bin' | get name})
 ] {
     if not ($path | is-empty) {
-        $env.PATH = ($env.PATH
-        | prepend ($path | where $it not-in ($env.PATH | split row (char esep))))
+        if $nu.os-info.family == 'windows'  {
+            $env.Path = ($env.Path
+            | prepend ($path | where $it not-in ($env.Path | split row (char esep))))
+        } else {
+            $env.PATH = ($env.PATH
+            | prepend ($path | where $it not-in ($env.PATH | split row (char esep))))
+        }
     }
 }
 
