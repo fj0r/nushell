@@ -72,8 +72,8 @@ def __cwdhist_switching [] {
 }
 
 export def empty-sqlite [] {
-    # pre-created empty sqlite database
-    'H4sIAAAAAAAAA+3LQQpAYBiE4fn+bMURvhPYuIAD2MgJLChKSv9BrZ1GSrHD/n1qmtlM29Rj7H1Y1rmLXiqXmSp3SeERuzrRzfQuqJi29Fy5lO0fHgAAAAAAAAAAAAAA4LcDzTELuwAgAAA='
+    # sqlite3 empty.db "VACUUM;"; cat empty.db | gzip | encode base64
+    'H4sIAAAAAAAAAwsO9MksSVVIyy/KTSxRMGYQYGBkZHBQUGBgYGCEYhhAZhMLGBn0ihbwglgCZOgeBaNgFIyCUTAKRsEoGAWjYBSMglEwCkYBVQAANHgbMAAQAAA='
     | decode base64 --binary | gzip -d
 }
 
