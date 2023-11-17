@@ -1,3 +1,5 @@
+use cmd_parse.nu *
+
 def "nu-complete systemctl cmd" [] {
     [
         # Unit Commands

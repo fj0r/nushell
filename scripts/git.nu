@@ -1,3 +1,5 @@
+use cmd_parse.nu *
+
 def agree [
     prompt
     --default-not (-n)
