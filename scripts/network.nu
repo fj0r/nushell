@@ -10,17 +10,23 @@ export def ns [] {
     | parse -r '(?P<proto>\w+) +(?P<recv>[0-9]+) +(?P<send>[0-9]+) +(?P<local>[0-9.]+):(?P<port>[0-9]+) +(?P<foreign>[0-9.:]+):(?P<f_port>[0-9]+) +(?P<state>\w+) +(?P<user>[0-9]+) +(?P<inode>[0-9]+) +(?P<program>.+)'
 }
 
+export def common-ips [] {
+    let addr = ip route | lines | get 0 | parse -r 'default via (?P<gateway>[0-9\.]+) dev (?P<dev>\w+)( proto dhcp src (?P<lan>[0-9\.]+))?'
+    return {
+        loopback:  'localhost'
+        gateway: $addr.gateway.0
+        lan: $addr.lan?.0?
+    }
+}
+
 def "nu-complete proxys" [context: string, offset: int] {
-    let cl = ('toggle proxy ' | str length)
+    let pre = $context | str substring ('toggle proxy ' | str length)..
     if ($context | str ends-with ':') {
-        [7890 7891 1080] | each {|x| $"($context | str substring $cl..)($x)"}
+        [7890 7891 1080] | each {|x| $"($pre)($x)"}
     } else if ($context | str ends-with '/') {
-        [
-            {value: 'localhost', description: 'loopback'}
-            {value: (ip route | lines | get 0 | split row ' ' | get 2), description: 'gateway'}
-            (hostname -I | split row ' ' | filter {|x| ($x | str length) > 1} | each {|x| {value: $x, description: 'local'} })
-        ] | flatten | each {|x|
-            {value: $"($context | str substring $cl..)($x.value):", description: $x.description}
+        let a = common-ips | transpose description value
+        $a | each {|x|
+            $x | update value $"($pre)($x.value):"
         }
     } else {
         ['socks5://' 'socks5h://' 'http://'  'https://']
