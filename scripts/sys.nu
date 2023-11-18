@@ -1,4 +1,4 @@
-use cmd_parse.nu *
+use argx.nu
 
 def "nu-complete systemctl cmd" [] {
     [
@@ -102,7 +102,7 @@ export def "ssc services" [user, kw?: string] {
 }
 
 def "nu-complete systemctl x" [context: string, offset: int] {
-    let ctx = ($context | cmd parse)
+    let ctx = ($context | argx parse)
     let cmd = $ctx._args.1
     let input = $ctx._args.2?
     let user = ('user' in $ctx)

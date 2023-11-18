@@ -1,6 +1,6 @@
 export def main [...args:string@comp] {
     let manifest = {
-        cmd_parse.nu:    modules/cmd_parse
+        argx.nu:         modules/argx
         ssh.nu:          modules/network
         docker.nu:       modules/docker
         kubernetes.nu:   modules/kubernetes
