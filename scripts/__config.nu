@@ -31,7 +31,7 @@ use sh.nu *
 use pwd-module.nu *
 #use direnv.nu *
 #use ime.nu *
-use zellij.nu *
+use taskfile.nu
 
 ####use starship.nu *
 use network.nu *

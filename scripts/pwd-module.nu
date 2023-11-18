@@ -1,22 +1,3 @@
-export def new_taskfie [] {
-    "
-    export def main [...args:string@comp] {
-        match $args.0 {
-
-        }
-    }
-
-    def comp [context: string, offset: int] {
-        let size = $context | str substring 0..$offset | split row ' ' | length
-        if $size < 3 {
-            []
-        } else if $size < 4 {
-            []
-        }
-    }
-    " | save ,.nu
-}
-
 def pwd_module [] {
     [
         {

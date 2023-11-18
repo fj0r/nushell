@@ -1,6 +1,7 @@
-export def main [...args:string@comp] {
+export def main [...args:string@compos] {
     let manifest = {
         argx.nu:         modules/argx
+        taskfile.nu:     modules/taskfile
         ssh.nu:          modules/network
         docker.nu:       modules/docker
         kubernetes.nu:   modules/kubernetes
@@ -39,11 +40,10 @@ export def main [...args:string@comp] {
     }
 }
 
-def comp [context: string, offset: int] {
-    let size = $context | str substring 0..$offset | split row ' ' | length
-    if $size < 3 {
-        ['export']
-    } else if $size < 4 {
-        []
+def compos [context: string, offset: int] {
+    let argv = $context | str substring 0..$offset | split row -r "\\s+" | range 1..
+    match ($argv | length) {
+        1 => [export]
+        _ => []
     }
 }
