@@ -22,6 +22,10 @@ export def positional [
                         }
                     }
                     list => {
+                        let fst = $acc.0? | describe -d | get type
+                        if not ($fst in ['list', 'record'])  {
+                            return $acc
+                        }
                         let r = $acc | where value == $x
                         if ($r | is-empty) {
                             $acc
