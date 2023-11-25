@@ -24,17 +24,8 @@ export def new [filename:string = ','] {
         }
     }
 
-    def compos [context: string, offset: int] {
-        let argv = $context
-            | str substring 0..$offset
-            | split row -r '\\s+'
-            | range 1..
-            | where not \($it | str starts-with '-')
-        match \($argv | length) {
-            1 => []
-            2 => []
-            _ => []
-        }
+    def compos [...context] {
+        $context | completion-generator positional []
     }
     "
     | unindent

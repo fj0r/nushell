@@ -32,6 +32,7 @@ use pwd-module.nu *
 #use direnv.nu *
 #use ime.nu *
 use taskfile.nu
+use completion-generator.nu
 
 ####use starship.nu *
 use network.nu *
