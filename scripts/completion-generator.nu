@@ -1,5 +1,6 @@
 export def 'from tree' [
-    schema --cmd-len(-c)=1
+    schema
+    --cmd-len(-c) = 1
     --selector = {value: 'value', description: 'description', next: 'next'}
 ] {
     let ctx = $in
@@ -8,7 +9,6 @@ export def 'from tree' [
         | split row -r '\s+'
         | range $cmd_len..
         | where not ($it | str starts-with '-')
-    let argl = $argv | length
     let menu = $argv
         | reduce -f $schema {|x, acc|
             if ($x | is-empty) {
@@ -27,7 +27,7 @@ export def 'from tree' [
                         if not ($fst in ['list', 'record'])  {
                             return $acc
                         }
-                        let r = $acc | where value == $x
+                        let r = $acc | filter {|i| ($i | get $selector.value) == $x}
                         if ($r | is-empty) {
                             $acc
                         } else {
@@ -68,11 +68,25 @@ export def 'from tree' [
     }
 }
 
-export def math [...args:string@compos] {
+export def flare [...args:string@comflare] {
     print ($args | str join ' -> ')
 }
 
-def compos [...context] {
+def comflare [...context] {
+    if not ('~/.cache/flare.json' | path exists) {
+        http get https://gist.githubusercontent.com/curran/d2656e98b489648ab3e2071479ced4b1/raw/9f2499d63e971c2110e52b3fa2066ebed234828c/flare-2.json
+        | to json
+        | save ~/.cache/flare.json
+    }
+    let data = open ~/.cache/flare.json
+    $context | from tree -c 2 --selector {value: name, description: value, next: children } [$data]
+}
+
+export def math [...args:string@commath] {
+    print ($args | str join ' -> ')
+}
+
+def commath [...context] {
     $context | from tree -c 2 [
         {
             value: Count
@@ -160,3 +174,4 @@ def compos [...context] {
         }
     ]
 }
+
