@@ -1,5 +1,6 @@
 export def 'from tree' [
     schema --cmd-len(-c)=1
+    --selector = {value: 'value', description: 'description', next: 'next'}
 ] {
     let ctx = $in
     let argv = $ctx.0
@@ -30,7 +31,7 @@ export def 'from tree' [
                         if ($r | is-empty) {
                             $acc
                         } else {
-                            let r = $r | first | get next
+                            let r = $r | first | get $selector.next
                             if ($r | describe -d | get type) == 'closure' {
                                do $r $x $acc
                             } else {
@@ -54,7 +55,16 @@ export def 'from tree' [
                 }
             }
         }
-        list => { $menu }
+        list => {
+            if ($menu.0? | describe -d | get type) == 'record' {
+                $menu
+                | each {|x| {$selector.value: null, $selector.description: null} | merge $x }
+                | select $selector.value $selector.description
+                | rename value description
+            } else {
+                $menu
+            }
+        }
     }
 }
 
