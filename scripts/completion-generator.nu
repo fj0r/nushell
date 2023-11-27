@@ -1,4 +1,4 @@
-export def positional [
+export def 'from tree' [
     schema --cmd-len(-c)=1
 ] {
     let ctx = $in
@@ -63,7 +63,7 @@ export def math [...args:string@compos] {
 }
 
 def compos [...context] {
-    $context | positional -c 2 [
+    $context | from tree -c 2 [
         {
             value: Count
             description: closure

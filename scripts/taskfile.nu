@@ -25,7 +25,7 @@ export def new [filename:string = ','] {
     }
 
     def compos [...context] {
-        $context | completion-generator positional []
+        $context | completion-generator from tree []
     }
     "
     | unindent

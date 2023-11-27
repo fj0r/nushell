@@ -42,7 +42,7 @@ export def main [...args:string@compos] {
 }
 
 def compos [...context] {
-    $context | completion-generator positional [
+    $context | completion-generator from tree [
         export
     ]
 }
