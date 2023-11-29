@@ -882,7 +882,8 @@ export def "kclean stucked ns" [ns: string] {
 
 export alias "kclean finalizer" = kubectl patch -p '{\"metadata\":{\"finalizers\":null}}'
 
-export alias "kadm renew" = kubeadm alpha certs renew all
+export alias "kadm check" = kubeadm certs check-expiration
+export alias "kadm renew" = kubeadm certs renew all
 
 ### cert-manager
 export def kgcert [] {

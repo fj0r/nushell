@@ -1,3 +1,11 @@
+def resolve-closure [args] {
+    if ($in | describe -d | get type) == 'closure' {
+        do $in $args
+    } else {
+        $in
+    }
+}
+
 export def 'from tree' [
     schema
     --cmd-len(-c) = 1
@@ -10,42 +18,41 @@ export def 'from tree' [
         | range $cmd_len..
         | where not ($it | str starts-with '-')
     let menu = $argv
-        | reduce -f $schema {|x, acc|
+        | reduce -f {schema: $schema, path: []} {|x, acc|
+            let acc = $acc | update path ($acc.path | append $x)
             if ($x | is-empty) {
                 $acc
             } else {
-                match ($acc | describe -d | get type) {
+                match ($acc.schema | describe -d | get type) {
                     record => {
-                        if $x in $acc {
-                            $acc | get $x
+                        if $x in $acc.schema {
+                            $acc | update schema ($acc.schema | get $x | resolve-closure $acc.path)
                         } else {
                             $acc
                         }
                     }
                     list => {
-                        let fst = $acc.0? | describe -d | get type
+                        let fst = $acc.schema.0? | describe -d | get type
                         if not ($fst in ['list', 'record'])  {
-                            return $acc
-                        }
-                        let r = $acc | filter {|i| ($i | get $selector.value) == $x}
-                        if ($r | is-empty) {
                             $acc
                         } else {
-                            let r = $r | first | get $selector.next
-                            if ($r | describe -d | get type) == 'closure' {
-                               do $r $x $acc
+                            let r = $acc.schema | filter {|i| ($i | get $selector.value) == $x}
+                            if ($r | is-empty) {
+                                $acc
                             } else {
-                               $r
+                                $acc | update schema ($r | first | get $selector.next | resolve-closure $acc.path)
                             }
                         }
                     }
-                    _ => { $acc }
+                    _ => {
+                        $acc
+                    }
                 }
             }
         }
-    match ($menu | describe -d | get type) {
+    match ($menu.schema | describe -d | get type) {
         record => {
-            $menu
+            $menu.schema
             | transpose k v
             | each {|i|
                 if ($i.v | describe -d | get type) == 'string' {
@@ -56,13 +63,13 @@ export def 'from tree' [
             }
         }
         list => {
-            if ($menu.0? | describe -d | get type) == 'record' {
-                $menu
+            if ($menu.schema.0? | describe -d | get type) == 'record' {
+                $menu.schema
                 | each {|x| {$selector.value: null, $selector.description: null} | merge $x }
                 | select $selector.value $selector.description
                 | rename value description
             } else {
-                $menu
+                $menu.schema
             }
         }
     }
@@ -91,7 +98,7 @@ def commath [...context] {
         {
             value: Count
             description: closure
-            next: {|x, acc| [$x] | append ['---'] | append $acc }
+            next: {|path| $path}
         }
         {
             value: PureMathematics
