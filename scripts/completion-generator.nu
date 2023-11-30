@@ -1,11 +1,3 @@
-def resolve-closure [args] {
-    if ($in | describe -d | get type) == 'closure' {
-        do $in $args
-    } else {
-        $in
-    }
-}
-
 export def 'from tree' [
     schema
     --cmd-len(-c) = 1
@@ -26,7 +18,7 @@ export def 'from tree' [
                 match ($acc.schema | describe -d | get type) {
                     record => {
                         if $x in $acc.schema {
-                            $acc | update schema ($acc.schema | get $x | resolve-closure $acc.path)
+                            $acc | merge { schema: ($acc.schema | get $x) }
                         } else {
                             $acc
                         }
@@ -40,13 +32,20 @@ export def 'from tree' [
                             if ($r | is-empty) {
                                 $acc
                             } else {
-                                $acc | update schema ($r | first | get $selector.next | resolve-closure $acc.path)
+                                $acc | merge { schema: ($r | first | get $selector.next) }
                             }
                         }
                     }
                     _ => {
                         $acc
                     }
+                }
+            }
+            | update schema {|x|
+                if ($x.schema | describe -d | get type) == 'closure' {
+                    do $x.schema $x.path
+                } else {
+                    $x.schema
                 }
             }
         }
