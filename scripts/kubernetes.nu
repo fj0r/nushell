@@ -541,11 +541,15 @@ export def kgno [] {
     | rename name status roles age version internal-ip external-ip os kernel runtime
 }
 
-def "nu-complete kube pods" [context: string, offset: int] {
+def "nu-complete kube deploys and pods" [context: string, offset: int] {
     let ctx = ($context | argx parse)
     let ns = (do -i { $ctx | get namespace })
     let ns = (spr [-n $ns])
-    kubectl get $ns pods | from ssv -a | get NAME
+    if ($ctx._pos.pod? | default '' | str ends-with '-') {
+        kubectl get $ns pods | from ssv -a | get NAME
+    } else {
+        kubectl get $ns deployments | from ssv -a | get NAME | each {|x| $"($x)-"}
+    }
 }
 
 def "nu-complete kube ctns" [context: string, offset: int] {
@@ -601,14 +605,20 @@ export def kdp [
 
 # kubectl attach (exec -it)
 export def ka [
-    pod?: string@"nu-complete kube pods"
+    pod?: string@"nu-complete kube deploys and pods"
     --namespace (-n): string@"nu-complete kube ns"
     --container(-c): string@"nu-complete kube ctns"
     --selector(-l): string
     ...args
 ] {
     let n = (spr [-n $namespace])
-    let pod = if ($selector | is-empty) { $pod } else {
+    let pod = if ($selector | is-empty) {
+        if ($pod | str ends-with '-') {
+            $"deployment/($pod | str substring ..-1)"
+        } else {
+            $pod
+        }
+        } else {
         let pods = (
             kubectl get pods $n -o wide -l $selector
             | from ssv -a
@@ -642,7 +652,7 @@ export def ka [
 
 # kubectl logs
 export def kl [
-    pod: string@"nu-complete kube pods"
+    pod: string@"nu-complete kube deploys and pods"
     --namespace(-n): string@"nu-complete kube ns"
     --container(-c): string@"nu-complete kube ctns"
     --follow(-f)
@@ -652,7 +662,12 @@ export def kl [
     let c = (spr [-c $container])
     let f = (sprb $follow [-f])
     let p = (sprb $previous [-p])
-    kubectl logs $n $f $p $pod $c
+    let trg = if ($pod | str ends-with '-') {
+        $"deployment/($pod | str substring ..-1)"
+        } else {
+            $pod
+        }
+    kubectl logs $n $f $p $trg $c
 }
 
 def "nu-complete port forward type" [] {

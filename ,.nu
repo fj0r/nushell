@@ -1,6 +1,6 @@
 export def main [...args:string@compos] {
     let manifest = {
-        completion-generator.nu: modules/completion-generator
+        #completion-generator.nu: modules/completion-generator
         argx.nu:                 modules/argx
         taskfile.nu:             modules/taskfile
         ssh.nu:                  modules/network
