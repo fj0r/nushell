@@ -54,16 +54,6 @@ use power.nu
 power init
 
 
-# if not (which atuin | is-empty) {
-#     source atuin.nu
-# }
-
-const USRCFG = '~/.nu'
-const USRCFG = if ($USRCFG | path expand | path exists) {
-    $USRCFG
-} else { 'dummy.nu' }
-source $USRCFG
-
 const plugin_query = ($nu.current-exe | path dirname | path join (
     if $nu.os-info.family == 'windows' { 'nu_plugin_query.exe' } else { 'nu_plugin_query' }
 ))

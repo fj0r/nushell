@@ -756,5 +756,11 @@ $env.config = {
     ]
 }
 
+const USRCFG = '~/.nu'
+const USRCFG = if ($USRCFG | path expand | path exists) {
+    $USRCFG
+} else { 'dummy.nu' }
+source $USRCFG
+
 source __env.nu
 source __config.nu
