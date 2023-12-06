@@ -307,7 +307,10 @@ export def container-create [
     let privileged = if $privileged {[--privileged]} else {[]}
     let appimage = if $appimage {[--device /dev/fuse]} else {[]}
     let netadmin = if $netadmin {[--cap-add=NET_ADMIN --device /dev/net/tun]} else {[]}
-    let clip = if $with_x {[-e DISPLAY -v /tmp/.X11-unix:/tmp/.X11-unix]} else {[]}
+    let with_x = if $with_x {[
+        -e $"DISPLAY=($env.DISPLAY)"
+        -v /tmp/.X11-unix:/tmp/.X11-unix
+        ]} else {[]}
     let ssh = if ($ssh|is-empty) { [] } else {
         let sshkey = cat ([$env.HOME .ssh $ssh] | path join) | split row ' ' | get 1
         [-e $"ed25519_($sshuser)=($sshkey)"]
@@ -323,7 +326,7 @@ export def container-create [
     let args = [
         $privileged $entrypoint $attach $daemon
         $ports $envs $ssh $proxy
-        $debug $appimage $netadmin $clip
+        $debug $appimage $netadmin $with_x
         $mnt $vols $workdir $cache
     ] | flatten
     let name = $"($img | split row '/' | last | str replace ':' '-')_(date now | format date %m%d%H%M)"
