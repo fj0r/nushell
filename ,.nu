@@ -2,7 +2,7 @@ export def main [...args:string@compos] {
     let manifest = {
         #completion-generator.nu: modules/completion-generator
         argx.nu:                 modules/argx
-        taskfile.nu:             modules/taskfile
+        #taskfile.nu:             modules/taskfile
         ssh.nu:                  modules/network
         docker.nu:               modules/docker
         kubernetes.nu:           modules/kubernetes
