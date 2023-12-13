@@ -12,10 +12,8 @@ def agree [
     ( if $default_not { [no yes] } else { [yes no] } | input list $prompt) in [yes]
 }
 
-def --wrapped with-flag [...ns] {
-    if ($in | is-empty) { [] } else {
-        [$ns $in] | flatten
-    }
+def --wrapped with-flag [...flag] {
+    if ($in | is-empty) { [] } else { [...$flag $in] }
 }
 
 # git status

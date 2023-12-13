@@ -7,10 +7,8 @@ export-env {
     }
 }
 
-def --wrapped with-flag [...ns] {
-    if ($in | is-empty) { [] } else {
-        [$ns $in] | flatten
-    }
+def --wrapped with-flag [...flag] {
+    if ($in | is-empty) { [] } else { [...$flag $in] }
 }
 
 def local_image [name] {
