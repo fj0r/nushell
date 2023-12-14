@@ -28,11 +28,10 @@ use docker.nu *
 #use timeit.nu *
 use sh.nu *
 #use pwd-overlay.nu *
-use pwd-module.nu *
 #use direnv.nu *
 #use ime.nu *
 use completion-generator.nu
-use taskfile.nu
+use comma.nu
 
 ####use starship.nu *
 use network.nu *
