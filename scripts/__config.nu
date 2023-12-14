@@ -12,8 +12,6 @@ $env.config.table.padding.left = 0
 
 #use utils.nu
 use nvim.nu *
-use after.nu *
-use timelog.nu *
 use cwdhist.nu *
 use nushell.nu *
 use sys.nu *

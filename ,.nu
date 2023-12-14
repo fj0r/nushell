@@ -9,7 +9,6 @@ export def main [...args:string@compos] {
         git.nu:                  modules/git/git-v2.nu
         git.md:                  modules/git/README.md
         nvim.nu:                 modules/nvim
-        after.nu:                modules/after
         log.nu:                  modules/log
 
         #just.nu:                custom-completions/just/just-completions.nu
