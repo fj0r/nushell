@@ -6,6 +6,21 @@ export def unindent [] {
     | str join (char newline)
 }
 
+export def 'path parents' [] {
+    $in
+    | path expand
+    | path split
+    | reduce -f [ '' ] {|x, acc| [( $acc.0 | path join $x ), ...$acc] }
+    | range ..-2
+}
+
+def find [] {
+    $in
+    | path parents
+    | filter {|x| $x | path join ',.nu' | path exists }
+    | get 0?
+}
+
 def pwd_module [] {
     [
         {
@@ -35,6 +50,10 @@ export-env {
     })
 }
 
+export def edit [] {
+    ^$env.EDITOR ,.nu
+}
+
 export def new [filename:string = ','] {
     $"
     def --env export-environment [] {
@@ -47,7 +66,7 @@ export def new [filename:string = ','] {
         export-environment
         match $args.0? {
             _ => {
-                print $\"created: \($env.created_at)\" 
+                print $\"created: \($env.created_at)\"
             }
         }
     }
