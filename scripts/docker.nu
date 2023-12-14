@@ -207,13 +207,15 @@ export def image-tag [from: string@"nu-complete docker images"  to: string -n: s
 }
 
 # push image
-export def image-push [img: string@"nu-complete docker images" -n: string@"nu-complete docker ns"] {
-    ^$env.docker-cli ($n | with-flag -n) push $img
+export def image-push [img: string@"nu-complete docker images" -n: string@"nu-complete docker ns" -i] {
+    let $insecure = if $i {[--insecure-registry]} else {[]}
+    ^$env.docker-cli ($n | with-flag -n) $insecure push $img
 }
 
 # pull image
-export def image-pull [img -n: string@"nu-complete docker ns"] {
-    ^$env.docker-cli ($n | with-flag -n) pull $img
+export def image-pull [img -n: string@"nu-complete docker ns" -i] {
+    let $insecure = if $i {[--insecure-registry]} else {[]}
+    ^$env.docker-cli ($n | with-flag -n) $insecure pull $img
 }
 
 ### list volume
