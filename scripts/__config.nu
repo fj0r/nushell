@@ -30,6 +30,7 @@ use sh.nu *
 #use ime.nu *
 use completion-generator.nu
 use comma.nu
+use task.nu
 
 ####use starship.nu *
 use network.nu *
