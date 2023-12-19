@@ -50,29 +50,125 @@ export-env {
     })
 }
 
-export def edit [] {
-    ^$env.EDITOR ,.nu
+def first-type [type] {
+    for i in $in {
+        if ($i | describe -d).type == $type {
+            return $i
+        }
+    }
+}
+
+export def run [tbl] {
+    let loc = $in
+    mut act = $tbl
+    mut arg = []
+    for i in $loc {
+        if ($act | describe -d).type == 'closure' {
+            $arg ++= [$i]
+        } else {
+            if ($i in $act) {
+                let n = $act | get $i
+                if ($n | describe -d).type == 'list' {
+                    $act = $n.0
+                } else {
+                    $act = $n
+                }
+            } else {
+                $act = {|| print $"not found `($i)`"}
+                break
+            }
+        }
+    }
+    let at = ($act | describe -d).type
+    match $at {
+        closure => { do $act $arg }
+        record => { print $'require argument: ($act | columns)' }
+        _ => { 'oops' }
+    }
+}
+
+export def 'parse argv' [] {
+    let context = $in
+    $context.0
+    | str substring 0..$context.1
+    | split row -r '\s+'
+    | range 1..
+    | where not ($it | str starts-with '-')
+}
+
+export def log [] {
+    let o = $in
+    if ($o | is-empty) {
+        echo $'---(char newline)' | save -f ~/.cache/comma.log
+    } else {
+        $o | to yaml | save -a ~/.cache/comma.log
+    }
+    $o
+}
+
+export def complete [tbl] {
+    let argv = $in
+    mut tbl = $env.comma
+    for i in ($argv | default []) {
+        let c = if ($i | is-empty) { $tbl } else { $tbl | get $i }
+        if ($c | describe -d).type == 'list' {
+            if ($c.0 | describe -d).type == 'closure' {
+                let x = $c | range 1.. | first-type 'closure'
+                $tbl = (do $x)
+            } else {
+                $tbl = $c.0
+            }
+        } else {
+            $tbl = $c
+        }
+    }
+    match ($tbl | describe -d).type {
+        record => {
+            $tbl
+            | transpose k v
+            | each {|x|
+                if ($x.v | describe -d).type == 'list' {
+                    let d = $x.v | range 1.. | first-type 'string'
+                    { value: $x.k, description: $d }
+                } else {
+                    $x.k
+                }
+            }
+        }
+        _ => { $tbl }
+    }
 }
 
 export def new [filename:string = ','] {
     $"
-    def --env export-environment [] {
-        $env.created_at = '(date now | format date '%Y-%m-%d[%w]%H:%M:%S')'
-    }
-
-
-
-    export def main [...args:string@compos] {
-        export-environment
-        match $args.0? {
-            _ => {
-                print $\"created: \($env.created_at)\"
+    export-env {
+        $env.comma = {
+            created-at: { '(date now | format date '%Y-%m-%d[%w]%H:%M:%S')' }
+            hello: [{|x| print $'hello \($x\)' }, 'hello \(x\)']
+            edit: { ^$env.EDITOR ,.nu }
+            a: {
+                b: {
+                    c: [{|x| print $x }, 'description', {|| ls | get name } ]
+                    d: { pwd }
+                }
+                x: [
+                    {
+                        y: [{|x| print y}, {|| [y1 y2 y3]}, 'description']
+                    },
+                    'xxx'
+                ]
             }
         }
     }
 
     def compos [...context] {
-        $context | completion-generator from tree {}
+        $context
+        | comma parse argv
+        | comma complete $env.comma
+    }
+
+    export def main [...args:string@compos] {
+        $args | comma run $env.comma
     }
     "
     | unindent
