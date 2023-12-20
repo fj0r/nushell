@@ -32,13 +32,13 @@ $env.comma_vars = {
 
 $env.comma = {
     export: {
-        $env.commax.act: {|argv, cv|
+        $env.comm.act: {|argv, cv|
             $cv.manifest
             | transpose k v
             | each {|x|
                 cp -v $'($env.PWD)/scripts/($x.k)' $'($cv.dest)/($x.v)'
             }
         }
-        $env.commax.dsc: 'export files to nu_scripts'
+        $env.comm.dsc: 'export files to nu_scripts'
     }
 }

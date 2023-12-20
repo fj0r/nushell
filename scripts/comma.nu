@@ -48,7 +48,7 @@ export-env {
             $o | append $val
         }
     })
-    $env.commax = ([sub dsc act cmp] | gendict 5)
+    $env.comm = ([sub dsc act cmp] | gendict 5)
 }
 
 def gendict [size: int = 5] {
@@ -80,7 +80,7 @@ def log [tag? -c] {
 
 def 'as act' [] {
     let o = $in
-    let ix = $env.commax
+    let ix = $env.comm
     let t = ($o | describe -d).type
     if $t == 'closure' {
         { $ix.act: $o }
@@ -95,7 +95,7 @@ def 'as act' [] {
 
 def run [tbl] {
     let loc = $in
-    let ix = $env.commax
+    let ix = $env.comm
     mut act = $tbl
     mut arg = []
     for i in $loc {
@@ -126,7 +126,7 @@ def run [tbl] {
 
 def complete [tbl] {
     let argv = $in
-    let ix = $env.commax
+    let ix = $env.comm
     mut tbl = $env.comma
     for i in $argv {
         let c = if ($i | is-empty) {
@@ -215,26 +215,26 @@ export def , [
                 }
 
                 $env.comma = {
-                    created: { '(date now | format date '%Y-%m-%d[%w]%H:%M:%S')' }
+                    created: {|a, e| '(date now | format date '%Y-%m-%d[%w]%H:%M:%S')' }
                     hello: {
-                        $env.commax.act: {|args, vars| print $'hello \($args\)' }
-                        $env.commax.dsc: 'hello \(x\)'
-                        $env.commax.cmp: {|args, vars| $args}
+                        $env.comm.act: {|args, vars| print $'hello \($args\)' }
+                        $env.comm.dsc: 'hello \(x\)'
+                        $env.comm.cmp: {|args, vars| $args}
                     }
                     open: {
-                        $env.commax.sub: {
+                        $env.comm.sub: {
                             any: {
-                                $env.commax.act: {|x| open $x.0}
-                                $env.commax.cmp: {ls | get name}
-                                $env.commax.dsc: 'open a file'
+                                $env.comm.act: {|a, e| open $a.0}
+                                $env.comm.cmp: {ls | get name}
+                                $env.comm.dsc: 'open a file'
                             }
                             json: {
-                                $env.commax.act: {|x| open $x.0}
-                                $env.commax.cmp: {ls *.json | get name}
-                                $env.commax.dsc: 'open a json file'
+                                $env.comm.act: {|a, e| open $a.0}
+                                $env.comm.cmp: {ls *.json | get name}
+                                $env.comm.dsc: 'open a json file'
                             }
                         }
-                        $env.commax.dsc: 'open a file'
+                        $env.comm.dsc: 'open a file'
                     }
                 }
                 "
