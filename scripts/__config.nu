@@ -29,7 +29,7 @@ use sh.nu *
 #use direnv.nu *
 #use ime.nu *
 use completion-generator.nu
-use comma.nu *
+use comma.nu ,
 use task.nu
 
 ####use starship.nu *

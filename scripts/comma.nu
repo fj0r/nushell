@@ -80,14 +80,6 @@ def log [tag? -c] {
     $o
 }
 
-def first-type [type] {
-    for i in $in {
-        if ($i | describe -d).type == $type {
-            return $i
-        }
-    }
-}
-
 def 'as act' [] {
     let o = $in
     let ix = $env.commax
@@ -204,28 +196,31 @@ export def , [...args:string@compos] {
             let a = [yes no] | input list 'create ,.nu?'
             if $a == 'yes' {
                 $"
-                let _ix = $env.commax
+                $env.commav = {
+
+                }
+
                 $env.comma = {
                     created: { '(date now | format date '%Y-%m-%d[%w]%H:%M:%S')' }
                     hello: {
-                        $_ix.act: {|x| print $'hello \($x\)' }
-                        $_ix.dsc: 'hello \(x\)'
-                        $_ix.cmp: {|args| $args}
+                        $env.commax.act: {|x| print $'hello \($x\)' }
+                        $env.commax.dsc: 'hello \(x\)'
+                        $env.commax.cmp: {|args| $args}
                     }
                     open: {
-                        $_ix.sub: {
+                        $env.commax.sub: {
                             any: {
-                                $_ix.act: {|x| open $x.0}
-                                $_ix.cmp: {ls | get name}
-                                $_ix.dsc: 'open a yaml file'
+                                $env.commax.act: {|x| open $x.0}
+                                $env.commax.cmp: {ls | get name}
+                                $env.commax.dsc: 'open a file'
                             }
                             json: {
-                                $_ix.act: {|x| open $x.0}
-                                $_ix.cmp: {ls *.json | get name}
-                                $_ix.dsc: 'open a json file'
+                                $env.commax.act: {|x| open $x.0}
+                                $env.commax.cmp: {ls *.json | get name}
+                                $env.commax.dsc: 'open a json file'
                             }
                         }
-                        $_ix.dsc: 'open a file'
+                        $env.commax.dsc: 'open a file'
                     }
                 }
                 "

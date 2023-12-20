@@ -1,5 +1,5 @@
-export def main [...args:string@compos] {
-    let manifest = {
+$env.commav = {
+    manifest: {
         #completion-generator.nu: modules/completion-generator
         argx.nu:                 modules/argx
         #taskfile.nu:             modules/taskfile
@@ -21,28 +21,23 @@ export def main [...args:string@compos] {
         power.md:                modules/prompt/powerline/README.md
 
         cwdhist.nu:              modules/cwdhist
+        comma.nu:                modules/comma
 
         #direnv.nu:              hooks/direnv
         #dynamic-load.nu:        hooks/dynamic-load
         #zoxide-menu.nu:         custom-menus
     }
-
-    let dest = $"($env.HOME)/world/nu_scripts"
-
-    match $args.0 {
-        'export' => {
-            $manifest
+    dest: $"($env.HOME)/world/nu_scripts"
+}
+$env.comma = {
+    export: {
+        $env.commax.act: {
+            $env.commav.manifest
             | transpose k v
             | each {|x|
-                cp -v $'($env.PWD)/scripts/($x.k)' $'($dest)/($x.v)'
+                cp -v $'($env.PWD)/scripts/($x.k)' $'($env.commav.dest)/($x.v)'
             }
         }
+        $env.commax.dsc: 'export files to nu_scripts'
     }
 }
-
-def compos [...context] {
-    $context | completion-generator from tree [
-        export
-    ]
-}
-
