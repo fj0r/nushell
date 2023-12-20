@@ -1,4 +1,4 @@
-export def unindent [] {
+def unindent [] {
     let txt = $in | lines | range 1..
     let indent = $txt.0 | parse --regex '^(?P<indent>\s*)' | get indent.0 | str length
     $txt
@@ -6,7 +6,7 @@ export def unindent [] {
     | str join (char newline)
 }
 
-export def 'path parents' [] {
+def 'path parents' [] {
     $in
     | path expand
     | path split
@@ -21,18 +21,18 @@ def find [] {
     | get 0?
 }
 
-def pwd_module [] {
+def comma_file [] {
     [
         {
           condition: {|_, after| not ($after | path join ',.nu' | path exists)}
-          code: "hide ,"
+          code: "$env.comma = null"
         }
         {
           condition: {|_, after| $after | path join ',.nu' | path exists}
           code: "
-          print $'(ansi default_underline)(ansi default_bold),(ansi reset) module (ansi green_italic)detected(ansi reset)...'
-          print $'(ansi yellow_italic)activating(ansi reset) (ansi default_underline)(ansi default_bold),(ansi reset) module with `(ansi default_dimmed)(ansi default_italic)use ,.nu(ansi reset)`'
-          use ,.nu
+          print $'(ansi default_underline)(ansi default_bold),(ansi reset).nu (ansi green_italic)detected(ansi reset)...'
+          print $'(ansi yellow_italic)activating(ansi reset) (ansi default_underline)(ansi default_bold),(ansi reset) module with `(ansi default_dimmed)(ansi default_italic)source ,.nu(ansi reset)`'
+          source ,.nu
           "
         }
     ]
@@ -41,13 +41,43 @@ def pwd_module [] {
 export-env {
     $env.config = ( $env.config | upsert hooks.env_change.PWD { |config|
         let o = ($config | get -i hooks.env_change.PWD)
-        let val = (pwd_module)
+        let val = (comma_file)
         if $o == null {
             $val
         } else {
             $o | append $val
         }
     })
+    let k = (gensym)
+    $env.commax = {
+        sub: $k.0
+        dsc: $k.1
+        act: $k.2
+        cmp: $k.3
+    }
+}
+
+def gensym [] {
+    mut r = []
+    let rk = random chars
+    for i in 1..4 {
+        let b = ($i - 1) * 5
+        let e = $i * 5
+        $r ++= [($rk | str substring $b..$e)]
+    }
+    $r
+    # TODO: debug
+    [sub dsc act cmp]
+}
+
+def log [tag? -c] {
+    let o = $in
+    if ($c) {
+        echo $'---(char newline)' | save -f ~/.cache/comma.log
+    } else {
+        echo $'---($tag)---($o | describe)(char newline)($o | to yaml)' | save -a ~/.cache/comma.log
+    }
+    $o
 }
 
 def first-type [type] {
@@ -58,66 +88,76 @@ def first-type [type] {
     }
 }
 
-export def run [tbl] {
+def 'as act' [] {
+    let o = $in
+    let ix = $env.commax
+    let t = ($o | describe -d).type
+    if $t == 'closure' {
+        { $ix.act: $o }
+    } else if ($ix.sub in $o) {
+        null
+    } else if ($ix.act in $o) {
+        $o
+    } else {
+        null
+    }
+}
+
+def run [tbl] {
     let loc = $in
+    let ix = $env.commax
     mut act = $tbl
     mut arg = []
     for i in $loc {
-        if ($act | describe -d).type == 'closure' {
-            $arg ++= [$i]
-        } else {
-            if ($i in $act) {
+        let a = $act | as act
+        if ($a | is-empty) {
+            if ($ix.sub in $act) and ($i in ($act | get $ix.sub)) {
+                let n = $act | get $ix.sub | get $i
+                $act = $n
+            } else if $i in $act {
                 let n = $act | get $i
-                if ($n | describe -d).type == 'list' {
-                    $act = $n.0
-                } else {
-                    $act = $n
-                }
+                $act = $n
             } else {
                 $act = {|| print $"not found `($i)`"}
                 break
             }
+        } else {
+            $arg ++= [$i]
         }
     }
-    let at = ($act | describe -d).type
-    match $at {
-        closure => { do $act $arg }
-        record => { print $'require argument: ($act | columns)' }
-        _ => { 'oops' }
-    }
-}
-
-export def 'parse argv' [] {
-    let context = $in
-    $context.0
-    | str substring 0..$context.1
-    | split row -r '\s+'
-    | range 1..
-    | where not ($it | str starts-with '-')
-}
-
-export def log [] {
-    let o = $in
-    if ($o | is-empty) {
-        echo $'---(char newline)' | save -f ~/.cache/comma.log
+    let a = $act | as act
+    if ($a | is-empty) {
+        let c = if $ix.sub in $act { $act | get $ix.sub | columns } else { $act | columns }
+        print $'require argument: ($c)'
     } else {
-        $o | to yaml | save -a ~/.cache/comma.log
+        do ($a | get $ix.act) $arg
     }
-    $o
 }
 
-export def complete [tbl] {
+def complete [tbl] {
     let argv = $in
+    let ix = $env.commax
     mut tbl = $env.comma
-    for i in ($argv | default []) {
-        let c = if ($i | is-empty) { $tbl } else { $tbl | get $i }
-        if ($c | describe -d).type == 'list' {
-            if ($c.0 | describe -d).type == 'closure' {
-                let x = $c | range 1.. | first-type 'closure'
-                $tbl = (do $x)
+    for i in $argv {
+        let c = if ($i | is-empty) {
+            $tbl
+        } else {
+            let tp =  ($tbl | describe -d).type
+            if ($tp == 'record') and ($i in $tbl) {
+                let j = $tbl | get $i
+                if $ix.sub in $j {
+                    $j | get $ix.sub
+                } else {
+                    $j
+                }
             } else {
-                $tbl = $c.0
+                $tbl
             }
+        }
+        let a = $c | as act
+        if not ($a | is-empty) {
+            let r = do ($a | get $ix.cmp) $argv
+            $tbl = $r
         } else {
             $tbl = $c
         }
@@ -127,51 +167,74 @@ export def complete [tbl] {
             $tbl
             | transpose k v
             | each {|x|
-                if ($x.v | describe -d).type == 'list' {
-                    let d = $x.v | range 1.. | first-type 'string'
-                    { value: $x.k, description: $d }
+                if ($x.v | describe -d).type == 'closure' {
+                    $x.k
+                } else if $ix.dsc in $x.v {
+                    { value: $x.k, description: ($x.v | get $ix.dsc) }
                 } else {
                     $x.k
                 }
             }
         }
+        list => { $tbl }
         _ => { $tbl }
     }
 }
 
-export def new [filename:string = ','] {
-    $"
-    export-env {
-        $env.comma = {
-            created-at: { '(date now | format date '%Y-%m-%d[%w]%H:%M:%S')' }
-            hello: [{|x| print $'hello \($x\)' }, 'hello \(x\)']
-            edit: { ^$env.EDITOR ,.nu }
-            a: {
-                b: {
-                    c: [{|x| print $x }, 'description', {|| ls | get name } ]
-                    d: { pwd }
-                }
-                x: [
-                    {
-                        y: [{|x| print y}, {|| [y1 y2 y3]}, 'description']
-                    },
-                    'xxx'
-                ]
-            }
-        }
-    }
-
-    def compos [...context] {
-        $context
-        | comma parse argv
-        | comma complete $env.comma
-    }
-
-    export def main [...args:string@compos] {
-        $args | comma run $env.comma
-    }
-    "
-    | unindent
-    | save $"($filename).nu"
+def 'parse argv' [] {
+    let context = $in
+    $context.0
+    | str substring 0..$context.1
+    | split row -r '\s+'
+    | range 1..
+    | where not ($it | str starts-with '-')
 }
 
+def compos [...context] {
+    $context
+    | parse argv
+    | complete $env.comma
+}
+
+export def , [...args:string@compos] {
+    if ($args | is-empty) {
+        if ([$env.PWD, ',.nu'] | path join | path exists) {
+            ^$env.EDITOR ,.nu
+        } else {
+            let a = [yes no] | input list 'create ,.nu?'
+            if $a == 'yes' {
+                $"
+                let _ix = $env.commax
+                $env.comma = {
+                    created: { '(date now | format date '%Y-%m-%d[%w]%H:%M:%S')' }
+                    hello: {
+                        $_ix.act: {|x| print $'hello \($x\)' }
+                        $_ix.dsc: 'hello \(x\)'
+                        $_ix.cmp: {|args| $args}
+                    }
+                    open: {
+                        $_ix.sub: {
+                            any: {
+                                $_ix.act: {|x| open $x.0}
+                                $_ix.cmp: {ls | get name}
+                                $_ix.dsc: 'open a yaml file'
+                            }
+                            json: {
+                                $_ix.act: {|x| open $x.0}
+                                $_ix.cmp: {ls *.json | get name}
+                                $_ix.dsc: 'open a json file'
+                            }
+                        }
+                        $_ix.dsc: 'open a file'
+                    }
+                }
+                "
+                | unindent
+                | save $",.nu"
+                #source ',.nu'
+            }
+        }
+    } else {
+        $args | run $env.comma
+    }
+}
