@@ -67,7 +67,7 @@ def gensym [] {
     }
     $r
     # TODO: debug
-    [sub dsc act cmp]
+    # [sub dsc act cmp]
 }
 
 def log [tag? -c] {
