@@ -29,10 +29,11 @@ $env.commav = {
     }
     dest: $"($env.HOME)/world/nu_scripts"
 }
+
 $env.comma = {
     export: {
-        $env.commax.act: {
-            $env.commav.manifest
+        $env.commax.act: {|argv, ev|
+            $ev.manifest
             | transpose k v
             | each {|x|
                 cp -v $'($env.PWD)/scripts/($x.k)' $'($env.commav.dest)/($x.v)'

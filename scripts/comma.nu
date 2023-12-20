@@ -48,26 +48,24 @@ export-env {
             $o | append $val
         }
     })
-    let k = (gensym)
-    $env.commax = {
-        sub: $k.0
-        dsc: $k.1
-        act: $k.2
-        cmp: $k.3
-    }
+    $env.commax = ([sub dsc act cmp env] | gendict 5)
 }
 
-def gensym [] {
-    mut r = []
-    let rk = random chars
-    for i in 1..4 {
-        let b = ($i - 1) * 5
-        let e = $i * 5
-        $r ++= [($rk | str substring $b..$e)]
+def gendict [size: int = 5] {
+    let keys = $in
+    mut k = []
+    let n = $keys | length
+    let rk = random chars -l ($n * $size)
+    for i in 1..$n {
+        let b = ($i - 1) * $size
+        let e = $i * $size
+        $k ++= [($rk | str substring $b..$e)]
     }
-    $r
-    # TODO: debug
-    # [sub dsc act cmp]
+    $keys
+    | zip $k
+    | reduce -f {} {|x, acc|
+        $acc | upsert $x.0 (if true { $x.1 } else { $x.0 })
+    }
 }
 
 def log [tag? -c] {
@@ -122,7 +120,7 @@ def run [tbl] {
         let c = if $ix.sub in $act { $act | get $ix.sub | columns } else { $act | columns }
         print $'require argument: ($c)'
     } else {
-        do ($a | get $ix.act) $arg
+        do ($a | get $ix.act) $arg $env.commav
     }
 }
 
@@ -148,7 +146,7 @@ def complete [tbl] {
         }
         let a = $c | as act
         if not ($a | is-empty) {
-            let r = do ($a | get $ix.cmp) $argv
+            let r = do ($a | get $ix.cmp) $argv $env.commav
             $tbl = $r
         } else {
             $tbl = $c
@@ -173,6 +171,11 @@ def complete [tbl] {
     }
 }
 
+def summary [] {
+    let o = $in
+    $o
+}
+
 def 'parse argv' [] {
     let context = $in
     $context.0
@@ -188,7 +191,18 @@ def compos [...context] {
     | complete $env.comma
 }
 
-export def , [...args:string@compos] {
+export def , [
+    --summary
+    --completion
+    ...args:string@compos
+] {
+    if $summary {
+        let r = $env.comma | summary | to json
+        return $r
+    }
+    if $completion {
+
+    }
     if ($args | is-empty) {
         if ([$env.PWD, ',.nu'] | path join | path exists) {
             ^$env.EDITOR ,.nu
