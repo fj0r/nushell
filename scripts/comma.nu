@@ -93,11 +93,27 @@ def 'as act' [] {
     }
 }
 
+def computed-env [args, vars] {
+    mut vs = {}
+    mut cls = []
+    for i in ($vars | transpose k v) {
+        if ($i.v | describe -d).type == 'closure' {
+            $cls ++= [$i]
+        } else {
+            $vs = ($vs | upsert $i.k $i.v)
+        }
+    }
+    for i in $cls {
+        $vs = ($vs | upsert $i.k (do $i.v $args $vs))
+    }
+    $vs
+}
+
 def run [tbl] {
     let loc = $in
     let ix = $env.comm
     mut act = $tbl
-    mut arg = []
+    mut argv = []
     for i in $loc {
         let a = $act | as act
         if ($a | is-empty) {
@@ -112,7 +128,7 @@ def run [tbl] {
                 break
             }
         } else {
-            $arg ++= [$i]
+            $argv ++= [$i]
         }
     }
     let a = $act | as act
@@ -120,7 +136,7 @@ def run [tbl] {
         let c = if $ix.sub in $act { $act | get $ix.sub | columns } else { $act | columns }
         print $'require argument: ($c)'
     } else {
-        do ($a | get $ix.act) $arg $env.comma_vars
+        do ($a | get $ix.act) $argv (computed-env $argv $env.comma_vars)
     }
 }
 
@@ -146,7 +162,7 @@ def complete [tbl] {
         }
         let a = $c | as act
         if not ($a | is-empty) {
-            let r = do ($a | get $ix.cmp) $argv $env.comma_vars
+            let r = do ($a | get $ix.cmp) $argv (computed-env null $env.comma_vars)
             $tbl = $r
         } else {
             $tbl = $c
@@ -201,7 +217,7 @@ export def , [
         return $r
     }
     if $completion {
-
+        return
     }
     if ($args | is-empty) {
         if ([$env.PWD, ',.nu'] | path join | path exists) {
@@ -211,11 +227,12 @@ export def , [
             if $a == 'yes' {
                 $"
                 $env.comma_vars = {
-
+                    created: '(date now | format date '%Y-%m-%d{%w}%H:%M:%S')'
+                    computed: {|a, e| $'\($e.created\)\($a\)' }
                 }
 
                 $env.comma = {
-                    created: {|a, e| '(date now | format date '%Y-%m-%d[%w]%H:%M:%S')' }
+                    created: {|a, e| $e.computed }
                     hello: {
                         $env.comm.act: {|args, vars| print $'hello \($args\)' }
                         $env.comm.dsc: 'hello \(x\)'
