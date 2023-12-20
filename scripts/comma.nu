@@ -48,7 +48,7 @@ export-env {
             $o | append $val
         }
     })
-    $env.commax = ([sub dsc act cmp env] | gendict 5)
+    $env.commax = ([sub dsc act cmp] | gendict 5)
 }
 
 def gendict [size: int = 5] {
@@ -120,7 +120,7 @@ def run [tbl] {
         let c = if $ix.sub in $act { $act | get $ix.sub | columns } else { $act | columns }
         print $'require argument: ($c)'
     } else {
-        do ($a | get $ix.act) $arg $env.commav
+        do ($a | get $ix.act) $arg $env.comma_vars
     }
 }
 
@@ -146,7 +146,7 @@ def complete [tbl] {
         }
         let a = $c | as act
         if not ($a | is-empty) {
-            let r = do ($a | get $ix.cmp) $argv $env.commav
+            let r = do ($a | get $ix.cmp) $argv $env.comma_vars
             $tbl = $r
         } else {
             $tbl = $c
@@ -210,16 +210,16 @@ export def , [
             let a = [yes no] | input list 'create ,.nu?'
             if $a == 'yes' {
                 $"
-                $env.commav = {
+                $env.comma_vars = {
 
                 }
 
                 $env.comma = {
                     created: { '(date now | format date '%Y-%m-%d[%w]%H:%M:%S')' }
                     hello: {
-                        $env.commax.act: {|x| print $'hello \($x\)' }
+                        $env.commax.act: {|args, vars| print $'hello \($args\)' }
                         $env.commax.dsc: 'hello \(x\)'
-                        $env.commax.cmp: {|args| $args}
+                        $env.commax.cmp: {|args, vars| $args}
                     }
                     open: {
                         $env.commax.sub: {

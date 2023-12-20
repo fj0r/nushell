@@ -1,4 +1,4 @@
-$env.commav = {
+$env.comma_vars = {
     manifest: {
         #completion-generator.nu: modules/completion-generator
         argx.nu:                 modules/argx
@@ -32,11 +32,11 @@ $env.commav = {
 
 $env.comma = {
     export: {
-        $env.commax.act: {|argv, ev|
-            $ev.manifest
+        $env.commax.act: {|argv, cv|
+            $cv.manifest
             | transpose k v
             | each {|x|
-                cp -v $'($env.PWD)/scripts/($x.k)' $'($env.commav.dest)/($x.v)'
+                cp -v $'($env.PWD)/scripts/($x.k)' $'($cv.dest)/($x.v)'
             }
         }
         $env.commax.dsc: 'export files to nu_scripts'
