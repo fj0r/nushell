@@ -58,8 +58,12 @@ $env.comma = {|_|{
             }
         }
         $_.cmp: {|a, e|
-            fd ',\.nu' ~
-            | lines
+            let s = fd ',\.nu' ~ | lines
+            $s
+            | each {|x| ls $x}
+            | flatten
+            | sort-by modified
+            | get name
         }
         $_.dsc: ',.nu -- commafile'
     }

@@ -48,7 +48,7 @@ export-env {
             $o | append $val
         }
     })
-    $env.comm = ([sub dsc act cmp flt cpu wth] | gendict 5)
+    $env.comm = ([log sub dsc act cmp flt cpu wth] | gendict 5)
 }
 
 def gendict [size: int = 5] {
@@ -125,7 +125,8 @@ def resolve-scope [args, vars, flts] {
 
 def get-comma [] {
     if ($env.comma | describe -d).type == 'closure' {
-        do $env.comma $env.comm
+        let dict = $env.comm | merge {$env.comm.log: {$in | log}}
+        do $env.comma $dict
     } else {
         $env.comma
     }
@@ -133,7 +134,8 @@ def get-comma [] {
 
 def get-scope [] {
     if ($env.comma_scope | describe -d).type == 'closure' {
-        do $env.comma_scope $env.comm
+        let dict = $env.comm | merge {$env.comm.log: {$in | log}}
+        do $env.comma_scope $dict
     } else {
         $env.comma_scope
     }
@@ -261,7 +263,7 @@ def complete [tbl] {
         }
         let a = $c | as act
         if not ($a | is-empty) {
-            let r = do ($a | get $ix.cmp) $argv (resolve-scope null (get-scope) null)
+            let r = do ($a | get $ix.cmp) $argv (resolve-scope null (get-scope) $flt)
             $tbl = $r
         } else {
             $tbl = $c
@@ -321,60 +323,8 @@ export def --wrapped , [
         if ([$env.PWD, ',.nu'] | path join | path exists) {
             ^$env.EDITOR ,.nu
         } else {
-            let a = [closure record no] | input list 'create ,.nu?'
-            if $a == 'record' {
-                $"
-                $env.comma_scope = {
-                    created: '(date now | format date '%Y-%m-%d{%w}%H:%M:%S')'
-                    computed: {$env.comm.cpu:{|a, s| $'\($s.created\)\($a\)' }}
-                    say: {|s| print $'\(ansi yellow_italic\)\($s\)\(ansi reset\)' }
-                    quick: {$env.comm.flt:{|a, s| do $s.say 'run a `quick` filter' }}
-                    slow: {$env.comm.flt:{|a, s|
-                        do $s.say 'run a `slow` filter'
-                        sleep 1sec
-                        do $s.say 'filter need to be declared'
-                        sleep 1sec
-                        $'\($s.computed\)<\($a\)>'
-                    }}
-                }
-
-                $env.comma = {
-                    created: {|a, s| $s.computed }
-                    open: {
-                        $env.comm.sub: {
-                            any: {
-                                $env.comm.act: {|a, s| open $a.0}
-                                $env.comm.cmp: {ls | get name}
-                                $env.comm.dsc: 'open a file'
-                            }
-                            json: {
-                                $env.comm.act: {|a, s| open $a.0}
-                                $env.comm.cmp: {ls *.json | get name}
-                                $env.comm.dsc: 'open a json file'
-                                $env.comm.wth: {
-                                    glob: '*.json'
-                                    op: ['Write', 'Create']
-                                }
-                            }
-                            scope: {
-                                $env.comm.act: {|a, s| print $'args: \($a\)'; $s }
-                                $env.comm.flt: ['slow']
-                                $env.comm.dsc: 'open scope'
-                                $env.comm.wth: {
-                                    interval: 2sec
-                                }
-                            }
-                        }
-                        $env.comm.dsc: 'open something'
-                        $env.comm.flt: ['quick']
-                    }
-                }
-                "
-                | unindent
-                | save $",.nu"
-                #source ',.nu'
-            }
-            if $a == 'closure' {
+            let a = [yes no] | input list 'create ,.nu?'
+            if $a == 'yes' {
                 $"
                 $env.comma_scope = {|_|{
                     created: '(date now | format date '%Y-%m-%d{%w}%H:%M:%S')'
