@@ -64,7 +64,7 @@ def gendict [size: int = 5] {
     $keys
     | zip $k
     | reduce -f {} {|x, acc|
-        $acc | upsert $x.0 (if true { $x.1 } else { $x.0 })
+        $acc | upsert $x.0 $"($x.0)_($x.1)"
     }
 }
 
