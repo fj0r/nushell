@@ -187,17 +187,29 @@ def run [tbl] {
     }
 }
 
-def enrich-desc [ctx] {
-    let o = $in
-    let f = if ($ctx.flt | is-empty) { '' } else { $" | ($ctx.flt | str join ' | ')" }
-    let w = if 'wth' in $ctx {
-        if ($ctx.wth | is-empty) {
+def enrich-desc [flt] {
+    let o = $in | log o
+    let _ = $env.comm
+    let flt = if $_.flt in $o.v { [...$flt, ...($o.v | get $_.flt)] } else { $flt }
+    let f = if ($flt | is-empty) { '' } else { $"($flt | str join '|')|" }
+    let w = if $_.wth in $o.v {
+        let w = $o.v | get $_.wth
+        if ($w | is-empty) {
             $"[watch]"
+        } else if ($w | str starts-with 'poll') {
+            $"[($w)]"
         } else {
-            $"[watch: ($ctx.wth)]"
+            $"[watch:($w)]"
         }
     } else { '' }
-    $"($o)($f)"
+
+    let suf = $"($w)($f)"
+    let suf = if ($suf | is-empty) { $suf } else { $"($suf) " }
+    if ($o.v | describe -d).type == 'record' {
+        { value: $o.k, description: $"($suf)($o.v | get $_.dsc)"}
+    } else {
+        { value: $o.k, description: $"($suf)($o.v)" }
+    }
 }
 
 def complete [tbl] {
@@ -232,17 +244,17 @@ def complete [tbl] {
             $tbl = $c
         }
     }
+    let flt = $flt
     match ($tbl | describe -d).type {
         record => {
             $tbl
             | transpose k v
             | each {|x|
-                if ($x.v | describe -d).type == 'closure' {
+                let ty = ($x.v | describe -d).type
+                if $ty == 'closure' {
                     $x.k
-                } else if $ix.dsc in $x.v {
-                    { value: $x.k, description: ($x.v | get $ix.dsc) }
                 } else {
-                    $x.k
+                    $x | enrich-desc $flt
                 }
             }
         }
@@ -298,7 +310,7 @@ export def --wrapped , [
                     slow: {$env.comm.flt:{|a, s|
                         do $s.say 'run a `slow` filter'
                         sleep 1sec
-                        do $s.say 'filter need annotation'
+                        do $s.say 'filter need to be declared'
                         sleep 1sec
                         $'\($s.computed\)<\($a\)>'
                     }}
