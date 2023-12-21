@@ -1,4 +1,4 @@
-$env.comma_scope = {
+$env.comma_scope = {|_|{
     manifest: {
         #completion-generator.nu: modules/completion-generator
         argx.nu:                 modules/argx
@@ -28,25 +28,25 @@ $env.comma_scope = {
         #zoxide-menu.nu:         custom-menus
     }
     dest: $"($env.HOME)/world/nu_scripts"
-}
+}}
 
-$env.comma = {
+$env.comma = {|_|{
     test: {
-        $env.comm.act: { ls }
-        $env.comm.cmp: { ls | get name }
+        $_.act: { ls }
+        $_.cmp: { ls | get name }
     }
     export: {
-        $env.comm.act: {|argv, cv|
+        $_.act: {|argv, cv|
             $cv.manifest
             | transpose k v
             | each {|x|
                 cp -v $'($env.PWD)/scripts/($x.k)' $'($cv.dest)/($x.v)'
             }
         }
-        $env.comm.dsc: 'export files to nu_scripts'
+        $_.dsc: 'export files to nu_scripts'
     }
     upgrade: {
-        $env.comm.act: {|a, e|
+        $_.act: {|a, e|
             if ($a.0? | is-empty) {
                 fd ',\.nu' ~
                 | lines
@@ -54,13 +54,13 @@ $env.comma = {
                     ^$env.EDITOR $x
                 }
             } else {
-                ^$env.EDITOR $a.0
+                e $a.0
             }
         }
-        $env.comm.cmp: {|a, e|
+        $_.cmp: {|a, e|
             fd ',\.nu' ~
             | lines
         }
-        $env.comm.dsc: ',.nu -- commafile'
+        $_.dsc: ',.nu -- commafile'
     }
-}
+}}
