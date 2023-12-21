@@ -157,7 +157,15 @@ def run [tbl] {
         if $ix.flt in $a {
             $flt ++= ($a | get $ix.flt)
         }
-        do ($a | get $ix.act) $argv (resolve-scope $argv $env.comma_scope $flt)
+        let scope = (resolve-scope $argv $env.comma_scope $flt)
+        let argv = $argv
+        if $ix.wth in $a {
+            let g = $a | get $ix.wth
+            let g = if ($g | is-empty) { '*' } else { $g }
+            watch . --glob=$g {|| do ($a | get $ix.act) $argv $scope }
+        } else {
+            do ($a | get $ix.act) $argv $scope
+        }
     }
 }
 
@@ -228,7 +236,7 @@ def compos [...context] {
     | complete $env.comma
 }
 
-export def , [
+export def --wrapped , [
     --summary
     --completion
     ...args:string@compos
@@ -250,15 +258,19 @@ export def , [
                 $env.comma_scope = {
                     created: '(date now | format date '%Y-%m-%d{%w}%H:%M:%S')'
                     computed: {$env.comm.cpu:{|a, s| $'\($s.created\)\($a\)' }}
+                    say: {|s| print $'\(ansi yellow_italic\)\($s\)\(ansi reset\)' }
+                    quick: {$env.comm.flt:{|a, s| do $s.say 'run a `quick` filter' }}
+                    slow: {$env.comm.flt:{|a, s|
+                        do $s.say 'run a `slow` filter'
+                        sleep 1sec
+                        do $s.say 'filter need annotation'
+                        sleep 1sec
+                        $'\($s.computed\)<\($a\)>'
+                    }}
                 }
 
                 $env.comma = {
                     created: {|a, s| $s.computed }
-                    hello: {
-                        $env.comm.act: {|args, scope| print $'hello \($args\)' }
-                        $env.comm.dsc: 'hello \(x\)'
-                        $env.comm.cmp: {|args, scope| $args}
-                    }
                     open: {
                         $env.comm.sub: {
                             any: {
@@ -270,9 +282,16 @@ export def , [
                                 $env.comm.act: {|a, s| open $a.0}
                                 $env.comm.cmp: {ls *.json | get name}
                                 $env.comm.dsc: 'open a json file'
+                                $env.comm.wth: '*.json'
+                            }
+                            scope: {
+                                $env.comm.act: {|a, s| print $'args: \($a\)'; $s }
+                                $env.comm.flt: ['slow']
+                                $env.comm.dsc: 'open scope'
                             }
                         }
-                        $env.comm.dsc: 'open a file'
+                        $env.comm.dsc: 'open something'
+                        $env.comm.flt: ['quick']
                     }
                 }
                 "
