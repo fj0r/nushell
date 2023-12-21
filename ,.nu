@@ -31,10 +31,7 @@ $env.comma_scope = {|_|{
 }}
 
 $env.comma = {|_|{
-    test: {
-        $_.act: {|a, e| $_ }
-        $_.cmp: { ls | get name }
-    }
+    inspect: {|a, s| {index: $_, scope: $s, args: $a} | table -e }
     export: {
         $_.act: {|argv, cv|
             for x in ($cv.manifest | transpose k v) {

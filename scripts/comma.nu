@@ -337,6 +337,7 @@ export def --wrapped , [
 
                 $env.comma = {|_|{
                     created: {|a, s| $s.computed }
+                    inspect: {|a, s| {index: $_, scope: $s, args: $a} | table -e }
                     open: {
                         $_.sub: {
                             any: {
