@@ -48,7 +48,7 @@ export-env {
             $o | append $val
         }
     })
-    $env.comma_index = ([log sub dsc act cmp flt cpu wth] | gendict 5)
+    $env.comma_index = ([sub dsc act cmp flt cpu wth] | gendict 5)
 }
 
 def gendict [size: int = 5] {

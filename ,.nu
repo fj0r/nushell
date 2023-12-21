@@ -2,17 +2,16 @@ $env.comma_scope = {|_|{
     manifest: {
         #completion-generator.nu: modules/completion-generator
         argx.nu:                 modules/argx
-        #taskfile.nu:             modules/taskfile
+        #taskfile.nu:            modules/taskfile
         ssh.nu:                  modules/network
         docker.nu:               modules/docker
         kubernetes.nu:           modules/kubernetes
         git.nu:                  modules/git/git-v2.nu
         git.md:                  modules/git/README.md
         nvim.nu:                 modules/nvim
-        log.nu:                  modules/log
 
         #just.nu:                custom-completions/just/just-completions.nu
-        mask.nu:                 custom-completions/mask/mask-completions.nu
+        #mask.nu:                custom-completions/mask/mask-completions.nu
 
         power.nu:                modules/prompt/powerline
         power_git.nu:            modules/prompt/powerline
@@ -22,6 +21,7 @@ $env.comma_scope = {|_|{
 
         cwdhist.nu:              modules/cwdhist
         comma.nu:                modules/comma
+        comma.md:                modules/comma/README.md
 
         #direnv.nu:              hooks/direnv
         #dynamic-load.nu:        hooks/dynamic-load
@@ -32,14 +32,12 @@ $env.comma_scope = {|_|{
 
 $env.comma = {|_|{
     test: {
-        $_.act: { ls }
+        $_.act: {|a, e| $_ }
         $_.cmp: { ls | get name }
     }
     export: {
         $_.act: {|argv, cv|
-            $cv.manifest
-            | transpose k v
-            | each {|x|
+            for x in ($cv.manifest | transpose k v) {
                 cp -v $'($env.PWD)/scripts/($x.k)' $'($cv.dest)/($x.v)'
             }
         }
