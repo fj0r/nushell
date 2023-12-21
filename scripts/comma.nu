@@ -48,7 +48,7 @@ export-env {
             $o | append $val
         }
     })
-    $env.comm = ([sub dsc act cmp] | gendict 5)
+    $env.comm = ([sub dsc act cmp flt cpu wth] | gendict 5)
 }
 
 def gendict [size: int = 5] {
@@ -93,18 +93,25 @@ def 'as act' [] {
     }
 }
 
-def computed-env [args, vars] {
+def resolve-scope [args, vars, flts] {
     mut vs = {}
-    mut cls = []
+    mut cpu = []
+    mut flt = []
     for i in ($vars | transpose k v) {
-        if ($i.v | describe -d).type == 'closure' {
-            $cls ++= [$i]
+        if ($i.v | describe -d).type == 'record' {
+            if $env.comm.cpu in $i.v {
+                $cpu ++= [{k: $i.k, v: ($i.v | get $env.comm.cpu)}]
+            } else if $env.comm.flt in $i.v {
+                $flt ++= [{k: $i.k, v: ($i.v | get $env.comm.flt)}]
+            } else {
+                $vs = ($vs | merge {$i.k: $i.v})
+            }
         } else {
-            $vs = ($vs | upsert $i.k $i.v)
+            $vs = ($vs | merge {$i.k: $i.v})
         }
     }
-    for i in $cls {
-        $vs = ($vs | upsert $i.k (do $i.v $args $vs))
+    for i in $cpu {
+        $vs = ($vs | merge {$i.k: (do $i.v $args $vs)} )
     }
     $vs
 }
@@ -136,7 +143,7 @@ def run [tbl] {
         let c = if $ix.sub in $act { $act | get $ix.sub | columns } else { $act | columns }
         print $'require argument: ($c)'
     } else {
-        do ($a | get $ix.act) $argv (computed-env $argv $env.comma_scope)
+        do ($a | get $ix.act) $argv (resolve-scope $argv $env.comma_scope null)
     }
 }
 
@@ -162,7 +169,7 @@ def complete [tbl] {
         }
         let a = $c | as act
         if not ($a | is-empty) {
-            let r = do ($a | get $ix.cmp) $argv (computed-env null $env.comma_scope)
+            let r = do ($a | get $ix.cmp) $argv (resolve-scope null $env.comma_scope null)
             $tbl = $r
         } else {
             $tbl = $c
@@ -228,25 +235,25 @@ export def , [
                 $"
                 $env.comma_scope = {
                     created: '(date now | format date '%Y-%m-%d{%w}%H:%M:%S')'
-                    computed: {|a, e| $'\($e.created\)\($a\)' }
+                    computed: {$env.comm.cpu:{|a, s| $'\($s.created\)\($a\)' }}
                 }
 
                 $env.comma = {
-                    created: {|a, e| $e.computed }
+                    created: {|a, s| $s.computed }
                     hello: {
-                        $env.comm.act: {|args, vars| print $'hello \($args\)' }
+                        $env.comm.act: {|args, scope| print $'hello \($args\)' }
                         $env.comm.dsc: 'hello \(x\)'
-                        $env.comm.cmp: {|args, vars| $args}
+                        $env.comm.cmp: {|args, scope| $args}
                     }
                     open: {
                         $env.comm.sub: {
                             any: {
-                                $env.comm.act: {|a, e| open $a.0}
+                                $env.comm.act: {|a, s| open $a.0}
                                 $env.comm.cmp: {ls | get name}
                                 $env.comm.dsc: 'open a file'
                             }
                             json: {
-                                $env.comm.act: {|a, e| open $a.0}
+                                $env.comm.act: {|a, s| open $a.0}
                                 $env.comm.cmp: {ls *.json | get name}
                                 $env.comm.dsc: 'open a json file'
                             }
