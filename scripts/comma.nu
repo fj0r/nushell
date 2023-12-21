@@ -48,7 +48,7 @@ export-env {
             $o | append $val
         }
     })
-    $env.comm = ([log sub dsc act cmp flt cpu wth] | gendict 5)
+    $env.comma_dict = ([log sub dsc act cmp flt cpu wth] | gendict 5)
 }
 
 def gendict [size: int = 5] {
@@ -80,13 +80,13 @@ def log [tag? -c] {
 
 def 'as act' [] {
     let o = $in
-    let ix = $env.comm
+    let _ = $env.comma_dict
     let t = ($o | describe -d).type
     if $t == 'closure' {
-        { $ix.act: $o }
-    } else if ($ix.sub in $o) {
+        { $_.act: $o }
+    } else if ($_.sub in $o) {
         null
-    } else if ($ix.act in $o) {
+    } else if ($_.act in $o) {
         $o
     } else {
         null
@@ -97,12 +97,13 @@ def resolve-scope [args, vars, flts] {
     mut vs = {}
     mut cpu = []
     mut flt = {}
+    let _ = $env.comma_dict
     for i in ($vars | transpose k v) {
         if ($i.v | describe -d).type == 'record' {
-            if $env.comm.cpu in $i.v {
-                $cpu ++= {k: $i.k, v: ($i.v | get $env.comm.cpu)}
-            } else if $env.comm.flt in $i.v {
-                $flt = ($flt | merge {$i.k: ($i.v | get $env.comm.flt)} )
+            if $_.cpu in $i.v {
+                $cpu ++= {k: $i.k, v: ($i.v | get $_.cpu)}
+            } else if $env.comma_dict.flt in $i.v {
+                $flt = ($flt | merge {$i.k: ($i.v | get $_.flt)} )
             } else {
                 $vs = ($vs | merge {$i.k: $i.v})
             }
@@ -125,7 +126,7 @@ def resolve-scope [args, vars, flts] {
 
 def get-comma [] {
     if ($env.comma | describe -d).type == 'closure' {
-        let dict = $env.comm | merge {$env.comm.log: {$in | log}}
+        let dict = $env.comma_dict | merge {$env.comma_dict.log: {$in | log}}
         do $env.comma $dict
     } else {
         $env.comma
@@ -134,7 +135,7 @@ def get-comma [] {
 
 def get-scope [] {
     if ($env.comma_scope | describe -d).type == 'closure' {
-        let dict = $env.comm | merge {$env.comm.log: {$in | log}}
+        let dict = $env.comma_dict | merge {$env.comma_dict.log: {$in | log}}
         do $env.comma_scope $dict
     } else {
         $env.comma_scope
@@ -143,18 +144,18 @@ def get-scope [] {
 
 def run [tbl] {
     let loc = $in
-    let ix = $env.comm
+    let _ = $env.comma_dict
     mut act = $tbl
     mut argv = []
     mut flt = []
     for i in $loc {
         let a = $act | as act
         if ($a | is-empty) {
-            if ($ix.sub in $act) and ($i in ($act | get $ix.sub)) {
-                if $ix.flt in $act {
-                    $flt ++= ($act | get $ix.flt)
+            if ($_.sub in $act) and ($i in ($act | get $_.sub)) {
+                if $_.flt in $act {
+                    $flt ++= ($act | get $_.flt)
                 }
-                let n = $act | get $ix.sub | get $i
+                let n = $act | get $_.sub | get $i
                 $act = $n
             } else if $i in $act {
                 let n = $act | get $i
@@ -169,17 +170,17 @@ def run [tbl] {
     }
     let a = $act | as act
     if ($a | is-empty) {
-        let c = if $ix.sub in $act { $act | get $ix.sub | columns } else { $act | columns }
+        let c = if $_.sub in $act { $act | get $_.sub | columns } else { $act | columns }
         print $'require argument: ($c)'
     } else {
-        if $ix.flt in $a {
-            $flt ++= ($a | get $ix.flt)
+        if $_.flt in $a {
+            $flt ++= ($a | get $_.flt)
         }
         let scope = (resolve-scope $argv (get-scope) $flt)
-        let cls = $a | get $ix.act
+        let cls = $a | get $_.act
         let argv = $argv
-        if $ix.wth in $a {
-            let w = $a | get $ix.wth
+        if $_.wth in $a {
+            let w = $a | get $_.wth
             if 'interval' in $w {
                 loop {
                     do $cls $argv $scope
@@ -193,7 +194,7 @@ def run [tbl] {
                 let ops = if ($w.op? | is-empty) {['Write']} else { $w.op }
                 watch . --glob=($w.glob? | default '*') {|op, path, new_path|
                     if $op in $ops {
-                        do $cls $argv ($scope | upsert $ix.wth {
+                        do $cls $argv ($scope | upsert $_.wth {
                             op: $op
                             path: $path
                             new_path: $path
@@ -209,7 +210,7 @@ def run [tbl] {
 
 def enrich-desc [flt] {
     let o = $in
-    let _ = $env.comm
+    let _ = $env.comma_dict
     let flt = if $_.flt in $o.v { [...$flt, ...($o.v | get $_.flt)] } else { $flt }
     let f = if ($flt | is-empty) { '' } else { $"($flt | str join '|')|" }
     let w = if $_.wth in $o.v {
@@ -239,7 +240,7 @@ def enrich-desc [flt] {
 
 def complete [tbl] {
     let argv = $in
-    let ix = $env.comm
+    let _ = $env.comma_dict
     mut tbl = (get-comma)
     mut flt = []
     for i in $argv {
@@ -249,11 +250,11 @@ def complete [tbl] {
             let tp =  ($tbl | describe -d).type
             if ($tp == 'record') and ($i in $tbl) {
                 let j = $tbl | get $i
-                if $ix.sub in $j {
-                    if $ix.flt in $j {
-                        $flt ++= ($j | get $ix.flt)
+                if $_.sub in $j {
+                    if $_.flt in $j {
+                        $flt ++= ($j | get $_.flt)
                     }
-                    $j | get $ix.sub
+                    $j | get $_.sub
                 } else {
                     $j
                 }
@@ -263,7 +264,7 @@ def complete [tbl] {
         }
         let a = $c | as act
         if not ($a | is-empty) {
-            let r = do ($a | get $ix.cmp) $argv (resolve-scope null (get-scope) $flt)
+            let r = do ($a | get $_.cmp) $argv (resolve-scope null (get-scope) $flt)
             $tbl = $r
         } else {
             $tbl = $c
