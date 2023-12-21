@@ -31,6 +31,10 @@ $env.comma_scope = {
 }
 
 $env.comma = {
+    test: {
+        $env.comm.act: { ls }
+        $env.comm.cmp: { ls | get name }
+    }
     export: {
         $env.comm.act: {|argv, cv|
             $cv.manifest
@@ -41,7 +45,7 @@ $env.comma = {
         }
         $env.comm.dsc: 'export files to nu_scripts'
     }
-    upgrade_commafile: {
+    upgrade: {
         $env.comm.act: {|a, e|
             if ($a.0? | is-empty) {
                 fd ',\.nu' ~
@@ -57,5 +61,6 @@ $env.comma = {
             fd ',\.nu' ~
             | lines
         }
+        $env.comm.dsc: ',.nu -- commafile'
     }
 }

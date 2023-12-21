@@ -188,7 +188,7 @@ def run [tbl] {
 }
 
 def enrich-desc [flt] {
-    let o = $in | log o
+    let o = $in
     let _ = $env.comm
     let flt = if $_.flt in $o.v { [...$flt, ...($o.v | get $_.flt)] } else { $flt }
     let f = if ($flt | is-empty) { '' } else { $"($flt | str join '|')|" }
@@ -206,9 +206,14 @@ def enrich-desc [flt] {
     let suf = $"($w)($f)"
     let suf = if ($suf | is-empty) { $suf } else { $"($suf) " }
     if ($o.v | describe -d).type == 'record' {
-        { value: $o.k, description: $"($suf)($o.v | get $_.dsc)"}
+        let dsc = if $_.dsc in $o.v { $o.v | get $_.dsc } else { '' }
+        if ($dsc | is-empty) {
+            $o.k
+        } else {
+            { value: $o.k, description: $"($suf)($dsc)"}
+        }
     } else {
-        { value: $o.k, description: $"($suf)($o.v)" }
+        { value: $o.k, description: $"__($suf)" }
     }
 }
 
@@ -250,8 +255,7 @@ def complete [tbl] {
             $tbl
             | transpose k v
             | each {|x|
-                let ty = ($x.v | describe -d).type
-                if $ty == 'closure' {
+                if ($x.v | describe -d).type == 'closure' {
                     $x.k
                 } else {
                     $x | enrich-desc $flt
