@@ -178,6 +178,7 @@ def run [tbl] {
                loop {
                    do $cls $argv $scope
                    sleep $poll.0
+                   print $"(ansi dark_gray)----------(ansi reset)"
                }
             }
         } else {
@@ -322,6 +323,7 @@ export def --wrapped , [
                                 $env.comm.act: {|a, s| print $'args: \($a\)'; $s }
                                 $env.comm.flt: ['slow']
                                 $env.comm.dsc: 'open scope'
+                                $env.comm.wth: 'poll:2sec'
                             }
                         }
                         $env.comm.dsc: 'open something'
