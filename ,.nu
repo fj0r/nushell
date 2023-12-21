@@ -1,4 +1,4 @@
-$env.comma_vars = {
+$env.comma_scope = {
     manifest: {
         #completion-generator.nu: modules/completion-generator
         argx.nu:                 modules/argx
@@ -40,5 +40,22 @@ $env.comma = {
             }
         }
         $env.comm.dsc: 'export files to nu_scripts'
+    }
+    upgrade_commafile: {
+        $env.comm.act: {|a, e|
+            if ($a.0? | is-empty) {
+                fd ',\.nu' ~
+                | lines
+                | each {|x|
+                    ^$env.EDITOR $x
+                }
+            } else {
+                ^$env.EDITOR $a.0
+            }
+        }
+        $env.comm.cmp: {|a, e|
+            fd ',\.nu' ~
+            | lines
+        }
     }
 }
