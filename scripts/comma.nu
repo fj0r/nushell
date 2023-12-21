@@ -59,7 +59,7 @@ def gendict [size: int = 5] {
     for i in 1..$n {
         let b = ($i - 1) * $size
         let e = $i * $size
-        $k ++= [($rk | str substring $b..$e)]
+        $k ++= ($rk | str substring $b..$e)
     }
     $keys
     | zip $k
@@ -96,13 +96,13 @@ def 'as act' [] {
 def resolve-scope [args, vars, flts] {
     mut vs = {}
     mut cpu = []
-    mut flt = []
+    mut flt = {}
     for i in ($vars | transpose k v) {
         if ($i.v | describe -d).type == 'record' {
             if $env.comm.cpu in $i.v {
-                $cpu ++= [{k: $i.k, v: ($i.v | get $env.comm.cpu)}]
+                $cpu ++= {k: $i.k, v: ($i.v | get $env.comm.cpu)}
             } else if $env.comm.flt in $i.v {
-                $flt ++= [{k: $i.k, v: ($i.v | get $env.comm.flt)}]
+                $flt = ($flt | merge {$i.k: ($i.v | get $env.comm.flt)} )
             } else {
                 $vs = ($vs | merge {$i.k: $i.v})
             }
@@ -113,6 +113,13 @@ def resolve-scope [args, vars, flts] {
     for i in $cpu {
         $vs = ($vs | merge {$i.k: (do $i.v $args $vs)} )
     }
+    for i in ($flts | default []) {
+        if $i in $flt {
+            $vs = ($vs | merge {$i: (do ($flt | get $i) $args $vs)} )
+        } else {
+            error make {msg: $"filter `($i)` not found" }
+        }
+    }
     $vs
 }
 
@@ -121,10 +128,14 @@ def run [tbl] {
     let ix = $env.comm
     mut act = $tbl
     mut argv = []
+    mut flt = []
     for i in $loc {
         let a = $act | as act
         if ($a | is-empty) {
             if ($ix.sub in $act) and ($i in ($act | get $ix.sub)) {
+                if $ix.flt in $act {
+                    $flt ++= ($act | get $ix.flt)
+                }
                 let n = $act | get $ix.sub | get $i
                 $act = $n
             } else if $i in $act {
@@ -135,7 +146,7 @@ def run [tbl] {
                 break
             }
         } else {
-            $argv ++= [$i]
+            $argv ++= $i
         }
     }
     let a = $act | as act
@@ -143,7 +154,10 @@ def run [tbl] {
         let c = if $ix.sub in $act { $act | get $ix.sub | columns } else { $act | columns }
         print $'require argument: ($c)'
     } else {
-        do ($a | get $ix.act) $argv (resolve-scope $argv $env.comma_scope null)
+        if $ix.flt in $a {
+            $flt ++= ($a | get $ix.flt)
+        }
+        do ($a | get $ix.act) $argv (resolve-scope $argv $env.comma_scope $flt)
     }
 }
 
