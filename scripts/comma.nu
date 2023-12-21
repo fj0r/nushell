@@ -136,7 +136,7 @@ def run [tbl] {
         let c = if $ix.sub in $act { $act | get $ix.sub | columns } else { $act | columns }
         print $'require argument: ($c)'
     } else {
-        do ($a | get $ix.act) $argv (computed-env $argv $env.comma_vars)
+        do ($a | get $ix.act) $argv (computed-env $argv $env.comma_scope)
     }
 }
 
@@ -162,7 +162,7 @@ def complete [tbl] {
         }
         let a = $c | as act
         if not ($a | is-empty) {
-            let r = do ($a | get $ix.cmp) $argv (computed-env null $env.comma_vars)
+            let r = do ($a | get $ix.cmp) $argv (computed-env null $env.comma_scope)
             $tbl = $r
         } else {
             $tbl = $c
@@ -226,7 +226,7 @@ export def , [
             let a = [yes no] | input list 'create ,.nu?'
             if $a == 'yes' {
                 $"
-                $env.comma_vars = {
+                $env.comma_scope = {
                     created: '(date now | format date '%Y-%m-%d{%w}%H:%M:%S')'
                     computed: {|a, e| $'\($e.created\)\($a\)' }
                 }
