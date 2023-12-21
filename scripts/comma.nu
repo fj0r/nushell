@@ -158,21 +158,52 @@ def run [tbl] {
             $flt ++= ($a | get $ix.flt)
         }
         let scope = (resolve-scope $argv $env.comma_scope $flt)
+        let cls = $a | get $ix.act
         let argv = $argv
         if $ix.wth in $a {
+            mut poll = []
             let g = $a | get $ix.wth
-            let g = if ($g | is-empty) { '*' } else { $g }
-            watch . --glob=$g {|| do ($a | get $ix.act) $argv $scope }
+            let g = if ($g | is-empty) {
+                '*'
+            } else if ($g | str starts-with 'poll') {
+                let p = $g | split row ':'
+                $poll ++= ($p.1? | default '1sec' | into duration)
+            } else {
+                $g
+            }
+
+            if ($poll | is-empty) {
+                watch . --glob=$g {|| do $cls $argv $scope }
+            } else {
+               loop {
+                   do $cls $argv $scope
+                   sleep $poll.0
+               }
+            }
         } else {
-            do ($a | get $ix.act) $argv $scope
+            do $cls $argv $scope
         }
     }
+}
+
+def enrich-desc [ctx] {
+    let o = $in
+    let f = if ($ctx.flt | is-empty) { '' } else { $" | ($ctx.flt | str join ' | ')" }
+    let w = if 'wth' in $ctx {
+        if ($ctx.wth | is-empty) {
+            $"[watch]"
+        } else {
+            $"[watch: ($ctx.wth)]"
+        }
+    } else { '' }
+    $"($o)($f)"
 }
 
 def complete [tbl] {
     let argv = $in
     let ix = $env.comm
     mut tbl = $env.comma
+    mut flt = []
     for i in $argv {
         let c = if ($i | is-empty) {
             $tbl
@@ -181,6 +212,9 @@ def complete [tbl] {
             if ($tp == 'record') and ($i in $tbl) {
                 let j = $tbl | get $i
                 if $ix.sub in $j {
+                    if $ix.flt in $j {
+                        $flt ++= ($j | get $ix.flt)
+                    }
                     $j | get $ix.sub
                 } else {
                     $j
