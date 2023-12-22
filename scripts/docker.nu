@@ -128,6 +128,7 @@ export def image-list [
             size: $r.Size
             labels: $r.Labels?
             env: $e
+            entrypoint: $r.Config.Entrypoint
             cmd: $r.Config.Cmd?
         }
     }
