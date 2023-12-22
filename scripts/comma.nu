@@ -32,6 +32,8 @@ def comma_file [] {
           code: "
           print $'(ansi default_underline)(ansi default_bold),(ansi reset).nu (ansi green_italic)detected(ansi reset)...'
           print $'(ansi yellow_italic)activating(ansi reset) (ansi default_underline)(ansi default_bold),(ansi reset) module with `(ansi default_dimmed)(ansi default_italic)source ,.nu(ansi reset)`'
+          # TODO: allow parent dir
+          $env.comma_working_dir = $after
           source ,.nu
           "
         }
@@ -49,6 +51,7 @@ export-env {
         }
     })
     $env.comma_index = ([sub dsc act cmp flt cpu wth] | gendict 5)
+    $env.comma_settings = {}
 }
 
 def gendict [size: int = 5] {
@@ -127,7 +130,11 @@ def resolve-scope [args, vars, flts] {
 def get-comma [key = 'comma'] {
     let _ = $env.comma_index
     if ($env | get $key | describe -d).type == 'closure' {
-        let dict = $_ | merge {log: {$in | log}}
+        let dict = $_ | merge {
+            log: {$in | log}
+            wd: $env.comma_working_dir
+            set: {|cb| $env.comma_settings = (do $cb $env.comma_settings) }
+        }
         do ($env | get $key) $dict
     } else {
         $env | get $key
@@ -282,7 +289,7 @@ def complete [tbl] {
     }
 }
 
-def summary [] {
+def gen-vscode [] {
     let o = $in
     $o
 }
@@ -303,12 +310,12 @@ def compos [...context] {
 }
 
 export def --wrapped , [
-    --summary
+    --vscode
     --completion
     ...args:string@compos
 ] {
-    if $summary {
-        let r = get-comma | summary | to json
+    if $vscode {
+        let r = get-comma | gen-vscode | to json
         return $r
     }
     if $completion {
