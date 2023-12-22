@@ -1,8 +1,25 @@
-export def 'config update' [ ] {
+export def 'config update' [
+    --vim (-v)
+] {
+    print '==> update nushell config'
     cd ($nu.config-path | path dirname)
     git pull
     #git log -1 --date=iso
     #source '($nu.config-path)'
+    if ($vim) {
+        print '==> update nvim config'
+        for c in [
+            ['etc' 'nvim']
+            [$env.HOME '.config' 'nvim']
+        ] {
+            let p = $c | path join
+            if ($p | path exists) {
+                print $'--> ($p)'
+                cd $p
+                git pull
+            }
+        }
+    }
 }
 
 def "nu-complete config scripts" [] {
