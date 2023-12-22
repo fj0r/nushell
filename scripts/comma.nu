@@ -31,9 +31,12 @@ def comma_file [] {
           code: "
           print $'(ansi default_underline)(ansi default_bold),(ansi reset).nu (ansi green_italic)detected(ansi reset)...'
           print $'(ansi yellow_italic)activating(ansi reset) (ansi default_underline)(ansi default_bold),(ansi reset) module with `(ansi default_dimmed)(ansi default_italic)source ,.nu(ansi reset)`'
+
           # TODO: allow parent dir
           $env.comma_index.wd = $after
           $env.comma_index.session_id = (random chars)
+
+          # echo '' | save -f ~/.cache/comma.log
           source ,.nu
           "
         }
@@ -283,7 +286,7 @@ def complete [tbl] {
         }
         let a = $c | as act
         if not ($a | is-empty) {
-            # TODO: leaf flt
+            let flt = if $_.flt in $a { $flt | append ($a | get $_.flt) } else { $flt }
             let r = do ($a | get $_.cmp) $argv (resolve-scope null (get-comma 'comma_scope') $flt)
             $tbl = $r
         } else {
