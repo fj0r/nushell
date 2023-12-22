@@ -12,7 +12,7 @@
 - [x] kubernetes independent kubectx & kubens
 - [x] docker
     - [x] -v
-    - [ ] transform dis output
+    - [x] transform dis output
 - [x] powerline
     - [x] proxy stat no effects in plain mode
     - [x] env hooks for regenerate thunks (def-env)

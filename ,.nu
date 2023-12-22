@@ -39,7 +39,7 @@ $env.comma = {|_|{
             let m = if ($a | is-empty) { $m } else {
                 $m | filter {|x| $x.k in $a }
             }
-            for x in () {
+            for x in $m {
                 cp -v $'($_.wd)/scripts/($x.k)' $'($s.dest)/($x.v)'
             }
         }

@@ -81,10 +81,11 @@ export def container-process-list [
             image: $r.Image
             created: $r.Created
             id: $r.Id
+            ports: $p
+            # FIXME: env
+            mounts: $m
             path: $r.Path
             args: $r.Args
-            ports: $p
-            mounts: $m
         }
     }
 }
