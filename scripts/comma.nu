@@ -33,7 +33,8 @@ def comma_file [] {
           print $'(ansi default_underline)(ansi default_bold),(ansi reset).nu (ansi green_italic)detected(ansi reset)...'
           print $'(ansi yellow_italic)activating(ansi reset) (ansi default_underline)(ansi default_bold),(ansi reset) module with `(ansi default_dimmed)(ansi default_italic)source ,.nu(ansi reset)`'
           # TODO: allow parent dir
-          $env.comma_working_dir = $after
+          $env.comma_index.wd = $after
+          $env.comma_index.session_id = (random chars)
           source ,.nu
           "
         }
@@ -51,7 +52,9 @@ export-env {
         }
     })
     $env.comma_index = ([sub dsc act cmp flt cpu wth] | gendict 5)
-    $env.comma_settings = {}
+    $env.comma_index.settings = {}
+    $env.comma_index.os = (os-type)
+    $env.comma_index.arch = (uname -m)
 }
 
 def gendict [size: int = 5] {
@@ -127,13 +130,30 @@ def resolve-scope [args, vars, flts] {
     $vs
 }
 
+def os-type [] {
+    let info = cat /etc/os-release
+    | lines
+    | reduce -f {} {|x, acc|
+        let a = $x | split row '='
+        $acc | upsert $a.0 ($a.1| str replace -a '"' '')
+    }
+    if 'ID_LIKE' in $info {
+        if not ($info.ID_LIKE | parse -r '(rhel|fedora|redhat)' | is-empty) {
+            'redhat'
+        } else {
+            $info.ID_LIKE
+        }
+    } else {
+        $info.ID
+    }
+}
+
 def get-comma [key = 'comma'] {
     let _ = $env.comma_index
     if ($env | get $key | describe -d).type == 'closure' {
         let dict = $_ | merge {
             log: {$in | log}
-            wd: $env.comma_working_dir
-            set: {|cb| $env.comma_settings = (do $cb $env.comma_settings) }
+            config: {|cb| $env.comma_index.settings = (do $cb $env.comma_index.settings) }
         }
         do ($env | get $key) $dict
     } else {
