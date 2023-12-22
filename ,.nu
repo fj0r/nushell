@@ -34,12 +34,19 @@ $env.comma = {|_|{
     inspect: {|a, s| {index: $_, scope: $s, args: $a} | table -e }
     set: {|a, s| do $_.set {|config| $config | upsert a 123 } }
     export: {
-        $_.act: {|argv, cv|
-            for x in ($cv.manifest | transpose k v) {
-                cp -v $'($env.PWD)/scripts/($x.k)' $'($cv.dest)/($x.v)'
+        $_.act: {|a,s|
+            let m = $s.manifest | transpose k v
+            let m = if ($a | is-empty) { $m } else {
+                $m | filter {|x| $x.k in $a }
+            }
+            for x in () {
+                cp -v $'($_.wd)/scripts/($x.k)' $'($s.dest)/($x.v)'
             }
         }
         $_.dsc: 'export files to nu_scripts'
+        $_.cmp: {|a,s|
+            $s.manifest | columns
+        }
     }
     upgrade: {
         $_.act: {|a, e|

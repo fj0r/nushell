@@ -4,9 +4,15 @@
     - `$nu.scope.commands | where name == ke | get signatures`
     - cache
 - [x] kconf import : mask
+    - [ ] diff server cert and prompt
+- [ ] git
+    - [ ]
+- [ ] comma
+    - [ ] run filter when completion
 - [x] kubernetes independent kubectx & kubens
 - [x] docker
     - [x] -v
+    - [ ] transform dis output
 - [x] powerline
     - [x] proxy stat no effects in plain mode
     - [x] env hooks for regenerate thunks (def-env)
