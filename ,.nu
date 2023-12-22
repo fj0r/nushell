@@ -32,7 +32,8 @@ $env.comma_scope = {|_|{
 
 $env.comma = {|_|{
     inspect: {|a, s| {index: $_, scope: $s, args: $a} | table -e }
-    set: {|a, s| do $_.set {|config| $config | upsert a 123 } }
+    set: {|a, s| do $_.config {|d| $d | upsert $a.0 $a.1 } }
+    get: {|a,s| $_.settings }
     export: {
         $_.act: {|a,s|
             let m = $s.manifest | transpose k v

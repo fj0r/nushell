@@ -150,12 +150,16 @@ def os-type [] {
     }
 }
 
-def get-comma [key = 'comma'] {
+
+def --env get-comma [key = 'comma'] {
     let _ = $env.comma_index
     if ($env | get $key | describe -d).type == 'closure' {
         let dict = $_ | merge {
             log: {$in | log}
-            config: {|cb| $env.comma_index.settings = (do $cb $env.comma_index.settings) }
+            config: {|cb|
+                # FIXME: no affected $env
+                $env.comma_index.settings = (do $cb $env.comma_index.settings)
+            }
         }
         do ($env | get $key) $dict
     } else {
