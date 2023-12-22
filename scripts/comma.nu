@@ -6,19 +6,18 @@ def unindent [] {
     | str join (char newline)
 }
 
-def 'path parents' [] {
-    $in
-    | path expand
-    | path split
-    | reduce -f [ '' ] {|x, acc| [( $acc.0 | path join $x ), ...$acc] }
-    | range ..-2
-}
-
-def find [] {
-    $in
-    | path parents
-    | filter {|x| $x | path join ',.nu' | path exists }
-    | get 0?
+def find-parent [] {
+    let o = $in
+    let depth = ($env.PWD | path expand | path split | length) - 1
+    mut cur = [',.nu']
+    mut e = ''
+    for i in 0..$depth {
+        $e = ($cur | path join)
+        if ($e | path exists) { break }
+        $cur = ['..', ...$cur]
+        $e = ''
+    }
+    $e
 }
 
 def comma_file [] {
