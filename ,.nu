@@ -22,6 +22,7 @@ $env.comma_scope = {|_|{
         cwdhist.nu:              modules/cwdhist
         comma.nu:                modules/comma
         comma_test.nu:           modules/comma
+        comma_tmpl.nu:           modules/comma
         comma.md:                modules/comma/README.md
 
         #direnv.nu:              hooks/direnv
