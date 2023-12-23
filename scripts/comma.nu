@@ -13,6 +13,7 @@ def find-parent [] {
     mut e = ''
     for i in 0..$depth {
         $e = ($cur | path join)
+        #print ($e | path expand)
         if ($e | path exists) { break }
         $cur = ['..', ...$cur]
         $e = ''
@@ -44,19 +45,43 @@ def comma_file [] {
 }
 
 export-env {
-    $env.config = ( $env.config | upsert hooks.env_change.PWD { |config|
-        let o = ($config | get -i hooks.env_change.PWD)
-        let val = (comma_file)
-        if $o == null {
-            $val
-        } else {
-            $o | append $val
+    # batch mode
+    if not ($env.config? | is-empty) {
+        $env.config = ( $env.config | upsert hooks.env_change.PWD { |config|
+            let o = ($config | get -i hooks.env_change.PWD)
+            let val = (comma_file)
+            if $o == null {
+                $val
+            } else {
+                $o | append $val
+            }
+        })
+    }
+    $env.comma_index = (
+        [sub dsc act cmp flt cpu wth]
+        | gendict 5
+        | merge {
+            settings: {}
+            os: (os-type)
+            arch: (uname -m)
+            log: {$in | log}
+            batch: {
+                let o = $in
+                    | lines
+                    | split row ';'
+                    | flatten
+                    | each {|x| $", ($x)"}
+                let cmd = ['use comma.nu *' 'source ,.nu' ...$o ]
+                    | str join (char newline)
+                print $"(ansi dark_gray)($cmd)(ansi reset)"
+                nu -c $cmd
+            }
+            config: {|cb|
+                # FIXME: no affected $env
+                $env.comma_index.settings = (do $cb $env.comma_index.settings)
+            }
         }
-    })
-    $env.comma_index = ([sub dsc act cmp flt cpu wth] | gendict 5)
-    $env.comma_index.settings = {}
-    $env.comma_index.os = (os-type)
-    $env.comma_index.arch = (uname -m)
+    )
 }
 
 def gendict [size: int = 5] {
@@ -84,6 +109,21 @@ def log [tag? -c] {
         echo $'---($tag)---($o | describe)(char newline)($o | to yaml)' | save -a ~/.cache/comma.log
     }
     $o
+}
+
+def detect-node [] { # [is-act, node]
+    let o = $in
+    let _ = $env.comma_index
+    let t = ($o | describe -d).type
+    if $t == 'closure' {
+        [ true  { $_.act: $o } ]
+    } else if ($_.sub in $o) {
+        [ false $o ]
+    } else if ($_.act in $o) {
+        [ true  $o ]
+    } else {
+        [ false {$_.sub: $o} ]
+    }
 }
 
 def 'as act' [] {
@@ -151,17 +191,10 @@ def os-type [] {
 }
 
 
-def --env get-comma [key = 'comma'] {
+def get-comma [key = 'comma'] {
     let _ = $env.comma_index
     if ($env | get $key | describe -d).type == 'closure' {
-        let dict = $_ | merge {
-            log: {$in | log}
-            config: {|cb|
-                # FIXME: no affected $env
-                $env.comma_index.settings = (do $cb $env.comma_index.settings)
-            }
-        }
-        do ($env | get $key) $dict
+        do ($env | get $key) $_
     } else {
         $env | get $key
     }
@@ -174,8 +207,10 @@ def run [tbl] {
     mut argv = []
     mut flt = []
     for i in $loc {
-        let a = $act | as act
-        if ($a | is-empty) {
+        let n = $act | detect-node
+        if $n.0 {
+            $argv ++= $i
+        } else {
             if ($_.sub in $act) and ($i in ($act | get $_.sub)) {
                 if $_.flt in $act {
                     $flt ++= ($act | get $_.flt)
@@ -189,23 +224,21 @@ def run [tbl] {
                 $act = {|| print $"not found `($i)`"}
                 break
             }
-        } else {
-            $argv ++= $i
         }
     }
-    let a = $act | as act
-    if ($a | is-empty) {
+    let n = $act | as act
+    if ($n | is-empty) {
         let c = if $_.sub in $act { $act | get $_.sub | columns } else { $act | columns }
         print $'require argument: ($c)'
     } else {
-        if $_.flt in $a {
-            $flt ++= ($a | get $_.flt)
+        if $_.flt in $n {
+            $flt ++= ($n | get $_.flt)
         }
         let scope = (resolve-scope $argv (get-comma 'comma_scope') $flt)
-        let cls = $a | get $_.act
+        let cls = $n | get $_.act
         let argv = $argv
-        if $_.wth in $a {
-            let w = $a | get $_.wth
+        if $_.wth in $n {
+            let w = $n | get $_.wth
             if 'interval' in $w {
                 loop {
                     do $cls $argv $scope

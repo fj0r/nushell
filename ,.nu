@@ -32,8 +32,6 @@ $env.comma_scope = {|_|{
 
 $env.comma = {|_|{
     inspect: {|a, s| {index: $_, scope: $s, args: $a} | table -e }
-    set: {|a, s| do $_.config {|d| $d | upsert $a.0 $a.1 } }
-    get: {|a,s| $_.settings }
     export: {
         $_.act: {|a,s|
             let m = $s.manifest | transpose k v
@@ -70,5 +68,63 @@ $env.comma = {|_|{
             | get name
         }
         $_.dsc: ',.nu -- commafile'
+    }
+    _example: {
+        a: {
+            b: {
+                $_.sub: {
+                    c: {
+                        $_.sub: {
+                            d: {|| print 'ok'}
+                            e: {
+                                $_.sub: {
+                                    f: {
+                                        $_.act: {|| true }
+                                    }
+                                }
+                                $_.dsc: 'ok'
+                            }
+                        }
+                    }
+                }
+                $_.dsc: 'this way'
+            }
+            g: {}
+        }
+        set: {|a, s| do $_.config {|d| $d | upsert $a.0 $a.1 } }
+        get: {|a,s| $_.settings }
+    }
+    test: {
+        batch: {
+            $_.act: {
+                nu -c 'use comma.nu *; source ,.nu; , inspect'
+                '_example a b c e f' | do $_.batch
+            }
+            $_.wth: { glob: '*.nu' }
+        }
+        struct: {
+            $_.act: {
+                '_example a b c e f' | do $_.batch
+            }
+            $_.wth: { glob: '*.nu' }
+        }
+        set-env: {
+            $_.act: {
+                '_example a b c e f' | do $_.batch
+            }
+            $_.wth: { glob: '*.nu' }
+        }
+        vscode: {
+            gen: {
+                $_.act: {
+                }
+                $_.wth: { glob: '*.nu' }
+            }
+            complete: {
+                $_.act: {
+                }
+                $_.wth: { glob: '*.nu' }
+            }
+        }
     }
 }}
