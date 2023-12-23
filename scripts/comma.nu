@@ -255,6 +255,9 @@ def run [tbl] {
                     }
                 }
             } else {
+                if not ($w.postpone? | default false) {
+                    do $cls $argv ($scope | upsert $_.wth { op: null path: null new_path: null })
+                }
                 let ops = if ($w.op? | is-empty) {['Write']} else { $w.op }
                 watch . --glob=($w.glob? | default '*') {|op, path, new_path|
                     if $op in $ops {
@@ -424,6 +427,7 @@ export def --wrapped , [
                                 $_.wth: {
                                     glob: '*'
                                     op: ['Write', 'Create']
+                                    postpone: true
                                 }
                             }
                             open_file: {
