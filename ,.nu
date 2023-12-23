@@ -80,8 +80,20 @@ $env.comma = {|_|{
                 ] | str join (char newline))
                 , export
             }
-            $_.wth: { glob: '*.nu' }
+            $_.wth: {
+                glob: '*.nu'
+                clear: true
+            }
             $_.dsc: 'copy this to uplevel'
+        }
+        poll: {
+            $_.act: {
+                print $env.PWD
+            }
+            $_.wth: {
+                interval: 3sec
+                clear: true
+            }
         }
         vscode: {
             gen: {
