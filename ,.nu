@@ -98,13 +98,11 @@ $env.comma = {|_|{
         }
         vscode: {
             gen: {
-                $_.act: {
-                }
+                $_.act: {}
                 $_.wth: { glob: '*.nu' }
             }
             complete: {
-                $_.act: {
-                }
+                $_.act: { 2 }
                 $_.wth: { glob: '*.nu' }
             }
         }
