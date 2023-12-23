@@ -31,7 +31,7 @@ def comma_file [] {
           condition: {|_, after| $after | path join ',.nu' | path exists}
           code: "
           print $'(ansi default_underline)(ansi default_bold),(ansi reset).nu (ansi green_italic)detected(ansi reset)...'
-          print $'(ansi yellow_italic)activating(ansi reset) (ansi default_underline)(ansi default_bold),(ansi reset) module with `(ansi default_dimmed)(ansi default_italic)source ,.nu(ansi reset)`'
+          print $'(ansi $env.comma_index.settings.theme.info)activating(ansi reset) (ansi default_underline)(ansi default_bold),(ansi reset) module with `(ansi default_dimmed)(ansi default_italic)source ,.nu(ansi reset)`'
 
           # TODO: allow parent dir
           $env.comma_index.wd = $after
@@ -61,7 +61,13 @@ export-env {
         [sub dsc act cmp flt cpu wth]
         | gendict 5
         | merge {
-            settings: {}
+            settings: {
+                theme: {
+                    info: 'yellow_italic'
+                    batch_hint: 'dark_gray'
+                    poll_sep: 'dark_gray'
+                }
+            }
             os: (os-type)
             arch: (uname -m)
             log: {$in | log}
@@ -70,10 +76,10 @@ export-env {
                     | lines
                     | split row ';'
                     | flatten
-                    | each {|x| $", ($x)"}
+                    | each {|x| $", ($x | str trim)" }
                 let cmd = ['use comma.nu *' 'source ,.nu' ...$o ]
                     | str join (char newline)
-                print $"(ansi dark_gray)($cmd)(ansi reset)"
+                print $"(ansi $env.comma_index.settings.theme.batch_hint)($cmd)(ansi reset)"
                 nu -c $cmd
             }
             config: {|cb|
@@ -243,7 +249,7 @@ def run [tbl] {
                 loop {
                     do $cls $argv $scope
                     sleep $w.interval
-                    print $"(ansi dark_gray)----------(ansi reset)"
+                    print $"(ansi $env.comma_index.settings.theme.poll_sep)----------(ansi reset)"
                     if ($w.clear? | default false) {
                         clear
                     }
@@ -390,7 +396,7 @@ export def --wrapped , [
                 $env.comma_scope = {|_|{
                     created: '(date now | format date '%Y-%m-%d{%w}%H:%M:%S')'
                     computed: {$_.cpu:{|a, s| $'\($s.created\)\($a\)' }}
-                    say: {|s| print $'\(ansi yellow_italic\)\($s\)\(ansi reset\)' }
+                    say: {|s| print $'\(ansi $env.comma_index.settings.theme.info\)\($s\)\(ansi reset\)' }
                     quick: {$_.flt:{|a, s| do $s.say 'run a `quick` filter' }}
                     slow: {$_.flt:{|a, s|
                         do $s.say 'run a `slow` filter'

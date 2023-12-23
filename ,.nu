@@ -92,7 +92,7 @@ $env.comma = {|_|{
             g: {}
         }
         set: {|a, s| do $_.config {|d| $d | upsert $a.0 $a.1 } }
-        get: {|a,s| $_.settings }
+        get: {|a,s| $_.settings | table -e }
     }
     test: {
         batch: {
@@ -110,7 +110,7 @@ $env.comma = {|_|{
         }
         set-env: {
             $_.act: {
-                '_example a b c e f' | do $_.batch
+                '_example set a b; _example get' | do $_.batch
             }
             $_.wth: { glob: '*.nu' }
         }
