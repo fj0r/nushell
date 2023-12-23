@@ -410,32 +410,37 @@ export def --wrapped , [
                 $env.comma = {|_|{
                     created: {|a, s| $s.computed }
                     inspect: {|a, s| {index: $_, scope: $s, args: $a} | table -e }
-                    open: {
+                    test: {
                         $_.sub: {
-                            any: {
-                                $_.act: {|a, s| open $a.0}
-                                $_.cmp: {ls | get name}
-                                $_.dsc: 'open a file'
+                            batch: {
+                                $_.act: {
+                                    'created; inspect' | do $_.batch
+                                }
                             }
-                            json: {
+                            watch: {
                                 $_.act: {|a, s| $s | get $_.wth }
                                 $_.cmp: {ls *.json | get name}
-                                $_.dsc: 'open a json file'
+                                $_.dsc: 'inspect watch context'
                                 $_.wth: {
-                                    glob: '*.json'
+                                    glob: '*'
                                     op: ['Write', 'Create']
                                 }
                             }
-                            scope: {
-                                $_.act: {|a, s| print $'args: \($a\)'; $s }
+                            open_file: {
+                                $_.act: {|a, s| open $a.0 }
+                                $_.cmp: {ls | get name}
+                                $_.dsc: 'open a file'
                                 $_.flt: ['slow']
-                                $_.dsc: 'open scope'
+                            }
+                            ping: {
+                                $_.act: {|a, s| ping -c 2 localhost }
                                 $_.wth: {
                                     interval: 2sec
+                                    clear: true
                                 }
                             }
                         }
-                        $_.dsc: 'open something'
+                        $_.dsc: 'run test'
                         $_.flt: ['quick']
                     }
                 }}

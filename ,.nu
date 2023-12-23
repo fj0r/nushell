@@ -98,7 +98,6 @@ $env.comma = {|_|{
         batch: {
             $_.act: {
                 nu -c 'use comma.nu *; source ,.nu; , inspect'
-                '_example a b c e f' | do $_.batch
             }
             $_.wth: { glob: '*.nu' }
         }
