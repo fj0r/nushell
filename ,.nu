@@ -21,6 +21,7 @@ $env.comma_scope = {|_|{
 
         cwdhist.nu:              modules/cwdhist
         comma.nu:                modules/comma
+        comma_test.nu:           modules/comma
         comma.md:                modules/comma/README.md
 
         #direnv.nu:              hooks/direnv
@@ -39,7 +40,7 @@ $env.comma = {|_|{
                 $m | filter {|x| $x.k in $a }
             }
             for x in $m {
-                cp -v $'($_.wd)/scripts/($x.k)' $'($s.dest)/($x.v)'
+                cp $'($_.wd)/scripts/($x.k)' $'($s.dest)/($x.v)'
             }
         }
         $_.dsc: 'export files to nu_scripts'
@@ -69,49 +70,18 @@ $env.comma = {|_|{
         }
         $_.dsc: ',.nu -- commafile'
     }
-    _example: {
-        a: {
-            b: {
-                $_.sub: {
-                    c: {
-                        $_.sub: {
-                            d: {|| print 'ok'}
-                            e: {
-                                $_.sub: {
-                                    f: {
-                                        $_.act: {|| true }
-                                    }
-                                }
-                                $_.dsc: 'ok'
-                            }
-                        }
-                    }
-                }
-                $_.dsc: 'this way'
-            }
-            g: {}
-        }
-        set: {|a, s| do $_.config {|d| $d | upsert $a.0 $a.1 } }
-        get: {|a,s| $_.settings | table -e }
-    }
     test: {
-        batch: {
+        comma: {
             $_.act: {
-                nu -c 'use comma.nu *; source ,.nu; , inspect'
+                nu -c ([
+                    'use scripts/comma.nu *'
+                    'source scripts/comma_test.nu'
+                    ', test all'
+                ] | str join (char newline))
+                , export
             }
             $_.wth: { glob: '*.nu' }
-        }
-        struct: {
-            $_.act: {
-                '_example a b c e f' | do $_.batch
-            }
-            $_.wth: { glob: '*.nu' }
-        }
-        set-env: {
-            $_.act: {
-                '_example set a b; _example get' | do $_.batch
-            }
-            $_.wth: { glob: '*.nu' }
+            $_.dsc: 'copy this to uplevel'
         }
         vscode: {
             gen: {
