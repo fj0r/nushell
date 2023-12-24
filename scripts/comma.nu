@@ -66,39 +66,26 @@ def 'find parent' [] {
     $e
 }
 
-def test [fmt, indent, dsc, spec] {
-    let id = {|x| $x}
-    # spec: spec | expect spec [args] [ctx]
-    # do fmt: indent status message args context
-    match ($spec | length) {
-        1 => {
-            let rst = (do $spec.0 null)
-            let r = (not ($rst | is-empty)) and ($rst == true)
-            let ctx = if $r { null } else { $rst }
-            do $fmt $indent $r $dsc null $ctx
-        }
-        2..4 => {
-            let args = $spec.2?
-            let rst = do $spec.1 $args
-            let pred = if ($spec.0 | describe -d).type == 'closure' {
-                do $spec.0 $rst $args
-            } else {
-                $spec.0 == $rst
-            }
-            let pred = (not ($pred | is-empty)) and ($pred == true)
-            let ctx = if ($spec.3? | is-empty) {
-                if $pred { null } else { $id }
-            } else { $spec.3 }
-            let ctx = if ($ctx | describe -d).type == 'closure' {
-                do $ctx $rst $args
-            } else {
-                $ctx
-            }
-            do $fmt $indent $pred $dsc $spec.2? $ctx
-        }
-        _ => {
-            error make {msg: 'too many args', }
-        }
+def test [fmt, indent, dsc, o] {
+    let rst = do $o.spec? $o.args?
+    let pred = if ($o.expect? | is-empty) {
+        true == $rst
+    } else if ($o.expect? | describe -d).type == 'closure' {
+        do $o.expect $rst $o.args?
+    } else {
+        $o.expect? == $rst
+    }
+    let ctx = if ($o.context? | is-empty) {
+        if $pred { null } else { $rst }
+    } else {
+        do $o.context $rst $o.args?
+    }
+    do $fmt {
+        indent: $indent
+        status: $pred
+        message: $dsc
+        args: $o.args?
+        context: $ctx
     }
 }
 
@@ -153,20 +140,20 @@ export-env {
         | gendict 5
         | merge {
             settings: {
-                test_message: {|indent, status, message, args, context|
-                    let indent = '    ' | str repeat $indent
-                    let status = if $status {
+                test_message: {|x|
+                    let indent = '    ' | str repeat $x.indent
+                    let status = if $x.status {
                         $"(ansi bg_green)SUCC(ansi reset)"
                     } else {
                         $"(ansi bg_red)FAIL(ansi reset)"
                     }
-                    print $"($indent)($status) (ansi yellow_bold)($message) (ansi light_gray)($args)(ansi reset)"
-                    if not ($context | is-empty) {
+                    print $"($indent)($status) (ansi yellow_bold)($x.message) (ansi light_gray)($x.args)(ansi reset)"
+                    if not ($x.context | is-empty) {
                         let ctx = if $indent == 0 {
-                            $context | to yaml
+                            $x.context | to yaml
                         } else {
-                            $context | to yaml | lines
-                            | each {|x| $"($indent)($x)"}
+                            $x.context | to yaml | lines
+                            | each {|i| $"($indent)($i)"}
                             | str join (char newline)
                         }
                         print $"(ansi light_gray)($ctx)(ansi reset)"
@@ -192,7 +179,7 @@ export-env {
                 print $"(ansi $env.comma_index.settings.theme.batch_hint)($cmd)(ansi reset)"
                 nu -c $cmd
             }
-            test: {|dsc, ...spec|
+            test: {|dsc, spec|
                 let fmt = $env.comma_index.settings.test_message
                 test $fmt 0 $dsc $spec
             }
