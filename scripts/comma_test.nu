@@ -68,14 +68,14 @@ $env.comma = {|_|{
             $_.dsc: 'copy this to uplevel'
         }
         all: {
-            do $_.test 'add' {|x| $x == 3 } {, example add 1 2 }
-            do $_.test 'struct' { , test struct }
-            do $_.test 'set env' {|x| $x.a? == 123 } { , test set-env } {|x| $x }
+            do $_.test 'add' {|x| $x == 3 } {|a|, example add 1 2 }
+            do $_.test 'struct' {|a| , test struct }
+            do $_.test 'args' {|x, a| true } {|x| [$x] } 'this is args' {|x, a| $x}
+            do $_.test 'set env' {|x| $x.a? == 123 } { , test set-env }
             do $_.test 'echo' 'hello' {, test other }
             do $_.test 'open file' {|x| $x == (open ,.nu) } { , example a b c e open_file ,.nu }
-            do $_.test 'completion end' {|x| ',.nu' in ( $x | from json) } { , -c example a b c e open_file }
-            #example a b c e
-            do $_.test 'completion' {|x| 'created' in ( $x | from json) } { , -c }
+            do $_.test 'completion' {|x| ',.nu' in ( $x | from json) } { , -c example a b c e open_file } [example a b c e open_file]
+            do $_.test 'completion' {|x| 'f' in ( $x | from json) } {|x| , -c $x } [example a b c e]
             do $_.test 'tree map' {|x| false } {, -e treemap }
         }
         struct: {

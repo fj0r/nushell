@@ -68,30 +68,33 @@ def 'find parent' [] {
 
 def test [fmt, indent, dsc, spec] {
     let id = {|x| $x}
+    # spec: spec | expect spec [args] [ctx]
+    # do fmt: indent status message args context
     match ($spec | length) {
         1 => {
-            let rst = (do $spec.0)
+            let rst = (do $spec.0 null)
             let r = (not ($rst | is-empty)) and ($rst == true)
             let ctx = if $r { null } else { $rst }
-            do $fmt $indent $r $dsc $ctx
+            do $fmt $indent $r $dsc null $ctx
         }
-        2|3 => {
-            let rst = do $spec.1
+        2..4 => {
+            let args = $spec.2?
+            let rst = do $spec.1 $args
             let pred = if ($spec.0 | describe -d).type == 'closure' {
-                do $spec.0 $rst
+                do $spec.0 $rst $args
             } else {
                 $spec.0 == $rst
             }
             let pred = (not ($pred | is-empty)) and ($pred == true)
-            let ctx = if ($spec.2? | is-empty) {
+            let ctx = if ($spec.3? | is-empty) {
                 if $pred { null } else { $id }
-            } else { $spec.2 }
+            } else { $spec.3 }
             let ctx = if ($ctx | describe -d).type == 'closure' {
-                do $ctx $rst
+                do $ctx $rst $args
             } else {
                 $ctx
             }
-            do $fmt $indent $pred $dsc $ctx
+            do $fmt $indent $pred $dsc $spec.2? $ctx
         }
         _ => {
             error make {msg: 'too many args', }
@@ -150,14 +153,14 @@ export-env {
         | gendict 5
         | merge {
             settings: {
-                test_message: {|indent, status, message, context|
+                test_message: {|indent, status, message, args, context|
                     let indent = '    ' | str repeat $indent
                     let status = if $status {
                         $"(ansi bg_green)SUCC(ansi reset)"
                     } else {
                         $"(ansi bg_red)FAIL(ansi reset)"
                     }
-                    print $"($indent)($status) (ansi yellow_bold)($message)(ansi reset)"
+                    print $"($indent)($status) (ansi yellow_bold)($message) (ansi light_gray)($args)(ansi reset)"
                     if not ($context | is-empty) {
                         let ctx = if $indent == 0 {
                             $context | to yaml
@@ -190,7 +193,8 @@ export-env {
                 nu -c $cmd
             }
             test: {|dsc, ...spec|
-                test $env.comma_index.settings.test_message 0 $dsc $spec
+                let fmt = $env.comma_index.settings.test_message
+                test $fmt 0 $dsc $spec
             }
             config: {|cb|
                 # FIXME: no affected $env
@@ -412,7 +416,11 @@ def cmpl [tbl] {
 def 'enrich desc' [flt] {
     let o = $in
     let _ = $env.comma_index
-    let flt = if $_.flt in $o.v { [...$flt, ...($o.v | get $_.flt)] } else { $flt }
+    let flt = if $_.flt in $o.v {
+        [...$flt, ...($o.v | get $_.flt)]
+    } else {
+        $flt
+    }
     let f = if ($flt | is-empty) { '' } else { $"($flt | str join '|')|" }
     let w = if $_.wth in $o.v {
         let w = $o.v | get $_.wth
@@ -481,7 +489,7 @@ export def --wrapped , [
     if $vscode {
         resolve comma | gen vscode | to json
     } else if $completion {
-        $args | cmpl (resolve comma) | to json
+        $args | flatten | cmpl (resolve comma) | to json
     } else if not ($expose | is-empty) {
         expose $expose
     } else if ($args | is-empty) {
@@ -499,6 +507,6 @@ export def --wrapped , [
             }
         }
     } else {
-        $args | run (resolve comma)
+        $args | flatten | run (resolve comma)
     }
 }
