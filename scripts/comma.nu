@@ -23,16 +23,6 @@ def is [tag?] {
     $o
 }
 
-def log [tag? -c] {
-    let o = $in
-    if ($c) {
-        echo $'---(char newline)' | save -f ~/.cache/comma.log
-    } else {
-        echo $'---($tag)---($o | describe)(char newline)($o | to yaml)' | save -a ~/.cache/comma.log
-    }
-    $o
-}
-
 def 'str repeat' [n] {
     let o = $in
     if $n < 1 { return '' }
@@ -119,7 +109,6 @@ def 'comma file' [] {
           $env.comma_index.wd = $after
           $env.comma_index.session_id = (random chars)
 
-          # echo '' | save -f ~/.cache/comma.log
           source ,.nu
           "
         }
@@ -432,6 +421,7 @@ def 'resolve comma' [key = 'comma'] {
 }
 
 def 'run watch' [act argv scope w] {
+    if $w == null { return }
     let _ = $env.comma_index
     let cl = $w.clear? | default false
     if 'interval' in $w {
@@ -469,7 +459,7 @@ def 'run watch' [act argv scope w] {
     }
 }
 
-def run [tbl] {
+def run [tbl --watch: bool] {
     let n = $in | tree select --strict $tbl
     let _ = $env.comma_index
     if not $n.node.end {
@@ -477,7 +467,16 @@ def run [tbl] {
         return
     }
     let flt = if $_.flt in $n.node { [...$n.filter ...($n.node | get $_.flt)] } else { $n.filter }
-    let wth = if $_.wth in $n.node { $n.node | get $_.wth } else { null }
+    let wth = if $watch {
+        if $_.wth in $n.node {
+            [...$n.watch ($n.node | get $_.watch)]
+        } else {
+            $n.watch
+        }
+        | reduce -f {} {|i,a| $a | merge $i}
+    } else {
+        null
+    }
     let act = $n.node | get $_.act
     let scope = resolve scope $n.rest (resolve comma 'comma_scope') $flt
 
@@ -601,6 +600,6 @@ export def --wrapped , [
             }
         }
     } else {
-        $args | flatten | run (resolve comma)
+        $args | flatten | run (resolve comma) --watch $watch
     }
 }

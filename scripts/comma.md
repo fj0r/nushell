@@ -80,14 +80,14 @@ $env.comma = {|_|{
     - [x] tree map
     - [x] test
     - [ ] tag
-    - [ ] watch mode
-        - [ ] override sub node watch
+    - [x] watch mode
+        - [x] override sub node watch
     - [x] args
     - [ ] allow running on leaf node
 - [ ] gen vscode task json file
     - [x] tree map
     - [x] batch mode
-    - [ ] shell input
+    - [ ] augustocdias.tasks-shell-input
 - [x] resolve-node
     - [x] run
     - [x] cmpl
