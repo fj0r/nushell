@@ -87,15 +87,16 @@ $env.comma = {|_|{
     - [ ] test action
         - [x] scope
         - [ ] filter
-    - [ ] support many expect with one spec
+    - [ ] support many expect (list) for one spec
     - [ ] curl integration
 - [ ] gen vscode task json file
     - [x] tree map
     - [x] batch mode
+        - [x] run complete in batch mode
     - [ ] augustocdias.tasks-shell-input
-- [x] resolve-node
+- [x] refactor with `resolve node`
     - [x] run
-    - [x] cmpl
-        - [ ] fix redundant filter in description
+    - [x] complete
+        - [x] fix redundant filter in description
 - [x] theme
     - [x] poll sep bar
