@@ -63,6 +63,33 @@ def 'run exp' [expect result o] {
     }
 }
 
+def diffo [x] {
+    let tbl = $x
+    | transpose k v
+    | do { if ($in | length) != 2 { error make -u { msg: "must be two fields" } } else { $in } }
+    | each {|i|
+        let n = mktemp -t
+        echo ($i.v? | default '' | into string) out> $n
+        $i | insert n $n
+    }
+    let a = $tbl.0
+    let b = $tbl.1
+    let d = ^diff -u $a.n $b.n
+    | lines
+    | each {|x|
+        if ($x | str starts-with $"--- ($a.n)") {
+            $"--- ($a.k)"
+        } else if ($x | str starts-with $"+++ ($b.n)") {
+            $"+++ ($b.k)"
+        } else {
+            $x
+        }
+    }
+    rm -f $a.n
+    rm -f $b.n
+    $d
+}
+
 def test [fmt, indent, dsc, o] {
     let result = do $o.spec? $o.args? $o.scope? | default false
     let exp_type = ($o.expect? | describe -d).type
@@ -227,21 +254,7 @@ export-env {
             F: { false }
             I: {|x| $x }
             diff: {|x|
-                let exp = mktemp -t; let rst = mktemp -t
-                echo ($x.expect? | default '' | into string) out> $exp
-                echo ($x.result | into string) out> $rst
-                let d = diff $exp $rst -u
-                    | lines
-                    | each {|x|
-                        if ($x | str starts-with $"--- ($exp)") {
-                            "--- expect"
-                        } else if ($x | str starts-with $"+++ ($rst)") {
-                            "+++ result"
-                        } else {
-                            $x
-                        }
-                    }
-                rm -f $exp; rm -f $rst
+                let d = diffo {expect: $x.expect, result: $x.result}
                 [$x.args, ('***' | str repeat 10),  ...$d] | str join (char newline)
             }
             config: {|cb|

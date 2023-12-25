@@ -10,6 +10,7 @@
 - [ ] comma
     - [ ] run filter when completion
 - [x] kubernetes independent kubectx & kubens
+    - [ ] parse `kube diff` and modify filename
 - [x] docker
     - [x] -v
     - [x] transform dis output
