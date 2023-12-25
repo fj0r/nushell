@@ -89,6 +89,8 @@ $env.comma = {|_|{
         - [ ] filter
     - [x] support many expect (list) for one spec
     - [ ] curl integration
+    - [ ] ctx transformer: diff
+    - [ ] run with `nu -c` (dynamic source nu file)
 - [ ] gen vscode task json file
     - [x] tree map
     - [x] batch mode

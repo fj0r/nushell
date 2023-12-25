@@ -2,10 +2,10 @@ $env.comma_scope = {|_|{
     created: '2023-12-23{6}12:51:14'
     computed: {$_.computed:{|a, s| $'($s.created)($a)' }}
     say: {|s| print $'(ansi $_.settings.theme.info)($s)(ansi reset)' }
-    q1: {$_.flt:{|a, s| do $s.say 'run a `q1` filter' }}
-    q2: {$_.flt:{|a, s| do $s.say 'run a `q2` filter' }}
-    q3: {$_.flt:{|a, s| do $s.say 'run a `q3` filter' }}
-    q4: {$_.flt:{|a, s| do $s.say 'run a `q4` filter' }}
+    q1: {$_.flt:{|a, s| do $s.say 'run `q1` filter' }}
+    q2: {$_.flt:{|a, s| do $s.say 'run `q2` filter' }}
+    q3: {$_.flt:{|a, s| do $s.say 'run `q3` filter' }}
+    q4: {$_.flt:{|a, s| do $s.say 'run `q4` filter' }}
     slow: {$_.flt:{|a, s|
         do $s.say 'run a `slow` filter'
         sleep 1sec

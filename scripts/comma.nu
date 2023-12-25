@@ -59,7 +59,7 @@ def 'find parent' [] {
 def 'run exp' [expect result o] {
     let r = do $expect $result $o.args? $o.scope?
     if ($r | describe -d).type == 'bool' { $r } else {
-        error make {msg: $"(view source $o.expect) must be bool" }
+        error make -u {msg: $"(view source $o.expect) must be bool" }
     }
 }
 
@@ -422,7 +422,7 @@ def 'resolve scope' [args, vars, flts] {
         if $i in $flt {
             $vs = ($vs | merge {$i: (do ($flt | get $i) $args $vs)} )
         } else {
-            error make {msg: $"filter `($i)` not found" }
+            error make -u {msg: $"filter `($i)` not found" }
         }
     }
     $vs
