@@ -18,13 +18,21 @@ $env.comma_scope = {|_|{
 $env.comma = {|_|{
     created: {|a, s| $s.computed }
     inspect: {|a, s| {index: $_, scope: $s, args: $a} }
+    suit: {
+        scope: {
+            run: {
+                $_.act: {|a, s| $s}
+                $_.exp: {|r, a| 'say' in $r }
+            }
+        }
+    }
     example: {
         a: {
             b: {
                 $_.sub: {
                     t1: {
-                        $_.act: { [1 2 3] }
-                        $_.exp: [1 2 3]
+                        $_.act: $_.T
+                        $_.exp: $_.T
                     }
                     c: {
                         $_.sub: {
@@ -125,6 +133,10 @@ $env.comma = {|_|{
                 expect: $_.T
                 spec: { , -t example a b t1 }
             }
+            do $_.test 'suit' {
+                expect: $_.T
+                spec: { , -t suit }
+            }
         }
         struct: {
             $_.act: {
@@ -137,8 +149,8 @@ $env.comma = {|_|{
                 , example get
             }
         }
-        other: {
-            echo 'hello'
+        other: {|a, s|
+            $s
         }
         poll: {
             $_.act: { print $env.PWD }
