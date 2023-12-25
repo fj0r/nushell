@@ -180,10 +180,16 @@ export-env {
                     }
                     print $"($indent)($status) (ansi yellow_bold)($x.message) (ansi light_gray)($x.args)(ansi reset)"
                     if not ($x.report | is-empty) {
-                        let report = if $indent == 0 {
-                            $x.report | to yaml
+                        let report = if ($x.report | describe -d).type == 'string' {
+                            $x.report
                         } else {
-                            $x.report | to yaml | lines
+                            $x.report | to yaml
+                        }
+                        let report = if $indent == 0 {
+                            $report
+                        } else {
+                            $report
+                            | lines
                             | each {|i| $"($indent)($i)"}
                             | str join (char newline)
                         }
@@ -220,7 +226,23 @@ export-env {
             T: { true }
             F: { false }
             I: {|x| $x }
-            diff: {|a, b|
+            diff: {|x|
+                let exp = mktemp -t; let rst = mktemp -t
+                echo ($x.expect? | default '' | into string) out> $exp
+                echo ($x.result | into string) out> $rst
+                let d = diff $exp $rst -u
+                    | lines
+                    | each {|x|
+                        if ($x | str starts-with $"--- ($exp)") {
+                            "--- expect"
+                        } else if ($x | str starts-with $"+++ ($rst)") {
+                            "+++ result"
+                        } else {
+                            $x
+                        }
+                    }
+                rm -f $exp; rm -f $rst
+                [$x.args, ('***' | str repeat 10),  ...$d] | str join (char newline)
             }
             config: {|cb|
                 # FIXME: no affected $env

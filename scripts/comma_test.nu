@@ -59,6 +59,7 @@ $env.comma = {|_|{
                                         $_.filter: ['q4']
                                         $_.exp: {|r, a| $r == (open ',.nu') }
                                         $_.mock: [',.nu']
+                                        $_.report: $_.diff
                                     }
                                     t3: {
                                         $_.act: $_.T
