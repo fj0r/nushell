@@ -41,7 +41,7 @@ $env.comma = {|_|{
                 $m | filter {|x| $x.k in $a }
             }
             for x in $m {
-                cp $'($_.wd)/scripts/($x.k)' $'($s.dest)/($x.v)' -v
+                cp $'($_.wd)/scripts/($x.k)' $'($s.dest)/($x.v)'
             }
         }
         $_.dsc: 'export files to nu_scripts'
