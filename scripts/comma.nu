@@ -78,7 +78,7 @@ def test [fmt, indent, dsc, o] {
     } else {
         $o.expect? == $result
     }
-    let ctx = if ($o.context? | is-empty) {
+    let report = if ($o.context? | is-empty) {
         if $status { null } else {
             let e = if $exp_type == 'closure' {
                 $"<(view source $o.expect)>"
@@ -88,10 +88,15 @@ def test [fmt, indent, dsc, o] {
             } else {
                 $o.expect?
             }
-            {
+            let r = {
                 args: $o.args?
                 result: $result
                 expect: $e
+            }
+            if ($o.report? | is-empty) {
+                $r
+            } else {
+                do $o.report $r
             }
         }
     } else {
@@ -102,7 +107,7 @@ def test [fmt, indent, dsc, o] {
         status: $status
         message: $dsc
         args: $o.args?
-        context: $ctx
+        report: $report
     }
 }
 
@@ -151,8 +156,10 @@ export-env {
             [computed cpu]
             [watch wth]
             tag
+            # test
             [expect exp]
-            [test_args args]
+            [mock test_args]
+            [report rpt]
         ]
         | gendict 5
         | merge {
@@ -172,15 +179,15 @@ export-env {
                         $"(ansi bg_red)FAIL(ansi reset)"
                     }
                     print $"($indent)($status) (ansi yellow_bold)($x.message) (ansi light_gray)($x.args)(ansi reset)"
-                    if not ($x.context | is-empty) {
-                        let ctx = if $indent == 0 {
-                            $x.context | to yaml
+                    if not ($x.report | is-empty) {
+                        let report = if $indent == 0 {
+                            $x.report | to yaml
                         } else {
-                            $x.context | to yaml | lines
+                            $x.report | to yaml | lines
                             | each {|i| $"($indent)($i)"}
                             | str join (char newline)
                         }
-                        print $"(ansi light_gray)($ctx)(ansi reset)"
+                        print $"(ansi light_gray)($report)(ansi reset)"
                     }
                 }
                 tips: {|m, a|
@@ -213,6 +220,8 @@ export-env {
             T: { true }
             F: { false }
             I: {|x| $x }
+            diff: {|a, b|
+            }
             config: {|cb|
                 # FIXME: no affected $env
                 $env.comma_index.settings = (do $cb $env.comma_index.settings)
@@ -301,7 +310,8 @@ def 'test suit' [] {
         test $i.fmt ($i.indent - 1) $i.desc {
             expect: $i.expect
             spec: $i.spec
-            args: $i.args
+            args: $i.mock
+            report: $i.report
             scope: (resolve scope null (resolve comma 'comma_scope') [])
         }
         $lv = $t
@@ -315,7 +325,8 @@ def 'run test' [--watch: bool] {
         if $_.exp in $node {
             let exp = $node | get $_.exp
             let spec = $node | get $_.act
-            let args = if $_.args in $node { $node | get $_.args }
+            let mock = if $_.mock in $node { $node | get $_.mock }
+            let report = if $_.rpt in $node { $node | get $_.rpt }
             let desc = $pth | last
             {
                 path: $pth
@@ -325,7 +336,8 @@ def 'run test' [--watch: bool] {
                 desc: $desc
                 expect: $exp
                 spec: $spec
-                args: $args
+                mock: $mock
+                report: $report
             }
         }
     }

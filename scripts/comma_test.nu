@@ -58,7 +58,7 @@ $env.comma = {|_|{
                                         $_.dsc: 'open a file'
                                         $_.filter: ['q4']
                                         $_.exp: {|r, a| $r == (open ',.nu') }
-                                        $_.args: [',.nu']
+                                        $_.mock: [',.nu']
                                     }
                                     t3: {
                                         $_.act: $_.T
