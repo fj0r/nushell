@@ -23,8 +23,8 @@ $env.comma = {|_|{
             b: {
                 $_.sub: {
                     t1: {
-                        $_.act: $_.T
-                        $_.exp: $_.T
+                        $_.act: { [1 2 3] }
+                        $_.exp: [1 2 3]
                     }
                     c: {
                         $_.sub: {
@@ -120,6 +120,10 @@ $env.comma = {|_|{
             do $_.test 'run test' {
                 expect: $_.T
                 spec: {, -e test example }
+            }
+            do $_.test 'run leaf test' {
+                expect: $_.T
+                spec: { , -t example a b t1 }
             }
         }
         struct: {
