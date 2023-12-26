@@ -663,7 +663,11 @@ def expose [t, a, tbl] {
     }
 }
 
-def compos [...context] {
+export def --wrapped pw [...x] {
+    print $"($x | flatten | str join ' ')"
+}
+
+def 'run completion' [...context] {
     $context
     | parse argv
     | cmpl (resolve comma)
@@ -677,7 +681,7 @@ export def --wrapped , [
     --tag (-g)
     --watch (-w)
     --expose (-e) # for test
-    ...args:string@compos
+    ...args:string@'run completion'
 ] {
     if ($args | is-empty) {
         if ([$env.PWD, ',.nu'] | path join | path exists) {
