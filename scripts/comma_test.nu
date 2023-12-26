@@ -25,6 +25,17 @@ $env.comma = {|_|{
                 $_.exp: {|r, a| 'say' in $r }
             }
         }
+        dry_run: {
+            a: { dry pwd }
+            no: {
+                $_.a: {, suit dry_run a }
+                $_.x: {|r| ($r | lines | get 0) == $env.PWD }
+            }
+            yes: {
+                $_.a: {, -d suit dry_run a }
+                $_.x: {|r| $r == 'pwd'}
+            }
+        }
         completion: {
             'example a b c e': {
                 $_.act: {, -c example a b c e }
@@ -34,11 +45,28 @@ $env.comma = {|_|{
                     {|r,a| 'q1|q2|q3|q4| open a file' == ($r | from json | get 1.description) }
                 ]
             }
+            'with args': {
+                $_.act: { , -c example a b c e open_file }
+                $_.x: {|r,a| ',.nu' in $r }
+            }
+            args: {
+                $_.a: {|a,s| $a }
+                $_.c: {|a,s| $a }
+            }
+            'run with args': {
+                $_.act: {|a| , suit completion args $a }
+                $_.m: [a b c d e f g]
+                $_.x: {|r,a| $r == $a }
+            }
+            'with multiple args': {
+                $_.act: {|a| , -c suit completion args $a | from json }
+                $_.m: [a b c d e f g]
+                $_.x: {|r,a| $r == $a }
+            }
         }
         vscode: {
             'gen': {
                 $_.a: { , -e vscode }
-                $_.x: $_.F
             }
         }
     }
@@ -94,11 +122,7 @@ $env.comma = {|_|{
     test: {
         comma: {
             $_.act: {
-                nu -c ([
-                    'use scripts/comma.nu *'
-                    'source scripts/comma_test.nu'
-                    ', test all'
-                ] | str join (char newline))
+                ', test all' | do $_.batch 'scripts/comma_test.nu'
             }
             $_.wth: {
                 glob: '*.nu'
@@ -121,8 +145,8 @@ $env.comma = {|_|{
                 context: {|x, a| $x}
             }
             do $_.test 'set env' {
-                expect: {|x| $x.a? == 123 }
                 spec: { , test set-env }
+                expect: {|x| $x.a? == 123 }
             }
             do $_.test 'open file' {
                 expect: {|x| $x == (open ,.nu) }

@@ -52,7 +52,6 @@ def 'find parent' [] {
     mut e = ''
     for i in 0..$depth {
         $e = ($cur | path join)
-        #print ($e | path expand)
         if ($e | path exists) { break }
         $cur = ['..', ...$cur]
         $e = ''
@@ -187,18 +186,20 @@ export-env {
             [expect exp e x]
             [mock test_args m]
             [report rpt r]
+            # internal
+            dry_run
         ]
         | gendict 5 {
             settings: {
                 test_group: {|x|
-                    let indent = '    ' | str repeat $x.indent
+                    let indent = '  ' | str repeat $x.indent
                     let s = $"(ansi bg_dark_gray)GROUP(ansi reset)"
                     let t = $"(ansi yellow_bold)($x.title)(ansi reset)"
                     let d = $"(ansi light_gray)($x.desc)(ansi reset)"
                     print $"($indent)($s) ($t) ($d)"
                 }
                 test_message: {|x|
-                    let indent = '    ' | str repeat $x.indent
+                    let indent = '  ' | str repeat $x.indent
                     let status = if $x.status {
                         $"(ansi bg_green)SUCC(ansi reset)"
                     } else {
@@ -227,13 +228,13 @@ export-env {
             os: (os type)
             arch: (uname -m)
             lg: {$in | lg}
-            batch: {
+            batch: {|mod=',.nu'|
                 let o = $in
                     | lines
                     | split row ';'
                     | flatten
                     | each {|x| $", ($x | str trim)" }
-                let cmd = ['use comma.nu *' 'source ,.nu' ...$o ]
+                let cmd = ['use comma.nu *' $'source ($mod)' ...$o ]
                     | str join (char newline)
                 print $"(ansi $env.comma_index.settings.theme.batch_hint)($cmd)(ansi reset)"
                 nu -c $cmd
@@ -256,7 +257,7 @@ export-env {
     )
 }
 
-def 'resolve node' [] { # [endpoint, node]
+def 'resolve node' [] {
     let o = $in
     let _ = $env.comma_index
     let t = ($o | describe -d).type
@@ -663,8 +664,12 @@ def expose [t, a, tbl] {
     }
 }
 
-export def --wrapped pw [...x] {
-    print $"($x | flatten | str join ' ')"
+export def --wrapped dry [...x] {
+    if (do -i { $env.comma_index | get $env.comma_index.dry_run } | default false) {
+        $"($x | flatten | str join ' ')"
+    } else {
+        ^$x.0 ($x | range 1..)
+    }
 }
 
 def 'run completion' [...context] {
@@ -680,6 +685,7 @@ export def --wrapped , [
     --test (-t)
     --tag (-g)
     --watch (-w)
+    --dry-run (-d)
     --expose (-e) # for test
     ...args:string@'run completion'
 ] {
@@ -708,6 +714,9 @@ export def --wrapped , [
         } else if $expose {
             expose $args.0 ($args | range 1..) $tbl
         } else {
+            if $dry_run {
+                $env.comma_index = ($env.comma_index | upsert $env.comma_index.dry_run true)
+            }
             $args | flatten | run $tbl --watch $watch
         }
     }
