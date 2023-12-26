@@ -51,15 +51,7 @@ $env.comma = {|_|{
     }
     upgrade: {
         $_.act: {|a, e|
-            if ($a.0? | is-empty) {
-                fd ',\.nu' ~
-                | lines
-                | each {|x|
-                    ^$env.EDITOR $x
-                }
-            } else {
-                e $a.0
-            }
+            e $a.0
         }
         $_.cmp: {|a, e|
             let s = fd ',\.nu' ~ | lines
@@ -101,16 +93,6 @@ $env.comma = {|_|{
             $_.wth: {
                 interval: 2sec
                 clear: true
-            }
-        }
-        vscode: {
-            gen: {
-                $_.act: {|a,s| print $a.0 }
-                $_.wth: { glob: '*.nu' }
-            }
-            complete: {
-                $_.act: { 2 }
-                $_.wth: { glob: '*.nu' }
             }
         }
     }
