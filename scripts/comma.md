@@ -2,6 +2,7 @@ Working dir task runner, similar to `pwd-module`, but supports completion and de
 - `,` or `*` need to be exported in order to use `,` directly
 - Directly execute `,` to create a new template file or edit an existing file
 - Custom tasks are written in `$env.comma` and can be nested
+    - no spaces allowed in name
 - Generate completions based on the structure of `$env.comma`
 - You can use closure to customize completion
 - In `$_.act` of default closure, you can receive parameters after the current position

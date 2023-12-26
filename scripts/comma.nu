@@ -670,6 +670,7 @@ def compos [...context] {
 }
 
 export def --wrapped , [
+    # flag with parameters is not supported
     --vscode
     --completion (-c)
     --test (-t)
