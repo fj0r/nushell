@@ -1,48 +1,50 @@
-def gendict [size extend] {
-    let keys = $in
-    mut k = []
-    let n = $keys | length
-    let rk = random chars -l ($n * $size)
-    for i in 1..$n {
-        let b = ($i - 1) * $size
-        let e = $i * $size
-        $k ++= ($rk | str substring $b..$e)
+module utils {
+    export def gendict [size extend] {
+        let keys = $in
+        mut k = []
+        let n = $keys | length
+        let rk = random chars -l ($n * $size)
+        for i in 1..$n {
+            let b = ($i - 1) * $size
+            let e = $i * $size
+            $k ++= ($rk | str substring $b..$e)
+        }
+        let ids = $keys
+        | zip $k
+        | reduce -f {} {|x, acc|
+            let id = if ($x.0 | describe -d).type == 'list' { $x.0 } else { [$x.0] }
+            $id | reduce -f $acc {|i,a| $a | insert $i $"($id.0)_($x.1)" }
+        }
+        $extend
+        | transpose k v
+        | reduce -f $ids {|x, acc|
+            $acc | insert $x.k { $x.v }
+        }
     }
-    let ids = $keys
-    | zip $k
-    | reduce -f {} {|x, acc|
-        let id = if ($x.0 | describe -d).type == 'list' { $x.0 } else { [$x.0] }
-        $id | reduce -f $acc {|i,a| $a | insert $i $"($id.0)_($x.1)" }
-    }
-    $extend
-    | transpose k v
-    | reduce -f $ids {|x, acc|
-        $acc | insert $x.k { $x.v }
-    }
-}
 
-def lg [tag?] {
-    let o = $in
-    print $'---($tag)---($o | describe)(char newline)($o | to yaml)'
-    $o
-}
-
-def 'str repeat' [n] {
-    let o = $in
-    if $n < 1 { return '' }
-    mut r = ''
-    for i in 0..($n - 1) {
-        $r += $o
+    export def lg [tag?] {
+        let o = $in
+        print $'---($tag)---($o | describe)(char newline)($o | to yaml)'
+        $o
     }
-    $r
-}
 
-def unindent [] {
-    let txt = $in | lines | range 1..
-    let indent = $txt.0 | parse --regex '^(?P<indent>\s*)' | get indent.0 | str length
-    $txt
-    | each {|s| $s | str substring $indent.. }
-    | str join (char newline)
+    export def 'str repeat' [n] {
+        let o = $in
+        if $n < 1 { return '' }
+        mut r = ''
+        for i in 0..($n - 1) {
+            $r += $o
+        }
+        $r
+    }
+
+    export def unindent [] {
+        let txt = $in | lines | range 1..
+        let indent = $txt.0 | parse --regex '^(?P<indent>\s*)' | get indent.0 | str length
+        $txt
+        | each {|s| $s | str substring $indent.. }
+        | str join (char newline)
+    }
 }
 
 def 'find parent' [] {
@@ -164,6 +166,7 @@ def 'comma file' [] {
 }
 
 export-env {
+    use utils *
     # batch mode
     if not ($env.config? | is-empty) {
         $env.config = ( $env.config | upsert hooks.env_change.PWD { |config|
