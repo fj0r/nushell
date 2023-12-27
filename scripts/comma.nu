@@ -1,3 +1,9 @@
+export def lg [tag?] {
+    let o = $in
+    print $'---($tag)---($o | describe)(char newline)($o | to yaml)'
+    $o
+}
+
 module utils {
     export def gendict [size extend] {
         let keys = $in
@@ -22,11 +28,6 @@ module utils {
         }
     }
 
-    export def lg [tag?] {
-        let o = $in
-        print $'---($tag)---($o | describe)(char newline)($o | to yaml)'
-        $o
-    }
 
     export def 'str repeat' [n] {
         let o = $in
@@ -279,48 +280,79 @@ def 'resolve node' [] {
     }
 }
 
-def 'tree op' [cur _] {
-    mut op = $in
-    mut wth = ($op.watch? | default [])
-    mut flt = ($op.filter? | default [])
-    if $_.flt in $cur { $flt ++= ($cur | get $_.flt) }
-    if $_.wth in $cur { $wth ++= ($cur | get $_.wth) }
-    {
-        filter: $flt
-        watch: $wth
-    }
-}
 
-def 'tree select' [tree --strict] {
-    let ph = $in
-    let _ = $env.comma_index
-    mut cur = $tree | resolve node
-    mut op = {} | tree op $cur $_
-    mut rest = []
-    for i in $ph {
-        if $cur.end {
-            $rest ++= $i
-        } else {
-            $op = ($op | tree op $cur $_)
-            let sub = $cur | get $_.sub
-            if $i in $sub {
-                $cur = ($sub | get $i | resolve node)
+module tree {
+    def op [cur _] {
+        mut data = $in
+        mut wth = ($data.watch? | default [])
+        mut flt = ($data.filter? | default [])
+        if $_.flt in $cur { $flt ++= ($cur | get $_.flt) }
+        if $_.wth in $cur { $wth ++= ($cur | get $_.wth) }
+        {
+            filter: $flt
+            watch: $wth
+        }
+    }
+
+    export def select [data --strict] {
+        let ph = $in
+        let _ = $env.comma_index
+        mut cur = $data | resolve node
+        mut ops = {} | op $cur $_
+        mut rest = []
+        for i in $ph {
+            if $cur.end {
+                $rest ++= $i
             } else {
-                if $strict {
-                    $cur = ({ do $_.settings.tips "not found" $i } | resolve node)
+                $ops = ($ops | op $cur $_)
+                let sub = $cur | get $_.sub
+                if $i in $sub {
+                    $cur = ($sub | get $i | resolve node)
                 } else {
-                    $cur
+                    if $strict {
+                        $cur = ({ do $_.settings.tips "not found" $i } | resolve node)
+                    } else {
+                        $cur
+                    }
+                    break
                 }
-                break
+            }
+        }
+        {
+            node: $cur
+            rest: $rest
+            ...$ops
+        }
+    }
+
+    export def map [cb bc?] {
+        let t = $in | resolve node
+        let _ = $env.comma_index
+        travel [] [] $t $cb $bc $_
+    }
+
+    def travel [path g data cb bc _] {
+        if $data.end {
+            do $cb $path $g $data $_
+        } else {
+            $data | get $_.sub
+            | transpose k v
+            | reduce -f [] {|x, a|
+                let v = $x.v | resolve node
+                let g = if ($bc | describe -d).type == 'closure' {
+                    $g | append (do $bc $v $_)
+                } else { $g }
+                let r = travel ($path | append $x.k) $g $v $cb $bc $_
+                if ($r | is-empty) {
+                    $a
+                } else {
+                    $a | append $r
+                }
             }
         }
     }
-    {
-        node: $cur
-        rest: $rest
-        ...$op
-    }
 }
+
 
 def 'test suit' [] {
     let specs = $in
@@ -355,6 +387,7 @@ def 'test suit' [] {
 def 'run test' [tbl --watch: bool] {
     let argv = $in
     let _ = $env.comma_index
+    use tree
     let bc = {|node, _|
         if $_.dsc in $node {
             $node | get $_.dsc
@@ -407,6 +440,7 @@ def 'run test' [tbl --watch: bool] {
 
 def summary [$tbl] {
     let argv = $in
+    use tree
     $argv
     | flatten
     | tree select --strict $tbl
@@ -416,33 +450,6 @@ def summary [$tbl] {
         path: $pth
         node: $node
     } }
-}
-
-def 'tree map' [cb bc?] {
-    let t = $in | resolve node
-    let _ = $env.comma_index
-    tree travel [] [] $t $cb $bc $_
-}
-
-def 'tree travel' [path g tree cb bc _] {
-    if $tree.end {
-        do $cb $path $g $tree $_
-    } else {
-        $tree | get $_.sub
-        | transpose k v
-        | reduce -f [] {|x, a|
-            let v = $x.v | resolve node
-            let g = if ($bc | describe -d).type == 'closure' {
-                $g | append (do $bc $v $_)
-            } else { $g }
-            let r = tree travel ($path | append $x.k) $g $v $cb $bc $_
-            if ($r | is-empty) {
-                $a
-            } else {
-                $a | append $r
-            }
-        }
-    }
 }
 
 def 'resolve scope' [args, vars, flts] {
@@ -544,7 +551,9 @@ def 'run watch' [act argv scope w] {
 }
 
 def run [tbl --watch: bool] {
-    let n = $in | tree select --strict $tbl
+    let n = $in
+    use tree
+    let n = $n | tree select --strict $tbl
     let _ = $env.comma_index
     if not $n.node.end {
         do $_.settings.tips "require argument" ($n.node | get $_.sub | columns)
@@ -574,6 +583,7 @@ def run [tbl --watch: bool] {
 def cmpl [tbl] {
     let n = $in
     let n = if ($n | last) == '' { $n | range ..-2 } else { $n }
+    use tree
     let n = $n | tree select $tbl
     let _ = $env.comma_index
     let flt = if $_.flt in $n.node { [...$n.filter ...($n.node | get $_.flt)] } else { $n.filter }
@@ -625,6 +635,7 @@ def 'enrich desc' [flt] {
 def 'gen vscode-tasks' [tbl] {
     let argv = $in
     let _ = $env.comma_index
+    use tree
     let bc = {|node, _|
         if $_.dsc in $node {
             $node | get $_.dsc
