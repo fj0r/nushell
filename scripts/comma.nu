@@ -197,7 +197,7 @@ module resolve {
 }
 
 module run {
-    export def watch_ [act argv scope w] {
+    export def watches [act argv scope w] {
         if $w == null { return }
         let _ = $env.comma_index
         let cl = $w.clear? | default false
@@ -263,7 +263,7 @@ module run {
         if ($wth | is-empty) {
             do $act $n.rest $scope
         } else {
-            run watch $act $n.rest $scope $wth
+            watches $act $n.rest $scope $wth
         }
     }
 
@@ -482,7 +482,7 @@ module test {
         }
         | tree map $cb $bc
         if ($watch | default false) {
-            watch_ {
+            watches {
                 $specs | suit
             } [] {} { clear: true }
         } else {
