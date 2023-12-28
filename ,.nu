@@ -66,11 +66,7 @@ $env.comma = {|_|{
     test: {
         comma: {
             $_.act: {
-                nu -c ([
-                    'use scripts/comma.nu *'
-                    'source scripts/comma_test.nu'
-                    ', test all'
-                ] | str join (char newline))
+                'test all' | do $_.batch 'comma_test.nu'
                 , export
             }
             $_.wth: {

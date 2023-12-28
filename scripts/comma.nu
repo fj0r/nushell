@@ -151,6 +151,19 @@ module tree {
             }
         }
     }
+
+
+    export def spread [list lv=0] {
+        $list
+        | each {|x|
+            if ($x | describe -d).type == 'list' {
+                spread $x ($lv + 1)
+            } else {
+                $x
+            }
+        } | flatten
+    }
+
 }
 
 module resolve {
@@ -750,6 +763,9 @@ def 'parse argv' [] {
     let context = $in
     $context.0
     | str substring 0..$context.1
+    | split row ';'
+    | last
+    | str trim -l
     | split row -r '\s+'
     | range 1..
     | where not ($it | str starts-with '-')
@@ -770,21 +786,61 @@ def expose [t, a, tbl] {
         }
         _ => {
             let _ = $env.comma_index
-            do $_.settings.tips "expose has different arguments" [test summary vscode]
+            do $_.settings.tips "expose has different arguments" [
+                test
+                summary
+                vscode
+            ]
         }
     }
 }
 
-export def --wrapped dry [...x] {
-    if (do -i { $env.comma_index | get $env.comma_index.dry_run } | default false) {
-        let w = term size | get columns
-        print $x.0
-        for i in ($x | range 1..) {
-            print ($i | flatten | str join ' ')
-            print '---'
+    # FIXME: Cannot be placed in `tree` module
+    def unnest [list lv=0] {
+        mut cur = []
+        mut rt = []
+        for i in $list {
+            if ($i | describe -d).type == 'list' {
+                $rt = [...$rt, {it: $cur, lv: $lv}, ...(unnest $i ($lv + 1))]
+                $cur = []
+            } else {
+                $cur = [...$cur, $i]
+            }
         }
+        if not ($cur | is-empty) {
+            $rt = [...$rt, {it: $cur, lv: $lv}]
+        }
+        return $rt
+    }
+
+# execute or echo
+export def --wrapped ee [...x --prefix='  ' --strip] {
+    use utils 'str repeat'
+    let w = term size | get columns
+    mut lines = []
+    for a in (unnest (if $strip { $x.0 } else { $x })) {
+        mut nl = ($prefix | str repeat $a.lv)
+        for t in $a.it {
+            let line = $"($nl) ($t)"
+            if ($line | str length) > $w {
+                $lines ++= $nl
+                $nl = $"($prefix | str repeat $a.lv) ($t)"
+            } else {
+                $nl = $line
+            }
+        }
+        $lines ++= $nl
+    }
+    $lines | str join $" \\(char newline)"
+}
+
+# perform or print
+export def --wrapped pp [...x] {
+    if (do -i { $env.comma_index | get $env.comma_index.dry_run } | default false) {
+        ee $x --strip
     } else {
-        ^$x.0 ($x | range 1.. | flatten | flatten)
+        use tree spread
+        ^$x.0 (spread ($x | range 1..))
     }
 }
 
@@ -804,7 +860,7 @@ export def --wrapped , [
     --test (-t)
     --tag (-g)
     --watch (-w)
-    --dry-run (-d)
+    --print (-p)
     --expose (-e) # for test
     ...args:string@'completion'
 ] {
@@ -853,7 +909,7 @@ export def --wrapped , [
         } else if $expose {
             expose $args.0 ($args | range 1..) $tbl
         } else {
-            if $dry_run {
+            if $print {
                 $env.comma_index = ($env.comma_index | upsert $env.comma_index.dry_run true)
             }
             use run
