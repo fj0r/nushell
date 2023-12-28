@@ -127,6 +127,18 @@ def record-to-set-json [value] {
     | str join ','
 }
 
+# helm to docker-compose
+export def khc [
+    chart: string@"nu-complete helm charts"
+    valuefile: path
+] {
+    mkdir /tmp/khc
+    let target = mktemp -p /tmp/khc
+    helm template --debug 'helm-compose' $chart -f $valuefile | save -f $target
+    let c = open $target | from yaml
+    $c
+}
+
 # helm install or upgrade via values file
 export def kah [
     name: string@"nu-complete helm list"

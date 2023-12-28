@@ -82,7 +82,7 @@ module tree {
         }
     }
 
-    def op [cur _] {
+    def gather [cur _] {
         mut data = $in
         mut wth = ($data.watch? | default [])
         mut flt = ($data.filter? | default [])
@@ -98,13 +98,13 @@ module tree {
         let ph = $in
         let _ = $env.comma_index
         mut cur = $data | node
-        mut ops = {} | op $cur $_
+        mut ops = {} | gather $cur $_
         mut rest = []
         for i in $ph {
             if $cur.end {
                 $rest ++= $i
             } else {
-                $ops = ($ops | op $cur $_)
+                $ops = ($ops | gather $cur $_)
                 let sub = $cur | get $_.sub
                 if $i in $sub {
                     $cur = ($sub | get $i | node)
@@ -722,6 +722,7 @@ export-env {
                 use test
                 test diffo {expect: $x.expect, result: $x.result}
             }
+            unindent: { $in | unindent }
             config: {|cb|
                 # FIXME: no affected $env
                 $env.comma_index.settings = (do $cb $env.comma_index.settings)
@@ -776,9 +777,14 @@ def expose [t, a, tbl] {
 
 export def --wrapped dry [...x] {
     if (do -i { $env.comma_index | get $env.comma_index.dry_run } | default false) {
-        $"($x | flatten | str join ' ')"
+        let w = term size | get columns
+        print $x.0
+        for i in ($x | range 1..) {
+            print ($i | flatten | str join ' ')
+            print '---'
+        }
     } else {
-        ^$x.0 ($x | range 1..)
+        ^$x.0 ($x | range 1.. | flatten | flatten)
     }
 }
 
