@@ -57,7 +57,7 @@ module utils {
         }
     }
 
-    export def unindent [] {
+    export def outdent [] {
         let txt = $in | lines | range 1..
         let indent = $txt.0 | parse --regex '^(?P<indent>\s*)' | get indent.0 | str length
         $txt
@@ -722,7 +722,7 @@ export-env {
                 use test
                 test diffo {expect: $x.expect, result: $x.result}
             }
-            unindent: { $in | unindent }
+            outdent: { $in | outdent }
             config: {|cb|
                 # FIXME: no affected $env
                 $env.comma_index.settings = (do $cb $env.comma_index.settings)

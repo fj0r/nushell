@@ -80,10 +80,11 @@ $env.comma = {|_|{
 ```
 
 ### todo
-- [ ] run
-    - [ ] dry wrap lines
-    - [ ] accept list<string>
-    - [ ] formatter: indent block
+- [x] run
+    - [ ] dry
+        - [ ] dry wrap lines
+        - [ ] accept list<string>
+    - [x] formatter: outdent
 - [x] complete
     - [x] with args
 - [x] scoped test
