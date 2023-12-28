@@ -66,7 +66,7 @@ $env.comma = {|_|{
     test: {
         comma: {
             $_.act: {
-                'test all' | do $_.batch 'comma_test.nu'
+                ', test all' | do $_.batch 'comma_test.nu'
                 , export
             }
             $_.wth: {

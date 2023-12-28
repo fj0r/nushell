@@ -37,7 +37,7 @@ $env.comma = {|_|{
             }
             ee: {
                 $_.a: {
-                    ee aaa bbbb ccccc dddddd eeeeee  [
+                    pp --print aaa bbbb ccccc dddddd eeeeee  [
                         ffffff gggggggggg [
                             hhhhhhhhh iiiiiiiiii lllllllll
                         ] mmmmmmmmmmmmm nnnnnnnnnnnn
@@ -143,7 +143,7 @@ $env.comma = {|_|{
     test: {
         comma: {
             $_.act: {
-                'test all' | do $_.batch 'comma_test.nu'
+                ', test all' | do $_.batch 'comma_test.nu'
             }
             $_.wth: {
                 glob: '*.nu'
