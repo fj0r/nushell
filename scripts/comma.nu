@@ -1,6 +1,6 @@
 export def lg [tag?] {
     let o = $in
-    print $'---($tag)---($o | describe)(char newline)($o | to yaml)'
+    print -e $'---($tag)---($o | describe)(char newline)($o | to yaml)'
     $o
 }
 
@@ -221,7 +221,7 @@ module run {
                 }
                 do $act $argv $scope
                 sleep $w.interval
-                print $env.comma_index.settings.theme.watch_separator
+                print -e $env.comma_index.settings.theme.watch_separator
             }
         } else {
             if $cl {
@@ -242,7 +242,7 @@ module run {
                         new_path: $path
                     })
                     if not $cl {
-                        print $env.comma_index.settings.theme.watch_separator
+                        print -e $env.comma_index.settings.theme.watch_separator
                     }
                 }
             }
@@ -668,8 +668,8 @@ def 'comma file' [] {
         {
           condition: {|_, after| $after | path join ',.nu' | path exists}
           code: "
-          print $'(ansi default_underline)(ansi default_bold),(ansi reset).nu (ansi green_italic)detected(ansi reset)...'
-          print $'(ansi $env.comma_index.settings.theme.info)activating(ansi reset) (ansi default_underline)(ansi default_bold),(ansi reset) module with `(ansi default_dimmed)(ansi default_italic)source ,.nu(ansi reset)`'
+          print -e $'(ansi default_underline)(ansi default_bold),(ansi reset).nu (ansi green_italic)detected(ansi reset)...'
+          print -e $'(ansi $env.comma_index.settings.theme.info)activating(ansi reset) (ansi default_underline)(ansi default_bold),(ansi reset) module with `(ansi default_dimmed)(ansi default_italic)source ,.nu(ansi reset)`'
 
           # TODO: allow parent dir
           $env.comma_index.wd = $after
@@ -740,7 +740,7 @@ export-env {
                     }
                 }
                 tips: {|m, a|
-                    print $"(ansi light_gray_italic)($m)(ansi reset) (ansi yellow_bold)($a)(ansi reset)"
+                    print -e $"(ansi light_gray_italic)($m)(ansi reset) (ansi yellow_bold)($a)(ansi reset)"
                 }
                 theme: {
                     info: 'yellow_italic'
@@ -758,7 +758,7 @@ export-env {
                     | flatten
                 let cmd = ['use comma.nu *' $'source ($mod)' ...$o ]
                     | str join (char newline)
-                print $"(ansi $env.comma_index.settings.theme.batch_hint)($cmd)(ansi reset)"
+                print -e $"(ansi $env.comma_index.settings.theme.batch_hint)($cmd)(ansi reset)"
                 nu -c $cmd
             }
             test: {|dsc, spec|
