@@ -59,6 +59,7 @@ export def 'history backup' [] {
     $".output ($env.history_backup_dir)/(date now | format date "%y_%m_%d_%H_%M_%S").sql
     ($nl)update history set cwd = replace\(cwd, '($env.HOME)', '~');
     ($nl).dump
+    ($nl)update history set cwd = replace\(cwd, '~', '($env.HOME)');
     ($nl).quit" | sqlite3 $nu.history-path
 }
 
@@ -68,5 +69,9 @@ def "nu-complete history_backup_file" [] {
 # restore history
 export def 'history restore' [name: string@"nu-complete history_backup_file"] {
     rm -f $nu.history-path
-    cat ([$env.history_backup_dir, $"($name).sql"] | path join) | sqlite3 $nu.history-path
+    cat ([$env.history_backup_dir, $"($name).sql"] | path join)
+    | sqlite3 $nu.history-path
+    let nl = char newline
+    $"update history set cwd = replace\(cwd, '~', '($env.HOME)');
+    ($nl).quit" | sqlite3 $nu.history-path
 }
