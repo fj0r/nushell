@@ -55,10 +55,11 @@ export-env {
 # backup history
 export def 'history backup' [] {
     ^mkdir [-p $env.history_backup_dir]
-    $'.output ($env.history_backup_dir)/(date now | format date "%y_%m_%d_%H_%M_%S").sql
-    update history set cwd = replace\(cwd, '($env.HOME)', '~');
-    .dump
-    .quit' | sqlite3 $nu.history-path
+    let nl = char newline
+    $".output ($env.history_backup_dir)/(date now | format date "%y_%m_%d_%H_%M_%S").sql
+    ($nl)update history set cwd = replace\(cwd, '($env.HOME)', '~');
+    ($nl).dump
+    ($nl).quit" | sqlite3 $nu.history-path
 }
 
 def "nu-complete history_backup_file" [] {

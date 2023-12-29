@@ -110,7 +110,7 @@ module tree {
                     $cur = ($sub | get $i | node)
                 } else {
                     if $strict {
-                        $cur = ({ do $_.settings.tips "not found" $i } | node)
+                        $cur = ({ do $_.tips "not found" $i } | node)
                     } else {
                         $cur
                     }
@@ -256,7 +256,7 @@ module run {
         let n = $n | tree select --strict $tbl
         let _ = $env.comma_index
         if not $n.node.end {
-            do $_.settings.tips "require argument" ($n.node | get $_.sub | columns)
+            do $_.tips "require argument" ($n.node | get $_.sub | columns)
             return
         }
         let flt = if $_.flt in $n.node { [...$n.filter ...($n.node | get $_.flt)] } else { $n.filter }
@@ -739,9 +739,6 @@ export-env {
                         print $"(ansi light_gray)($report)(ansi reset)"
                     }
                 }
-                tips: {|m, a|
-                    print -e $"(ansi light_gray_italic)($m)(ansi reset) (ansi yellow_bold)($a)(ansi reset)"
-                }
                 theme: {
                     info: 'yellow_italic'
                     batch_hint: 'dark_gray'
@@ -765,6 +762,9 @@ export-env {
                 use test
                 let fmt = $env.comma_index.settings.test_message
                 test $fmt 0 $dsc $spec
+            }
+            tips: {|m, a|
+                print -e $"(ansi light_gray_italic)($m)(ansi reset) (ansi yellow_bold)($a)(ansi reset)"
             }
             T: { true }
             F: { false }
@@ -828,7 +828,7 @@ def expose [t, a, tbl] {
         }
         _ => {
             let _ = $env.comma_index
-            do $_.settings.tips "expose has different arguments" [
+            do $_.tips "expose has different arguments" [
                 test
                 summary
                 vscode
