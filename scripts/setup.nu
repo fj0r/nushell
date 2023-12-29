@@ -55,7 +55,7 @@ export-env {
 # backup history
 export def 'history backup' [] {
     ^mkdir [-p $env.history_backup_dir]
-    $'.output ($env.history_backup_dir)/(date now | format date "%y%m%d%H%M%S").sql
+    $'.output ($env.history_backup_dir)/(date now | format date "%y_%m_%d_%H_%M_%S").sql
     (char newline).dump
     (char newline).quit' | sqlite3 $nu.history-path
 }
