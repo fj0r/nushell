@@ -53,14 +53,18 @@ export-env {
     $env.history_backup_dir = $'($env.HOME)/.cache/nu-history-backup'
 }
 # backup history
-export def 'history backup' [] {
+export def 'history backup' [tag?] {
     ^mkdir [-p $env.history_backup_dir]
-    let nl = char newline
-    $".output ($env.history_backup_dir)/(date now | format date "%y_%m_%d_%H_%M_%S").sql
-    ($nl)update history set cwd = replace\(cwd, '($env.HOME)', '~');
-    ($nl).dump
-    ($nl)update history set cwd = replace\(cwd, '~', '($env.HOME)');
-    ($nl).quit" | sqlite3 $nu.history-path
+    let tag = if ($tag | is-empty) { '' } else { $"($tag)::" }
+    [
+        $".output ($env.history_backup_dir)/($tag)(date now | format date "%y_%m_%d_%H_%M_%S").sql"
+        $"update history set cwd = replace\(cwd, '($env.HOME)', '~');"
+        '.dump'
+        $"update history set cwd = replace\(cwd, '~', '($env.HOME)');"
+        '.quit'
+    ]
+    | str join (char newline)
+    | sqlite3 $nu.history-path
 }
 
 def "nu-complete history_backup_file" [] {
@@ -71,7 +75,10 @@ export def 'history restore' [name: string@"nu-complete history_backup_file"] {
     rm -f $nu.history-path
     cat ([$env.history_backup_dir, $"($name).sql"] | path join)
     | sqlite3 $nu.history-path
-    let nl = char newline
-    $"update history set cwd = replace\(cwd, '~', '($env.HOME)');
-    ($nl).quit" | sqlite3 $nu.history-path
+    [
+        $"update history set cwd = replace\(cwd, '~', '($env.HOME)');"
+        '.quit'
+    ]
+    | str join (char newline)
+    | sqlite3 $nu.history-path
 }
