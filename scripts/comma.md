@@ -38,6 +38,7 @@ Working dir task runner, similar to `pwd-module`, but supports completion and de
 - [x] complete
     - [x] with args
 - [x] scoped test
+    - [x] pass scoped
     - [x] tree map
     - [x] test
     - [ ] tag

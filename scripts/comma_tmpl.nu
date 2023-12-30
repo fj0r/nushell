@@ -31,7 +31,7 @@ $env.comma = {|_|{
         }
         watch: {
             $_.a: {|a,s| $', dev run ($a.0)' | do $_.batch ',.nu' }
-            $_.x: {|r,a| false }
+            $_.x: (do $_.T {|r,a,s| $s | lg })
             $_.m: [,.nu]
             $_.c: { ls *.nu | get name }
         }
