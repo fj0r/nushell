@@ -57,10 +57,10 @@ $env.comma = {|_|{
                      && chown -R 33:33 /opt/vendor"
                     | do $_.outdent
                     | save -f $tmp
-                    rm -f $tmp
 
                     ^$env.docker-cli build -f $tmp -t $a.1 .
-                    #^$env.docker-cli push $a.1
+                    rm -f $tmp
+                    ^$env.docker-cli push $a.1
                 }
                 $_.c: {|a,s|
                     let l = $a | length
