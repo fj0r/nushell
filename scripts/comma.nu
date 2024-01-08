@@ -670,10 +670,6 @@ def 'find parent' [] {
 def 'comma file' [] {
     [
         {
-          condition: {|_, after| not ($after | path join ',.nu' | path exists)}
-          code: "$env.comma = null"
-        }
-        {
           condition: {|_, after| $after | path join ',.nu' | path exists}
           code: "
           print -e $'(ansi default_underline)(ansi default_bold),(ansi reset).nu (ansi green_italic)detected(ansi reset)...'
