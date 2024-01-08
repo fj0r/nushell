@@ -849,7 +849,7 @@ def expose [t, a, tbl] {
 export def --wrapped pp [...x --print] {
     if $print or (do -i { $env.comma_index | get $env.comma_index.dry_run } | default false) {
         use run
-        run dry $x --strip
+        print -e $"(ansi light_gray)(run dry $x --strip)(ansi reset)(char newline)"
     } else {
         use tree spread
         ^$x.0 (spread ($x | range 1..))
