@@ -10,7 +10,7 @@ $env.config.table.padding.left = 0
 
 # config.nu
 
-#use utils.nu
+use utils.nu *
 use nvim.nu *
 use cwdhist.nu *
 use nushell.nu *
@@ -27,25 +27,25 @@ use sh.nu *
 #use pwd-overlay.nu *
 #use direnv.nu *
 #use ime.nu *
-use completion-generator.nu
+use completion-generator.nu *
 use comma.nu *
-use task.nu
+use task.nu *
 
 ####use starship.nu *
 use network.nu *
 use setup.nu *
 
 use power.nu
-    use power_git.nu
+    use power_git.nu *
     power inject 0 1 {source: git,   color: '#504945'}
-    use power_kube.nu
+    use power_kube.nu *
     power inject 1 2 {source: kube,  color: '#504945'} {
         context: cyan
     } {
         reverse: true
         separator: '@'
     }
-    use power_utils.nu
+    use power_utils.nu *
     # power inject 0 1 {source: atuin, color: '#404040'}
     power set time null { style: compact }
 power init
