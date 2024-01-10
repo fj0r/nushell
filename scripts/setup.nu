@@ -54,7 +54,7 @@ export-env {
 }
 # backup history
 export def 'history backup' [tag?] {
-    ^mkdir [-p $env.history_backup_dir]
+    ^mkdir -p $env.history_backup_dir
     let tag = if ($tag | is-empty) { '' } else { $"($tag)::" }
     [
         $".output ($env.history_backup_dir)/($tag)(date now | format date "%y_%m_%d_%H_%M_%S").sql"
