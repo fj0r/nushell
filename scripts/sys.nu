@@ -86,7 +86,7 @@ export def "ssc services" [user, kw?: string] {
     } else {
         [ $"($kw)*" ]
     }
-    systemctl list-units --all (if $user {[--user]} else {[]}) $kw
+    systemctl list-units --all ...(if $user {[--user]} else {[]}) ...$kw
     | head -n -5
     | from ssv -a
     | reduce -f [] {|x, a|
@@ -134,7 +134,7 @@ export def ssc [
     if $dry_run {
         echo $"systemctl ($cmd) ($args) ($x)"
     } else {
-        sudo systemctl (if $user {[--user]} else {[]}) $cmd $args $x
+        sudo systemctl ...(if $user {[--user]} else {[]}) $cmd ...$args ...$x
     }
 }
 
