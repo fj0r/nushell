@@ -235,8 +235,10 @@ module run {
                     clear
                 }
                 do $act $argv $scope
+                if not $cl {
+                    print -e $env.comma_index.settings.theme.watch_separator
+                }
                 sleep $w.interval
-                print -e $env.comma_index.settings.theme.watch_separator
             }
         } else {
             if $cl {
