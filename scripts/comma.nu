@@ -236,7 +236,7 @@ module run {
                 }
                 do $act $argv $scope
                 if not $cl {
-                    print -e $env.comma_index.settings.theme.watch_separator
+                    do $env.comma_index.settings.theme.watch_separator
                 }
                 sleep $w.interval
             }
@@ -259,7 +259,7 @@ module run {
                         new_path: $path
                     })
                     if not $cl {
-                        print -e $env.comma_index.settings.theme.watch_separator
+                        do $env.comma_index.settings.theme.watch_separator
                     }
                 }
             }
@@ -755,7 +755,10 @@ export-env {
                 theme: {
                     info: 'yellow_italic'
                     batch_hint: 'dark_gray'
-                    watch_separator: $"(ansi dark_gray)------------------------------(ansi reset)"
+                    watch_separator: {
+                        let w = term size | get columns
+                        print -e $"(ansi dark_gray)('-' | str repeat $w)(ansi reset)"
+                    }
                 }
             }
             distro: (distro)
