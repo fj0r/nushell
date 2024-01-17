@@ -157,35 +157,35 @@ export def gp [
         let m = if $merge { [] } else { [--rebase] }
         let a = if $autostash {[--autostash]} else {[]}
         let branch = if ($branch | is-empty) { (_git_status).branch } else { $branch }
-        let branch_str = $'(ansi yellow)($branch)(ansi light_gray)'
+        let branch_repr = $'(ansi yellow)($branch)(ansi light_gray)'
         let remote = if ($remote|is-empty) { 'origin' } else { $remote }
         let lbs = git branch | lines | each {|x| $x | str substring 2..}
         let rbs = remote_braches | each {|x| $x.1}
         let prev = (_git_status).branch
         if $branch in $rbs {
             if $branch in $lbs {
-                let bmsg = $'both local and remote have ($branch_str) branch'
+                let bmsg = $'both local and remote have ($branch_repr) branch'
                 if $force {
-                    tips $'($bmsg), with --force, push'
+                    tips $'($bmsg), with `--force`, push'
                     git branch -u $'($remote)/($branch)' $branch
                     git push --force
                 } else {
                     tips $'($bmsg), pull'
                     if $prev != $branch {
-                        tips $'switch to ($branch)'
+                        tips $'switch to ($branch_repr)'
                         git checkout $branch
                     }
                     git pull ...$m ...$a
                 }
             } else {
-                tips $"local doesn't have ($branch) branch, fetch"
+                tips $"local doesn't have ($branch_repr) branch, fetch"
                 git checkout -b $branch
                 git fetch $remote $branch
                 git branch -u $'($remote)/($branch)' $branch
                 git pull ...$m ...$a -v
             }
         } else {
-            let bmsg = $"remote doesn't have `($branch)` branch"
+            let bmsg = $"remote doesn't have ($branch_repr) branch"
             let force = if $force {[--force]} else {[]}
             if $branch in $lbs {
                 tips $'($bmsg), set upstream and push'
