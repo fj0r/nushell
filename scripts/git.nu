@@ -194,7 +194,7 @@ export def gp [
                 tips $'($bmsg), create and push'
                 git checkout -b $branch
             }
-            git push $force --set-upstream $remote $branch
+            git push ...$force --set-upstream $remote $branch
         }
 
         if $back_to_prev {
