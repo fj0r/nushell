@@ -17,14 +17,26 @@ export def --wrapped ll [...args] {
     let lv = if $n == 1 { 0 } else { $args.0 }
     let s = match $n {
         1 => ($args | range 0..)
-        2 => ($args | range 1..)
-        _ => ($args | range 2..)
+        _ => ($args | range 1..)
     }
-    let g = if $n > 2 { $'[($args.1)]' } else { '' }
+    let s = $s
+    | reduce -f {tag: {}, msg:[]} {|x, acc|
+        if ($x | describe -d).type == 'record' {
+            $acc | update tag ($acc.tag | merge $x)
+        } else {
+            $acc | update msg ($acc.msg | append $x)
+        }
+    }
+    let gray = (ansi light_gray)
+    let tag = (ansi aqua)
+    let g = $s.tag
+    | transpose k v
+    | each {|y| $"($tag)($y.k):($gray)($y.v)"}
+    | str join ' '
+    | do { if ($in | is-empty) {''} else {$"($gray)|($in)($gray)|"} }
     let r = [
-        $"(ansi ($c | get $lv))($t)(ansi reset)"
-        $g
-        $"(ansi light_gray)($s | str join ' ')(ansi reset)"
+        $"(ansi ($c | get $lv))($t)($g)"
+        $"($gray)($s.msg | str join ' ')(ansi reset)"
     ]
     | where { not ($in | is-empty) }
     | str join ' '
