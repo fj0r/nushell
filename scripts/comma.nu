@@ -257,7 +257,7 @@ module run {
                 if $cl {
                     clear
                 }
-                do $act $argv $scope
+                do $act $argv $scope | spy
                 if not $cl {
                     do $env.comma_index.settings.theme.watch_separator
                 }
