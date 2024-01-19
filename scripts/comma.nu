@@ -915,6 +915,7 @@ export def --wrapped , [
     --watch (-w)
     --print (-p)
     --expose (-e) # for test
+    --readme
     ...args:string@'completion'
 ] {
     use resolve
@@ -922,6 +923,8 @@ export def --wrapped , [
         if $vscode {
             use vscode-tasks
             vscode-tasks merge $args (resolve comma) --opt {json: $json}
+        } else if $readme {
+            ^$env.EDITOR ([$nu.default-config-dir 'scripts' 'comma.md'] | path join)
         } else if ([$env.PWD, ',.nu'] | path join | path exists) {
             ^$env.EDITOR ,.nu
         } else {
