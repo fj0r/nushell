@@ -28,14 +28,14 @@ export def --wrapped ll [...args] {
         }
     }
     let gray = (ansi light_gray)
-    let tag = (ansi aqua)
+    let dark = (ansi grey39)
     let g = $s.tag
     | transpose k v
-    | each {|y| $"($tag)($y.k):($gray)($y.v)"}
+    | each {|y| $"($dark)($y.k):($gray)($y.v)"}
     | str join ' '
-    | do { if ($in | is-empty) {''} else {$"($gray)|($in)($gray)|"} }
+    | do { if ($in | is-empty) {''} else {$"($in)($dark)|"} }
     let r = [
-        $"(ansi ($c | get $lv))($t)($g)"
+        $"(ansi ($c | get $lv))($t)($dark)|($g)"
         $"($gray)($s.msg | str join ' ')(ansi reset)"
     ]
     | where { not ($in | is-empty) }
