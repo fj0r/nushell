@@ -43,6 +43,13 @@ export def --wrapped ll [...args] {
     print -e $r
 }
 
+export alias l0 = ll 0
+export alias l1 = ll 1
+export alias l2 = ll 2
+export alias l3 = ll 3
+export alias l4 = ll 4
+export alias l5 = ll 5
+
 module utils {
     export def gendict [size extend] {
         let keys = $in
@@ -882,7 +889,11 @@ def expose [t, a, tbl] {
 }
 
 # perform or print
-export def --wrapped pp [...x --print --as-str] {
+export def --wrapped pp [
+    ...x
+    --print(-p)
+    --as-str
+] {
     if $print or (do -i { $env.comma_index | get $env.comma_index.dry_run } | default false) {
         use run
         let r = run dry $x --strip
