@@ -173,7 +173,7 @@ export def container-log-namespace [ctn: string@"nu-complete docker containers"
 }
 
 # attach container
-export def container-attach [
+export def --wrapped container-attach [
     ctn: string@"nu-complete docker containers"
     -n: string@"nu-complete docker ns"
     ...args
