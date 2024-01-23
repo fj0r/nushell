@@ -160,7 +160,7 @@ export def container-log [ctn: string@"nu-complete docker containers"
     -l: int = 100 # line
 ] {
     let l = if $l == 0 { [] } else { [--tail $l] }
-    ^$env.docker-cli logs -f $l $ctn
+    ^$env.docker-cli logs -f ...$l $ctn
 }
 
 # container log with namespace
@@ -413,7 +413,7 @@ def "nu-complete registry show" [cmd: string, offset: int] {
 }
 
 ### docker registry show
-export def "registry show" [
+export def "docker registry show" [
     url: string
     reg?: string@"nu-complete registry show"
     tag?: string@"nu-complete registry show"
@@ -434,7 +434,7 @@ export def "registry show" [
 }
 
 ### docker registry delete
-export def "registry delete" [
+export def "docker registry delete" [
     url: string
     reg: string@"nu-complete registry show"
     tag: string@"nu-complete registry show"
