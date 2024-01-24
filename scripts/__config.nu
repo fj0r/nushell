@@ -10,7 +10,6 @@ $env.config.table.padding.left = 0
 
 # config.nu
 
-use utils.nu *
 use nvim.nu *
 use cwdhist.nu *
 use nushell.nu *
