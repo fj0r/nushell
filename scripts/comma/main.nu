@@ -142,7 +142,7 @@ export-env {
                 let fmt = $env.comma_index.settings.test_message
                 test $fmt 0 $dsc $spec
             }
-            spy: {$in | spy }
+            spy: { $in | utils spy }
             tips: {|...m|
                 if ($m | length) > 2 {
                     print -e $"(ansi light_gray_italic)Accepts no more than (ansi yellow_bold)2(ansi reset)(ansi light_gray_italic) parameters(ansi reset)"
@@ -151,8 +151,7 @@ export-env {
                 }
             }
             log: {|...args|
-                use utils.nu ll
-                ll ...$args
+                utils ll ...$args
             }
             T: {|f| {|r,a,s| do $f $r $a $s; true } }
             F: {|f| {|r,a,s| do $f $r $a $s; false } }
