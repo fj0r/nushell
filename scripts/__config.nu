@@ -27,24 +27,24 @@ use sh.nu *
 #use direnv.nu *
 #use ime.nu *
 use completion-generator.nu *
-use comma.nu *
+use comma/main.nu *
 #use task.nu *
 
 ####use starship.nu *
 use network.nu *
 use setup.nu *
 
-use power.nu
-    use power_git.nu *
+use power/power.nu
+    use power/lib/git.nu *
     power inject 0 1 {source: git,   color: '#504945'}
-    use power_kube.nu *
+    use power/lib/kube.nu *
     power inject 1 2 {source: kube,  color: '#504945'} {
         context: cyan
     } {
         reverse: true
         separator: '@'
     }
-    use power_utils.nu *
+    use power/lib/utils.nu *
     # power inject 0 1 {source: atuin, color: '#404040'}
     power set time null { style: compact }
 power init

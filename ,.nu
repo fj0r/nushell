@@ -13,17 +13,9 @@ $env.comma_scope = {|_|{
         #just.nu:                custom-completions/just/just-completions.nu
         #mask.nu:                custom-completions/mask/mask-completions.nu
 
-        power.nu:                modules/prompt/powerline
-        power_git.nu:            modules/prompt/powerline
-        power_kube.nu:           modules/prompt/powerline
-        power_utils.nu:          modules/prompt/powerline
-        power.md:                modules/prompt/powerline/README.md
-
+        power:                   modules/prompt/powerline
         cwdhist.nu:              modules/cwdhist
-        comma.nu:                modules/comma
-        comma_test.nu:           modules/comma
-        comma_tmpl.nu:           modules/comma
-        comma.md:                modules/comma/README.md
+        comma:                   modules/comma
 
         #direnv.nu:              hooks/direnv
         #dynamic-load.nu:        hooks/dynamic-load
@@ -41,7 +33,7 @@ $env.comma = {|_|{
                 $m | filter {|x| $x.k in $a }
             }
             for x in $m {
-                cp $'($_.wd)/scripts/($x.k)' $'($s.dest)/($x.v)'
+                cp -r $'($_.wd)/scripts/($x.k)' $'($s.dest)/($x.v)'
             }
         }
         $_.dsc: 'export files to nu_scripts'
@@ -66,7 +58,7 @@ $env.comma = {|_|{
     test: {
         comma: {
             $_.act: {
-                ', test all' | do $_.batch 'comma_test.nu'
+                ', test all' | do $_.batch 'comma/test.nu'
                 , export
             }
             $_.wth: {
