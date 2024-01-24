@@ -16,10 +16,10 @@ $env.comma = {|_|{
         $_.watch: { glob: ',.nu' }
     }
     start: {
-        echo 'start'
+        do $_.log 1 'start'
     }
     stop: {
-        echo 'stop'
+        l1 'stop'
     }
     dev: {
         nu: {

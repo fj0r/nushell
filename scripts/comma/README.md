@@ -6,7 +6,8 @@ Working dir task runner, similar to `pwd-module`, but supports completion and de
 `,` or `*` need to be exported in order to use `,` Directly
 
 ```
-use comma.nu *
+use comma/main.nu *
+use comma/utils.nu *
 ```
 
 When you enter a directory, if a `,.nu` file exists, it will be loaded. (Currently you need to press the Enter key again to take effect)

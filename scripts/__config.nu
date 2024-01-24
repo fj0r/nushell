@@ -28,6 +28,7 @@ use sh.nu *
 #use ime.nu *
 use completion-generator.nu *
 use comma/main.nu *
+use comma/utils.nu *
 #use task.nu *
 
 ####use starship.nu *

@@ -1,74 +1,3 @@
-export def spy [tag?] {
-    let o = $in
-    let t = [
-        $'(ansi xterm_grey)--------(ansi xterm_olive)($tag)(ansi xterm_grey)--------'
-        $'(ansi xterm_grey39)($o | describe)'
-        $'(ansi xterm_grey66)($o | to yaml)'
-        (ansi reset)
-    ]
-    print -e ($t | str join (char newline))
-    $o
-}
-
-export def --wrapped ll [...args] {
-    let c = ['navy' 'teal' 'xpurplea' 'xgreen' 'olive' 'maroon']
-    let t = date now | format date '%Y-%m-%dT%H:%M:%S'
-    let n = $args | length
-    let lv = if $n == 1 { 0 } else { $args.0 }
-    let s = match $n {
-        1 => ($args | range 0..)
-        _ => ($args | range 1..)
-    }
-    let s = $s
-    | reduce -f {tag: {}, msg:[]} {|x, acc|
-        if ($x | describe -d).type == 'record' {
-            $acc | update tag ($acc.tag | merge $x)
-        } else {
-            $acc | update msg ($acc.msg | append $x)
-        }
-    }
-    let gray = (ansi light_gray)
-    let dark = (ansi grey39)
-    let g = $s.tag
-    | transpose k v
-    | each {|y| $"($dark)($y.k):($gray)($y.v)"}
-    | str join ' '
-    | do { if ($in | is-empty) {''} else {$"($in)($dark)|"} }
-    let r = [
-        $"(ansi ($c | get $lv))($t)($dark)|($g)"
-        $"($gray)($s.msg | str join ' ')(ansi reset)"
-    ]
-    | where { not ($in | is-empty) }
-    | str join ' '
-    print -e $r
-}
-
-export alias l0 = ll 0
-export alias l1 = ll 1
-export alias l2 = ll 2
-export alias l3 = ll 3
-export alias l4 = ll 4
-export alias l5 = ll 5
-
-def "nu-complete ps" [] {
-    ps -l | each {|x| { value: $"($x.pid)", description: $x.command } }
-}
-
-export def wait-pid [pid: string@"nu-complete ps"] {
-    do -i { tail --pid $pid -f /dev/null }
-}
-
-export def wait-cmd [action -i: duration = 1sec  -t: string] {
-    mut time = 0
-    loop {
-        l0 { time: $time } $t
-        let c = do --ignore-errors $action | complete | get exit_code
-        if ($c == 0) { break }
-        sleep $i
-        $time = $time + 1
-    }
-}
-
 def 'find parent' [] {
     let o = $in
     let depth = ($env.PWD | path expand | path split | length) - 1
@@ -82,8 +11,6 @@ def 'find parent' [] {
     }
     $e
 }
-
-
 
 def 'comma file' [] {
     [
@@ -103,8 +30,32 @@ def 'comma file' [] {
     ]
 }
 
+def gendict [size extend] {
+    let keys = $in
+    mut k = []
+    let n = $keys | length
+    let rk = random chars -l ($n * $size)
+    for i in 1..$n {
+        let b = ($i - 1) * $size
+        let e = $i * $size
+        $k ++= ($rk | str substring $b..$e)
+    }
+    let ids = $keys
+    | zip $k
+    | reduce -f {} {|x, acc|
+        let id = if ($x.0 | describe -d).type == 'list' { $x.0 } else { [$x.0] }
+        $id | reduce -f $acc {|i,a| $a | insert $i $"($id.0)_($x.1)" }
+    }
+    $extend
+    | transpose k v
+    | reduce -f $ids {|x, acc|
+        $acc | insert $x.k { $x.v }
+    }
+}
+
 export-env {
-    use lib/utils.nu *
+    use lib/os.nu
+    use utils.nu
     # batch mode
     if not ($env.config? | is-empty) {
         $env.config = ( $env.config | upsert hooks.env_change.PWD { |config|
@@ -170,13 +121,18 @@ export-env {
                     }
                 }
             }
-            distro: (distro)
+            distro: (os distro)
             batch: {|mod|
                 let o = $in
                     | lines
                     | split row ';'
                     | flatten
-                let cmd = ['use comma/main.nu *' $'source ($mod)' ...$o ]
+                let cmd = [
+                    'use comma/main.nu *'
+                    'use comma/utils.nu *'
+                    $'source ($mod)'
+                    ...$o
+                    ]
                     | str join (char newline)
                 print -e $"(ansi $env.comma_index.settings.theme.batch_hint)($cmd)(ansi reset)"
                 nu -c $cmd
@@ -195,6 +151,7 @@ export-env {
                 }
             }
             log: {|...args|
+                use utils.nu ll
                 ll ...$args
             }
             T: {|f| {|r,a,s| do $f $r $a $s; true } }
@@ -204,7 +161,7 @@ export-env {
                 use lib/test.nu
                 test diffo {expect: $x.expect, result: $x.result}
             }
-            outdent: { $in | outdent }
+            outdent: { $in | utils outdent }
             config: {|cb|
                 # FIXME: no affected $env
                 $env.comma_index.settings = (do $cb $env.comma_index.settings)
@@ -268,26 +225,6 @@ def expose [t, a, tbl] {
     }
 }
 
-# perform or print
-export def --wrapped pp [
-    ...x
-    --print(-p)
-    --as-str
-] {
-    if $print or (do -i { $env.comma_index | get $env.comma_index.dry_run } | default false) {
-        use lib/run.nu
-        let r = run dry $x --strip
-        if $as_str {
-            $r
-        } else {
-            print -e $"(ansi light_gray)($r)(ansi reset)(char newline)"
-        }
-    } else {
-        use lib/tree.nu spread
-        ^$x.0 ...(spread ($x | range 1..))
-    }
-}
-
 def completion [...context] {
     use lib/resolve.nu
     use lib/run.nu
@@ -315,13 +252,13 @@ export def --wrapped , [
             use lib/vscode-tasks.nu
             vscode-tasks merge $args (resolve comma) --opt {json: $json}
         } else if $readme {
-            ^$env.EDITOR ([$nu.default-config-dir 'scripts' 'comma.md'] | path join)
+            ^$env.EDITOR ([$nu.default-config-dir 'scripts' 'comma' 'README.md'] | path join)
         } else if ([$env.PWD, ',.nu'] | path join | path exists) {
             ^$env.EDITOR ,.nu
         } else {
             let a = [yes no] | input list 'create ,.nu ?'
             let time = date now | format date '%Y-%m-%d{%w}%H:%M:%S'
-            let txt = [($nu.config-path | path dirname) scripts comma_tmpl.nu]
+            let txt = [$nu.default-config-dir 'scripts' 'comma' 'tmpl.nu']
                 | path join
                 | open $in
                 | str replace '{{time}}' $time

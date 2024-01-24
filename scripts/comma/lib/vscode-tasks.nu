@@ -51,7 +51,7 @@ export def gen [tbl] {
     | $in.node
     | reject 'end'
     | tree map $cb $bc
-    let nuc = "nu -c 'use comma/main.nu *; source ,.nu;"
+    let nuc = "nu -c 'use comma/main.nu *; use comma/utils.nu *; source ,.nu;"
     let tasks = $vs
     | each {|x|
         let input = if ($x.cmp | is-empty) { '' } else { $" ${input:($x.cmp)}"}
