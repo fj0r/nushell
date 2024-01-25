@@ -21,17 +21,14 @@ use git.nu *
 use ssh.nu *
 use kubernetes.nu *
 use docker.nu *
-#use timeit.nu *
 use sh.nu *
 #use pwd-overlay.nu *
 #use direnv.nu *
-#use ime.nu *
 use completion-generator.nu *
 use comma/main.nu *
 use comma/utils.nu *
 #use task.nu *
 
-####use starship.nu *
 use network.nu *
 use setup.nu *
 
