@@ -40,6 +40,6 @@ export def main [
     if ($recipes | is-empty) {
         ^just
     } else {
-        ^just $recipes $args
+        ^just $recipes ...$args
     }
 }
