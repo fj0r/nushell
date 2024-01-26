@@ -15,7 +15,6 @@ $env.comma_scope = {|_|{
 
         power:                   modules/prompt/powerline
         cwdhist.nu:              modules/cwdhist
-        comma:                   modules/comma
 
         #direnv.nu:              hooks/direnv
         #dynamic-load.nu:        hooks/dynamic-load
@@ -27,18 +26,23 @@ $env.comma_scope = {|_|{
 $env.comma = {|_|{
     inspect: {|a, s| {index: $_, scope: $s, args: $a} | table -e }
     export: {
-        $_.act: {|a,s|
-            let m = $s.manifest | transpose k v
-            let m = if ($a | is-empty) { $m } else {
-                $m | filter {|x| $x.k in $a }
+        nu_scripts: {
+            $_.act: {|a,s|
+                let m = $s.manifest | transpose k v
+                let m = if ($a | is-empty) { $m } else {
+                    $m | filter {|x| $x.k in $a }
+                }
+                for x in $m {
+                    cp -r $'($_.wd)/scripts/($x.k)' $'($s.dest)/($x.v)'
+                }
             }
-            for x in $m {
-                cp -r $'($_.wd)/scripts/($x.k)' $'($s.dest)/($x.v)'
+            $_.dsc: 'export files to nu_scripts'
+            $_.cmp: {|a,s|
+                $s.manifest | columns
             }
         }
-        $_.dsc: 'export files to nu_scripts'
-        $_.cmp: {|a,s|
-            $s.manifest | columns
+        comma: {
+            rsync -avp --delete --exclude=.git $'($_.wd)/scripts/comma/' $"($env.HOME)/world/comma"
         }
     }
     upgrade: {
