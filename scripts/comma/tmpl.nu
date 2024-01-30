@@ -22,18 +22,16 @@ $env.comma = {|_|{
         l1 'stop'
     }
     dev: {
-        run: {
+        comma: {
             $_.action: {|a,s|
                 let act = $a | str join ' '
                 $', ($act)' | do $_.batch ',.nu'
             }
             $_.watch: { glob: ",.nu", clear: true }
-        }
-        nu: {
-            $_.action: {|a,s| nu $a.0 }
-            $_.watch: { glob: '*.nu', clear: true }
-            $_.completion: { ls *.nu | get name }
-            $_.desc: "develop a nu script"
+            $_.completion: {|a,s|
+                , -c ...$a
+            }
+            $_.desc: "reload ,.nu"
         }
     }
 }}

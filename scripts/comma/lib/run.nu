@@ -72,6 +72,7 @@ export def main [tbl --opt: record] {
 
 export def complete [tbl] {
     let n = $in
+    let n = if ($n | is-empty) { [''] } else { $n }
     let n = if ($n | last) == '' { $n | range ..-2 } else { $n }
     use tree.nu
     use resolve.nu

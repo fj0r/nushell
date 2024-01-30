@@ -207,7 +207,7 @@ build: {
         - [x] dry wrap lines
         - [x] accept list<string>
     - [x] formatter: outdent
-    - [ ] reload mode
+    - [x] reload mode (tmpl)
 - [x] complete
     - [x] with args
 - [x] scoped test
