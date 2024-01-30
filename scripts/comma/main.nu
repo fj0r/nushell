@@ -246,13 +246,35 @@ export def --wrapped , [
     ...args:string@'completion'
 ] {
     use lib/resolve.nu
-    if ($args | is-empty) {
+    let tbl = resolve comma
+    if $completion {
+        use lib/run.nu
+        let c = $args | flatten | run complete $tbl
         if $vscode {
-            use lib/vscode-tasks.nu
-            vscode-tasks merge $args (resolve comma) --opt {json: $json}
-        } else if $readme {
-            ^$env.EDITOR ([$nu.default-config-dir 'scripts' 'comma' 'README.md'] | path join)
-        } else if ([$env.PWD, ',.nu'] | path join | path exists) {
+            $c
+            | each {|x|
+                if ($x | describe -d).type == 'string' { $x } else {
+                    $"($x.value)||($x.description)|"
+                }
+            }
+            | str join (char newline)
+        } else if $json {
+            $c | to json
+        } else {
+            $c
+        }
+    } else if $test {
+        use lib/test.nu
+        $args | flatten | test run $tbl --opt {watch: $watch}
+    } else if $expose {
+        expose $args.0 ($args | range 1..) $tbl
+    } else if $vscode {
+        use lib/vscode-tasks.nu
+        vscode-tasks merge $args (resolve comma) --opt {json: $json}
+    } else if $readme {
+        ^$env.EDITOR ([$nu.default-config-dir 'scripts' 'comma' 'README.md'] | path join)
+    } else if ($args | is-empty) {
+        if ([$env.PWD, ',.nu'] | path join | path exists) {
             ^$env.EDITOR ,.nu
         } else {
             let a = [yes no] | input list 'create ,.nu ?'
@@ -269,34 +291,10 @@ export def --wrapped , [
             }
         }
     } else {
-        let tbl = resolve comma
-        if $completion {
-            use lib/run.nu
-            let c = $args | flatten | run complete $tbl
-            if $vscode {
-                $c
-                | each {|x|
-                    if ($x | describe -d).type == 'string' { $x } else {
-                        $"($x.value)||($x.description)|"
-                    }
-                }
-                | str join (char newline)
-            } else if $json {
-                $c | to json
-            } else {
-                $c
-            }
-        } else if $test {
-            use lib/test.nu
-            $args | flatten | test run $tbl --opt {watch: $watch}
-        } else if $expose {
-            expose $args.0 ($args | range 1..) $tbl
-        } else {
-            if $print {
-                $env.comma_index = ($env.comma_index | upsert $env.comma_index.dry_run true)
-            }
-            use lib/run.nu
-            $args | flatten | run $tbl --opt {watch: $watch}
+        if $print {
+            $env.comma_index = ($env.comma_index | upsert $env.comma_index.dry_run true)
         }
+        use lib/run.nu
+        $args | flatten | run $tbl --opt {watch: $watch}
     }
 }
