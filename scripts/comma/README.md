@@ -207,6 +207,7 @@ build: {
         - [x] dry wrap lines
         - [x] accept list<string>
     - [x] formatter: outdent
+    - [ ] reload mode
 - [x] complete
     - [x] with args
 - [x] scoped test
@@ -214,7 +215,7 @@ build: {
     - [x] tree map
     - [x] test
     - [ ] tag
-    - [ ] watch mode
+    - [x] watch mode
         - [x] override sub node watch
     - [x] args
     - [x] allow running on leaf node
