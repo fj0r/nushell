@@ -11,16 +11,6 @@ def --wrapped with-flag [...flag] {
     if ($in | is-empty) { [] } else { [...$flag $in] }
 }
 
-def local_image [name] {
-    let s = $name | split row '/'
-    if ($s | length) > 1 {
-        $name
-    } else {
-        ['localhost', $name] | str join '/'
-    }
-
-}
-
 def "nu-complete docker ns" [] {
     if $env.docker-cli == 'nerdctl' {
         ^$env.docker-cli namespace list
@@ -395,7 +385,6 @@ export def container-create [
     if $dry_run {
         echo ([docker $ns run --name $name $args $img $cmd] | flatten | str join ' ')
     } else {
-        let $img = if $env.docker-cli == 'nerdctl' { local_image $img } else { $img }
         ^$env.docker-cli ...$ns run --name $name ...$args $img ...($cmd | flatten)
     }
 }
