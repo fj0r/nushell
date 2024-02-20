@@ -145,16 +145,9 @@ def "nu-complete docker images" [] {
     | each {|x| $"($x.REPOSITORY):($x.TAG)"}
 }
 
+
 # container log
 export def container-log [ctn: string@"nu-complete docker containers"
-    -l: int = 100 # line
-] {
-    let l = if $l == 0 { [] } else { [--tail $l] }
-    ^$env.docker-cli logs -f ...$l $ctn
-}
-
-# container log with namespace
-export def container-log-namespace [ctn: string@"nu-complete docker containers"
     -l: int = 100 # line
     -n: string@"nu-complete docker ns" # namespace
 ] {
@@ -498,7 +491,6 @@ export def "bud rm" [
 export alias dp = container-list
 export alias di = image-list
 export alias dl = container-log
-export alias dln = container-log-namespace
 export alias da = container-attach
 export alias dcp = container-copy-file
 export alias dcr = container-remove
