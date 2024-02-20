@@ -33,7 +33,7 @@ $env.comma = {|_|{
                     $m | filter {|x| $x.k in $a }
                 }
                 for x in $m {
-                    cp -r $'($_.wd)/scripts/($x.k)' $'($s.dest)/($x.v)'
+                    pp cp -r $'($_.wd)/scripts/($x.k)' $'($s.dest)/($x.v)'
                 }
             }
             $_.dsc: 'export files to nu_scripts'
@@ -42,7 +42,7 @@ $env.comma = {|_|{
             }
         }
         comma: {
-            rsync -avp --delete --exclude=.git $'($_.wd)/scripts/comma/' $"($env.HOME)/world/comma"
+            pp rsync -avp --delete --exclude=.git $'($_.wd)/scripts/comma/' $"($env.HOME)/world/comma"
         }
     }
     upgrade: {

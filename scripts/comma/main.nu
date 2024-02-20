@@ -245,11 +245,10 @@ export def --wrapped , [
     --readme
     ...args:string@'completion'
 ] {
-    use lib/resolve.nu
-    let tbl = resolve comma
     if $completion {
         use lib/run.nu
-        let c = $args | flatten | run complete $tbl
+        use lib/resolve.nu
+        let c = $args | flatten | run complete (resolve comma)
         if $vscode {
             $c
             | each {|x|
@@ -265,10 +264,13 @@ export def --wrapped , [
         }
     } else if $test {
         use lib/test.nu
-        $args | flatten | test run $tbl --opt {watch: $watch}
+        use lib/resolve.nu
+        $args | flatten | test run (resolve comma) --opt {watch: $watch}
     } else if $expose {
-        expose $args.0 ($args | range 1..) $tbl
+        use lib/resolve.nu
+        expose $args.0 ($args | range 1..) (resolve comma)
     } else if $vscode {
+        use lib/resolve.nu
         use lib/vscode-tasks.nu
         vscode-tasks merge $args (resolve comma) --opt {json: $json}
     } else if $readme {
@@ -295,6 +297,7 @@ export def --wrapped , [
             $env.comma_index = ($env.comma_index | upsert $env.comma_index.dry_run true)
         }
         use lib/run.nu
-        $args | flatten | run $tbl --opt {watch: $watch}
+        use lib/resolve.nu
+        $args | flatten | run (resolve comma) --opt {watch: $watch}
     }
 }
