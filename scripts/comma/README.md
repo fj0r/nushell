@@ -203,6 +203,11 @@ build: {
 
 ## todo
 - [x] run
+    - [ ] resolve scope
+        - cache with session_id
+        - calc args
+            - only calc closure with two parameters
+            - filter
     - [x] dry
         - [x] dry wrap lines
         - [x] accept list<string>
