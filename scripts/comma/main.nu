@@ -22,7 +22,6 @@ def 'comma file' [] {
 
           # TODO: allow parent dir
           $env.comma_index.wd = $after
-          $env.comma_index.session_id = (random chars)
 
           source ,.nu
           "
@@ -86,6 +85,8 @@ export-env {
             dry_run
         ]
         | gendict 5 {
+            wd: $env.PWD
+            session_id: (random chars)
             settings: {
                 test_group: {|x|
                     let indent = '' | fill -c '  ' -w $x.indent
