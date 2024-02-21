@@ -24,7 +24,6 @@ $env.comma_scope = {|_|{
 }}
 
 $env.comma = {|_|{
-    inspect: {|a, s| {index: $_, scope: $s, args: $a} | table -e }
     export: {
         nu_scripts: {
             $_.act: {|a,s|
@@ -86,6 +85,33 @@ $env.comma = {|_|{
                 interval: 2sec
                 clear: true
             }
+        }
+    }
+    .: {
+        created: {
+            $_.action: {|a, s| $s.computed }
+            $_.filter: [log_args]
+            $_.desc: "created"
+        }
+        inspect: {|a, s| {index: $_, scope: $s, args: $a} | table -e }
+        reload: {
+            $_.action: {|a,s|
+                let act = $a | str join ' '
+                $', ($act)' | do $_.batch ',.nu'
+            }
+            $_.watch: { glob: ",.nu", clear: true }
+            $_.completion: {|a,s|
+                , -c ...$a
+            }
+            $_.desc: "reload ,.nu"
+        }
+        vscode-tasks: {
+            $_.action: {
+                mkdir .vscode
+                ', --vscode -j' | do $_.batch ',.nu' | save -f .vscode/tasks.json
+            }
+            $_.desc: "generate .vscode/tasks.json"
+            $_.watch: { glob: ',.nu' }
         }
     }
 }}

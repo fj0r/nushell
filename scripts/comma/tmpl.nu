@@ -5,24 +5,20 @@ $env.comma_scope = {|_|{
 }}
 
 $env.comma = {|_|{
-    created: {|a, s| $s.computed }
-    inspect: {|a, s| {index: $_, scope: $s, args: $a} | table -e }
-    vscode-tasks: {
-        $_.action: {
-            mkdir .vscode
-            ', --vscode -j' | do $_.batch ',.nu' | save -f .vscode/tasks.json
-        }
-        $_.desc: "generate .vscode/tasks.json"
-        $_.watch: { glob: ',.nu' }
-    }
     start: {
         do $_.log 1 'start'
     }
     stop: {
         l1 'stop'
     }
-    dev: {
-        comma: {
+    .: {
+        created: {
+            $_.action: {|a, s| $s.computed }
+            $_.filter: [log_args]
+            $_.desc: "created"
+        }
+        inspect: {|a, s| {index: $_, scope: $s, args: $a} | table -e }
+        reload: {
             $_.action: {|a,s|
                 let act = $a | str join ' '
                 $', ($act)' | do $_.batch ',.nu'
@@ -32,6 +28,14 @@ $env.comma = {|_|{
                 , -c ...$a
             }
             $_.desc: "reload ,.nu"
+        }
+        vscode-tasks: {
+            $_.action: {
+                mkdir .vscode
+                ', --vscode -j' | do $_.batch ',.nu' | save -f .vscode/tasks.json
+            }
+            $_.desc: "generate .vscode/tasks.json"
+            $_.watch: { glob: ',.nu' }
         }
     }
 }}
