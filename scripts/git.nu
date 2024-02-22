@@ -130,10 +130,14 @@ export def --env gn [
 }
 
 # edit .gitignore
-export def gig [--exclude-all] {
-    if $exclude_all {
-        let nl = char newline
-        echo $"/**($nl)!/.gitignore" | save .gitignore
+export def gig [--empty-dir] {
+    if $empty_dir {
+        [
+            '# Ignore everything in this directory'
+            '*'
+            '# Except this file'
+            '!.gitignore'
+        ] | str join (char newline) | save .gitignore
     } else {
         e $"(git rev-parse --show-toplevel)/.gitignore"
     }
