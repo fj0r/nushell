@@ -10,6 +10,7 @@ def dbg [a b] {
     }
 }
 
+# FIXME:
 export def --env comma_get_cache [key, act] {
     if $key in $env.comma_cache {
         $env.comma_cache | get $key
@@ -55,7 +56,6 @@ export def scope [args, vars, flts] {
     dbg "resolve scope" ((date now) - $start)
     $vs
 }
-
 
 
 export def comma [key = 'comma'] {
