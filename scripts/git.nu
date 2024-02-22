@@ -130,8 +130,13 @@ export def --env gn [
 }
 
 # edit .gitignore
-export def gig [] {
-    e $"(git rev-parse --show-toplevel)/.gitignore"
+export def gig [--exclude-all] {
+    if $exclude_all {
+        let nl = char newline
+        echo $"/**($nl)!/.gitignore" | save .gitignore
+    } else {
+        e $"(git rev-parse --show-toplevel)/.gitignore"
+    }
 }
 
 # git pull, push and switch
