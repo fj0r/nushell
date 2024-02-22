@@ -124,7 +124,10 @@ If run with the `--test` flag, it will detect that all nodes with `$_.expect` un
 
 If there is also the --watch flag, it will run in watch mode without defining `$_.watch`.
 
-If `$_.mock` exists, it will be passed as arguments to the `$_.action` and `$_.expect`.
+If `$_.mock` is closure, call it with `$_.comma_scope` to get the result, otherwise it will be used as the result directly.
+
+The result will be passed as arguments to the `$_.action` and `$_.expect`.
+If the result is a nested list, call iteratively multiple times
 
 If `$_.expect` is closure, pass it the result of `$_.action`, rest arguments and `$_.comma_scope`, if return True and the test passes.
 

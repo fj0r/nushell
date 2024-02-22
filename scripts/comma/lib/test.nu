@@ -37,7 +37,8 @@ export def diffo [x] {
 }
 
 export def main [fmt, indent, dsc, o] {
-    let result = do $o.spec? $o.args? $o.scope? | default false
+    let args = $o.args?
+    let result = do $o.spec? $args $o.scope? | default false
     let exp_type = ($o.expect? | describe -d).type
     mut stat_list = []
     let status = if $exp_type == 'nothing' {
@@ -61,7 +62,7 @@ export def main [fmt, indent, dsc, o] {
             $o.expect?
         }
         let r = {
-            args: $o.args?
+            args: $args
             result: $result
             expect: $e
         }
@@ -75,7 +76,7 @@ export def main [fmt, indent, dsc, o] {
         indent: $indent
         status: $status
         message: $dsc
-        args: $o.args?
+        args: $args
         report: $report
     }
 }
@@ -100,12 +101,30 @@ def suit [] {
                 do $g { indent: $j.index title: $j.item desc: $desc}
             }
         }
-        main $i.fmt ($i.indent - 1) $i.desc {
-            expect: $i.expect
-            spec: $i.spec
-            args: $i.mock
-            report: $i.report
-            scope: (resolve scope null (resolve comma 'comma_scope') [])
+        let scope = (resolve scope null (resolve comma 'comma_scope') [])
+        let args = $i.mock
+        let args = if ($args | describe -d).type == 'closure' {
+            do $args $scope
+        } else {
+            $args
+        }
+        let args = if ($args | describe -d).type == 'list' {
+            if ($args.0? | describe -d).type == 'list' {
+                $args
+            } else {
+                [$args]
+            }
+        } else {
+            [[$args]]
+        }
+        for a in $args {
+            main $i.fmt ($i.indent - 1) $i.desc {
+                expect: $i.expect
+                spec: $i.spec
+                args: $a
+                report: $i.report
+                scope: $scope
+            }
         }
         $lv = $t
     }
