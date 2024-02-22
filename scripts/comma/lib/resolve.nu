@@ -1,4 +1,28 @@
+def wid [] {
+    $env.PWD | path split | range 1.. | str join ':'
+}
+
+def dbg [a b] {
+    if not ($env.comma_debug? | is-empty) {
+        let _ = $env.comma_index
+        do $_.tips $a $b
+        #print -e $env.comma_cache
+    }
+}
+
+export def --env comma_get_cache [key, act] {
+    if $key in $env.comma_cache {
+        $env.comma_cache | get $key
+    } else {
+        #dbg "miss cache" $key
+        let r = do $act
+        $env.comma_cache = ($env.comma_cache | upsert $key $r)
+        $r
+    }
+}
+
 export def scope [args, vars, flts] {
+    let start = date now
     mut vs = {}
     mut cpu = []
     mut flt = {}
@@ -28,15 +52,20 @@ export def scope [args, vars, flts] {
             error make -u {msg: $"filter `($i)` not found" }
         }
     }
+    dbg "resolve scope" ((date now) - $start)
     $vs
 }
 
 
+
 export def comma [key = 'comma'] {
+    let start = date now
     let _ = $env.comma_index
-    if ($env | get $key | describe -d).type == 'closure' {
-        do ($env | get $key) $_
+    let r = if ($env | get $key | describe -d).type == 'closure' {
+        comma_get_cache $"resolve-($key)::(wid)" { do ($env | get $key) $_ }
     } else {
         $env | get $key
     }
+    dbg $"resolve comma ($key)" ((date now) - $start)
+    $r
 }

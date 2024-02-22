@@ -1,3 +1,5 @@
+use lib/resolve.nu
+
 def 'find parent' [] {
     let o = $in
     let depth = ($env.PWD | path expand | path split | length) - 1
@@ -67,6 +69,7 @@ export-env {
             }
         })
     }
+    $env.comma_cache = {}
     $env.comma_index = (
         [
             [children sub s]
@@ -226,7 +229,6 @@ def expose [t, a, tbl] {
 }
 
 def completion [...context] {
-    use lib/resolve.nu
     use lib/run.nu
     $context
     | parse argv
@@ -248,7 +250,6 @@ export def --wrapped , [
 ] {
     if $completion {
         use lib/run.nu
-        use lib/resolve.nu
         let c = $args | flatten | run complete (resolve comma)
         if $vscode {
             $c
@@ -265,13 +266,10 @@ export def --wrapped , [
         }
     } else if $test {
         use lib/test.nu
-        use lib/resolve.nu
         $args | flatten | test run (resolve comma) --opt {watch: $watch}
     } else if $expose {
-        use lib/resolve.nu
         expose $args.0 ($args | range 1..) (resolve comma)
     } else if $vscode {
-        use lib/resolve.nu
         use lib/vscode-tasks.nu
         vscode-tasks merge $args (resolve comma) --opt {json: $json}
     } else if $readme {
@@ -298,7 +296,6 @@ export def --wrapped , [
             $env.comma_index = ($env.comma_index | upsert $env.comma_index.dry_run true)
         }
         use lib/run.nu
-        use lib/resolve.nu
         $args | flatten | run (resolve comma) --opt {watch: $watch}
     }
 }
