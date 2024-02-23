@@ -575,10 +575,10 @@ export def _git_log [v num] {
         _git_log_stat $num
     } else { {} }
     let r = do -i {
-        git log --reverse -n $num --pretty=%h»¦«%s»¦«%aN»¦«%aE»¦«%aD
+        git log --reverse -n $num --pretty=%h»¦«%s»¦«%aN»¦«%aE»¦«%aD»¦«%D
         | lines
-        | split column "»¦«" sha message author email date
-        | each {|x| ($x| upsert date ($x.date | into datetime))}
+        | split column "»¦«" sha message author email date refs
+        | upsert date { into datetime }
     }
     if $v {
         $r | merge $stat
