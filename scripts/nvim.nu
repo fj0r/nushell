@@ -51,17 +51,18 @@ export-env {
     })
 }
 
-def edit [action file] {
+def edit [action ...file] {
     if ($env.NVIM? | is-empty) {
-        nvim $file
+        nvim ...$file
     } else {
-        let af = ($file | each {|f|
+        let af = $file
+        | each {|f|
             if ($f|str substring ..1) in ['/', '~'] {
                 $f
             } else {
                 $"($env.PWD)/($f)"
             }
-        })
+        }
         let cmd = $"<cmd>($action) ($af|str join ' ')<cr>"
         nvim --headless --noplugin --server $env.NVIM --remote-send $cmd
     }
@@ -81,7 +82,7 @@ export def e [...file: string] {
     if ($file|is-empty) {
         nvim
     } else {
-        edit vsplit $file
+        edit vsplit ...$file
     }
 }
 
@@ -89,7 +90,7 @@ export def c [...file: string] {
     if ($file|is-empty) {
         nvim
     } else {
-        edit split $file
+        edit split ...$file
     }
 }
 
@@ -97,7 +98,7 @@ export def v [...file: string] {
     if ($file|is-empty) {
         nvim
     } else {
-        edit vsplit $file
+        edit vsplit ...$file
     }
 }
 
@@ -105,7 +106,7 @@ export def x [...file: string] {
     if ($file|is-empty) {
         nvim
     } else {
-        edit tabnew $file
+        edit tabnew ...$file
     }
 }
 
