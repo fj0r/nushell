@@ -139,10 +139,21 @@ export def nvim-srv [port: int=9999] {
     nvim --headless --listen $"0.0.0.0:($port)"
 }
 
-export def nvc [addr: string] {
-    nvim --remote-ui --server $addr
-}
-
-export def nvdc [addr: string] {
-    neovide --maximized --server $addr
+export def nvc [
+    addr: string
+    --gui(-g)
+] {
+    if $gui {
+        let gs = {
+            neovide: [--maximized --server $addr]
+        }
+        for g in ($gs | transpose prog args) {
+            if not (which $g.prog | is-empty) {
+                ^$g.prog ...$g.args
+                break
+            }
+        }
+    } else {
+        nvim --remote-ui --server $addr
+    }
 }
