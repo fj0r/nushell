@@ -73,7 +73,9 @@ export def main [tbl --opt: record] {
 export def complete [tbl] {
     let n = $in
     let n = if ($n | is-empty) { [''] } else { $n }
-    let n = if ($n | last) == '' { $n | range ..-2 } else { $n }
+    ## The last parameter is empty and has the same number of characters as the characters already entered.
+    # let has_tail = ($n | last) == ''
+    # let n = if $has_tail { $n | range ..-2 } else { $n }
     use tree.nu
     use resolve.nu
     let n = $n | tree select $tbl
