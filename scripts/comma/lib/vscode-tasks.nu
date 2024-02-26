@@ -20,7 +20,7 @@ export def gen [tbl] {
     }
     let cb = {|pth, g, node, _|
         let indent = ($pth | length)
-        if $_.exp in $node {
+        if ($_.desc in $node) and ($node | get $_.desc | str contains '!vscode') {
             []
         } else {
             let label = $g

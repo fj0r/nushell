@@ -152,7 +152,8 @@ $env.comma = {|_|{
     }
 }}
 ```
-> requires `augustocdias.tasks-shell-input` to run `$_.completion` closure.
+- requires `augustocdias.tasks-shell-input` to run `$_.completion` closure.
+- add `!vscode` into `$_.desc` to exclude
 
 ## variables
 ### $_.wd
