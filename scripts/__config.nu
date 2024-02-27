@@ -8,6 +8,30 @@ $env.config.table.header_on_separator = true
 $env.config.table.mode = compact #light compact
 $env.config.table.padding.left = 0
 
+if 'PREFER_ALT' in $env {
+    let prefer_alt = [
+        move_one_word_left
+        move_one_word_right_or_take_history_hint
+        move_to_line_start
+        move_to_line_end_or_take_history_hint
+        move_left
+        move_right_or_take_history_hint
+        move_up
+        move_down
+        delete_one_word_backward
+        cut_line_from_start
+    ]
+    $env.config.keybindings = (
+        $env.config.keybindings
+        | each {|x|
+            if ($x.name? in $prefer_alt) and ($x.modifier? in ['control' 'alt']) {
+                $x | update modifier (if $x.modifier == 'alt' {'control'} else {'alt'})
+            } else {
+                $x
+            }
+        })
+}
+
 # config.nu
 
 use nvim.nu *
