@@ -1,10 +1,5 @@
 #!/usr/bin/env nu
 
-def main [file: string] {
-    if ($env.NVIM? | is-empty) {
-        nvim $file
-    } else {
-        #nvim --headless --noplugin --server $env.NVIM --remote-wait $file
-        nvim --cmd 'let g:unception_block_while_host_edits=1' $file
-    }
+def main [...file: string] {
+    nve ...$file
 }

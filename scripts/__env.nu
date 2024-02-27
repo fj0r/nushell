@@ -47,7 +47,7 @@ $env.LD_LIBRARY_PATH = (do -i {
 $env.TERM = 'screen-256color'
 $env.SHELL = '/usr/bin/nu'
 
-$env.EDITOR = 'nuedit' # 'nvim'
+$env.EDITOR = 'nvim' # 'nuedit'
 if ($env.EDITOR == 'nuedit') and (not ($'($env.HOME)/.local/bin/nuedit' | path exists)) {
     mkdir $'($env.HOME)/.local/bin/'
     cp $'($nu.config-path | path dirname)/nuedit' $'($env.HOME)/.local/bin/nuedit'
