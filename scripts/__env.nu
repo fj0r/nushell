@@ -45,7 +45,13 @@ $env.LD_LIBRARY_PATH = (do -i {
 })
 
 $env.TERM = 'screen-256color'
-$env.SHELL = '/usr/bin/nu'
+for s in ['/usr/local/bin', '/usr/bin'] {
+    let p = [$s, 'nu'] | path join
+    if not (which $p | is-empty) {
+        $env.SHELL = $p
+        break
+    }
+}
 
 $env.EDITOR = 'nvim' # 'nuedit'
 if ($env.EDITOR == 'nuedit') and (not ($'($env.HOME)/.local/bin/nuedit' | path exists)) {
