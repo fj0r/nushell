@@ -47,6 +47,9 @@ use power/power.nu
     power set time null { style: compact }
 power init
 
+if not (which atuin | is-empty) {
+    source atuin.nu
+}
 
 const plugin_query = ($nu.current-exe | path dirname | path join (
     if $nu.os-info.family == 'windows' { 'nu_plugin_query.exe' } else { 'nu_plugin_query' }
