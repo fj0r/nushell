@@ -8,8 +8,9 @@ $env.config.table.header_on_separator = true
 $env.config.table.mode = compact #light compact
 $env.config.table.padding.left = 0
 
-if 'PREFER_ALT' in $env {
-    let prefer_alt = [
+let prefer_alt = $env.PREFER_ALT? | default '0' | into int
+if $prefer_alt > 0 {
+    let acts = [
         move_one_word_left
         move_one_word_right_or_take_history_hint
         move_to_line_start
@@ -24,8 +25,16 @@ if 'PREFER_ALT' in $env {
     $env.config.keybindings = (
         $env.config.keybindings
         | each {|x|
-            if ($x.name? in $prefer_alt) and ($x.modifier? in ['control' 'alt']) {
-                $x | update modifier (if $x.modifier == 'alt' {'control'} else {'alt'})
+            if ($x.name? in $acts) and ($x.modifier? in ['control' 'alt']) {
+                $x | update modifier (
+                    if $x.modifier == 'control' {
+                        'alt'
+                    } else if $prefer_alt > 1 {
+                        'shift_alt'
+                    } else {
+                        'control'
+                    }
+                )
             } else {
                 $x
             }
