@@ -53,7 +53,10 @@ for s in ['/usr/local/bin', '/usr/bin'] {
     }
 }
 
+$env.PREFER_ALT = '1'
+
 $env.EDITOR = 'nvim' # 'nuedit'
+
 if ($env.EDITOR == 'nuedit') and (not ($'($env.HOME)/.local/bin/nuedit' | path exists)) {
     mkdir $'($env.HOME)/.local/bin/'
     cp $'($nu.config-path | path dirname)/nuedit' $'($env.HOME)/.local/bin/nuedit'

@@ -33,7 +33,7 @@ export def 'config edit' [script: string@"nu-complete config scripts"] {
 }
 
 def "nu-complete config table-modes" [] {
-    [basic, compact, compact_double, light, thin, with_love, rounded, reinforced, heavy, none, other]
+    table -l
 }
 
 export def --env 'config table mode' [mode: string@"nu-complete config table-modes"] {

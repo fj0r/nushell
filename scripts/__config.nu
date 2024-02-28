@@ -21,6 +21,10 @@ if $prefer_alt > 0 {
         move_down
         delete_one_word_backward
         cut_line_from_start
+        quit_shell
+        cut_word_to_right
+        cancel_command
+        capitalize_char
     ]
     $env.config.keybindings = (
         $env.config.keybindings
