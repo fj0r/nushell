@@ -12,11 +12,11 @@ let prefer_alt = $env.PREFER_ALT? | default '0' | into int
 if $prefer_alt > 0 {
     let acts = [
         # f
-        move_right_or_take_history_hint
-        move_one_word_right_or_take_history_hint
+        #move_right_or_take_history_hint
+        #move_one_word_right_or_take_history_hint
         # b
-        move_left
-        move_one_word_left
+        #move_left
+        #move_one_word_left
         # a
         move_to_line_start
         # e
@@ -36,6 +36,9 @@ if $prefer_alt > 0 {
         # c
         cancel_command
         capitalize_char
+        #z
+        undo_change
+        undo_or_previous_page_menu
     ]
     $env.config.keybindings = (
         $env.config.keybindings
@@ -50,6 +53,24 @@ if $prefer_alt > 0 {
                         'control'
                     }
                 )
+            } else if $x.keycode == 'char_f' {
+                if ($x.event.until? | is-empty) { $x } else {
+                    $x | update event.until {|y|
+                        $y.event.until | each {|z|
+                            if 'send' in $z {
+                                $z | update send {|u|
+                                    match $u.send {
+                                        'historyhintcomplete' => 'historyhintwordcomplete'
+                                        'historyhintwordcomplete' => 'historyhintcomplete'
+                                        _ => $u.send
+                                    }
+                                }
+                            } else {
+                                $z
+                            }
+                        }
+                    }
+                }
             } else {
                 $x
             }

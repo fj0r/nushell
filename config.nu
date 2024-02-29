@@ -532,7 +532,7 @@ $env.config = {
         {
             name: move_down
             modifier: control
-            keycode: char_t
+            keycode: char_n
             mode: [emacs, vi_normal, vi_insert]
             event: {
                 until: [
