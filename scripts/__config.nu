@@ -11,18 +11,29 @@ $env.config.table.padding.left = 0
 let prefer_alt = $env.PREFER_ALT? | default '0' | into int
 if $prefer_alt > 0 {
     let acts = [
-        move_one_word_left
-        move_one_word_right_or_take_history_hint
-        move_to_line_start
-        move_to_line_end_or_take_history_hint
-        move_left
+        # f
         move_right_or_take_history_hint
+        move_one_word_right_or_take_history_hint
+        # b
+        move_left
+        move_one_word_left
+        # a
+        move_to_line_start
+        # e
+        move_to_line_end_or_take_history_hint
+        # p
         move_up
+        # t
         move_down
+        # w
         delete_one_word_backward
+        # u
         cut_line_from_start
+        upper_case_word
+        # d
         quit_shell
         cut_word_to_right
+        # c
         cancel_command
         capitalize_char
     ]
