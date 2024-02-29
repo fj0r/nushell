@@ -87,9 +87,7 @@ export def opwd [] {
 }
 
 export def nve [action ...file] {
-    if ($file | is-empty) {
-        nvim
-    } else if ($env.NVIM? | is-empty) {
+    if ($env.NVIM? | is-empty) {
         nvim ...$file
     } else {
         let af = $file
@@ -100,6 +98,7 @@ export def nve [action ...file] {
                 $"($env.PWD)/($f)"
             }
         }
+        let action = if ($file | is-empty) { $action | str replace -r 'sp.*$' 'new' } else { $action }
         let cmd = $"<cmd>($action) ($af|str join ' ')<cr>"
         nvim --headless --noplugin --server $env.NVIM --remote-send $cmd
     }
