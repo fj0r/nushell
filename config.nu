@@ -762,6 +762,7 @@ $env.config = {
 }
 
 source __env.nu
+source __config.nu
 
 const USRCFG = '~/.nu'
 const USRCFG = if ($USRCFG | path expand | path exists) {
@@ -769,4 +770,5 @@ const USRCFG = if ($USRCFG | path expand | path exists) {
 } else { 'dummy.nu' }
 source $USRCFG
 
-source __config.nu
+use __prefer_alt.nu prefer_alt_env
+prefer_alt_env $env.PREFER_ALT?
