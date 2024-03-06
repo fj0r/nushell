@@ -13,7 +13,7 @@ $env.comma_scope = {|_|{
         #just.nu:                custom-completions/just/just-completions.nu
         #mask.nu:                custom-completions/mask/mask-completions.nu
 
-        power:                   modules/prompt/powerline
+        #power:                  modules/prompt/powerline
         cwdhist.nu:              modules/cwdhist
 
         #direnv.nu:              hooks/direnv

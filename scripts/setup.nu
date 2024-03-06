@@ -23,7 +23,7 @@ export def 'config update' [
 }
 
 def "nu-complete config scripts" [] {
-    ls -s ([($nu.config-path | path dirname) scripts '*.nu'] | path join)
+    ls -s ([($nu.config-path | path dirname) scripts '*.nu'] | path join | into glob)
     | each {|x| $x.name | str substring ..-3 }
 }
 

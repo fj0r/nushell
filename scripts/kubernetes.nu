@@ -612,7 +612,7 @@ def "nu-complete kube cp" [cmd: string, offset: int] {
         | lines
         | each {|x| $"($n | get 0):($x)"}
     } else {
-        let files = do -i { ls -a $"($p)*"
+        let files = do -i { ls -a ($"($p)*" | into glob)
             | each {|x| if $x.type == dir { $"($x.name)/"} else { $x.name }}
         }
         $files | append $ctn
@@ -1059,7 +1059,7 @@ def "nu-complete helm charts" [context: string, offset: int] {
     let ctx = $context | argx parse
     let path = $ctx | get _pos.chart
     let path = if ($path | is-empty) { '.' } else { $path }
-    let paths = do -i { ls $"($path)*" | each {|x| if $x.type == dir { $"($x.name)/"} else { $x.name }} }
+    let paths = do -i { ls ($"($path)*" | into glob) | each {|x| if $x.type == dir { $"($x.name)/"} else { $x.name }} }
     helm repo list | from ssv -a | rename value description
     | append $paths
 }

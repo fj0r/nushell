@@ -195,7 +195,7 @@ def "nu-complete docker cp" [cmd: string, offset: int] {
         | each {|x| $"($n | get 0):($x)"}
     } else {
         let files = do -i {
-            ls -a $"($p)*"
+            ls -a ($"($p)*" | into glob)
             | each {|x| if $x.type == dir { $"($x.name)/"} else { $x.name }}
         }
         $files | append $ctn
