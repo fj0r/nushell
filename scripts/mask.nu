@@ -20,19 +20,19 @@ def "nu-complete mask args" [context: string, offset: int] {
         | where name == $r.1
         | get 0
     mut rt = []
-    if not ($c | get required_args | is-empty) {
+    if ($c | get required_args | is-not-empty) {
         $rt ++= ($c | get required_args | each {|x|
             {value: null, description: $"($x.name) \(positional)"}
         })
     }
-    if not ($c | get subcommands | is-empty) {
+    if ($c | get subcommands | is-not-empty) {
         $rt ++= ($c | get subcommands | each {|x|
             {value: $x.name, description: $"($x.description) \(subcommand)"}
         })
     }
-    if not ($c | get named_flags | is-empty) {
+    if ($c | get named_flags | is-not-empty) {
         $rt ++= ($c | get named_flags | each {|x|
-            let v = if not ($x.long | is-empty) { $"`--($x.long)`" } else if not ($x.short | is-empty) { $"`-($x.short)`" } else { $"---($x.name)" }
+            let v = if ($x.long | is-not-empty) { $"`--($x.long)`" } else if ($x.short | is-not-empty) { $"`-($x.short)`" } else { $"---($x.name)" }
             let a = ["required", "multiple", "takes_value", "validate_as_number"]
                 | filter {|y| ($x | get $y) == true }
                 | str join ','

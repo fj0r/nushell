@@ -24,7 +24,7 @@ export def gen [tbl] {
             []
         } else {
             let label = $g
-                | filter {|x| not ($x | is-empty) }
+                | filter {|x| $x | is-not-empty }
                 | str join ' | '
             let command = $pth
                 | str join ' '
@@ -67,7 +67,7 @@ export def gen [tbl] {
         }
     }
     let inputs = $vs
-    | filter {|x| not ($x.cmp | is-empty) }
+    | filter {|x| $x.cmp | is-not-empty }
     | each {|x| {
         id: $x.cmp
         type: 'command'

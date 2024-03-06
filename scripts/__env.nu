@@ -40,7 +40,7 @@ $env.LD_LIBRARY_PATH = (do -i {
 $env.TERM = 'screen-256color'
 for s in ['/usr/local/bin', '/usr/bin'] {
     let p = [$s, 'nu'] | path join
-    if not (which $p | is-empty) {
+    if (which $p | is-not-empty) {
         $env.SHELL = $p
         break
     }

@@ -58,7 +58,7 @@ export-env {
     use lib/os.nu
     use utils.nu
     # batch mode
-    if not ($env.config? | is-empty) {
+    if ($env.config? | is-not-empty) {
         $env.config = ( $env.config | upsert hooks.env_change.PWD { |config|
             let o = ($config | get -i hooks.env_change.PWD)
             let val = (comma file)
@@ -106,7 +106,7 @@ export-env {
                         $"(ansi bg_red)FAIL(ansi reset)"
                     }
                     print $"($indent)($status) (ansi yellow_bold)($x.message) (ansi light_gray)($x.args)(ansi reset)"
-                    if not ($x.report | is-empty) {
+                    if ($x.report | is-not-empty) {
                         let report = if $indent == 0 {
                             $x.report
                         } else {

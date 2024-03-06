@@ -137,7 +137,7 @@ def unnest [list lv=0] {
             $cur = [...$cur, $i]
         }
     }
-    if not ($cur | is-empty) {
+    if ($cur | is-not-empty) {
         $rt = [...$rt, {it: $cur, lv: $lv}]
     }
     return $rt

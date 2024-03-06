@@ -3,7 +3,7 @@ def wid [] {
 }
 
 def dbg [a b] {
-    if not ($env.comma_debug? | is-empty) {
+    if ($env.comma_debug? | is-not-empty) {
         let _ = $env.comma_index
         do $_.tips $a $b
         #print -e $env.comma_cache

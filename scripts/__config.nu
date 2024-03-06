@@ -57,7 +57,7 @@ use power/power.nu
     power set time null { style: compact }
 power init
 
-if not (which atuin | is-empty) {
+if (which atuin | is-not-empty) {
     source atuin.nu
 }
 

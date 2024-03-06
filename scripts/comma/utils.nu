@@ -39,7 +39,7 @@ export def --wrapped ll [...args] {
         $"(ansi ($c | get $lv))($t)($dark)($sep.1)($g)"
         $"($gray)($s.msg | str join ' ')(ansi reset)"
     ]
-    | where { not ($in | is-empty) }
+    | where { $in | is-not-empty }
     | str join ' '
     print -e $r
 }

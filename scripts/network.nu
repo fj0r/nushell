@@ -1,5 +1,5 @@
 export def has [name] {
-    $name in ($in | columns) and (not ($in | get $name | is-empty))
+    $name in ($in | columns) and ($in | get $name | is-not-empty)
 }
 
 export alias site-mirror = wget -m -k -E -p -np -e robots=off

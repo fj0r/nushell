@@ -2,7 +2,7 @@ export def ensure-cache [cache paths action] {
     mut cfgs = []
     for i in $paths {
         let cs = (do -i {ls $i})
-        if not ($cs | is-empty) {
+        if ($cs | is-not-empty) {
             $cfgs = ($cfgs | append $cs)
         }
     }

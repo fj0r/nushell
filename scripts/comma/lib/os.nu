@@ -8,7 +8,7 @@ export def distro [] {
                 $acc | upsert $a.0 ($a.1| str replace -a '"' '')
             }
             if 'ID_LIKE' in $info {
-                if not ($info.ID_LIKE | parse -r '(rhel|fedora|redhat)' | is-empty) {
+                if ($info.ID_LIKE | parse -r '(rhel|fedora|redhat)' | is-not-empty) {
                     'redhat'
                 } else {
                     $info.ID_LIKE

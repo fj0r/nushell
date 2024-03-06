@@ -61,7 +61,7 @@ $env.comma = {|_|{
             'example a b c e': {
                 $_.act: {, -c example a b c e }
                 $_.x: [
-                    {|r,a,s| $r | where value == 'f' | not ($in | is-empty) }
+                    {|r,a,s| $r | where value == 'f' | ($in | is-not-empty) }
                     (do $_.T {|r,a,s| $s | spy 'expect'})
                     {|r,a| 'q1|q2|q3|q4| open a file' == ($r | get 1.description) }
                 ]
@@ -76,7 +76,7 @@ $env.comma = {|_|{
             }
             '': {
                 $_.act: { , test -c }
-                $_.x: {|r,a| $r | where value == 'ping' | not ($in | is-empty) }
+                $_.x: {|r,a| $r | where value == 'ping' | ($in | is-not-empty) }
             }
             'run with args': {
                 $_.act: {|a| , suit completion args $a }
@@ -189,7 +189,7 @@ $env.comma = {|_|{
                 args: [example a b c e open_file]
             }
             do $_.test 'completion' {
-                expect: {|x| $x | where value == 'f' | not ($in | is-empty) }
+                expect: {|x| $x | where value == 'f' | ($in | is-not-empty) }
                 spec: {|x| , -c $x }
                 args: [example a b c e]
             }

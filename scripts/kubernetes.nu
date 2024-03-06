@@ -4,7 +4,7 @@ export def ensure-cache-by-lines [cache path action] {
     let ls = do -i { open $path | lines | length }
     if ($ls | is-empty) { return false }
     let lc = do -i { open $cache | get lines}
-    if not (($cache | path exists) and (not ($lc | is-empty)) and ($ls == $lc)) {
+    if not (($cache | path exists) and ($lc | is-not-empty) and ($ls == $lc)) {
         mkdir ($cache | path dirname)
         {
             lines: $ls
@@ -298,7 +298,7 @@ def "nu-complete kube jsonpath" [context: string] {
             let m = kubectl get ...$ns $kind $res $"--output=jsonpath={($p)}" | from json
             let l = $row | last
             let c = do -i {$m | get $l}
-            if (not ($c | is-empty)) and ($c | describe | str substring 0..5) == 'table' {
+            if ($c | is-not-empty) and ($c | describe | str substring 0..5) == 'table' {
                 $r = (0..(($c | length) - 1) | each {|x| $'($p).($l)[($x)]'})
             } else {
                 $r = ($m | columns | each {|x| $'($p).($x)'})
@@ -463,7 +463,7 @@ export def kgp [
     --selector (-l): string
     --all (-a)
 ] {
-    if not ($r | is-empty) {
+    if ($r | is-not-empty) {
         kubectl get pods ...($namespace | with-flag -n) $r --output=json
         | from json
         | {...$in.metadata, ...$in.spec, ...$in.status}
@@ -951,18 +951,18 @@ export def kcmp [--without-service(-s)] {
             | each {|z|
                 let sp = $z.subPath? | default ''
                 let s = $v | get $z.name
-                let s = if not ($s.hostPath? | is-empty) {
+                let s = if ($s.hostPath? | is-not-empty) {
                     $s.hostPath.path
-                } else if not ($s.path? | is-empty) {
+                } else if ($s.path? | is-not-empty) {
                     $s.path
-                } else if not ($s.persistentVolumeClaim?.claimName? | is-empty) {
+                } else if ($s.persistentVolumeClaim?.claimName? | is-not-empty) {
                     $pvc | get $s.persistentVolumeClaim.claimName
-                } else if not ($s.configMap?.name? | is-empty) {
+                } else if ($s.configMap?.name? | is-not-empty) {
                     ['.'
                     ($cm | get $s.configMap.name)
                     $sp
                     ] | path join
-                } else if not ($s.secret?.secretName? | is-empty) {
+                } else if ($s.secret?.secretName? | is-not-empty) {
                     ['.'
                     ($sec | get $s.secret.secretName)
                     $sp
