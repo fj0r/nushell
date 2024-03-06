@@ -1,3 +1,12 @@
+########################################
+const USRCFG = '~/.nu'
+const USRCFG = if ($USRCFG | path expand | path exists) {
+    $USRCFG
+} else { 'dummy.nu' }
+########################################
+source $USRCFG
+source __env.nu
+
 # settings
 
 $env.config.show_banner = false
@@ -56,3 +65,9 @@ const plugin_query = ($nu.current-exe | path dirname | path join (
     if $nu.os-info.family == 'windows' { 'nu_plugin_query.exe' } else { 'nu_plugin_query' }
 ))
 register $plugin_query
+
+########################################
+source $USRCFG
+
+use __prefer_alt.nu prefer_alt_env
+prefer_alt_env $env.PREFER_ALT?
