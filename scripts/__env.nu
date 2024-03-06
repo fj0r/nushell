@@ -24,7 +24,7 @@ def --env merge-path [path] {
 merge-path [
     $'($env.HOME)/.local/bin'
     '/opt/*/bin'
-    $'($env.LS_ROOT)/*/bin'
+    $'($env.LS_ROOT?)/*/bin'
 ]
 
 $env.LD_LIBRARY_PATH = (if ($env.LD_LIBRARY_PATH? | is-empty) { [] } else { $env.LD_LIBRARY_PATH })
