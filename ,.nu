@@ -15,6 +15,7 @@ $env.comma_scope = {|_|{
 
         #power:                  modules/prompt/powerline
         cwdhist.nu:              modules/cwdhist
+        history-utils.nu:        modules/history-utils
 
         #direnv.nu:              hooks/direnv
         #dynamic-load.nu:        hooks/dynamic-load
