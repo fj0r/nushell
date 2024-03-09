@@ -42,6 +42,7 @@ use comma/utils.nu *
 use network.nu *
 use setup.nu *
 use history-utils.nu *
+use resolvenv.nu *
 
 use power/power.nu
     use power/lib/git.nu *
