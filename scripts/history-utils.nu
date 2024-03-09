@@ -41,12 +41,28 @@ export def 'history restore' [name: string@"nu-complete history_backup_file"] {
     | sqlite3 $nu.history-path
 }
 
+def quote [...t] {
+    $"'($t | str join '')'"
+}
+
 export def 'history timing' [
     pattern?
+    --exclude(-x): string
     --num(-n)=10
     --all(-a)
 ] {
-    let pattern = if ($pattern | is-empty) {[]} else {['and' 'cmd' 'like' $"'%($pattern)%'"]}
+    mut cond = ["cmd not like 'history timing%'"]
+    if ($pattern | is-not-empty) {
+        $cond ++= (['cmd' 'like' (quote '%' $pattern '%')] | str join ' ')
+    }
+    if ($exclude | is-not-empty) {
+        $cond ++= (['cmd' 'not' 'like' (quote '%' $exclude '%')] | str join ' ')
+    }
+    if not $all {
+        $cond ++= (['cwd' '=' (quote $env.PWD)] | str join ' ')
+    }
+    let cond = if ($cond | is-empty) {[]} else {['where' ($cond | str join ' and ')]}
+
     let q = [
         "select"
         ([
@@ -57,9 +73,7 @@ export def 'history timing' [
             'exit_status as exit'
         ] | str join ', ')
         'from history'
-        'where' "cmd not like 'history timing%'"
-        ...$pattern
-        ...(if $all {[]} else {['and' 'cwd' '=' $"'($env.PWD)'"]})
+        ...$cond
         'order by' 'start' 'desc'
         'limit' $num
     ]
@@ -73,22 +87,56 @@ export def 'history timing' [
     }
 }
 
+def "nu-complete history dir" [] {
+    open $nu.history-path | query db "
+        select cwd, count(1) as count
+        from history
+        group by cwd
+        order by count desc
+        limit 20
+        ;
+    "
+    | rename value description
+    | update value {|x| $x.value | str replace $env.HOME '~' }
+}
+
 export def 'history top' [
     num=10
     --before (-b): duration
+    --dir (-d)
+    --path(-p): list<string@"nu-complete history dir">
 ] {
-    let before = if ($before | is-empty) {[]} else {['where' 'start_timestamp' '>' (
-        (date now) - $before | into int | do { $in / 1_000_000 }
-    )]}
+    mut cond = []
+    if ($before | is-not-empty) {
+        let ts = (date now) - $before | into int | do { $in / 1_000_000 }
+        $cond ++= (['start_timestamp' '>' $ts] | str join ' ')
+    }
+    if ($path | is-not-empty) {
+        let ps = $path | path expand | each { quote $in } | str join ', '
+        $cond ++= (['cwd' 'in' '(' $ps  ')'] | str join ' ')
+    }
+    let cond = if ($cond | is-empty) {[]} else {['where' ($cond | str join ' and ')]}
+
+    let tk = if $dir {
+        [
+            $"replace\(cwd, '($env.HOME)', '~') as cwd"
+            'cwd'
+        ]
+    } else {
+        [
+            'command_line as cmd'
+            'cmd'
+        ]
+    }
     let q = [
         'select'
         ([
-            'command_line as cmd'
+            $tk.0
             'count(1) as count'
         ] | str join ', ')
         'from history'
-        ...$before
-        'group by' 'cmd'
+        ...$cond
+        'group by' $tk.1
         'order by' 'count' 'desc'
         'limit' $num
     ]
