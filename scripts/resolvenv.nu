@@ -23,15 +23,6 @@ export def regex_match_record [val, tbl] {
     $ev
 }
 
-
-export def 'wifi ssid' [dev=wlan0] {
-    if (which iw | is-empty) {
-        print -e 'please install iw'
-    } else {
-        iw dev $dev link | awk '/SSID/{print $2}'
-    }
-}
-
 # Connect to a special wifi to perform corresponding operations (wifi select) or set environment variables (wifi env).
 # For example, use an external monitor in the workplace and set different scaling parameters (this example may not be very appropriate, and the monitor should be detected)
 # ```
@@ -51,6 +42,22 @@ export def 'wifi ssid' [dev=wlan0] {
 #     }
 # }
 # ```
+
+export def 'wifi ssid' [dev=wlan0] {
+    if (which iw | is-empty) {
+        print -e 'please install iw'
+    } else {
+        iw dev $dev link
+        | lines
+        | range 1..
+        | str trim
+        | where ($it | str starts-with 'SSID')
+        | first
+        | split row ' '
+        | get 1
+    }
+}
+
 export def 'wifi select' [dev tbl] {
     let ssid = wifi ssid $dev
     regex_match $ssid $tbl
@@ -59,4 +66,22 @@ export def 'wifi select' [dev tbl] {
 export def --env 'wifi env' [dev tbl] {
     let ssid = wifi ssid $dev
     regex_match_record $ssid $tbl | load-env
+}
+
+def screens [] {
+    xrandr
+    | lines
+    | where ($it | str starts-with Screen)
+    | each { $in | parse -r 'Screen (?<screen>\w+):.*current (?<x>\w+) x (?<y>\w+),.*' }
+    | flatten
+}
+
+export def 'current screen' [] {
+    let s = xdotool getmouselocation
+    | split row ' '
+    | where ($it | str starts-with screen)
+    | first
+    | split row ':'
+    | get 1
+    screens | where screen == $s
 }
