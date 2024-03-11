@@ -92,9 +92,9 @@ $env.comma = {|_|{
     }
     dev: {
         source scripts/resolvenv.nu
-        let x = env select wlan0 [
-            [{wifi: 'pan', screen: { port: 'hdmi' }}, { print 1 }]
-            [_, { id: 0 }]
+        let x = select wlan0 [
+            [{wifi: 'pan', screen: { port: 'hdmi-0' }}, { print 1 }]
+            [_, { print 0 }]
         ]
     }
     .: {

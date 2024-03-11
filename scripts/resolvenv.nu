@@ -26,18 +26,15 @@ export def record_match [pat obj] {
 }
 
 # [pattern object action] : list<table<any, any, any>>
-export def rx_match [tbl] {
+export def rx_match [obj tbl] {
     mut default = null
     mut action = null
-    mut object = null
     for i in $tbl {
         if ($i.0 | describe -d).type == 'string' {
-            $object = $i.1
-            $default = $i.2
+            $default = $i.1
         } else {
-            if (record_match $i.0 $i.1) {
-                $object = $i.1
-                $action = $i.2
+            if (record_match $i.0 $obj) {
+                $action = $i.1
                 break
             }
         }
@@ -48,7 +45,7 @@ export def rx_match [tbl] {
     let t = ($action | describe -d).type
     if ($env.DEBUG? | default false) { print -e $t }
     match $t {
-        closure => { $object | do $action $object }
+        closure => { $obj | do $action $obj }
         _ => { $action }
     }
     | default {}
@@ -104,6 +101,5 @@ export def --env select [wifi tbl] {
         wifi: (wifi ssid $wifi)
         screen: (current screen)
     }
-    let tbl = $tbl | each {|x| [$x.0 $obj $x.1] }
-    rx_match $tbl | load-env
+    rx_match $obj $tbl | load-env
 }
