@@ -14,7 +14,7 @@ def direnv [] {
                 echo $'🖊️ Loading variable from .env: ($env.envpath)/.env'
                 open .env
                 | lines
-                | parse -r '(?P<k>.+?)=(?P<v>.+)'
+                | parse -r '(?<k>.+?)=(?<v>.+)'
                 | reduce -f {} {|x, acc| $acc | upsert $x.k $x.v}
                 | load-env
             "
@@ -29,7 +29,7 @@ def direnv [] {
                     $env.envpath = $'($env.envpath)/.env'
                     open $env.envpath
                     | lines
-                    | parse -r '(?P<k>.+?)=(?P<v>.+)'
+                    | parse -r '(?<k>.+?)=(?<v>.+)'
                     | reduce -f {} {|x, acc| $acc | upsert $x.k null}
                     | load-env
                     $env.envpath = null

@@ -7,11 +7,11 @@ export alias site-mirror = wget -m -k -E -p -np -e robots=off
 export def ns [] {
     netstat -aplnetu
     | awk '(NR>2)'
-    | parse -r '(?P<proto>\w+) +(?P<recv>[0-9]+) +(?P<send>[0-9]+) +(?P<local>[0-9.]+):(?P<port>[0-9]+) +(?P<foreign>[0-9.:]+):(?P<f_port>[0-9]+) +(?P<state>\w+) +(?P<user>[0-9]+) +(?P<inode>[0-9]+) +(?P<program>.+)'
+    | parse -r '(?<proto>\w+) +(?<recv>[0-9]+) +(?<send>[0-9]+) +(?<local>[0-9.]+):(?<port>[0-9]+) +(?<foreign>[0-9.:]+):(?<f_port>[0-9]+) +(?<state>\w+) +(?<user>[0-9]+) +(?<inode>[0-9]+) +(?<program>.+)'
 }
 
 export def common-ips [] {
-    let addr = ip route | lines | get 0 | parse -r 'default via (?P<gateway>[0-9\.]+) dev (?P<dev>\w+)( proto dhcp src (?P<lan>[0-9\.]+))?'
+    let addr = ip route | lines | get 0 | parse -r 'default via (?<gateway>[0-9\.]+) dev (?<dev>\w+)( proto dhcp src (?<lan>[0-9\.]+))?'
     return {
         loopback:  'localhost'
         gateway: $addr.gateway.0
