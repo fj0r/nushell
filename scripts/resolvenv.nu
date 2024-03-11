@@ -1,87 +1,109 @@
-export def regex_match [val, tbl] {
-    for i in ($tbl | transpose k v | where k != '_') {
-        if ($val | find -ir $i.k | is-not-empty) {
-            return (do $i.v $val)
+export def record_match [pat obj] {
+    $pat
+    | transpose k v
+    | reduce -f true {|i,a|
+        match ($i.v | describe -d).type {
+            string => {
+                $obj | get $i.k | find -ir $i.v | is-not-empty
+            }
+            int => {
+                $i.v == ($obj | get $i.k)
+            }
+            record => {
+                record_match $i.v ($obj | get $i.k)
+            }
+            list => {
+                $obj | get $i.k
+                | zip $i.v
+                | reduce -f true {|i1, a1|
+                    let tk = random chars -l 6
+                    $a1 and (record_match {$tk: $i1.1} {$tk: $i1.0} )
+                }
+            }
         }
-    }
-    if ('_' in $tbl) {
-        return (do ($tbl | get '_') $val)
+        | do { $a and $in}
     }
 }
 
-export def regex_match_record [val, tbl] {
-    mut ev = {}
-    for i in ($tbl | transpose k v | where k != '_') {
-        if ($val | find -ir $i.k | is-not-empty) {
-            $ev = $i.v
-            break
+# [pattern object action] : list<table<any, any, any>>
+export def rx_match [tbl] {
+    mut default = null
+    mut action = null
+    mut object = null
+    for i in $tbl {
+        if ($i.0 | describe -d).type == 'string' {
+            $object = $i.1
+            $default = $i.2
+        } else {
+            if (record_match $i.0 $i.1) {
+                $object = $i.1
+                $action = $i.2
+                break
+            }
         }
     }
-    if ($ev | is-empty) and ('_' in $tbl) {
-        $ev = ($tbl | get '_')
+    if ($action | is-empty) {
+        $action = $default
     }
-    $ev
+    let t = ($action | describe -d).type
+    if ($env.DEBUG? | default false) { print -e $t }
+    match $t {
+        closure => { $object | do $action $object }
+        _ => { $action }
+    }
+    | default {}
 }
 
-# Connect to a special wifi to perform corresponding operations (wifi select) or set environment variables (wifi env).
-# For example, use an external monitor in the workplace and set different scaling parameters (this example may not be very appropriate, and the monitor should be detected)
-# ```
-# use wifi-env.nu *
-# wifi env wlan0 {
-#     home-wlan: {
-#         NEOVIM_LINE_SPACE: '2'
-#         NEOVIDE_SCALE_FACTOR:  '0.5'
-#     }
-#     workspace-wlan: {
-#         NEOVIM_LINE_SPACE: '1'
-#         NEOVIDE_SCALE_FACTOR:  '0.7'
-#     }
-#     _: {
-#         NEOVIM_LINE_SPACE: '0'
-#         NEOVIDE_SCALE_FACTOR:  '0.5'
-#     }
-# }
-# ```
 
 export def 'wifi ssid' [dev=wlan0] {
     if (which iw | is-empty) {
         print -e 'please install iw'
     } else {
-        iw dev $dev link
+        let r = iw dev $dev link
         | lines
-        | range 1..
-        | str trim
-        | where ($it | str starts-with 'SSID')
-        | first
-        | split row ' '
-        | get 1
+        | parse -r '\s*SSID: (?<ssid>[\w\-]+)'
+        if ($r | is-not-empty) { $r | get 0.ssid }
     }
 }
 
-export def 'wifi select' [dev tbl] {
-    let ssid = wifi ssid $dev
-    regex_match $ssid $tbl
-}
-
-export def --env 'wifi env' [dev tbl] {
-    let ssid = wifi ssid $dev
-    regex_match_record $ssid $tbl | load-env
-}
-
-def screens [] {
-    xrandr
-    | lines
-    | where ($it | str starts-with Screen)
-    | each { $in | parse -r 'Screen (?<screen>\w+):.*current (?<x>\w+) x (?<y>\w+),.*' }
-    | flatten
+export def screens [] {
+    # TODO: optimize
+    mut monitor = []
+    for i in (xrandr | lines) {
+        let x = $i | parse -r '(?<port>[\w\-]+)\s+connected\s+(?<x>\d+)x(?<y>\d+)\+(?<_x>\d+)\+(?<_y>\d+).*'
+        if ($x | is-not-empty) {
+            let r = $x | get 0
+            | transpose k v
+            | reduce -f {} {|i,a|
+                let v = if $i.k == 'port' { $i.v } else { $i.v | into int }
+                $a | insert $i.k $v
+            }
+            $monitor ++= $r
+        }
+    }
+    $monitor
 }
 
 export def 'current screen' [] {
-    let s = xdotool getmouselocation
+    let c = xdotool getmouselocation
     | split row ' '
-    | where ($it | str starts-with screen)
-    | first
-    | split row ':'
-    | get 1
-    screens | where screen == $s
+    | each { $in | split row ':'}
+    | reduce -f {} {|i,a| $a | insert $i.0 ($i.1 | into int)}
+    for i in (screens) {
+        let x = $c.x > $i._x and $c.x < ($i.x + $i._x)
+        let y = $c.y > $i._y and $c.y < ($i.y + $i._y)
+        if $x and $y {
+            return $i
+        }
+    }
+}
+
+# [pattern action]
+export def --env select [wifi tbl] {
+    let obj = {
+        wifi: (wifi ssid $wifi)
+        screen: (current screen)
+    }
+    let tbl = $tbl | each {|x| [$x.0 $obj $x.1] }
+    rx_match $tbl | load-env
 }

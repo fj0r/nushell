@@ -17,6 +17,7 @@ $env.comma_scope = {|_|{
         cwdhist.nu:              modules/cwdhist
         history-utils.nu:        modules/history-utils
         resolvenv.nu:            modules/resolvenv
+        resolvenv.md:            modules/resolvenv
 
         #direnv.nu:              hooks/direnv
         #dynamic-load.nu:        hooks/dynamic-load
@@ -89,6 +90,13 @@ $env.comma = {|_|{
             }
         }
     }
+    dev: {
+        source scripts/resolvenv.nu
+        let x = env select wlan0 [
+            [{wifi: 'pan', screen: { port: 'hdmi' }}, { print 1 }]
+            [_, { id: 0 }]
+        ]
+    }
     .: {
         created: {
             $_.action: {|a, s| $s.computed }
@@ -101,7 +109,7 @@ $env.comma = {|_|{
                 let act = $a | str join ' '
                 $', ($act)' | do $_.batch ',.nu'
             }
-            $_.watch: { glob: ",.nu", clear: true }
+            $_.watch: { glob: "**/*nu", clear: true }
             $_.completion: {|a,s|
                 , -c ...$a
             }
