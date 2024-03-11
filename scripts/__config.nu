@@ -1,10 +1,10 @@
 ########################################
-const USRCFG = '~/.nu'
-const USRCFG = if ($USRCFG | path expand | path exists) {
-    $USRCFG
+const USRENV = '~/.env.nu'
+const USRENV = if ($USRENV | path expand | path exists) {
+    $USRENV
 } else { 'dummy.nu' }
+source $USRENV
 ########################################
-source $USRCFG
 source __env.nu
 
 # settings
@@ -68,8 +68,14 @@ const plugin_query = ($nu.current-exe | path dirname | path join (
 ))
 register $plugin_query
 
+
 ########################################
+const USRCFG = '~/.nu'
+const USRCFG = if ($USRCFG | path expand | path exists) {
+    $USRCFG
+} else { 'dummy.nu' }
 source $USRCFG
+########################################
 
 use __prefer_alt.nu prefer_alt_env
 prefer_alt_env $env.PREFER_ALT?
