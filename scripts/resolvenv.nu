@@ -90,8 +90,8 @@ export def 'current screen' [] {
     | each { $in | split row ':'}
     | reduce -f {} {|i,a| $a | insert $i.0 ($i.1 | into int)}
     for i in (screens) {
-        let x = $c.x > $i._x and $c.x < ($i.x + $i._x)
-        let y = $c.y > $i._y and $c.y < ($i.y + $i._y)
+        let x = $c.x >= $i._x and $c.x < ($i.x + $i._x)
+        let y = $c.y >= $i._y and $c.y < ($i.y + $i._y)
         if $x and $y {
             return $i
         }
