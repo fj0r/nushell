@@ -32,7 +32,7 @@ export def --wrapped ll [...args] {
     let sep = ['│', '│']
     let g = $s.tag
     | transpose k v
-    | each {|y| $"($dark)($y.k):($gray)($y.v)"}
+    | each {|y| $"($dark)($y.k)=($gray)($y.v)"}
     | str join ' '
     | do { if ($in | is-empty) {''} else {$"($in)($dark)($sep.0)"} }
     let r = [
@@ -40,7 +40,7 @@ export def --wrapped ll [...args] {
         $"($gray)($s.msg | str join ' ')(ansi reset)"
     ]
     | where { $in | is-not-empty }
-    | str join ' '
+    | str join ''
     print -e $r
 }
 
