@@ -97,3 +97,28 @@ export def outdent [] {
     | each {|s| $s | str substring $indent.. }
     | str join (char newline)
 }
+
+export def batch [
+    ...modules
+    --bare (-b)
+] {
+    let o = $in
+    | lines
+    | split row ';'
+    | flatten
+    let modules = $modules
+    | each { $'source ($in)' }
+    let cmd = if $bare { [] } else {
+        [
+            'use comma/main.nu *'
+            'use comma/utils.nu *'
+        ]
+    }
+    | append [...$modules ...$o]
+    | str join (char newline)
+    print -e $"(ansi $env.comma_index.settings.theme.batch_hint)($cmd)(ansi reset)"
+    let begin = date now
+    nu -c $cmd
+    let duration = (date now) - $begin
+    print -e $"(ansi $env.comma_index.settings.theme.batch_hint)($duration)(ansi reset)"
+}

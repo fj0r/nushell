@@ -153,7 +153,7 @@ $env.comma = {|_|{
     test: {
         comma: {
             $_.act: {
-                ', test all' | do $_.batch 'comma_test.nu'
+                ', test all' | batch 'comma_test.nu'
             }
             $_.wth: {
                 glob: '*.nu'
