@@ -8,7 +8,6 @@ source $USRENV
 source __env.nu
 
 # settings
-
 $env.config.show_banner = false
 $env.config.use_kitty_protocol = true
 $env.config.history.file_format = "sqlite"
@@ -18,14 +17,11 @@ $env.config.table.mode = compact #light compact
 $env.config.table.padding.left = 0
 
 
-# config.nu
-
-use nvim.nu *
+# config
 use cwdhist.nu *
 use nushell.nu *
 use sys.nu *
 use just.nu *
-use mask.nu *
 use git-cmp.nu *
 use git.nu *
 use ssh.nu *
@@ -34,7 +30,7 @@ use docker.nu *
 use sh.nu *
 #use pwd-overlay.nu *
 #use direnv.nu *
-use completion-generator.nu *
+#use completion-generator.nu *
 use comma/main.nu *
 use comma/utils.nu *
 #use task.nu *
@@ -43,6 +39,7 @@ use network.nu *
 use setup.nu *
 use history-utils.nu *
 use resolvenv.nu
+use nvim.nu *
 
 use power/power.nu
     use power/lib/git.nu *
