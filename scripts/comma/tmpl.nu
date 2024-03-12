@@ -6,7 +6,15 @@ $env.comma_scope = {|_|{
 
 $env.comma = {|_|{
     start: {
-        do $_.log 1 'start'
+        $_.act: {|a,s|
+            ll 1 start
+        }
+        $_.cmp: {|a,s|
+            match ($a | length) {
+                1 => []
+                _ => {}
+            }
+        }
     }
     stop: {
         l1 'stop'

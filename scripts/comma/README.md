@@ -189,13 +189,10 @@ build: {
             ^$env.docker-cli push $a.1
         }
         $_.c: {|a,s|
-            let l = $a | length
-            if $l < 1 {
-                ['ubuntu', 'alpine', 'nginx']
-            } else if $l < 2 {
-                ['target']
-            } else {
-                ['vendor']
+            match ($a | length) {
+                1 => ['ubuntu', 'alpine', 'nginx']
+                2 => ['target']
+                _ => ['vendor']
             }
         }
         $_.d: 'build docker image'
