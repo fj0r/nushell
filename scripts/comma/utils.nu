@@ -122,3 +122,11 @@ export def batch [
     let duration = (date now) - $begin
     print -e $"(ansi $env.comma_index.settings.theme.batch_hint)($duration)(ansi reset)"
 }
+
+export def deprecated [old new] {
+    let o = (ansi yellow_bold)
+    let n = (ansi light_green)
+    let g = (ansi light_gray_italic)
+    let r = (ansi reset)
+    print -e $"($o)($old)($g) is deprecated, use ($r)($n)($new)($r)"
+}

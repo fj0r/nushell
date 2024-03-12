@@ -126,7 +126,11 @@ export-env {
                 }
             }
             distro: (os distro)
-            batch: {|mod| $in | utils batch $mod }
+            batch: {|mod|
+                let x = $in
+                utils deprecated '$_.batch' 'batch'
+                $x | utils batch $mod
+            }
             test: {|dsc, spec|
                 use lib/test.nu
                 let fmt = $env.comma_index.settings.test_message

@@ -64,8 +64,8 @@ $env.comma = {|_|{
     test: {
         comma: {
             $_.act: {
-                ', test all' | do $_.batch 'comma/test.nu'
-                , export
+                ', test all' | batch 'comma/test.nu'
+                , export nu_scripts
             }
             $_.wth: {
                 glob: '*.nu'
@@ -107,7 +107,7 @@ $env.comma = {|_|{
         reload: {
             $_.action: {|a,s|
                 let act = $a | str join ' '
-                $', ($act)' | do $_.batch ',.nu'
+                $', ($act)' | batch ',.nu'
             }
             $_.watch: { glob: "**/*nu", clear: true }
             $_.completion: {|a,s|
@@ -118,7 +118,7 @@ $env.comma = {|_|{
         vscode-tasks: {
             $_.action: {
                 mkdir .vscode
-                ', --vscode -j' | do $_.batch ',.nu' | save -f .vscode/tasks.json
+                ', --vscode -j' | batch ',.nu' | save -f .vscode/tasks.json
             }
             $_.desc: "generate .vscode/tasks.json"
             $_.watch: { glob: ',.nu' }

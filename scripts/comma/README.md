@@ -145,7 +145,7 @@ $env.comma = {|_|{
     vscode-tasks: {
         $_.a: {
             mkdir .vscode
-            ', --vscode -j' | do $_.batch ',.nu' | save -f .vscode/tasks.json
+            ', --vscode -j' | batch ',.nu' | save -f .vscode/tasks.json
         }
         $_.d: "generate .vscode/tasks.json"
         $_.w: { glob: ',.nu' }
