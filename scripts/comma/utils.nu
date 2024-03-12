@@ -103,9 +103,21 @@ export def batch [
     --bare (-b)
 ] {
     let o = $in
-    | lines
-    | split row ';'
-    | flatten
+    let o = if ($o | describe -d).type == 'list' {
+        $o
+        | each {|x|
+            if ($x | describe -d).type == 'list' {
+                $x | str join ' '
+            } else {
+                $x
+            }
+        }
+    } else {
+        $o
+        | lines
+        | split row ';'
+        | flatten
+    }
     let modules = $modules
     | each { $'source ($in)' }
     let cmd = if $bare { [] } else {
