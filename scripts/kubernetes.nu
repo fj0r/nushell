@@ -1,4 +1,5 @@
 use argx.nu
+use refine.nu
 
 export def ensure-cache-by-lines [cache path action] {
     let ls = do -i { open $path | lines | length }
@@ -40,6 +41,66 @@ export-env {
         s: services
         d: deployments
         p: pods
+    }
+    $env.KUBERNETES_REFINE = {
+        _namespace: [
+            'kube-system', 'istio-system', 'ingress-nginx'
+            'kube-flannel', 'kube-node-lease', 'kube-public'
+        ]
+        status: {
+
+        }
+        resource: {
+            namespace: {
+                labels: metadata.labels
+                created: creationTimestamp
+            }
+            deployments: {
+                labels: spec.template.metadata.labels
+                replicas: spec.replicas
+                containers: {
+                    _: spec.template.spec.containers
+                    name: name
+                    image: image
+                    imagePullPolicy: imagePullPolicy
+                    env: env
+                    ports: ports
+                    resources: resources
+                    args: args
+                    label: label
+                    replicas: replicas
+                }
+            }
+            configMap: {
+                labels: metadata.labels
+                data: data
+            }
+            secrets: {
+                labels: metadata.labels
+                data: data
+                type: type
+            }
+            virtualservices.networking.istio.io: {
+                labels: metadata.labels
+                http: spec.http
+                apiVersion: apiVersion
+                gateways: {
+                    _: spec.gateways
+                    hosts: {
+                        _: spec.hosts
+                    }
+                }
+            }
+            ingresses: {
+                labels: metadata.labels
+                annotations: metadata.annotations
+                rules: {
+                    _: spec.rules
+                    host: host
+                    http: http
+                }
+            }
+        }
     }
 }
 
@@ -864,6 +925,35 @@ export def kgcert [] {
     kubectl get certificaterequests -o wide | from ssv | rename certificaterequests
     kubectl get order.acme -o wide | from ssv | rename order.acme
     kubectl get challenges.acme -o wide | from ssv | rename challenges.acme
+}
+
+### refine kubernetes resources
+export def 'kube refine' [] {
+    let config = $env.KUBERNETES_REFINE
+    let namespace = kubectl get namespace
+    | from ssv -a
+    | get NAME
+    | filter {|x| $x not-in $config._namespace}
+
+    mut data = []
+    for p in ($config.resources | transpose k v) {
+        for ns in $namespace {
+            ll 3 {kind: $p.k, ns: $ns} list
+            let rs = kubectl get $p.k --namespace $ns | from ssv -a | get NAME
+            for r in $rs {
+                ll 1 {kind: $p.k, ns: $ns, name: $r} collect
+                let obj = kubectl get $p.k --namespace $ns $r --output=json | from json
+                let pyl = refine $p.v $obj
+                $data ++= {
+                    namespace: $ns
+                    kind: $p.k
+                    name: $r
+                    ...$pyl
+                }
+            }
+        }
+    }
+    $data
 }
 
 # kubernetes to docker-compose
