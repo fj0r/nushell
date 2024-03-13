@@ -31,6 +31,7 @@ use sh.nu *
 #use pwd-overlay.nu *
 #use direnv.nu *
 #use completion-generator.nu *
+use refine.nu
 use comma/main.nu *
 use comma/utils.nu *
 #use task.nu *
