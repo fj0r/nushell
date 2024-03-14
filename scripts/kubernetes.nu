@@ -71,7 +71,7 @@ export-env {
                     replicas: [replicas]
                 }
             }
-            configMap: {
+            configmaps: {
                 labels: [metadata labels]
                 data: [data]
             }
@@ -101,6 +101,16 @@ export-env {
                 }
             }
         }
+    }
+}
+
+def krefine [kind attr] {
+    let obj = $in
+    let conf = $env.KUBERNETES_REFINE
+    if $kind in $conf.resources {
+        refine ($conf.resources | get $kind) $obj | upsert kind $kind | merge $attr
+    } else {
+        $obj
     }
 }
 
@@ -417,7 +427,7 @@ export def kg [
             kubectl get ...$n $kind $"--output=jsonpath={($jsonpath)}" | from json
         }
     } else {
-        kubectl get ...$n $kind $resource -o json | from json
+        kubectl get ...$n $kind $resource -o json | from json | krefine $kind {namespace: $namespace}
     }
 }
 
