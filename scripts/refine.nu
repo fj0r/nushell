@@ -7,7 +7,7 @@ def safe_get [path obj] {
         let p = $ps | first
 
         if ($p | describe -d).type == closure {
-            $r = (do $p $r)
+            $r = ($r | do $p $r)
             $ps = ($ps | range 1..)
             continue
         }

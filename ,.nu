@@ -6,6 +6,7 @@ $env.comma_scope = {|_|{
         ssh.nu:                  modules/network
         docker.nu:               modules/docker
         kubernetes.nu:           modules/kubernetes
+        refine.nu:               modules/kubernetes
         git.nu:                  modules/git/git-v2.nu
         git.md:                  modules/git/README.md
         nvim.nu:                 modules/nvim
@@ -16,8 +17,8 @@ $env.comma_scope = {|_|{
         #power:                  modules/prompt/powerline
         cwdhist.nu:              modules/cwdhist
         history-utils.nu:        modules/history-utils
-        resolvenv.nu:            modules/resolvenv
-        resolvenv.md:            modules/resolvenv
+        #resolvenv.nu:            modules/resolvenv
+        #resolvenv.md:            modules/resolvenv
 
         #direnv.nu:              hooks/direnv
         #dynamic-load.nu:        hooks/dynamic-load

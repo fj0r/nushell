@@ -20,13 +20,7 @@ $env.comma = {|_|{
         l1 'stop'
     }
     .: {
-        created: {
-            $_.action: {|a, s| $s.computed }
-            $_.filter: [log_args]
-            $_.desc: "created"
-        }
-        inspect: {|a, s| {index: $_, scope: $s, args: $a} | table -e }
-        reload: {
+        .: {
             $_.action: {|a,s|
                 let act = $a | str join ' '
                 $', ($act)' | batch ',.nu'
@@ -35,8 +29,14 @@ $env.comma = {|_|{
             $_.completion: {|a,s|
                 , -c ...$a
             }
-            $_.desc: "reload ,.nu"
+            $_.desc: "reload & run ,.nu"
         }
+        created: {
+            $_.action: {|a, s| $s.computed }
+            $_.filter: [log_args]
+            $_.desc: "created"
+        }
+        inspect: {|a, s| {index: $_, scope: $s, args: $a} | table -e }
         vscode-tasks: {
             $_.action: {
                 mkdir .vscode
