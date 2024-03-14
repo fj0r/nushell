@@ -61,6 +61,20 @@ export def `kcache flush` [] {
     rm -rf ~/.cache/nu-complete/k8s-api-resources/
 }
 
+def kube-shortnames [] {
+    kubectl api-resources | from ssv -a
+    | where SHORTNAMES != ''
+    | reduce -f {} {|i,a|
+        $i.SHORTNAMES
+        | split row ','
+        | reduce -f {} {|j,b|
+            $b | insert $j $i.NAME
+        }
+        | merge $a
+    }
+    | to nuon -i 4
+}
+
 export-env {
     $env.KUBERNETES_SCHEMA_URL = $"file:///($env.HOME)/.config/kubernetes-json-schema/all.json"
     $env.KUBERNETES_RESOURCE_ABBR = {
@@ -81,6 +95,32 @@ export-env {
             kube-system kube-node-lease kube-public
             kube-flannel istio-system ingress-nginx
         ]
+        shortnames: {
+            sc: storageclasses
+            ing: ingresses
+            vs: virtualservices
+            gw: gateways
+            dr: destinationrules
+            ev: events
+            cj: cronjobs
+            hpa: horizontalpodautoscalers
+            sts: statefulsets
+            rs: replicasets
+            deploy: deployments
+            ds: daemonsets
+            crd: customresourcedefinitions
+            svc: services
+            sa: serviceaccounts
+            quota: resourcequotas
+            rc: replicationcontrollers
+            po: pods
+            pv: persistentvolumes
+            pvc: persistentvolumeclaims
+            no: nodes
+            ns: namespaces
+            ep: endpoints
+            cm: configmaps
+        }
         cluster_resources: {
             ns: {
                 ...$id
@@ -186,6 +226,11 @@ export-env {
 def krefine [kind] {
     let obj = $in
     let conf = $env.KUBERNETES_REFINE
+    let kind = if $kind in $conf.shortnames {
+        $conf.shortnames | get $kind
+    } else {
+        $kind
+    }
     let tg = [cluster_resources cluster_status resources status]
     | reduce -f {} {|i,a|
         let r = $conf | get $i
