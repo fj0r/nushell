@@ -10,16 +10,10 @@ export def spy [tag?] {
     $o
 }
 
-export def --wrapped ll [...args] {
+export def --wrapped ll [lv ...args] {
     let c = ['navy' 'teal' 'xpurplea' 'xgreen' 'olive' 'maroon']
     let t = date now | format date '%Y-%m-%dT%H:%M:%S'
-    let n = $args | length
-    let lv = if $n == 1 { 0 } else { $args.0 }
-    let s = match $n {
-        1 => ($args | range 0..)
-        _ => ($args | range 1..)
-    }
-    let s = $s
+    let s = $args
     | reduce -f {tag: {}, msg:[]} {|x, acc|
         if ($x | describe -d).type == 'record' {
             $acc | update tag ($acc.tag | merge $x)
@@ -29,7 +23,7 @@ export def --wrapped ll [...args] {
     }
     let gray = (ansi light_gray)
     let dark = (ansi grey39)
-    let sep = ['│', '│']
+    let sep = ['│' '│']
     let g = $s.tag
     | transpose k v
     | each {|y| $"($dark)($y.k)=($gray)($y.v)"}

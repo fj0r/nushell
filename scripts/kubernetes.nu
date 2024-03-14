@@ -937,6 +937,10 @@ export def kgcert [] {
     kubectl get challenges.acme -o wide | from ssv | rename challenges.acme
 }
 
+def log [theme ...msg] {
+    let t = date now | format date '%Y-%m-%dT%H:%M:%S'
+}
+
 ### refine kubernetes resources
 export def 'kube refine' [
     ...namespace: string@"nu-complete kube ns"
