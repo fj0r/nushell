@@ -6,6 +6,12 @@ def safe_get [path obj] {
         if $r == null { break }
         let p = $ps | first
 
+        if ($p | describe -d).type == closure {
+            $r = (do $p $r)
+            $ps = ($ps | range 1..)
+            continue
+        }
+
         match ($r | describe -d).type {
             record => {
                 if $p in $r {

@@ -68,25 +68,69 @@ export-env {
         d: deployments
         p: pods
     }
+    let id = {
+        name: [metadata name]
+        labels: [metadata labels]
+        created: [metadata creationTimestamp {|x|$x | into datetime}]
+    }
+    let ids = {...$id, namespace: [metadata namespace] }
     $env.KUBERNETES_REFINE = {
         _namespace: [
             kube-system kube-node-lease kube-public
             kube-flannel istio-system ingress-nginx
         ]
-        status: {
+        cluster_resources: {
+            ns: {
+                ...$id
+            }
+        }
+        cluster_status: {
 
         }
-        resources: {
-            namespaces: {
-                labels: [metadata labels]
-                created: [creationTimestamp]
-            }
+        status: {
             deployments: {
-                labels: [spec template metadata labels]
+                conditions: {
+                    _: [status conditions]
+                    type: [type]
+                    reason: [reason]
+                    message: [message]
+                }
+            }
+            pods: {
+                ...$ids
+                image: [spec containers image]
+                containers: {
+                    _: [spec containers]
+                    name: [name]
+                    image: [image]
+                    serviceAccount: [serviceAccount]
+                    env: [env]
+                    args: [args]
+                    ports: [ports]
+                    volumeMounts: [volumeMounts]
+                    node: [nodeName]
+                    nodeSelector: [nodeSelector]
+                }
+                hostIP: [status hostIP]
+                podIP: [status podIP]
+                phase: [status phase]
+                startTime: [status startTime]
+                conditions: {
+                    _: [status conditions]
+                    type: [type]
+                    reason: [reason]
+                    message: [message]
+                }
+            }
+        }
+        resources: {
+            deployments: {
+                ...$ids
                 replicas: [spec replicas]
                 containers: {
                     _: [spec template spec containers]
                     name: [name]
+                    labels: [metadata labels]
                     image: [image]
                     imagePullPolicy: [imagePullPolicy]
                     env: [env]
@@ -97,17 +141,25 @@ export-env {
                     replicas: [replicas]
                 }
             }
+            services: {
+                ...$ids
+                type: [spec type]
+                clusterIP: [spec clusterIP]
+                ports: [spec ports]
+                selector: [spec selector]
+                sessionAffinity: [sessionAffinity]
+            }
             configmaps: {
-                labels: [metadata labels]
+                ...$ids
                 data: [data]
             }
             secrets: {
-                labels: [metadata labels]
+                ...$ids
                 data: [data]
                 type: [type]
             }
             virtualservices.networking.istio.io: {
-                labels: [metadata labels]
+                ...$ids
                 http: [spec http]
                 apiVersion: [apiVersion]
                 gateways: {
@@ -118,7 +170,7 @@ export-env {
                 }
             }
             ingresses: {
-                labels: [metadata labels]
+                ...$ids
                 annotations: [metadata annotations]
                 rules: {
                     _: [spec rules]
@@ -130,13 +182,22 @@ export-env {
     }
 }
 
-def krefine [kind attr] {
+def krefine [kind] {
     let obj = $in
     let conf = $env.KUBERNETES_REFINE
-    if $kind in $conf.resources {
-        refine ($conf.resources | get $kind) $obj | upsert kind $kind | merge $attr
-    } else {
+    let tg = [cluster_resources cluster_status resources status]
+    | reduce -f {} {|i,a|
+        let r = $conf | get $i
+        if $kind in $r {
+            $a | merge ($r | get $kind)
+        } else {
+            $a
+        }
+    }
+    if ($tg | is-empty) {
         $obj
+    } else {
+        refine $tg $obj
     }
 }
 
@@ -430,20 +491,10 @@ export def kg [
         let l = $selector | with-flag -l
         if ($jsonpath | is-empty) {
             let wide = if $wide {[-o wide]} else {[]}
-            if ($verbose) {
-                kubectl get -o json ...$n $kind ...$l | from json | get items
-                | each {|x|
-                    {
-                        name: $x.metadata.name
-                        kind: $x.kind
-                        ns: $x.metadata.namespace
-                        created: ($x.metadata.creationTimestamp | into datetime)
-                        metadata: $x.metadata
-                        status: $x.status
-                        spec: $x.spec
-                    }
-                }
-                | normalize-column-names
+            if $verbose {
+                kubectl get -o json ...$n $kind ...$l | from json
+                | get items
+                | krefine $kind
             } else if $watch {
                 kubectl get ...$n $kind ...$l ...$wide --watch
             } else {
@@ -453,7 +504,8 @@ export def kg [
             kubectl get ...$n $kind $"--output=jsonpath={($jsonpath)}" | from json
         }
     } else {
-        kubectl get ...$n $kind $resource -o json | from json | krefine $kind {namespace: $namespace}
+        let o = kubectl get ...$n $kind $resource -o json | from json
+        if $verbose { $o } else { $o | krefine $kind }
     }
 }
 
@@ -561,9 +613,7 @@ export def kgp [
     --all (-a)
 ] {
     if ($pod | is-not-empty) {
-        kubectl get pods ...($namespace | with-flag -n) $pod --output=json
-        | from json
-        | {...$in.metadata, ...$in.spec, ...$in.status}
+        kg pods -n $namespace $pod
     } else if $all {
         kg pods -a --wide
     } else {
@@ -735,9 +785,7 @@ export def kgs [
     if ($service | is-empty) {
         kg services -n $namespace -p $jsonpath -l $selector $service
     } else {
-        kubectl get svc ...($namespace | with-flag -n) $service --output=json
-        | from json
-        | {...$in.metadata, ...$in.spec, ...$in.status}
+        kg services -n $namespace $service
     }
 }
 
