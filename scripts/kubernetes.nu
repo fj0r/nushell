@@ -401,19 +401,13 @@ export def --env kcconf [name: string@"nu-complete kube ctx"] {
     $env.KUBECONFIG = $"($dist)/($name)"
 }
 
-### common
-def "nu-complete kube kind without cache" [] {
-    kubectl api-resources | from ssv -a | get NAME
-    | append (kubectl get crd | from ssv -a | get NAME)
-}
-
 def "nu-complete kube kind" [] {
     let ctx = (kube-config)
     let cache = $'($env.HOME)/.cache/nu-complete/k8s-api-resources/($ctx.data.current-context).json'
     ensure-cache-by-lines $cache $ctx.path {||
         kubectl api-resources | from ssv -a
         | each {|x| {value: $x.NAME description: $x.SHORTNAMES} }
-        | append (kubectl get crd | from ssv -a | each {|x| {$x.NAME} })
+        | append (kubectl get crd | from ssv -a | get NAME | wrap value)
     }
 }
 
