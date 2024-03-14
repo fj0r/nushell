@@ -1,6 +1,32 @@
 use argx.nu
 use refine.nu
 
+export def --wrapped ll [lv ...args] {
+    let c = ['navy' 'teal' 'xpurplea' 'xgreen' 'olive' 'maroon']
+    let gray = (ansi light_gray)
+    let dark = (ansi grey39)
+    let t = date now | format date '%Y-%m-%dT%H:%M:%S'
+    let t = $"(ansi ($c | get $lv))($t)"
+    let s = $args
+    | reduce -f {tag: {}, msg:[]} {|x, acc|
+        if ($x | describe -d).type == 'record' {
+            $acc | update tag ($acc.tag | merge $x)
+        } else {
+            $acc | update msg ($acc.msg | append $x)
+        }
+    }
+    let g = $s.tag
+    | transpose k v
+    | each {|y| $"($dark)($y.k)=($gray)($y.v)"}
+    | str join ' '
+    | do { if ($in | is-empty) {''} else {$in} }
+    let m = $"($gray)($s.msg | str join ' ')"
+    let r = [$t $g $m]
+    | where { $in | is-not-empty }
+    | str join $'($dark)│'
+    print -e $r
+}
+
 export def ensure-cache-by-lines [cache path action] {
     let ls = do -i { open $path | lines | length }
     if ($ls | is-empty) { return false }
@@ -965,10 +991,10 @@ export def 'kube refine' [
     for p in ($config.resources | transpose k v) {
         if $p.k not-in $resource { continue }
         for ns in $namespace {
-            #ll 3 {kind: $p.k, ns: $ns} list
+            ll 3 {kind: $p.k, ns: $ns} list
             let rs = kubectl get $p.k --namespace $ns | from ssv -a | get NAME
             for r in $rs {
-                #ll 1 {kind: $p.k, ns: $ns, name: $r} collect
+                ll 1 {kind: $p.k, ns: $ns, name: $r} collect
                 let obj = kubectl get $p.k --namespace $ns $r --output=json | from json
                 let pyl = refine $p.v $obj
                 $data ++= {
