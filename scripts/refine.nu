@@ -33,11 +33,11 @@ def extract [tg obj] {
     | reduce -f {} {|i,a|
         match ($i.v | describe -d).type {
             string => {
-                let c = safe_get ($i.v | split row '.') $obj
+                let c = safe_get $i.v $obj
                 $a | upsert $i.k $c
             }
             record => {
-                let o = safe_get ($i.v._ | split row '.') $obj
+                let o = safe_get $i.v._ $obj
                 let t = $i.v | reject _
                 $a | upsert $i.k (main $t $o)
             }

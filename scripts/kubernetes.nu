@@ -52,52 +52,52 @@ export-env {
         }
         resource: {
             namespace: {
-                labels: metadata.labels
-                created: creationTimestamp
+                labels: [metadata labels]
+                created: [creationTimestamp]
             }
             deployments: {
-                labels: spec.template.metadata.labels
-                replicas: spec.replicas
+                labels: [spec template metadata labels]
+                replicas: [spec replicas]
                 containers: {
-                    _: spec.template.spec.containers
-                    name: name
-                    image: image
-                    imagePullPolicy: imagePullPolicy
-                    env: env
-                    ports: ports
-                    resources: resources
-                    args: args
-                    label: label
-                    replicas: replicas
+                    _: [spec template spec containers]
+                    name: [name]
+                    image: [image]
+                    imagePullPolicy: [imagePullPolicy]
+                    env: [env]
+                    ports: [ports]
+                    resources: [resources]
+                    args: [args]
+                    label: [label]
+                    replicas: [replicas]
                 }
             }
             configMap: {
-                labels: metadata.labels
-                data: data
+                labels: [metadata labels]
+                data: [data]
             }
             secrets: {
-                labels: metadata.labels
-                data: data
-                type: type
+                labels: [metadata labels]
+                data: [data]
+                type: [type]
             }
             virtualservices.networking.istio.io: {
-                labels: metadata.labels
-                http: spec.http
-                apiVersion: apiVersion
+                labels: [metadata labels]
+                http: [spec http]
+                apiVersion: [apiVersion]
                 gateways: {
-                    _: spec.gateways
+                    _: [spec gateways]
                     hosts: {
-                        _: spec.hosts
+                        _: [spec hosts]
                     }
                 }
             }
             ingresses: {
-                labels: metadata.labels
-                annotations: metadata.annotations
+                labels: [metadata labels]
+                annotations: [metadata annotations]
                 rules: {
-                    _: spec.rules
-                    host: host
-                    http: http
+                    _: [spec rules]
+                    host: [host]
+                    http: [http]
                 }
             }
         }
