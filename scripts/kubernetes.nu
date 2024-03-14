@@ -44,14 +44,14 @@ export-env {
     }
     $env.KUBERNETES_REFINE = {
         _namespace: [
-            'kube-system', 'istio-system', 'ingress-nginx'
-            'kube-flannel', 'kube-node-lease', 'kube-public'
+            kube-system kube-node-lease kube-public
+            kube-flannel istio-system ingress-nginx
         ]
         status: {
 
         }
-        resource: {
-            namespace: {
+        resources: {
+            namespaces: {
                 labels: [metadata labels]
                 created: [creationTimestamp]
             }
@@ -928,20 +928,33 @@ export def kgcert [] {
 }
 
 ### refine kubernetes resources
-export def 'kube refine' [] {
+export def 'kube refine' [
+    ...namespace: string@"nu-complete kube ns"
+    --kind(-k): list<string@"nu-complete kube kind">
+] {
     let config = $env.KUBERNETES_REFINE
+
+    let nsf = if ($namespace | is-empty) {
+        {|x| $x not-in $config._namespace }
+    } else {
+        {|x| $x in $namespace}
+    }
     let namespace = kubectl get namespace
     | from ssv -a
     | get NAME
-    | filter {|x| $x not-in $config._namespace}
+    | filter $nsf
+
+    let resource = kubectl get crd | from ssv | get NAME
+    let resource = kubectl api-resources | from ssv -a | get NAME | append $resource
 
     mut data = []
     for p in ($config.resources | transpose k v) {
+        if $p.k not-in $resource { continue }
         for ns in $namespace {
-            ll 3 {kind: $p.k, ns: $ns} list
+            #ll 3 {kind: $p.k, ns: $ns} list
             let rs = kubectl get $p.k --namespace $ns | from ssv -a | get NAME
             for r in $rs {
-                ll 1 {kind: $p.k, ns: $ns, name: $r} collect
+                #ll 1 {kind: $p.k, ns: $ns, name: $r} collect
                 let obj = kubectl get $p.k --namespace $ns $r --output=json | from json
                 let pyl = refine $p.v $obj
                 $data ++= {

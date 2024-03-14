@@ -32,7 +32,7 @@ def extract [tg obj] {
     | transpose k v
     | reduce -f {} {|i,a|
         match ($i.v | describe -d).type {
-            string => {
+            list => {
                 let c = safe_get $i.v $obj
                 $a | upsert $i.k $c
             }
