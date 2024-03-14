@@ -70,6 +70,8 @@ export-env {
     }
     let id = {
         name: [metadata name]
+        kind: [kind {|x|$x| str downcase}]
+        apiVersion: [apiVersion]
         labels: [metadata labels]
         created: [metadata creationTimestamp {|x|$x | into datetime}]
     }
@@ -161,7 +163,6 @@ export-env {
             virtualservices.networking.istio.io: {
                 ...$ids
                 http: [spec http]
-                apiVersion: [apiVersion]
                 gateways: {
                     _: [spec gateways]
                     hosts: {
@@ -1045,12 +1046,7 @@ export def 'kube refine' [
                 ll 1 {kind: $p.k, ns: $ns, name: $r} collect
                 let obj = kubectl get $p.k --namespace $ns $r --output=json | from json
                 let pyl = refine $p.v $obj
-                $data ++= {
-                    namespace: $ns
-                    kind: $p.k
-                    name: $r
-                    ...$pyl
-                }
+                $data ++= $pyl
             }
         }
     }
