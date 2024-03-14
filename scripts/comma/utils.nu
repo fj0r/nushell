@@ -12,6 +12,9 @@ export def spy [tag?] {
 
 export def --wrapped ll [lv ...args] {
     let c = ['navy' 'teal' 'xpurplea' 'xgreen' 'olive' 'maroon']
+    let gray = (ansi light_gray)
+    let dark = (ansi grey39)
+    let sep = ['│' '│']
     let t = date now | format date '%Y-%m-%dT%H:%M:%S'
     let s = $args
     | reduce -f {tag: {}, msg:[]} {|x, acc|
@@ -21,9 +24,6 @@ export def --wrapped ll [lv ...args] {
             $acc | update msg ($acc.msg | append $x)
         }
     }
-    let gray = (ansi light_gray)
-    let dark = (ansi grey39)
-    let sep = ['│' '│']
     let g = $s.tag
     | transpose k v
     | each {|y| $"($dark)($y.k)=($gray)($y.v)"}

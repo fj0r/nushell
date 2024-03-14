@@ -141,3 +141,20 @@ export def ssc [
 export def sleeping [] {
     bash -c "echo mem | sudo tee /sys/power/state > /dev/null"
 }
+
+def "nu-complete ps" [] {
+    ps -l | each {|x| { value: $"($x.pid)", description: $x.command } }
+}
+
+export def 'ancestor process' [pid: int@"nu-complete ps"] {
+    let px = ps
+    let cur = $px | where pid == $pid | get 0
+    mut s = [$cur]
+    loop {
+        let ppid = $s | last | get ppid
+        let p = $px | where pid == $ppid
+        if ($p | is-empty) { break }
+        $s ++= $p.0
+    }
+    $s
+}
