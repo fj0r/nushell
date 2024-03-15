@@ -6,7 +6,7 @@ $env.comma_scope = {|_|{
         ssh.nu:                  modules/network
         docker.nu:               modules/docker
         kubernetes.nu:           modules/kubernetes
-        refine.nu:               modules/kubernetes
+        refine.nu:               modules/refine
         git.nu:                  modules/git/git-v2.nu
         git.md:                  modules/git/README.md
         nvim.nu:                 modules/nvim

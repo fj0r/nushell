@@ -72,7 +72,6 @@ def kube-shortnames [] {
         }
         | merge $a
     }
-    | to nuon -i 4
 }
 
 export-env {
@@ -99,7 +98,8 @@ export-env {
             sc: storageclasses
             ing: ingresses
             vs: virtualservices
-            gw: gateways
+            gw: gateways.networking.istio.io
+            gtw: gateways
             dr: destinationrules
             ev: events
             cj: cronjobs
@@ -200,6 +200,39 @@ export-env {
                 data: [data]
                 type: [type]
             }
+            gateways: {
+                ...$ids
+                addresses: [spec addresses]
+                gatewayClassName: [spec gatewayClassName]
+                listeners: {
+                    _: [spec listeners]
+                    name: [name]
+                    port: [port]
+                    protocol: [protocol]
+                    tls: [tls]
+                }
+
+            }
+            httproutes: {
+                ...$ids
+                hostnames: [spec hostnames]
+                parentRefs: [spec parentRefs name]
+                rules: {
+                    _: [spec rules]
+                    backend: {
+                        _: [backendRefs]
+                        name: [name]
+                        port: [port]
+                        weight: [weight]
+                    }
+                    matches: {
+                        _: [matches]
+                        type: [path type]
+                        value: [path value]
+                    }
+
+                }
+            }
             virtualservices.networking.istio.io: {
                 ...$ids
                 http: [spec http]
@@ -209,6 +242,12 @@ export-env {
                         _: [spec hosts]
                     }
                 }
+            }
+            gateways.networking.istio.io: {
+                ...$ids
+                selector: [spec selector]
+                servers: [spec servers]
+
             }
             ingresses: {
                 ...$ids
