@@ -439,7 +439,8 @@ export def 'kconf export' [name: string@"nu-complete kube ctx"] {
     } | to yaml
 }
 
-export def --env kcconf [name: string@"nu-complete kube ctx"] {
+# kubectl change context clone
+export def --env kccc [name: string@"nu-complete kube ctx"] {
     let dist = $"($env.HOME)/.kube/config.d"
     mkdir $dist
     kconf export $name | save -fr $"($dist)/($name)"
