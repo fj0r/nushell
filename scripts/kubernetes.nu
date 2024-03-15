@@ -122,7 +122,7 @@ export-env {
             cm: configmaps
         }
         cluster_resources: {
-            ns: {
+            namespaces: {
                 ...$id
             }
         }
@@ -1068,7 +1068,7 @@ export def 'kube refine' [
     } else {
         {|x| $x in $namespace}
     }
-    let namespace = kubectl get namespace
+    let cns = kubectl get namespace
     | from ssv -a
     | get NAME
     | filter $nsf
@@ -1077,13 +1077,28 @@ export def 'kube refine' [
     let resource = kubectl api-resources | from ssv -a | get NAME | append $resource
 
     mut data = []
+    if ($namespace | is-empty) {
+        ll 4 {stage: cluster}
+        for p in ($config.cluster_resources | transpose k v) {
+            if $p.k not-in $resource { continue }
+            ll 3 {kind: $p.k} list
+            let rs = kubectl get $p.k | from ssv -a | get NAME
+            for r in $rs {
+                ll 1 {kind: $p.k, name: $r} collect
+                let obj = kubectl get $p.k $r --output=json | from json
+                let pyl = refine $p.v $obj
+                $data ++= $pyl
+            }
+        }
+    }
+    ll 4 {stage: namespace}
     for p in ($config.resources | transpose k v) {
         if $p.k not-in $resource { continue }
-        for ns in $namespace {
-            ll 3 {kind: $p.k, ns: $ns} list
+        for ns in $cns {
+            ll 2 {kind: $p.k, ns: $ns} list
             let rs = kubectl get $p.k --namespace $ns | from ssv -a | get NAME
             for r in $rs {
-                ll 1 {kind: $p.k, ns: $ns, name: $r} collect
+                ll 0 {kind: $p.k, ns: $ns, name: $r} collect
                 let obj = kubectl get $p.k --namespace $ns $r --output=json | from json
                 let pyl = refine $p.v $obj
                 $data ++= $pyl
