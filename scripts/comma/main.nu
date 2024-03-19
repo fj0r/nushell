@@ -145,7 +145,7 @@ export-env {
                 }
             }
             log: {|...args|
-                utils ll 0 ...$args
+                utils ll $args.0 ...($args | range 1..)
             }
             T: {|f| {|r,a,s| do $f $r $a $s; true } }
             F: {|f| {|r,a,s| do $f $r $a $s; false } }
