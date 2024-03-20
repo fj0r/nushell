@@ -306,12 +306,14 @@ export def volume-list [-n: string@"nu-complete docker ns"] {
 }
 
 def "nu-complete docker volume" [] {
-    dvl | get name
+    ^$env.docker-cli volume ls
+    | from ssv -a
+    | get 'VOLUME NAME'
 }
 
 # create volume
 export def volume-create [name: string -n: string@"nu-complete docker ns"] {
-    ^$env.docker-cli ...($n | with-flag -n) volume create
+    ^$env.docker-cli ...($n | with-flag -n) volume create $name
 }
 
 # inspect volume
@@ -322,6 +324,39 @@ export def volume-inspect [name: string@"nu-complete docker volume" -n: string@"
 # remove volume
 export def volume-remove [...name: string@"nu-complete docker volume" -n: string@"nu-complete docker ns"] {
     ^$env.docker-cli ...($n | with-flag -n) volume rm ...$name
+}
+
+# dump volume
+export def volume-dump [
+    name: string@"nu-complete docker volume"
+    --image(-i): string='debian'
+    -n: string@"nu-complete docker ns"
+] {
+    let id = random chars -l 6
+    ^$env.docker-cli ...($n | with-flag -n) ...[
+        run --rm
+        -v $"($name):/tmp/($id)"
+        $image
+        sh -c $'cd /tmp/($id); tar -zcf - *'
+    ]
+}
+
+# restore volume
+export def volume-restore [
+    name: string@"nu-complete docker volume"
+    --from(-f): string
+    --image(-i): string='debian'
+    -n: string@"nu-complete docker ns"
+] {
+    let id = random chars -l 6
+    let src = random chars -l 6
+    ^$env.docker-cli ...($n | with-flag -n) ...[
+        run --rm
+        -v $"($name):/tmp/($id)"
+        -v $"(host-path $from):/tmp/($src)"
+        $image
+        sh -c $'cd /tmp/($id); tar -zxf /tmp/($src)'
+    ]
 }
 
 ### run
