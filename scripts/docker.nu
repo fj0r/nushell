@@ -67,7 +67,7 @@ export def container-list [
             id: $r.Id
             status: $r.State.Status?
             image: $image
-            created: $r.Created
+            created: ($r.Created | into datetime)
             ports: $p
             env: $imgEnv
             mounts: $m
@@ -76,6 +76,31 @@ export def container-list [
             args: $r.Args
         }
     }
+}
+
+def parse-img [] {
+    let n = $in | split row ':'
+    let tag = $n.1? | default 'latest'
+    let repo = $n.0 | split row '/'
+    let image = $repo | last
+    let repo = $repo | range 0..-2 | str join '/'
+    {image: $image, tag: $tag, repo: $repo}
+}
+
+# select image
+export def image-select [name] {
+    let n = $name | parse-img
+    let imgs = (image-list)
+    let fs = [image tag repo]
+    for i in 2..0 {
+        let r = $imgs | filter {|x|
+            $fs | range 0..$i | all {|y| ($n | get $y) == ($x | get $y) }
+        }
+        if ($r | is-not-empty) {
+            return ($r | sort-by -r created | first | get name)
+        }
+    }
+    $name
 }
 
 # list images
@@ -87,17 +112,15 @@ export def image-list [
         ^$env.docker-cli ...($n | with-flag -n) images
             | from ssv -a
             | each {|x|
-                let size = $x.SIZE | into filesize
-                let path = $x.REPOSITORY | split row '/'
-                let image = $path | last
-                let repo = $path | range ..(($path|length) - 2) | str join '/'
+                let img = $x.REPOSITORY | parse-img
                 {
-                    repo: $repo
-                    image: $image
-                    tag: $x.TAG
+                    name: $"($x.REPOSITORY):($x.TAG)"
                     id: $x.'IMAGE ID'
                     created: $x.CREATED
-                    size: $size
+                    size: ($x.SIZE | into filesize)
+                    repo: $img.repo
+                    image: $img.image
+                    tag: $x.TAG
                 }
             }
     } else {
@@ -109,9 +132,14 @@ export def image-list [
                 let x = $i | split row '='
                 $a | upsert $x.0 $x.1?
             }
+        let id = if $env.docker-cli == 'nerdctl' {
+            $r.RepoDigests.0? | split row ':' | get 1 | str substring 0..12
+        } else {
+            $r.Id | str substring 0..12
+        }
         {
-            id: $r.Id
-            created: $r.Created
+            id: $id
+            created: ($r.Created | into datetime)
             author: $r.Author
             arch: $r.Architecture
             os: $r.Os
@@ -236,7 +264,10 @@ export def container-copy-file [
 
 # remove container
 export def container-remove [container: string@"nu-complete docker containers" -n: string@"nu-complete docker ns"] {
-    ^$env.docker-cli ...($n | with-flag -n) container rm -f $container
+    let cs = ^$env.docker-cli ...($n | with-flag -n) ps -a | from ssv -a | get NAMES
+    if $container in $cs {
+        ^$env.docker-cli ...($n | with-flag -n) container rm -f $container
+    }
 }
 
 
