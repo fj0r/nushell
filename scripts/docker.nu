@@ -109,18 +109,20 @@ export def image-list [
     image?: string@"nu-complete docker images"
 ] {
     if ($image | is-empty) {
-        ^$env.docker-cli ...($n | with-flag -n) images
-            | from ssv -a
+        let fmt = '{"id":"{{.ID}}", "repo": "{{.Repository}}", "tag":"{{.Tag}}", "size":"{{.Size}}" "created":"{{.CreatedAt}}"}'
+        ^$env.docker-cli ...($n | with-flag -n) images --format $fmt
+            | lines
             | each {|x|
-                let img = $x.REPOSITORY | parse-img
+                let x = $x | from json
+                let img = $x.repo | parse-img
                 {
-                    name: $"($x.REPOSITORY):($x.TAG)"
-                    id: $x.'IMAGE ID'
-                    created: $x.CREATED
-                    size: ($x.SIZE | into filesize)
+                    name: $"($x.repo):($x.tag)"
+                    id: $x.id
+                    created: ($x.created | into datetime)
+                    size: ($x.size | into filesize)
                     repo: $img.repo
                     image: $img.image
-                    tag: $x.TAG
+                    tag: $x.tag
                 }
             }
     } else {
