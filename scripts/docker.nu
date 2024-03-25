@@ -269,6 +269,8 @@ export def container-remove [container: string@"nu-complete docker containers" -
     let cs = ^$env.docker-cli ...($n | with-flag -n) ps -a | from ssv -a | get NAMES
     if $container in $cs {
         ^$env.docker-cli ...($n | with-flag -n) container rm -f $container
+    } else {
+        print -e $"(ansi grey)container (ansi yellow)($container)(ansi grey) not exist(ansi reset)"
     }
 }
 
