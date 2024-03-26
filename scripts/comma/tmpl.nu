@@ -31,6 +31,18 @@ $env.comma = {|_|{
             }
             $_.desc: "reload & run ,.nu"
         }
+        nu: {
+            $_.action: {|a,s| nu $a.0 }
+            $_.watch: { glob: '*.nu', clear: true }
+            $_.completion: { ls *.nu | get name }
+            $_.desc: "develop a nu script"
+        }
+        py: {
+            $_.action: {|a,s| python3 $a.0 }
+            $_.watch: { glob: '*.py', clear: true }
+            $_.completion: { ls *.py| get name }
+            $_.desc: "develop a python script"
+        }
         created: {
             $_.action: {|a, s| $s.computed }
             $_.filter: [log_args]
