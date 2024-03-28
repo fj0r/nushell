@@ -2,14 +2,6 @@ def wid [] {
     $env.PWD | path split | range 1.. | str join ':'
 }
 
-def dbg [a b] {
-    if ($env.comma_debug? | is-not-empty) {
-        let _ = $env.comma_index
-        do $_.tips $a $b
-        #print -e $env.comma_cache
-    }
-}
-
 # FIXME:
 export def --env comma_get_cache [key, act] {
     if $key in $env.comma_cache {
@@ -53,7 +45,7 @@ export def scope [args, vars, flts] {
             error make -u {msg: $"filter `($i)` not found" }
         }
     }
-    dbg "resolve scope" ((date now) - $start)
+    _DBG "resolve scope" ((date now) - $start)
     $vs
 }
 
@@ -66,6 +58,6 @@ export def comma [key = 'comma'] {
     } else {
         $env | get $key
     }
-    dbg $"resolve comma ($key)" ((date now) - $start)
+    _DBG $"resolve comma ($key)" ((date now) - $start)
     $r
 }

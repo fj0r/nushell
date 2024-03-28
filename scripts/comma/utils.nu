@@ -10,30 +10,44 @@ export def spy [tag?] {
     $o
 }
 
-export def --wrapped ll [lv ...args] {
-    let c = ['navy' 'teal' 'xpurplea' 'xgreen' 'olive' 'maroon']
-    let gray = (ansi light_gray)
-    let dark = (ansi grey39)
-    let t = date now | format date '%Y-%m-%dT%H:%M:%S'
-    let t = $"(ansi ($c | get $lv))($t)"
+export-env {
+    $env.comma_log_level = 2
+    $env.comma_log_file = ''
+}
+def parse_msg [args] {
+    let time = date now | format date '%Y-%m-%dT%H:%M:%S'
     let s = $args
-    | reduce -f {tag: {}, msg:[]} {|x, acc|
-        if ($x | describe -d).type == 'record' {
-            $acc | update tag ($acc.tag | merge $x)
-        } else {
-            $acc | update msg ($acc.msg | append $x)
+        | reduce -f {tag: {}, msg:[]} {|x, acc|
+            if ($x | describe -d).type == 'record' {
+                $acc | update tag ($acc.tag | merge $x)
+            } else {
+                $acc | update msg ($acc.msg | append $x)
+            }
         }
+    {time: $time, msg: $s.msg, tag: $s.tag } 
+}
+export def --wrapped ll [lv ...args] {
+    if $lv < $env.comma_log_level {
+        return
     }
-    let g = $s.tag
-    | transpose k v
-    | each {|y| $"($dark)($y.k)=($gray)($y.v)"}
-    | str join ' '
-    | do { if ($in | is-empty) {''} else {$in} }
-    let m = $"($gray)($s.msg | str join ' ')"
-    let r = [$t $g $m]
-    | where { $in | is-not-empty }
-    | str join $'($dark)│'
-    print -e $r
+    if ($env.comma_log_file? | is-empty) {
+        let c = ['navy' 'teal' 'xpurplea' 'xgreen' 'olive' 'maroon']
+        let gray = ansi light_gray
+        let dark = ansi grey39
+        let msg = parse_msg $args
+        let t = $"(ansi ($c | get $lv))($msg.time)"
+        let g = $msg.tag
+        | transpose k v
+        | each {|y| $"($dark)($y.k)=($gray)($y.v)"}
+        | str join ' '
+        | do { if ($in | is-empty) {''} else {$in} }
+        let m = $"($gray)($msg.msg | str join ' ')"
+        let r = [$t $g $m]
+        | where { $in | is-not-empty }
+        | str join $'($dark)│'
+        print -e $r
+    } else {
+    }
 }
 
 export alias l0 = ll 0
@@ -42,6 +56,12 @@ export alias l2 = ll 2
 export alias l3 = ll 3
 export alias l4 = ll 4
 export alias l5 = ll 5
+export alias _TRC = ll 0
+export alias _DBG = ll 1
+export alias _INF = ll 2
+export alias _WRN = ll 3
+export alias _ERR = ll 4
+export alias _CRT = ll 5
 
 def "nu-complete ps" [] {
     ps -l | each {|x| { value: $"($x.pid)", description: $x.command } }
