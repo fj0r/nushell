@@ -1,3 +1,15 @@
+export def spy [tag?] {
+    let o = $in
+    let t = [
+        $'(ansi xterm_grey)--------(ansi xterm_olive)($tag)(ansi xterm_grey)--------'
+        $'(ansi xterm_grey39)($o | describe)'
+        $'(ansi xterm_grey66)($o | to yaml)'
+        (ansi reset)
+    ]
+    print -e ($t | str join (char newline))
+    $o
+}
+
 def "nu-complete ps" [] {
     ps -l | each {|x| { value: $"($x.pid)", description: $x.command } }
 }

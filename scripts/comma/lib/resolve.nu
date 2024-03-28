@@ -14,7 +14,7 @@ export def --env comma_get_cache [key, act] {
     }
 }
 
-# use log.nu
+use log.nu
 export def scope [args, vars, flts] {
     let start = date now
     mut vs = {}
