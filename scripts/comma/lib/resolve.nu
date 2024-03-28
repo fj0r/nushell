@@ -45,7 +45,7 @@ export def scope [args, vars, flts] {
             error make -u {msg: $"filter `($i)` not found" }
         }
     }
-    _DBG "resolve scope" ((date now) - $start)
+    DEBUG "resolve scope" ((date now) - $start)
     $vs
 }
 
@@ -58,6 +58,6 @@ export def comma [key = 'comma'] {
     } else {
         $env | get $key
     }
-    _DBG $"resolve comma ($key)" ((date now) - $start)
+    DEBUG $"resolve comma ($key)" ((date now) - $start)
     $r
 }

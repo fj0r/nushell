@@ -66,12 +66,12 @@ export alias l2 = ll 2
 export alias l3 = ll 3
 export alias l4 = ll 4
 export alias l5 = ll 5
-export alias _TRC = ll 0
-export alias _DBG = ll 1
-export alias _INF = ll 2
-export alias _WRN = ll 3
-export alias _ERR = ll 4
-export alias _CRT = ll 5
+export alias TRACE = ll 0
+export alias DEBUG = ll 1
+export alias INFO = ll 2
+export alias WARNING = ll 3
+export alias ERROR = ll 4
+export alias CRITICAL = ll 5
 
 def "nu-complete ps" [] {
     ps -l | each {|x| { value: $"($x.pid)", description: $x.command } }
