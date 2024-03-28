@@ -17,36 +17,46 @@ export-env {
 def parse_msg [args] {
     let time = date now | format date '%Y-%m-%dT%H:%M:%S'
     let s = $args
-        | reduce -f {tag: {}, msg:[]} {|x, acc|
+        | reduce -f {tag: {}, txt:[]} {|x, acc|
             if ($x | describe -d).type == 'record' {
                 $acc | update tag ($acc.tag | merge $x)
             } else {
-                $acc | update msg ($acc.msg | append $x)
+                $acc | update txt ($acc.txt | append $x)
             }
         }
-    {time: $time, msg: $s.msg, tag: $s.tag } 
+    {time: $time, txt: $s.txt, tag: $s.tag }
 }
 export def --wrapped ll [lv ...args] {
     if $lv < $env.comma_log_level {
         return
     }
+    let ty = ['TRC' 'DBG' 'INF' 'WRN' 'ERR' 'CRT']
+    let msg = parse_msg $args
     if ($env.comma_log_file? | is-empty) {
-        let c = ['navy' 'teal' 'xpurplea' 'xgreen' 'olive' 'maroon']
+        let c = ['navy' 'teal' 'xgreen' 'xpurplea' 'olive' 'maroon']
         let gray = ansi light_gray
         let dark = ansi grey39
-        let msg = parse_msg $args
+        let l = $"(ansi dark_gray)($ty | get $lv)"
         let t = $"(ansi ($c | get $lv))($msg.time)"
         let g = $msg.tag
         | transpose k v
         | each {|y| $"($dark)($y.k)=($gray)($y.v)"}
         | str join ' '
         | do { if ($in | is-empty) {''} else {$in} }
-        let m = $"($gray)($msg.msg | str join ' ')"
-        let r = [$t $g $m]
+        let m = $"($gray)($msg.txt | str join ' ')"
+        let r = [$t $l $g $m]
         | where { $in | is-not-empty }
         | str join $'($dark)│'
         print -e $r
     } else {
+        [
+            ''
+            $'#($ty | get $lv)# ($msg.txt | str join " ")'
+            ...($msg.tag | transpose k v | each {|y| $"($y.k)=($y.v | to nuon)"})
+            ''
+        ]
+        | str join (char newline)
+        | save -af ~/.cache/nonstdout
     }
 }
 
