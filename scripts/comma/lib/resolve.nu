@@ -15,7 +15,7 @@ export def --env comma_get_cache [key, act] {
 }
 
 use log.nu
-export def scope [args, vars, flts] {
+export def scope [args, vars, flts, --completion] {
     let start = date now
     mut vs = {}
     mut cpu = []
@@ -28,6 +28,7 @@ export def scope [args, vars, flts] {
             } else if $_.flt in $i.v {
                 $flt = ($flt | merge {$i.k: ($i.v | get $_.flt)} )
             } else {
+                # not added when $_.cpu or $_.flt exists
                 $vs = ($vs | merge {$i.k: $i.v})
             }
         } else {
@@ -35,18 +36,20 @@ export def scope [args, vars, flts] {
         }
     }
     for i in $cpu {
-        $vs = ($vs | merge {$i.k: (do $i.v $args $vs)} )
+        # required parameters may not exist when completing
+        $vs = ($vs | merge {$i.k: (do --ignore-errors $i.v $args $vs $completion)} )
     }
     for i in ($flts | default []) {
         if $i in $flt {
-            let fr = do ($flt | get $i) $args $vs
+            # required parameters may not exist when completing
+            let fr = do --ignore-errors ($flt | get $i) $args $vs $completion
             let fr = if ($fr | describe -d).type == 'record' { $fr } else { {} }
             $vs = ($vs | merge $fr)
         } else {
             error make -u {msg: $"filter `($i)` not found" }
         }
     }
-    log debug "resolve scope" ((date now) - $start)
+    log dbg "resolve scope" ((date now) - $start)
     $vs
 }
 
@@ -59,6 +62,6 @@ export def comma [key = 'comma'] {
     } else {
         $env | get $key
     }
-    log debug $"resolve comma ($key)" ((date now) - $start)
+    log dbg $"resolve comma ($key)" ((date now) - $start)
     $r
 }

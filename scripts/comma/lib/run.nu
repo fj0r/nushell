@@ -84,7 +84,7 @@ export def complete [tbl] {
     let wth = if $_.wth in $n.node { $n.node | get $_.wth } else { null }
     if $n.node.end {
         let cmp = $n.node | get $_.cmp
-        let scope = resolve scope null (resolve comma 'comma_scope') $flt
+        let scope = resolve scope null (resolve comma 'comma_scope') $flt --completion
         do $cmp $n.rest $scope
     } else {
         $n.node | get $_.sub | transpose k v | each {|x| $x | update v ($x.v | tree node) | enrich desc $flt }

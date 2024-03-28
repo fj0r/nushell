@@ -53,16 +53,10 @@ export def --wrapped ll [lv ...args] {
     }
 }
 
-export def --wrapped trace    [...args] { ll 0 ...$args }
-export def --wrapped debug    [...args] { ll 1 ...$args }
-export def --wrapped info     [...args] { ll 2 ...$args }
-export def --wrapped warning  [...args] { ll 3 ...$args }
-export def --wrapped error    [...args] { ll 4 ...$args }
-export def --wrapped critical [...args] { ll 5 ...$args }
-
-export alias l0 = log.ll 0
-export alias l1 = log.ll 1
-export alias l2 = log.ll 2
-export alias l3 = log.ll 3
-export alias l4 = log.ll 4
-export alias l5 = log.ll 5
+export def --wrapped trc [...args] { ll 0 ...$args }
+export def --wrapped dbg [...args] { ll 1 ...$args }
+# FIXME: `inf` cannot be used as a name
+export def --wrapped msg [...args] { ll 2 ...$args }
+export def --wrapped wrn [...args] { ll 3 ...$args }
+export def --wrapped err [...args] { ll 4 ...$args }
+export def --wrapped crt [...args] { ll 5 ...$args }
