@@ -18,6 +18,7 @@ $env.config.table.padding.left = 0
 
 
 # config
+use log.nu
 use cwdhist.nu *
 use nushell.nu *
 use sys.nu *

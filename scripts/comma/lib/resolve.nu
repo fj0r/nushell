@@ -14,6 +14,7 @@ export def --env comma_get_cache [key, act] {
     }
 }
 
+# use log.nu
 export def scope [args, vars, flts] {
     let start = date now
     mut vs = {}
@@ -45,7 +46,7 @@ export def scope [args, vars, flts] {
             error make -u {msg: $"filter `($i)` not found" }
         }
     }
-    DEBUG "resolve scope" ((date now) - $start)
+    log debug "resolve scope" ((date now) - $start)
     $vs
 }
 
@@ -58,6 +59,6 @@ export def comma [key = 'comma'] {
     } else {
         $env | get $key
     }
-    DEBUG $"resolve comma ($key)" ((date now) - $start)
+    log debug $"resolve comma ($key)" ((date now) - $start)
     $r
 }
