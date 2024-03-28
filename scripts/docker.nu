@@ -7,6 +7,10 @@ export-env {
     }
 }
 
+def --wrapped container [...flag] {
+    ^$env.docker-cli ...$flag
+}
+
 def --wrapped with-flag [...flag] {
     if ($in | is-empty) { [] } else { [...$flag $in] }
 }
@@ -596,6 +600,7 @@ export def "bud rm" [
     buildah rm $id
 }
 
+export alias d = container
 export alias dp = container-list
 export alias di = image-list
 export alias dl = container-log
