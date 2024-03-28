@@ -15,7 +15,7 @@ export def --env comma_get_cache [key, act] {
 }
 
 use log.nu
-export def scope [args, vars, flts, --completion] {
+export def scope [args, vars, flts, --mode: string] {
     let start = date now
     mut vs = {}
     mut cpu = []
@@ -37,12 +37,12 @@ export def scope [args, vars, flts, --completion] {
     }
     for i in $cpu {
         # required parameters may not exist when completing
-        $vs = ($vs | merge {$i.k: (do --ignore-errors $i.v $args $vs $completion)} )
+        $vs = ($vs | merge {$i.k: (do --ignore-errors $i.v $args $vs $mode)} )
     }
     for i in ($flts | default []) {
         if $i in $flt {
             # required parameters may not exist when completing
-            let fr = do --ignore-errors ($flt | get $i) $args $vs $completion
+            let fr = do --ignore-errors ($flt | get $i) $args $vs $mode
             let fr = if ($fr | describe -d).type == 'record' { $fr } else { {} }
             $vs = ($vs | merge $fr)
         } else {

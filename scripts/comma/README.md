@@ -56,7 +56,7 @@ These attributes support aliases like:
 
 The closure of the task's `action`, `completion` accepts two parameters, the `rest arguments` after the breadcrumbs and `$env.comma_scope`.
 
-`computed` and `filter` are defined in `$env.comma_scope` which is used to share data, in addition to accepting those two parameters, it also accepts a `completion ` indicating whether to run in completion mode.
+`computed` and `filter` are defined in `$env.comma_scope` which is used to share data, in addition to accepting those two parameters, it also accepts a `mode` indicating mode (main|completion|test).
 
 `computed` is calculated in the defined order and replaced with the result.
 ```

@@ -101,7 +101,7 @@ def suit [] {
                 do $g { indent: $j.index title: $j.item desc: $desc}
             }
         }
-        let scope = (resolve scope null (resolve comma 'comma_scope') [])
+        let scope = resolve scope null (resolve comma 'comma_scope') [] --mode 'test'
         let args = $i.mock
         let args = if ($args | describe -d).type == 'closure' {
             do $args $scope
