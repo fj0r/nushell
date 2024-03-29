@@ -58,6 +58,8 @@ The closure of the task's `action`, `completion` accepts two parameters, the `re
 
 `computed` and `filter` are defined in `$env.comma_scope` which is used to share data, in addition to accepting those two parameters, it also accepts a `mode` indicating mode (main|completion|test).
 
+if your closure accepts more than two parameters, it can be executed in completion and test modes, otherwise it can only be executed in main mode.
+
 `computed` is calculated in the defined order and replaced with the result.
 ```
 $env.comma_scope = {|_|{

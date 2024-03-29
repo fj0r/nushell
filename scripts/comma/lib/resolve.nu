@@ -15,6 +15,7 @@ export def --env comma_get_cache [key, act] {
 }
 
 use log.nu
+use closure.nu
 export def scope [args, vars, flts, --mode: string] {
     let start = date now
     mut vs = {}
@@ -36,13 +37,21 @@ export def scope [args, vars, flts, --mode: string] {
         }
     }
     for i in $cpu {
-        # required parameters may not exist when completing
-        $vs = ($vs | merge {$i.k: (do --ignore-errors $i.v $args $vs $mode)} )
+        # required arguments may not exist when completing
+        # when the number of parameters is more than 2, it will be executed in non-main
+        let cr = if $mode == 'main' or (closure parameters $i.v | length) > 2 {
+            do $i.v $args $vs $mode
+        }
+        $vs = ($vs | merge {$i.k: $cr} )
     }
     for i in ($flts | default []) {
         if $i in $flt {
-            # required parameters may not exist when completing
-            let fr = do --ignore-errors ($flt | get $i) $args $vs $mode
+            let cl = $flt | get $i
+            # required arguments may not exist when completing
+            # when the number of parameters is more than 2, it will be executed in non-main
+            let fr = if $mode == 'main' or (closure parameters $cl | length) > 2 {
+                do $cl $args $vs $mode
+            }
             let fr = if ($fr | describe -d).type == 'record' { $fr } else { {} }
             $vs = ($vs | merge $fr)
         } else {
