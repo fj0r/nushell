@@ -23,14 +23,14 @@ export def scope [args, vars, flts, --mode: string] {
     mut flt = {}
     let _ = $env.comma_index
     for i in ($vars | transpose k v) {
-        if ($i.v | describe -d).type == 'record' {
+        if ($i.v | describe -d).type == 'record' and (
+            $_.cpu in $i.v or $_.flt in $i.v
+        ) {
             if $_.cpu in $i.v {
                 $cpu ++= {k: $i.k, v: ($i.v | get $_.cpu)}
-            } else if $_.flt in $i.v {
+            }
+            if $_.flt in $i.v {
                 $flt = ($flt | merge {$i.k: ($i.v | get $_.flt)} )
-            } else {
-                # not added when $_.cpu or $_.flt exists
-                $vs = ($vs | merge {$i.k: $i.v})
             }
         } else {
             $vs = ($vs | merge {$i.k: $i.v})

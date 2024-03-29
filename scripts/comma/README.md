@@ -207,6 +207,7 @@ build: {
 ## todo
 - [x] run
     - [x] optimize resolve scope
+        - [ ] cpu and flt without parameters would resolve once during initialization
     - [x] dry
         - [x] dry wrap lines
         - [x] accept list<string>
