@@ -60,6 +60,7 @@ export def outdent [] {
 export def batch [
     ...modules
     --bare (-b)
+    --init (-i)
 ] {
     let o = $in
     let o = if ($o | describe -d).type == 'list' {
@@ -79,14 +80,17 @@ export def batch [
     }
     let modules = $modules
     | each { $'source ($in)' }
-    let cmd = if $bare { [] } else {
-        [
-            'use comma/main.nu *'
-            'use comma/utils.nu *'
-        ]
+    mut cmd = if $init { [
+        $'source ($nu.env-path)'
+        $'source ($nu.config-path)'
+    ] } else { [] }
+    if not $bare {
+        $cmd ++= 'use comma/main.nu *'
+        $cmd ++= 'use comma/utils.nu *'
     }
-    | append [...$modules ...$o]
-    | str join (char newline)
+    $cmd ++= $modules
+    $cmd ++= $o
+    $cmd = ($cmd | str join (char newline))
     print -e $"(ansi $env.comma_index.settings.theme.batch_hint)($cmd)(ansi reset)"
     let begin = date now
     nu -c $cmd

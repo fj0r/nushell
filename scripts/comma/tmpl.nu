@@ -26,7 +26,7 @@ $env.comma = {|_|{
         .: {
             $_.action: {|a,s|
                 let act = $a | str join ' '
-                $', ($act)' | batch ',.nu'
+                $', ($act)' | batch -i ',.nu'
             }
             $_.watch: { glob: ",.nu", clear: true }
             $_.completion: {|a,s|
