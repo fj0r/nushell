@@ -1,29 +1,35 @@
 $env.comma_scope = {|_|{
-    manifest: {
-        #completion-generator.nu: modules/completion-generator
-        argx.nu:                 modules/argx
-        #taskfile.nu:            modules/taskfile
-        ssh.nu:                  modules/network
-        docker.nu:               modules/docker
-        kubernetes.nu:           modules/kubernetes
-        refine.nu:               modules/refine
-        git.nu:                  modules/git/git-v2.nu
-        git.md:                  modules/git/README.md
-        nvim.nu:                 modules/nvim
+    manifest: [
+    { from: completion-generator.nu, to: modules/completion-generator, disable: true }
+    { from: argx.nu, to: modules/argx }
+    { from: taskfile.nu, to: modules/taskfile, disable: true }
+    { from: ssh.nu, to: modules/network }
+    { from: docker.nu, to: modules/docker }
 
-        #just.nu:                custom-completions/just/just-completions.nu
-        #mask.nu:                custom-completions/mask/mask-completions.nu
+    { from: kubernetes.nu, to: modules/kubernetes }
+    { from: refine.nu, to: modules/kubernetes }
+    { from: argx.nu, to: modules/kubernetes }
+    { from: log.nu, to: modules/kubernetes }
 
-        #power:                  modules/prompt/powerline
-        cwdhist.nu:              modules/cwdhist
-        history-utils.nu:        modules/history-utils
-        #resolvenv.nu:            modules/resolvenv
-        #resolvenv.md:            modules/resolvenv
+    { from: git.nu, to: modules/git/git-v2.nu }
+    { from: argx.nu, to: modules/git }
+    { from: git.md, to: modules/git/README.md }
 
-        #direnv.nu:              hooks/direnv
-        #dynamic-load.nu:        hooks/dynamic-load
-        #zoxide-menu.nu:         custom-menus
-    }
+    { from: nvim.nu, to: modules/nvim }
+
+    { from: just.nu, to: custom-completions/just/just-completions.nu, disable: true }
+    { from: mask.nu, to: custom-completions/mask/mask-completions.nu, disable: true }
+
+    { from: power, to: modules/prompt/powerline, disable: true }
+    { from: cwdhist.nu, to: modules/cwdhist }
+    { from: history-utils.nu, to: modules/history-utils, disable: true }
+    { from: resolvenv.nu, to: modules/resolvenv, disable: true }
+    { from: resolvenv.md, to: modules/resolvenv, disable: true }
+
+    { from: direnv.nu, to: hooks/direnv, disable: true }
+    { from: dynamic-load.nu, to: hooks/dynamic-load, disable: true }
+    { from: zoxide-menu.nu, to: custom-menus, disable: true }
+    ]
     dest: $"($env.HOME)/world/nu_scripts"
 }}
 
@@ -31,20 +37,21 @@ $env.comma = {|_|{
     export: {
         nu_scripts: {
             $_.act: {|a,s|
-                let m = $s.manifest | transpose k v
+                let m = $s.manifest | filter {|x| not ($x.disable? | default false) }
                 let m = if ($a | is-empty) { $m } else {
-                    $m | filter {|x| $x.k in $a }
+                    $m | where to in $a
                 }
                 for x in $m {
-                    pp cp -r $'($_.wd)/scripts/($x.k)' $'($s.dest)/($x.v)'
+                    pp cp -r $'($_.wd)/scripts/($x.from)' $'($s.dest)/($x.to)'
                 }
             }
             $_.dsc: 'export files to nu_scripts'
             $_.cmp: {|a,s|
-                $s.manifest | columns
+                $s.manifest | group-by to | columns
             }
         }
         comma: {
+            cp $'($_.wd)/scripts/log.nu' $'($_.wd)/scripts/comma/lib/log.nu'
             pp rsync -avp --delete --exclude=.git $'($_.wd)/scripts/comma/' $"($env.HOME)/world/comma"
         }
     }
@@ -93,7 +100,7 @@ $env.comma = {|_|{
     }
     dev: {
         source scripts/resolvenv.nu
-        let x = select wlan0 [
+        let x = resolvenv select wlan0 [
             [{wifi: 'pan', screen: { port: 'hdmi-0' }}, { print 1 }]
             [_, { print 0 }]
         ]
