@@ -1,7 +1,7 @@
 use argx.nu
 use refine.nu
 
-export def --wrapped ll [lv ...args] {
+def --wrapped ll [lv ...args] {
     let c = ['navy' 'teal' 'xpurplea' 'xgreen' 'olive' 'maroon']
     let gray = (ansi light_gray)
     let dark = (ansi grey39)
