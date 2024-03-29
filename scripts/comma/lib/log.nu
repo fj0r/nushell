@@ -5,6 +5,18 @@ def get_settings [] {
     }
 }
 
+export-env {
+    $env.nlog_prefix = ['TRC' 'DBG' 'INF' 'WRN' 'ERR' 'CRT']
+    $env.nlog_prefix_index = {
+        trc: 0
+        dbg: 1
+        inf: 2  msg: 2
+        wrn: 3
+        err: 4
+        crt: 5
+    }
+}
+
 def parse_msg [args] {
     let time = date now | format date '%Y-%m-%dT%H:%M:%S'
     let s = $args
@@ -23,40 +35,42 @@ export def --wrapped ll [lv ...args] {
     if $lv < $setting.level {
         return
     }
-    let ty = ['TRC' 'DBG' 'INF' 'WRN' 'ERR' 'CRT']
     let msg = parse_msg $args
     if ($setting.file? | is-empty) {
         let c = ['navy' 'teal' 'xgreen' 'xpurplea' 'olive' 'maroon']
         let gray = ansi light_gray
         let dark = ansi grey39
-        let l = $"(ansi dark_gray)($ty | get $lv)"
+        let l = $"(ansi dark_gray)($env.nlog_prefix | get $lv)"
         let t = $"(ansi ($c | get $lv))($msg.time)"
         let g = $msg.tag
         | transpose k v
         | each {|y| $"($dark)($y.k)=($gray)($y.v)"}
         | str join ' '
-        | do { if ($in | is-empty) {''} else {$in} }
-        let m = $"($gray)($msg.txt | str join ' ')"
+        let m = $msg.txt | str join ' '
+        let m = if ($m | is-empty) { '' } else { $"($gray)($m)" }
         let r = [$t $l $g $m]
-        | where { $in | is-not-empty }
+        | filter {|x| $x | is-not-empty }
         | str join $'($dark)│'
-        print -e $r
+        print -e ($r + (ansi reset))
     } else {
         [
             ''
-            $'#($ty | get $lv)# ($msg.txt | str join " ")'
+            $'#($env.nlog_prefix | get $lv)# ($msg.txt | str join " ")'
             ...($msg.tag | transpose k v | each {|y| $"($y.k)=($y.v | to json)"})
             ''
         ]
         | str join (char newline)
-        | save -af ~/.cache/nonstdout
+        | save -af $setting.file
     }
 }
 
-export def --wrapped trc [...args] { ll 0 ...$args }
-export def --wrapped dbg [...args] { ll 1 ...$args }
-# FIXME: `inf` cannot be used as a name
-export def --wrapped msg [...args] { ll 2 ...$args }
-export def --wrapped wrn [...args] { ll 3 ...$args }
-export def --wrapped err [...args] { ll 4 ...$args }
-export def --wrapped crt [...args] { ll 5 ...$args }
+def 'nu-complete log-prefix' [] {
+    $env.nlog_prefix_index | columns
+}
+
+export def --wrapped main [
+    lv:string@'nu-complete log-prefix'
+    ...args
+] {
+    ll ($env.nlog_prefix_index | get $lv) ...$args
+}
