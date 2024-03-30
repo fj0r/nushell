@@ -16,7 +16,6 @@ def "nu-complete helm list" [context: string, offset: int] {
 def "nu-complete helm charts" [context: string, offset: int] {
     let ctx = $context | argx parse
     let path = $ctx | get _pos.chart?
-    let path = if ($path | is-empty) { '.' } else { $path }
     let paths = do -i { ls ($"($path)*" | into glob) | each {|x| if $x.type == dir { $"($x.name)/"} else { $x.name }} }
     helm repo list | from ssv -a | rename value description
     | append $paths
