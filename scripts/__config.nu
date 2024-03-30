@@ -39,7 +39,7 @@ use comma/utils.nu *
 use network.nu *
 use setup.nu *
 use history-utils.nu *
-use resolvenv.nu
+use resolvenv
 use nvim.nu *
 
 use power

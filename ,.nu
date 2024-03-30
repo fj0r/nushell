@@ -1,22 +1,22 @@
 $env.comma_scope = {|_|{
     manifest: [
     { from: completion-generator.nu, to: modules/completion-generator, disable: true }
-    { from: argx, to: modules/argx }
+    { from: argx/*, to: modules/argx }
     { from: taskfile.nu, to: modules/taskfile, disable: true }
     { from: ssh.nu, to: modules/network }
-    { from: docker, to: modules/docker }
+    { from: docker/*, to: modules/docker }
 
-    { from: kubernetes, to: modules/kubernetes }
-    { from: lg, to: modules/lg }
+    { from: kubernetes/*, to: modules/kubernetes }
+    { from: lg/*, to: modules/lg }
 
-    { from: git, to: modules/git }
+    { from: git/*, to: modules/git }
 
     { from: nvim.nu, to: modules/nvim }
 
     { from: just.nu, to: custom-completions/just/just-completions.nu, disable: true }
     { from: mask.nu, to: custom-completions/mask/mask-completions.nu, disable: true }
 
-    { from: power, to: modules/prompt/powerline, disable: true }
+    { from: power/*, to: modules/prompt/powerline, disable: true }
     { from: cwdhist.nu, to: modules/cwdhist }
     { from: history-utils.nu, to: modules/history-utils, disable: true }
     { from: resolvenv.nu, to: modules/resolvenv, disable: true }
@@ -38,7 +38,7 @@ $env.comma = {|_|{
                     $m | where to in $a
                 }
                 for x in $m {
-                    pp cp -r $'($_.wd)/scripts/($x.from)' $'($s.dest)/($x.to)'
+                    cp -r ($'($_.wd)/scripts/($x.from)' | into glob) $'($s.dest)/($x.to)'
                 }
             }
             $_.dsc: 'export files to nu_scripts'
@@ -95,7 +95,7 @@ $env.comma = {|_|{
         }
     }
     dev: {
-        source scripts/resolvenv.nu
+        source scripts/resolvenv/mod.nu
         let x = resolvenv select wlan0 [
             [{wifi: 'pan', screen: { port: 'hdmi-0' }}, { print 1 }]
             [_, { print 0 }]
