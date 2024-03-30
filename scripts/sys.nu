@@ -1,4 +1,4 @@
-use argx.nu
+use argx
 
 def "nu-complete systemctl cmd" [] {
     [

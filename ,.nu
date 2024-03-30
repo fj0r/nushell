@@ -1,17 +1,15 @@
 $env.comma_scope = {|_|{
     manifest: [
     { from: completion-generator.nu, to: modules/completion-generator, disable: true }
-    { from: argx.nu, to: modules/argx }
+    { from: argx, to: modules/argx }
     { from: taskfile.nu, to: modules/taskfile, disable: true }
     { from: ssh.nu, to: modules/network }
-    { from: docker.nu, to: modules/docker }
+    { from: docker, to: modules/docker }
 
-    { from: kubernetes.nu, to: modules/kubernetes }
-    { from: refine.nu, to: modules/kubernetes }
-    { from: lg.nu, to: modules/kubernetes }
+    { from: kubernetes, to: modules/kubernetes }
+    { from: lg, to: modules/lg }
 
-    { from: git.nu, to: modules/git/git-v2.nu }
-    { from: git.md, to: modules/git/README.md }
+    { from: git, to: modules/git }
 
     { from: nvim.nu, to: modules/nvim }
 
@@ -49,7 +47,7 @@ $env.comma = {|_|{
             }
         }
         comma: {
-            cp $'($_.wd)/scripts/lg.nu' $'($_.wd)/scripts/comma/lib/lg.nu'
+            cp $'($_.wd)/scripts/lg/mod.nu' $'($_.wd)/scripts/comma/lib/lg.nu'
             pp rsync -avp --delete --exclude=.git $'($_.wd)/scripts/comma/' $"($env.HOME)/world/comma"
         }
     }

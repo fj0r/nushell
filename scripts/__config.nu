@@ -18,22 +18,21 @@ $env.config.table.padding.left = 0
 
 
 # config
-use lg.nu
+use lg
 use cwdhist.nu *
 use nushell.nu *
 use sys.nu *
 use just.nu *
 use git-cmp.nu *
-use git.nu *
+use git *
 use ssh.nu *
-use kubernetes.nu *
-use docker.nu *
+use kubernetes *
+use docker *
 use sh.nu *
 #use pwd-overlay.nu *
 #use direnv.nu *
 #use completion-generator.nu *
-use refine.nu
-use comma/main.nu *
+use comma *
 use comma/utils.nu *
 #use task.nu *
 
@@ -43,7 +42,7 @@ use history-utils.nu *
 use resolvenv.nu
 use nvim.nu *
 
-use power/power.nu
+use power
     use power/lib/git.nu *
     power inject 0 1 {source: git,   color: '#504945'}
     use power/lib/kube.nu *
