@@ -7,7 +7,7 @@ $env.comma_scope = {|_|{
     { from: kubernetes/*, to: modules/kubernetes }
     { from: lg/*, to: modules/lg }
 
-    { from: git/*, to: modules/git }
+    { from: git/*, to: modules/gitv2 }
 
     { from: nvim/*, to: modules/nvim }
 
