@@ -87,9 +87,3 @@ export def upsert_row [table col mask id value] {
     }
 }
 
-export def record-to-set-json [value] {
-    $value | transpose k v
-    | each {|x| $"($x.k)=($x.v | to json -r)"}
-    | str join ','
-}
-

@@ -2,6 +2,12 @@ use complete.nu *
 use utils.nu *
 use argx
 
+export def record-to-set-json [value] {
+    $value | transpose k v
+    | each {|x| $"($x.k)=($x.v | to json -r)"}
+    | str join ','
+}
+
 def "nu-complete helm list" [context: string, offset: int] {
     let ctx = $context | argx parse
     kgh -n $ctx.namespace? | each {|x| {value: $x.name  description: $x.updated} }
