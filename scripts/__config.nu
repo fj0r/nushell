@@ -30,8 +30,6 @@ use resolvenv
 use nvim *
 
 
-use arithmetic.nu *
-
 use sh.nu *
 use nushell.nu *
 use sys.nu *
