@@ -1,9 +1,7 @@
 $env.comma_scope = {|_|{
     manifest: [
-    { from: completion-generator.nu, to: modules/completion-generator, disable: true }
     { from: argx/*, to: modules/argx }
-    { from: taskfile.nu, to: modules/taskfile, disable: true }
-    { from: ssh.nu, to: modules/network }
+    { from: ssh/mod.nu, to: modules/network/ssh.nu }
     { from: docker/*, to: modules/docker }
 
     { from: kubernetes/*, to: modules/kubernetes }
@@ -11,20 +9,17 @@ $env.comma_scope = {|_|{
 
     { from: git/*, to: modules/git }
 
-    { from: nvim.nu, to: modules/nvim }
+    { from: nvim/*, to: modules/nvim }
 
     { from: just.nu, to: custom-completions/just/just-completions.nu, disable: true }
     { from: mask.nu, to: custom-completions/mask/mask-completions.nu, disable: true }
 
     { from: power/*, to: modules/prompt/powerline, disable: true }
-    { from: cwdhist.nu, to: modules/cwdhist }
-    { from: history-utils.nu, to: modules/history-utils, disable: true }
-    { from: resolvenv.nu, to: modules/resolvenv, disable: true }
-    { from: resolvenv.md, to: modules/resolvenv, disable: true }
+    { from: cwdhist/*, to: modules/cwdhist }
+    { from: history-utils/*, to: modules/history-utils, disable: true }
+    { from: resolvenv/*, to: modules/resolvenv, disable: true }
 
     { from: direnv.nu, to: hooks/direnv, disable: true }
-    { from: dynamic-load.nu, to: hooks/dynamic-load, disable: true }
-    { from: zoxide-menu.nu, to: custom-menus, disable: true }
     ]
     dest: $"($env.HOME)/world/nu_scripts"
 }}

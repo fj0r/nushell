@@ -1,3 +1,4 @@
+export use utils.nu *
 use lib/resolve.nu
 
 def 'find parent' [] {

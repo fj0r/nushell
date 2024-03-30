@@ -1,5 +1,5 @@
 use argx
-use ./refine.nu
+export use refine.nu *
 
 export def ensure-cache-by-lines [cache path action] {
     let ls = do -i { open $path | lines | length }

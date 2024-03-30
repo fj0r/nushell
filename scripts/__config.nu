@@ -19,28 +19,28 @@ $env.config.table.padding.left = 0
 
 # config
 use lg
-use cwdhist.nu *
+use git *
+use ssh *
+use kubernetes *
+use docker *
+use cwdhist *
+use comma *
+use history-utils *
+use resolvenv
+use nvim *
+
+use sh.nu *
 use nushell.nu *
 use sys.nu *
 use just.nu *
 use git-cmp.nu *
-use git *
-use ssh.nu *
-use kubernetes *
-use docker *
-use sh.nu *
 #use pwd-overlay.nu *
 #use direnv.nu *
 #use completion-generator.nu *
-use comma *
-use comma/utils.nu *
 #use task.nu *
 
 use network.nu *
 use setup.nu *
-use history-utils.nu *
-use resolvenv
-use nvim.nu *
 
 use power
     use power/lib/git.nu *
