@@ -21,7 +21,7 @@ export def wait-pid [pid: string@"nu-complete ps"] {
 export def wait-cmd [action -i: duration = 1sec  -t: string] {
     mut time = 0
     loop {
-        log msg { time: $time } $t
+        lg msg { time: $time } $t
         let c = do --ignore-errors $action | complete | get exit_code
         if ($c == 0) { break }
         sleep $i

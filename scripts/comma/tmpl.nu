@@ -10,7 +10,7 @@ $env.comma_scope = {|_|{
 $env.comma = {|_|{
     start: {
         $_.act: {|a,s|
-            log msg start
+            lg msg start
         }
         $_.cmp: {|a,s|
             match ($a | length) {
@@ -20,7 +20,7 @@ $env.comma = {|_|{
         }
     }
     stop: {
-        log wrn 'stop'
+        lg wrn 'stop'
     }
     .: {
         .: {

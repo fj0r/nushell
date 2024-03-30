@@ -8,7 +8,7 @@ $env.comma_scope = {|_|{
 
     { from: kubernetes.nu, to: modules/kubernetes }
     { from: refine.nu, to: modules/kubernetes }
-    { from: log.nu, to: modules/kubernetes }
+    { from: lg.nu, to: modules/kubernetes }
 
     { from: git.nu, to: modules/git/git-v2.nu }
     { from: git.md, to: modules/git/README.md }
@@ -49,7 +49,7 @@ $env.comma = {|_|{
             }
         }
         comma: {
-            cp $'($_.wd)/scripts/log.nu' $'($_.wd)/scripts/comma/lib/log.nu'
+            cp $'($_.wd)/scripts/lg.nu' $'($_.wd)/scripts/comma/lib/lg.nu'
             pp rsync -avp --delete --exclude=.git $'($_.wd)/scripts/comma/' $"($env.HOME)/world/comma"
         }
     }
