@@ -48,7 +48,7 @@ def parse_msg [args] {
 }
 
 export def --wrapped level [
-    lv
+    level
     ...args
     --multiline(-m)
     --label: string
@@ -60,7 +60,7 @@ export def --wrapped level [
     let output = if ($setting.file? | is-empty) {{ print -e $in }} else {{ $in | save -af $setting.file }}
     let msg = parse_msg $args
 
-    let time = $"($theme.level | get $lv)($msg.time)"
+    let time = $"($theme.level | get $level)($msg.time)"
     let label = if ($label | is-empty) { '' } else { $"($theme.fg)($label)" }
     let txt = $msg.txt | str join ' '
     let txt = if ($txt | is-empty) { '' } else { $"($theme.fg)($txt)" }
@@ -89,12 +89,12 @@ def 'nu-complete log-prefix' [] {
 }
 
 export def --wrapped main [
-    lv:string@'nu-complete log-prefix'
+    level: string@'nu-complete log-prefix'
     --multiline(-m)
     ...args
 ] {
     let setting = get_settings
-    let lv = $env.nlog_prefix_index | get $lv
+    let lv = $env.nlog_prefix_index | get $level
     if $lv < $setting.level {
         return
     }

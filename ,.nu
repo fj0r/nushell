@@ -8,11 +8,9 @@ $env.comma_scope = {|_|{
 
     { from: kubernetes.nu, to: modules/kubernetes }
     { from: refine.nu, to: modules/kubernetes }
-    { from: argx.nu, to: modules/kubernetes }
     { from: log.nu, to: modules/kubernetes }
 
     { from: git.nu, to: modules/git/git-v2.nu }
-    { from: argx.nu, to: modules/git }
     { from: git.md, to: modules/git/README.md }
 
     { from: nvim.nu, to: modules/nvim }
