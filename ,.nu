@@ -14,7 +14,7 @@ $env.comma_scope = {|_|{
         { from: just.nu, to: custom-completions/just/just-completions.nu, disable: true }
         { from: mask.nu, to: custom-completions/mask/mask-completions.nu, disable: true }
 
-        { from: power/*, to: modules/prompt/powerline, disable: true }
+        { from: power/*, to: modules/prompt/powerline, disable: false }
         { from: cwdhist/*, to: modules/cwdhist }
         { from: history-utils/*, to: modules/history-utils, disable: true }
         { from: resolvenv/*, to: modules/resolvenv, disable: true }
