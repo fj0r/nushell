@@ -1,8 +1,7 @@
 $env.comma_scope = {|_|{
     manifest: [
         { from: argx/*, to: modules/argx }
-        { from: ssh/mod.nu, to: modules/network/ssh.nu }
-        { from: ssh/scp.nu, to: modules/network/scp.nu }
+        { from: ssh/*, to: modules/ssh }
         { from: docker/*, to: modules/docker }
 
         { from: kubernetes/*, to: modules/kubernetes }
@@ -11,6 +10,7 @@ $env.comma_scope = {|_|{
         { from: git/*, to: modules/gitv2 }
 
         { from: nvim/*, to: modules/nvim }
+        { from: process/*, to: modules/process }
 
         { from: just.nu, to: custom-completions/just/just-completions.nu, disable: true }
         { from: mask.nu, to: custom-completions/mask/mask-completions.nu, disable: true }

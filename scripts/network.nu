@@ -1,7 +1,3 @@
-export def has [name] {
-    $name in ($in | columns) and ($in | get $name | is-not-empty)
-}
-
 export alias site-mirror = wget -m -k -E -p -np -e robots=off
 
 export def ns [] {
@@ -34,7 +30,7 @@ def "nu-complete proxys" [context: string, offset: int] {
 }
 
 export def --env "toggle proxy" [proxy?:string@"nu-complete proxys"] {
-    let has_set = ($env | has 'https_proxy')
+    let has_set = ($env.https_proxy? | is-not-empty)
     let no_val = ($proxy | is-empty)
     let proxy = if $has_set and $no_val {
                 echo 'hide proxy'
