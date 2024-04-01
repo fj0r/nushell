@@ -1,25 +1,25 @@
 $env.comma_scope = {|_|{
     manifest: [
-    { from: argx/*, to: modules/argx }
-    { from: ssh/mod.nu, to: modules/network/ssh.nu }
-    { from: docker/*, to: modules/docker }
+        { from: argx/*, to: modules/argx }
+        { from: ssh/mod.nu, to: modules/network/ssh.nu }
+        { from: docker/*, to: modules/docker }
 
-    { from: kubernetes/*, to: modules/kubernetes }
-    { from: lg/*, to: modules/lg }
+        { from: kubernetes/*, to: modules/kubernetes }
+        { from: lg/*, to: modules/lg }
 
-    { from: git/*, to: modules/gitv2 }
+        { from: git/*, to: modules/gitv2 }
 
-    { from: nvim/*, to: modules/nvim }
+        { from: nvim/*, to: modules/nvim }
 
-    { from: just.nu, to: custom-completions/just/just-completions.nu, disable: true }
-    { from: mask.nu, to: custom-completions/mask/mask-completions.nu, disable: true }
+        { from: just.nu, to: custom-completions/just/just-completions.nu, disable: true }
+        { from: mask.nu, to: custom-completions/mask/mask-completions.nu, disable: true }
 
-    { from: power/*, to: modules/prompt/powerline, disable: true }
-    { from: cwdhist/*, to: modules/cwdhist }
-    { from: history-utils/*, to: modules/history-utils, disable: true }
-    { from: resolvenv/*, to: modules/resolvenv, disable: true }
+        { from: power/*, to: modules/prompt/powerline, disable: true }
+        { from: cwdhist/*, to: modules/cwdhist }
+        { from: history-utils/*, to: modules/history-utils, disable: true }
+        { from: resolvenv/*, to: modules/resolvenv, disable: true }
 
-    { from: direnv.nu, to: hooks/direnv, disable: true }
+        { from: direnv.nu, to: hooks/direnv, disable: true }
     ]
     dest: $"($env.HOME)/world/nu_scripts"
 }}
@@ -42,7 +42,6 @@ $env.comma = {|_|{
             }
         }
         comma: {
-            cp $'($_.wd)/scripts/lg/mod.nu' $'($_.wd)/scripts/comma/lib/lg.nu'
             pp rsync -avp --delete --exclude=.git $'($_.wd)/scripts/comma/' $"($env.HOME)/world/comma"
         }
     }

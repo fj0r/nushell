@@ -53,7 +53,7 @@ use power
         reverse: true
         separator: '@'
     }
-    use power/lib/utils.nu *
+    # use power/lib/utils.nu *
     # power inject 0 1 {source: atuin, color: '#404040'}
     power set time null { style: compact }
 power init
