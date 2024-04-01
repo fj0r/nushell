@@ -28,11 +28,12 @@ use comma *
 use history-utils *
 use resolvenv
 use nvim *
+use process *
+use system *
 
 
 use sh.nu *
 use nushell.nu *
-use sys.nu *
 use just.nu *
 use git-cmp.nu *
 #use pwd-overlay.nu *

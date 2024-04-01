@@ -10,25 +10,6 @@ export def spy [tag?] {
     $o
 }
 
-def "nu-complete ps" [] {
-    ps -l | each {|x| { value: $"($x.pid)", description: $x.command } }
-}
-
-export def wait-pid [pid: string@"nu-complete ps"] {
-    do -i { tail --pid $pid -f /dev/null }
-}
-
-export def wait-cmd [action -i: duration = 1sec  -t: string] {
-    mut time = 0
-    loop {
-        lg msg { time: $time } $t
-        let c = do --ignore-errors $action | complete | get exit_code
-        if ($c == 0) { break }
-        sleep $i
-        $time = $time + 1
-    }
-}
-
 # perform or print
 export def --wrapped pp [
     ...x

@@ -2,6 +2,7 @@ $env.comma_scope = {|_|{
     manifest: [
         { from: argx/*, to: modules/argx }
         { from: ssh/mod.nu, to: modules/network/ssh.nu }
+        { from: ssh/scp.nu, to: modules/network/scp.nu }
         { from: docker/*, to: modules/docker }
 
         { from: kubernetes/*, to: modules/kubernetes }
