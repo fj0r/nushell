@@ -50,14 +50,19 @@ use power
     power inject 0 1 {source: git,   color: '#504945'}
     use power/lib/kube.nu *
     power inject 1 2 {source: kube,  color: '#504945'} {
-        context: cyan
-    } {
-        reverse: true
-        separator: '@'
+        theme: {
+            context: cyan
+        }
+        config: {
+            reverse: true
+            separator: '@'
+        }
     }
     # use power/lib/utils.nu *
     # power inject 0 1 {source: atuin, color: '#404040'}
-    power set time null { style: compact }
+    power set time {
+        config: { style: compact }
+    }
 power init
 
 if (which atuin | is-not-empty) {
