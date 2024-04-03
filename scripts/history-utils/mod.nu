@@ -1,5 +1,3 @@
-export use backup.nu *
-
 def quote [...t] {
     $"'($t | str join '')'"
 }

@@ -26,6 +26,7 @@ use docker *
 use cwdhist *
 use comma *
 use history-utils *
+use history-utils/backup.nu *
 use resolvenv
 use nvim *
 use process *
