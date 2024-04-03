@@ -66,8 +66,7 @@ export def batch [
         $'source ($nu.config-path)'
     ] } else { [] }
     if not $bare {
-        $cmd ++= 'use comma/main.nu *'
-        $cmd ++= 'use comma/utils.nu *'
+        $cmd ++= 'use comma *'
     }
     $cmd ++= $modules
     $cmd ++= $o
