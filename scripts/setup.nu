@@ -43,7 +43,6 @@ export def --env 'config table mode' [mode: string@"nu-complete config table-mod
 
 export def 'config reset' [] {
     config nu --default | save -f $nu.config-path
-    echo $"(char newline)source __env.nu" | save -a $nu.config-path
     echo $"(char newline)source __config.nu" | save -a $nu.config-path
     config env --default | save -f $nu.env-path
 }
