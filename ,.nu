@@ -17,7 +17,7 @@ $env.comma_scope = {|_|{
 
         { from: power/*, to: modules/prompt/powerline, disable: false }
         { from: cwdhist/*, to: modules/cwdhist }
-        { from: history-utils/*, to: modules/history-utils, disable: true }
+        { from: history-utils/mod.nu, to: modules/history-utils, disable: false }
         { from: resolvenv/*, to: modules/resolvenv, disable: true }
 
         { from: direnv.nu, to: hooks/direnv, disable: true }
