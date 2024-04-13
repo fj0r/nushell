@@ -30,14 +30,6 @@ export def --wrapped pp [
     }
 }
 
-export def outdent [] {
-    let txt = $in | lines | range 1..
-    let indent = $txt.0 | parse --regex '^(?<indent>\s*)' | get indent.0 | str length
-    $txt
-    | each {|s| $s | str substring $indent.. }
-    | str join (char newline)
-}
-
 export def batch [
     ...modules
     --bare (-b)

@@ -44,6 +44,7 @@ use git-cmp.nu *
 
 use network.nu *
 use setup.nu *
+use outdent.nu
 
 use power
     use power/lib/git.nu *
