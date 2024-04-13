@@ -67,7 +67,7 @@ export def screens [] {
     # TODO: optimize
     mut monitor = []
     for i in (xrandr | lines) {
-        let x = $i | parse -r '(?<port>[\w\-]+)\s+connected\s+(?<x>\d+)x(?<y>\d+)\+(?<_x>\d+)\+(?<_y>\d+).*'
+        let x = $i | parse -r '(?<port>[\w\-]+)\s+connected.*\s+(?<x>\d+)x(?<y>\d+)\+(?<_x>\d+)\+(?<_y>\d+).*'
         if ($x | is-not-empty) {
             let r = $x | get 0
             | transpose k v
