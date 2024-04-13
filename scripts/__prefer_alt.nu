@@ -34,6 +34,11 @@ export def --env prefer_alt_env [prefer_alt] {
         $env.config.keybindings = (
             $env.config.keybindings
             | each {|x|
+                let x = if $x.name == 'move_down' and $x.keycode == 'char_t' {
+                    $x | update keycode 'char_n'
+                } else {
+                    $x
+                }
                 if ($x.name? in $acts) and ($x.modifier? in ['control' 'alt']) {
                     $x | update modifier (
                         if $x.modifier == 'control' {
