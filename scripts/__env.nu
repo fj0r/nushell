@@ -22,6 +22,8 @@ def --env merge-path [path] {
 }
 
 merge-path [
+    $'($env.HOME)/.cargo/bin'
+    $'($env.HOME)/.ghcup/bin'
     $'($env.HOME)/.local/bin'
     '/opt/*/bin'
     $'($env.LS_ROOT?)/*/bin'
