@@ -15,6 +15,7 @@ $env.comma_scope = {|_|{
     }}
 }}
 
+use outdent.nu
 $env.comma = {|_|{
     created: {|a, s| $s.computed }
     inspect: {|a, s| {index: $_, scope: $s, args: $a} }
@@ -53,7 +54,7 @@ $env.comma = {|_|{
                     oooooooo ppppppppp \
                         qqqqqq \
                             rrrrrr ssssss tttttt \
-                        uuuuuu' | do $_.outdent)
+                        uuuuuu' | outdent)
                 $_.report: $_.diff
             }
         }
@@ -153,7 +154,7 @@ $env.comma = {|_|{
     test: {
         comma: {
             $_.act: {
-                ', test all' | batch 'comma_test.nu'
+                ', test all' | batch 'comma/test.nu'
             }
             $_.wth: {
                 glob: '*.nu'

@@ -127,11 +127,6 @@ export-env {
                 }
             }
             distro: (os distro)
-            batch: {|mod|
-                let x = $in
-                utils deprecated '$_.batch' 'batch'
-                $x | utils batch $mod
-            }
             test: {|dsc, spec|
                 use lib/test.nu
                 let fmt = $env.comma_index.settings.test_message
@@ -145,9 +140,6 @@ export-env {
                     print -e $"(ansi light_gray_italic)($m.0)(ansi reset) (ansi yellow_bold)($m.1?)(ansi reset)"
                 }
             }
-            log: {|...args|
-                utils ll $args.0 ...($args | range 1..)
-            }
             T: {|f| {|r,a,s| do $f $r $a $s; true } }
             F: {|f| {|r,a,s| do $f $r $a $s; false } }
             I: {|x| $x }
@@ -155,7 +147,6 @@ export-env {
                 use lib/test.nu
                 test diffo {expect: $x.expect, result: $x.result}
             }
-            outdent: { $in | utils outdent }
             config: {|cb|
                 # FIXME: no affected $env
                 $env.comma_index.settings = (do $cb $env.comma_index.settings)
