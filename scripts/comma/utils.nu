@@ -13,7 +13,7 @@ export def spy [tag?] {
 # perform or print
 export def --wrapped pp [
     ...x
-    --print(-p)
+    --print
     --as-str
 ] {
     if $print or (do -i { $env.comma_index | get $env.comma_index.dry_run } | default false) {
