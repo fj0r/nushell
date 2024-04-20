@@ -411,7 +411,7 @@ def "nu-complete docker run vol" [] {
 def "nu-complete docker run sshkey" [ctx: string, pos: int] {
     ls ~/.ssh/**/*.pub
     | get name
-    | each { $in | path relative-to ~/.ssh } 
+    | each { $in | path relative-to ~/.ssh }
 }
 
 def "nu-complete docker run proxy" [] {

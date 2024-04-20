@@ -5,22 +5,86 @@ $env.comma_scope = {|_|{
         if $m == 'completion' { return }
         do $_.tips 'received arguments' $a
     }}
+    dev: {
+        container: [io:x srv]
+        id: ($_.wd | path parse | get stem)
+        wd: '/world'
+        pubkey: 'id_ed25519.pub'
+        user: root
+        privileged: false
+        proxy: 'http://192.168.99.100:7890'
+        env: {
+            PREFER_ALT: 1
+            NEOVIM_LINE_SPACE: 2
+            NEOVIDE_SCALE_FACTOR: 0.7
+        }
+    }
 }}
 
 $env.comma = {|_|{
-    start: {
-        $_.act: {|a,s|
-            lg msg start
-        }
-        $_.cmp: {|a,s|
-            match ($a | length) {
-                1 => []
-                _ => {}
+    dev: {
+        up: {
+            $_.act: {|a,s|
+                , dev down
+                let port = $a.0
+                lg level 3 {
+                    container: $s.dev.id, workdir: $s.dev.wd
+                    port: $port, pubkey: $s.dev.pubkey
+                } start
+                let privileged = if $s.dev.privileged {[
+                    --privileged
+                ]} else {[
+                    --cap-add=SYS_ADMIN
+                    --cap-add=SYS_PTRACE
+                    --security-opt seccomp=unconfined
+                    --cap-add=NET_ADMIN
+                    --device /dev/net/tun
+                ]}
+                let proxy = if ($s.dev.proxy? | is-empty) {[]} else {[
+                    -e $"http_proxy=($s.dev.proxy)"
+                    -e $"https_proxy=($s.dev.proxy)"
+                ]}
+                let x = [
+                    -e $"DISPLAY=($env.DISPLAY)"
+                    -v /tmp/.X11-unix:/tmp/.X11-unix
+                ]
+                let sshkey = cat ([$env.HOME .ssh $s.dev.pubkey] | path join) | split row ' ' | get 1
+                let dev = [
+                    -e $"NVIM_WORKDIR=($s.dev.wd)"
+                    -v $"($_.wd):($s.dev.wd)"
+                    -w $s.dev.wd
+                    -p $"($port):9999"
+                    -e $"ed25519_($s.dev.user)=($sshkey)"
+                ]
+                let cu = $s.dev.env | transpose k v
+                | each {|x| [-e $"($x.k)=($x.v)"]}
+                | flatten
+                pp $env.docker-cli run ...[
+                    --name $s.dev.id
+                    -d
+                    ...$privileged
+                    ...$x
+                    ...$dev
+                    ...$proxy
+                    ...$cu
+                ] ...$s.dev.container
+            }
+            $_.cmp: {|a,s|
+                match ($a | length) {
+                    1 => [(port 9990)]
+                    _ => {}
+                }
             }
         }
-    }
-    stop: {
-        lg wrn 'stop'
+        down: {|a,s|
+            let cs = ^$env.docker-cli ps | from ssv -a | get NAMES
+            if $s.dev.id in $cs {
+                lg level 2 { container: $s.dev.id } 'stop'
+                pp $env.docker-cli rm -f $s.dev.id
+            } else {
+                lg level 3 { container: $s.dev.id } 'not running'
+            }
+        }
     }
     .: {
         .: {
@@ -51,7 +115,7 @@ $env.comma = {|_|{
             $_.filter: [log_args]
             $_.desc: "created"
         }
-        inspect: {|a, s| {index: $_, scope: $s, args: $a} | table -e }
+        inspect: {|a, s| { index: $_, scope: $s, args: $a } | table -e }
         vscode-tasks: {
             $_.action: {
                 mkdir .vscode
