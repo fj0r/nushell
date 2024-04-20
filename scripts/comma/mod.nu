@@ -260,18 +260,14 @@ export def --wrapped , [
         if ([$env.PWD, ',.nu'] | path join | path exists) {
             ^$env.EDITOR ,.nu
         } else {
-            let a = [yes no] | input list 'create ,.nu ?'
+            let tmpl_dir = [$nu.default-config-dir 'scripts' 'comma' 'tmpl'] | path join
+            let tmpl = ls $"($tmpl_dir)" | get name | path relative-to $tmpl_dir | input list 'create `,.nu` from'
             let time = date now | format date '%Y-%m-%d{%w}%H:%M:%S'
-            let txt = [$nu.default-config-dir 'scripts' 'comma' 'tmpl.nu']
+            let txt = [$tmpl_dir, $tmpl]
                 | path join
                 | open $in
                 | str replace '{{time}}' $time
-            if $a == 'yes' {
-                $txt | save $",.nu"
-                #source ',.nu'
-            } else {
-                $txt
-            }
+                | save ",.nu"
         }
     } else {
         if $print {
