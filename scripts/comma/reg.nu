@@ -32,16 +32,22 @@ export def --env action [path action opts?] {
     }
     $env.comma = (
         build $x.origin $x.path {
-            $x.idx.action: {|a,s|
-                do $action $a $s $x.idx
-            }
+            $x.idx.action: {|a,s| do $action $a $s $x.idx }
             ...$opts
         }
     )
 }
 
-export def --env scope [path action opts?] {
+export def --env scope [path type val] {
     let x = ah comma_scope $path
+    let val = if ($type | is-empty) {
+        $val
+    } else {
+        { ($x.idx | get $type): ({|a,s,m| do $val $a $s $m $x.idx }) }
+    }
+    $env.comma_scope = (
+        build $x.origin $x.path $val
+    )
 }
 
 

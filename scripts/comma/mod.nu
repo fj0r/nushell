@@ -1,6 +1,5 @@
 export use utils.nu *
 use lib/resolve.nu
-export use comma.nu
 
 def 'find parent' [] {
     let o = $in
@@ -217,6 +216,16 @@ def completion [...context] {
     $context
     | parse argv
     | run complete (resolve comma)
+}
+
+use reg.nu
+
+export def --env 'comma action' [...args] {
+    reg action $args.0 $args.1 $args.2?
+}
+
+export def --env 'comma scope' [...args] {
+    reg scope $args.0 $args.1 $args.2
 }
 
 export def --wrapped , [

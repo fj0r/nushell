@@ -1,27 +1,70 @@
 $env.comma_scope = {|_|{
     created: '{{time}}'
     computed: {$_.computed:{|a, s, m| $'($s.created)($a)' }}
-    log_args: {$_.filter:{|a, s, m|
-        if $m == 'completion' { return }
-        do $_.tips 'received arguments' $a
-    }}
-    dev: {
-        container: [io:x srv]
-        id: ($_.wd | path parse | get stem)
-        wd: '/world'
-        pubkey: 'id_ed25519.pub'
-        user: root
-        privileged: false
-        proxy: 'http://192.168.99.100:7890'
-        env: {
-            PREFER_ALT: 1
-            NEOVIM_LINE_SPACE: 2
-            NEOVIDE_SCALE_FACTOR: 0.7
+}}
+
+comma scope 'log_args' filter {|a, s, m, _|
+    if $m == 'completion' { return }
+    do $env.comma_index.tips 'received arguments' $a
+}
+
+comma scope [dev] null {
+    container: [io:x srv]
+    id: ($env.comma_index.wd | path parse | get stem)
+    wd: '/world'
+    pubkey: 'id_ed25519.pub'
+    user: root
+    privileged: false
+    proxy: 'http://192.168.99.100:7890'
+}
+
+comma scope [dev env] null {
+    PREFER_ALT: 1
+    NEOVIM_LINE_SPACE: 2
+    NEOVIDE_SCALE_FACTOR: 0.7
+}
+
+$env.comma = {|_|{
+    .: {
+        .: {
+            $_.action: {|a,s|
+                let act = $a | str join ' '
+                $', ($act)' | batch -i ',.nu'
+            }
+            $_.watch: { glob: ",.nu", clear: true }
+            $_.completion: {|a,s|
+                , -c ...$a
+            }
+            $_.desc: "reload & run ,.nu"
+        }
+        nu: {
+            $_.action: {|a,s| nu $a.0 }
+            $_.watch: { glob: '*.nu', clear: true }
+            $_.completion: { ls *.nu | get name }
+            $_.desc: "develop a nu script"
+        }
+        py: {
+            $_.action: {|a,s| python3 $a.0 }
+            $_.watch: { glob: '*.py', clear: true }
+            $_.completion: { ls *.py| get name }
+            $_.desc: "develop a python script"
+        }
+        created: {
+            $_.action: {|a, s| $s.computed }
+            $_.filter: [log_args]
+            $_.desc: "created"
+        }
+        inspect: {|a, s| { index: $_, scope: $s, args: $a } | table -e }
+        vscode-tasks: {
+            $_.action: {
+                mkdir .vscode
+                ', --vscode -j' | batch ',.nu' | save -f .vscode/tasks.json
+            }
+            $_.desc: "generate .vscode/tasks.json"
+            $_.watch: { glob: ',.nu' }
         }
     }
 }}
-
-$env.comma = {}
 
 comma action [dev up] {|a,s,_|
     , dev down
@@ -84,41 +127,4 @@ comma action [dev down] {|a,s|
     } else {
         lg level 3 { container: $s.dev.id } 'not running'
     }
-}
-
-comma action '. .' {|a,s|
-    let act = $a | str join ' '
-    $', ($act)' | batch -i ',.nu'
-} {
-    watch: { glob: ",.nu", clear: true }
-    completion: {|a,s|
-        , -c ...$a
-    }
-    desc: "reload & run ,.nu"
-}
-
-comma action '. nu' {|a,s| nu $a.0 } {
-    watch: { glob: '*.nu', clear: true }
-    completion: { ls *.nu | get name }
-    desc: "develop a nu script"
-}
-
-comma action '. py' {|a,s| python3 $a.0 } {
-    watch: { glob: '*.py', clear: true }
-    completion: { ls *.py| get name }
-    desc: "develop a python script"
-}
-
-comma action '. created' {|a, s| $s.computed } {
-    filter: [log_args]
-    desc: "created"
-}
-
-comma action '. inspect' {|a, s, _| { index: $_, scope: $s, args: $a } | table -e }
-comma action '. vscode-tasks' {
-    mkdir .vscode
-    ', --vscode -j' | batch ',.nu' | save -f .vscode/tasks.json
-} {
-    desc: "generate .vscode/tasks.json"
-    watch: { glob: ',.nu' }
 }
