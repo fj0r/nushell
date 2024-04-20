@@ -1,5 +1,6 @@
 export use utils.nu *
 use lib/resolve.nu
+export use comma.nu
 
 def 'find parent' [] {
     let o = $in
@@ -70,6 +71,7 @@ export-env {
             }
         })
     }
+    $env.comma = {}
     $env.comma_cache = {}
     $env.comma_index = (
         [

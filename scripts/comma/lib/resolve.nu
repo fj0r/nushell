@@ -2,18 +2,6 @@ def wid [] {
     $env.PWD | path split | range 1.. | str join ':'
 }
 
-# FIXME:
-export def --env comma_get_cache [key, act] {
-    if $key in $env.comma_cache {
-        $env.comma_cache | get $key
-    } else {
-        #dbg "miss cache" $key
-        let r = do $act
-        $env.comma_cache = ($env.comma_cache | upsert $key $r)
-        $r
-    }
-}
-
 use closure.nu
 export def scope [args, vars, flts, --mode: string] {
     let start = date now
@@ -66,7 +54,7 @@ export def comma [key = 'comma'] {
     let start = date now
     let _ = $env.comma_index
     let r = if ($env | get $key | describe -d).type == 'closure' {
-        comma_get_cache $"resolve-($key)::(wid)" { do ($env | get $key) $_ }
+        do ($env | get $key) $_
     } else {
         $env | get $key
     }
