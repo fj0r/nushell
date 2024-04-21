@@ -15,7 +15,7 @@ comma scope [dev] null {
     pubkey: 'id_ed25519.pub'
     user: root
     privileged: false
-    proxy: 'http://192.168.99.100:7890'
+    proxy: 'http://host.containers.internal:7890'
 }
 
 comma scope [dev env] null {
