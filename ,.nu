@@ -86,14 +86,12 @@ comma action 'export comma' {|a,s,_|
     pp rsync -avp --delete --exclude=.git $'($_.wd)/scripts/comma/' $"($env.HOME)/world/comma"
 }
 
-comma action 'upgrade' {|a, e|
+comma action 'upgrade' {|a,s|
     e $a.0
 } {
-    cmp: {|a, e|
-        let s = fd ',\.nu' ~ | lines
-        $s
-        | each {|x| ls $x}
-        | flatten
+    cmp: {|a,s|
+        ls ~/**/,.nu
+        | filter { $in | is-not-empty }
         | sort-by modified
         | get name
     }
