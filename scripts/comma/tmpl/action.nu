@@ -1,9 +1,9 @@
 $env.comma_scope = {|_|{
     created: '{{time}}'
-    computed: {$_.computed:{|a, s, m| $'($s.created)($a)' }}
+    computed: {$_.computed:{|a,s,m| $'($s.created)($a)' }}
 }}
 
-comma scope 'log_args' filter {|a, s, m, _|
+comma scope 'log_args' filter {|a,s,m,_|
     if $m == 'completion' { return }
     do $env.comma_index.tips 'received arguments' $a
 }

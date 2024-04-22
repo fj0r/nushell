@@ -67,6 +67,7 @@ $env.comma = {|_|{
     }
 }}
 
+comma node 'export' { desc: '...' }
 comma action 'export nu_scripts' {|a,s,_|
     let m = $s.manifest | filter {|x| not ($x.disable? | default false) }
     let m = if ($a | is-empty) { $m } else {
