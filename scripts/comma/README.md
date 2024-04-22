@@ -167,46 +167,43 @@ $env.comma = {|_|{
 ### T, F, I & diff
 ### docker image template
 ```
-build: {
-    image: {
-        $_.a: {|a,s|
-            ^$env.docker-cli pull $a.0
-            let tmp = mktemp
-            $"
-            FROM ($a.0)
+comma action [build image] {|a,s|
+    ^$env.docker-cli pull $a.0
+    let tmp = mktemp
+    $"
+    FROM ($a.0)
 
-            RUN apt update \\
-             && apt-get upgrade -y \\
-             && DEBIAN_FRONTEND=noninteractive \\
-                apt-get install -y --no-install-recommends \\
-                    curl ca-certificates \\
-             && apt-get autoremove -y && apt-get clean -y && rm -rf /var/lib/apt/lists/* \\
-             && curl -sSL ($a.2) | tar zxf - -C /opt/vendor \\
-             && chown -R 33:33 /opt/vendor"
-            | do $_.outdent
-            | save -f $tmp
+    RUN apt update \\
+     && apt-get upgrade -y \\
+     && DEBIAN_FRONTEND=noninteractive \\
+        apt-get install -y --no-install-recommends \\
+            curl ca-certificates \\
+     && apt-get autoremove -y && apt-get clean -y && rm -rf /var/lib/apt/lists/* \\
+     && curl -sSL ($a.2) | tar zxf - -C /opt/vendor \\
+     && chown -R 33:33 /opt/vendor"
+    | do $_.outdent
+    | save -f $tmp
 
-            ^$env.docker-cli build -f $tmp -t $a.1 .
-            rm -f $tmp
-            ^$env.docker-cli push $a.1
+    ^$env.docker-cli build -f $tmp -t $a.1 .
+    rm -f $tmp
+    ^$env.docker-cli push $a.1
+} {
+    cmp: {|a,s|
+        match ($a | length) {
+            1 => ['ubuntu', 'alpine', 'nginx']
+            2 => ['target']
+            _ => ['vendor']
         }
-        $_.c: {|a,s|
-            match ($a | length) {
-                1 => ['ubuntu', 'alpine', 'nginx']
-                2 => ['target']
-                _ => ['vendor']
-            }
-        }
-        $_.d: 'build docker image'
-        $_.f: ['log_args']
     }
+    desc: 'build docker image'
+    flt: ['log_args']
 }
 ```
 
 
 ## todo
 - [x] run
-    - [ ] optimize `comma action`
+    - [x] optimize `comma action`
     - [x] optimize resolve scope
         - [-] cpu and flt without parameters would resolve once during initialization
     - [x] dry
