@@ -8,7 +8,7 @@ comma scope 'log_args' filter {|a, s, m, _|
     do $env.comma_index.tips 'received arguments' $a
 }
 
-comma scope [dev] null {
+comma scope 'dev' null {
     container: [io:x srv]
     id: ($env.comma_index.wd | path parse | get stem)
     wd: '/world'
@@ -18,7 +18,7 @@ comma scope [dev] null {
     proxy: $"http://(ip route | lines | get 0 | parse -r 'default via (?<gateway>[0-9\.]+) dev (?<dev>\w+)( proto dhcp src (?<lan>[0-9\.]+))?' | get 0.lan):7890"
 }
 
-comma scope [dev env] null {
+comma scope 'dev env' null {
     PREFER_ALT: 1
     NEOVIM_LINE_SPACE: 2
     NEOVIDE_SCALE_FACTOR: 0.7
@@ -66,7 +66,7 @@ $env.comma = {|_|{
     }
 }}
 
-comma action [dev up] {|a,s,_|
+comma action 'dev up' {|a,s,_|
     , dev down
     let port = $a.0
     lg level 3 {
@@ -119,7 +119,7 @@ comma action [dev up] {|a,s,_|
     }
 }
 
-comma action [dev down] {|a,s|
+comma action 'dev down' {|a,s|
     let cs = ^$env.docker-cli ps | from ssv -a | get NAMES
     if $s.dev.id in $cs {
         lg level 2 { container: $s.dev.id } 'stop'
