@@ -1,9 +1,9 @@
 def build [obj path val] {
     if ($path | length) > 1 {
         let n = if $path.0 in $obj { $obj | get $path.0 } else { {} }
-        $obj | upsert $path.0 (build $n ($path | range 1..) $val)
+        $obj | merge { ($path.0): (build $n ($path | range 1..) $val) }
     } else {
-        $obj | insert $path.0 $val
+        $obj | insert $path.0 {|| $val }
     }
 }
 
@@ -14,7 +14,9 @@ def ah [key path] {
         $path | split row -r '\s+'
     }
     let idx = $env.comma_index
-    let oc = if ($env | get $key | describe -d).type == 'closure' {
+    let oc = if $key not-in $env {
+        {}
+    } else if ($env | get $key | describe -d).type == 'closure' {
         do ($env | get $key) $idx
     } else {
         $env | get $key
@@ -30,12 +32,11 @@ export def --env action [path action opts?] {
             $a | merge { ($x.idx | get $i.k): ($i.v) }
         }
     }
-    $env.comma = (
-        build $x.origin $x.path {
-            $x.idx.action: {|a,s| do $action $a $s $x.idx }
-            ...$opts
-        }
-    )
+    let c = build $x.origin $x.path {
+        $x.idx.action: {|a,s| do $action $a $s $x.idx }
+        ...$opts
+    }
+    $env.comma = $c
 }
 
 export def --env scope [path type val] {
@@ -45,9 +46,6 @@ export def --env scope [path type val] {
     } else {
         { ($x.idx | get $type): ({|a,s,m| do $val $a $s $m $x.idx }) }
     }
-    $env.comma_scope = (
-        build $x.origin $x.path $val
-    )
+    $env.comma_scope = (build $x.origin $x.path $val)
 }
-
 

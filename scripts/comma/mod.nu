@@ -220,12 +220,12 @@ def completion [...context] {
 
 use reg.nu
 
-export def --env 'comma action' [...args] {
-    reg action $args.0 $args.1 $args.2?
+export def --env 'comma action' [path action opts?] {
+    reg action $path $action $opts
 }
 
-export def --env 'comma scope' [...args] {
-    reg scope $args.0 $args.1 $args.2
+export def --env 'comma scope' [path type val] {
+    reg scope $path $type $val
 }
 
 export def --wrapped , [
