@@ -25,7 +25,7 @@ comma scope [dev env] null {
 }
 
 $env.comma = {|_|{
-    .: {
+    dev: {
         .: {
             $_.action: {|a,s|
                 let act = $a | str join ' '

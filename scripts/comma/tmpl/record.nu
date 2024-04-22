@@ -85,8 +85,6 @@ $env.comma = {|_|{
                 lg level 3 { container: $s.dev.id } 'not running'
             }
         }
-    }
-    .: {
         .: {
             $_.action: {|a,s|
                 let act = $a | str join ' '

@@ -90,30 +90,35 @@ $env.comma = {|_|{
         }
     }
     dev: {
-        source scripts/resolvenv/mod.nu
-        let x = resolvenv select wlan0 [
-            [{wifi: 'pan', screen: { port: 'hdmi-0' }}, { print 1 }]
-            [_, { print 0 }]
-        ]
-    }
-    .: {
+        .: {
+            $_.action: {|a,s|
+                let act = $a | str join ' '
+                $', ($act)' | batch -i ',.nu'
+            }
+            $_.watch: { glob: ",.nu", clear: true }
+            $_.completion: {|a,s|
+                , -c ...$a
+            }
+            $_.desc: "reload & run ,.nu"
+        }
+        nu: {
+            $_.action: {|a,s| nu $a.0 }
+            $_.watch: { glob: '*.nu', clear: true }
+            $_.completion: { ls *.nu | get name }
+            $_.desc: "develop a nu script"
+        }
+        py: {
+            $_.action: {|a,s| python3 $a.0 }
+            $_.watch: { glob: '*.py', clear: true }
+            $_.completion: { ls *.py| get name }
+            $_.desc: "develop a python script"
+        }
         created: {
             $_.action: {|a, s| $s.computed }
             $_.filter: [log_args]
             $_.desc: "created"
         }
-        inspect: {|a, s| {index: $_, scope: $s, args: $a} | table -e }
-        reload: {
-            $_.action: {|a,s|
-                let act = $a | str join ' '
-                $', ($act)' | batch ',.nu'
-            }
-            $_.watch: { glob: "**/*nu", clear: true }
-            $_.completion: {|a,s|
-                , -c ...$a
-            }
-            $_.desc: "reload ,.nu"
-        }
+        inspect: {|a, s| { index: $_, scope: $s, args: $a } | table -e }
         vscode-tasks: {
             $_.action: {
                 mkdir .vscode
