@@ -7,32 +7,30 @@ def build [obj path val] {
     }
 }
 
-def ah [key path] {
+def ah [path] {
     let path = if ($path | describe -d).type == list {
         $path
     } else {
         $path | split row -r '\s+'
     }
     let idx = $env.comma_index
-    let oc = if $key not-in $env {
-        {}
-    } else if ($env | get $key | describe -d).type == 'closure' {
-        do ($env | get $key) $idx
-    } else {
-        $env | get $key
-    }
-    { path: $path, idx: $idx, origin: $oc }
+    { path: $path, idx: $idx }
 }
 
 export def --env action [path action opts?] {
-    let x = ah comma $path
+    let x = ah $path
     let opts = if ($opts | is-empty) {{}} else {
         $opts | transpose k v
         | reduce -f {} {|i,a|
             $a | merge { ($x.idx | get $i.k): ($i.v) }
         }
     }
-    let c = build $x.origin $x.path {
+    let o = if ($env.comma | describe -d).type == 'closure' {
+        do $env.comma $x.idx
+    } else {
+        $env.comma
+    }
+    let c = build $o $x.path {
         $x.idx.action: {|a,s| do $action $a $s $x.idx }
         ...$opts
     }
@@ -40,12 +38,17 @@ export def --env action [path action opts?] {
 }
 
 export def --env scope [path type val] {
-    let x = ah comma_scope $path
+    let x = ah $path
     let val = if ($type | is-empty) {
         $val
     } else {
         { ($x.idx | get $type): ({|a,s,m| do $val $a $s $m $x.idx }) }
     }
-    $env.comma_scope = (build $x.origin $x.path $val)
+    let o = if ($env.comma_scope | describe -d).type == 'closure' {
+        do $env.comma_scope $x.idx
+    } else {
+        $env.comma_scope
+    }
+    $env.comma_scope = (build $o $x.path $val)
 }
 
