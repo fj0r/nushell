@@ -37,6 +37,16 @@ $env.comma = {|_|{
     }
 }}
 ```
+Or using `comma action` command.
+```
+comma action 'dev run' {|a,s,_|
+    nu $a.0
+} {
+    watch: { glob: '*.nu', clear: true }
+    completion: { ls *.nu | get name }
+    desc: "develop a nu script"
+}
+```
 
 These attributes support aliases like:
 
@@ -85,6 +95,19 @@ $env.comma = {|_|{
         $_.filter: ['log']
     }
 }}
+
+```
+Or using `comma node/action` command.
+```
+comma node 'foo' {
+    filter: ['log']
+}
+
+comma action 'foo bar' {
+    echo 'hello'
+} {
+    filter: ['log']
+}
 ```
 
 #### Dry run

@@ -220,6 +220,10 @@ def completion [...context] {
 
 use reg.nu
 
+export def --env 'comma node' [path opts] {
+    reg node $path $opts
+}
+
 export def --env 'comma action' [path action opts?] {
     reg action $path $action $opts
 }

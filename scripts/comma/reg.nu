@@ -1,7 +1,18 @@
-def build [obj path val] {
+def build [idx obj path val] {
     if ($path | length) > 1 {
-        let n = if $path.0 in $obj { $obj | get $path.0 } else { {} }
-        $obj | merge { ($path.0): (build $n ($path | range 1..) $val) }
+        let new_path = $path | range 1..
+        let x = if $path.0 in $obj {
+            let o = $obj | get $path.0
+            if $idx.sub in $o {
+                let n = build $idx ($o | get $idx.sub) $new_path $val
+                $o | upsert $idx.sub {|| $n }
+            } else {
+                build $idx $o $new_path $val
+            }
+        } else {
+            build $idx {} $new_path $val
+        }
+        $obj | merge { ($path.0): $x }
     } else {
         $obj | insert $path.0 {|| $val }
     }
@@ -17,6 +28,25 @@ def ah [path] {
     { path: $path, idx: $idx }
 }
 
+export def --env node [path opts] {
+    let x = ah $path
+    let opts = $opts
+    | transpose k v
+    | reduce -f {} {|i,a|
+        $a | merge { ($x.idx | get $i.k): ($i.v) }
+    }
+    let o = if ($env.comma | describe -d).type == 'closure' {
+        do $env.comma $x.idx
+    } else {
+        $env.comma
+    }
+    let c = build $x.idx $o $x.path {
+        $x.idx.sub: {}
+        ...$opts
+    }
+    $env.comma = $c
+}
+
 export def --env action [path action opts?] {
     let x = ah $path
     let opts = if ($opts | is-empty) {{}} else {
@@ -30,7 +60,7 @@ export def --env action [path action opts?] {
     } else {
         $env.comma
     }
-    let c = build $o $x.path {
+    let c = build $x.idx $o $x.path {
         $x.idx.action: {|a,s| do $action $a $s $x.idx }
         ...$opts
     }
@@ -49,6 +79,6 @@ export def --env scope [path type val] {
     } else {
         $env.comma_scope
     }
-    $env.comma_scope = (build $o $x.path $val)
+    $env.comma_scope = (build $x.idx $o $x.path $val)
 }
 
