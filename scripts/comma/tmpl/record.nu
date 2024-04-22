@@ -12,7 +12,7 @@ $env.comma_scope = {|_|{
         pubkey: 'id_ed25519.pub'
         user: root
         privileged: false
-        proxy: 'http://host.containers.internal:7890'
+        proxy: $"http://(ip route | lines | get 0 | parse -r 'default via (?<gateway>[0-9\.]+) dev (?<dev>\w+)( proto dhcp src (?<lan>[0-9\.]+))?' | get 0.lan):7890"
         env: {
             PREFER_ALT: 1
             NEOVIM_LINE_SPACE: 2
