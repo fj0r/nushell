@@ -26,69 +26,6 @@ $env.comma_scope = {|_|{
 }}
 
 $env.comma = {|_|{
-    export: {
-        nu_scripts: {
-            $_.act: {|a,s|
-                let m = $s.manifest | filter {|x| not ($x.disable? | default false) }
-                let m = if ($a | is-empty) { $m } else {
-                    $m | where to in $a
-                }
-                for x in $m {
-                    cp -r ($'($_.wd)/scripts/($x.from)' | into glob) $'($s.dest)/($x.to)'
-                }
-            }
-            $_.dsc: 'export files to nu_scripts'
-            $_.cmp: {|a,s|
-                $s.manifest | group-by to | columns
-            }
-        }
-        comma: {
-            pp rsync -avp --delete --exclude=.git $'($_.wd)/scripts/comma/' $"($env.HOME)/world/comma"
-        }
-    }
-    upgrade: {
-        $_.act: {|a, e|
-            e $a.0
-        }
-        $_.cmp: {|a, e|
-            let s = fd ',\.nu' ~ | lines
-            $s
-            | each {|x| ls $x}
-            | flatten
-            | sort-by modified
-            | get name
-        }
-        $_.dsc: ',.nu -- commafile'
-    }
-    test: {
-        comma: {
-            $_.act: {
-                ', test all' | batch 'comma/test.nu'
-                , export nu_scripts
-            }
-            $_.wth: {
-                glob: '*.nu'
-                clear: true
-            }
-            $_.dsc: 'copy this to uplevel'
-        }
-        poll: {
-            $_.act: {
-                print $env.PWD
-            }
-            $_.wth: {
-                interval: 3sec
-                clear: true
-            }
-        }
-        ping: {
-            $_.act: { ping 127.0.0.1 -c 3 }
-            $_.wth: {
-                interval: 2sec
-                clear: true
-            }
-        }
-    }
     .: {
         .: {
             $_.action: {|a,s|
@@ -129,3 +66,56 @@ $env.comma = {|_|{
         }
     }
 }}
+
+comma action 'export nu_scripts' {|a,s,_|
+    let m = $s.manifest | filter {|x| not ($x.disable? | default false) }
+    let m = if ($a | is-empty) { $m } else {
+        $m | where to in $a
+    }
+    for x in $m {
+        cp -r ($'($_.wd)/scripts/($x.from)' | into glob) $'($s.dest)/($x.to)'
+    }
+} {
+    dsc: 'export files to nu_scripts'
+    cmp: {|a,s|
+        $s.manifest | group-by to | columns
+    }
+}
+
+comma action 'export comma' {|a,s,_|
+    pp rsync -avp --delete --exclude=.git $'($_.wd)/scripts/comma/' $"($env.HOME)/world/comma"
+}
+
+comma action 'upgrade' {|a, e|
+    e $a.0
+} {
+    cmp: {|a, e|
+        let s = fd ',\.nu' ~ | lines
+        $s
+        | each {|x| ls $x}
+        | flatten
+        | sort-by modified
+        | get name
+    }
+    dsc: ',.nu -- commafile'
+}
+
+comma action 'test comma' {
+    ', test all' | batch 'comma/test.nu'
+    , export nu_scripts
+} {
+    wth: {
+        glob: '*.nu'
+        clear: true
+    }
+    dsc: 'copy this to uplevel'
+}
+
+comma action 'test poll' {
+    ping 127.0.0.1 -c 3
+} {
+    wth: {
+        interval: 3sec
+        clear: true
+    }
+}
