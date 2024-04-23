@@ -47,9 +47,9 @@ use setup.nu *
 use outdent.nu
 
 use power
-    use power/lib/git.nu *
+    use power/plugin/git.nu *
     power inject 0 1 {source: git,   color: '#504945'}
-    use power/lib/kube.nu *
+    use power/plugin/kube.nu *
     power inject 1 2 {source: kube,  color: '#504945'} {
         theme: {
             context: cyan
