@@ -22,7 +22,7 @@ def ah [path] {
     let path = if ($path | describe -d).type == list {
         $path
     } else {
-        $path | split row -r '\s+'
+        $path | str trim | split row -r '\s+'
     }
     let idx = $env.comma_index
     { path: $path, idx: $idx }

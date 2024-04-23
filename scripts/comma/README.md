@@ -227,6 +227,7 @@ comma action [build image] {|a,s|
 
 
 ## todo
+- [ ] `computed ` in description parameter `s`
 - [x] run
     - [x] optimize `comma action`
     - [x] optimize resolve scope

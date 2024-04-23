@@ -82,16 +82,16 @@ export def complete [tbl] {
     let _ = $env.comma_index
     let flt = if $_.flt in $n.node { [...$n.filter ...($n.node | get $_.flt)] } else { $n.filter }
     let wth = if $_.wth in $n.node { $n.node | get $_.wth } else { null }
+    let scope = resolve scope $n.rest (resolve comma 'comma_scope') $flt --mode 'completion'
     if $n.node.end {
         let cmp = $n.node | get $_.cmp
-        let scope = resolve scope $n.rest (resolve comma 'comma_scope') $flt --mode 'completion'
         do $cmp $n.rest $scope
     } else {
-        $n.node | get $_.sub | transpose k v | each {|x| $x | update v ($x.v | tree node) | enrich desc $flt }
+        $n.node | get $_.sub | transpose k v | each {|x| $x | update v ($x.v | tree node) | enrich desc $flt $n.rest $scope }
     }
 }
 
-def 'enrich desc' [flt] {
+def 'enrich desc' [flt rest scope] {
     let o = $in
     let _ = $env.comma_index
     let flt = if $_.flt in $o.v {
@@ -115,6 +115,7 @@ def 'enrich desc' [flt] {
     let suf = if ($suf | is-empty) { $suf } else { $"($suf) " }
     if ($o.v | describe -d).type == 'record' {
         let dsc = if $_.dsc in $o.v { $o.v | get $_.dsc } else { '' }
+        let dsc = if ($dsc | describe -d).type == 'closure' { do $dsc $rest $scope } else { $dsc }
         if ($dsc | is-empty) and ($suf | is-empty) {
             $o.k
         } else {
