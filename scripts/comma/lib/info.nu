@@ -12,15 +12,14 @@ export def main [tbl] {
         let indent = ($pth | length)
 
         let description = $g
-            | filter {|x| $x | is-not-empty }
-            | str join ' | '
+        | filter {|x| $x | is-not-empty }
+        | str join ' | '
         let command = $pth
-            | str join ' '
+        | str join ' '
         {
             command: $command
             description: $description
         }
     }
-    $tbl
-    | tree map $cb $bh
+    $tbl | tree map $cb $bh
 }
