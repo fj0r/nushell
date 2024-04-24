@@ -72,7 +72,10 @@ def get_desc [node, _, scope] {
 export def map [callback marker? scope?] {
     let t = $in | node
     let _ = $env.comma_index
-    let marker = if ($marker | is-empty) { {|n,i,s| get_desc $n $i $s } } else { $marker }
+    let marker = match $marker {
+        get_desc => { {|n,i,s| get_desc $n $i $s } }
+        _ => $marker
+    }
     travel [] [] $t $callback $marker $_ $scope
 }
 

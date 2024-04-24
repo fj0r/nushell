@@ -16,5 +16,5 @@ export def main [tbl] {
             description: $description
         }
     }
-    $tbl | tree map $cb null $scope
+    $tbl | tree map $cb 'get_desc' $scope
 }

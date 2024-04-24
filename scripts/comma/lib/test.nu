@@ -168,7 +168,7 @@ export def run [tbl --opt: record] {
             {$n: ($i.node | reject 'end') }
         }
     }
-    | tree map $cb null
+    | tree map $cb 'get_desc'
     if ($opt.watch? | default false) {
         use run.nu watches
         watches {

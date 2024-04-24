@@ -45,7 +45,7 @@ export def gen [tbl] {
     | tree select --strict $tbl
     | $in.node
     | reject 'end'
-    | tree map $cb null $scope
+    | tree map $cb 'get_desc' $scope
     let nuc = "nu -c 'use comma/main.nu *; use comma/utils.nu *; source ,.nu;"
     let tasks = $vs
     | each {|x|
