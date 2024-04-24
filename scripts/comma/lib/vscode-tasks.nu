@@ -11,7 +11,7 @@ export def gen [tbl] {
     let argv = $in
     let _ = $env.comma_index
     use tree.nu
-    let bh = {|node, _|
+    let mk = {|node, _|
         if $_.dsc in $node {
             $node | get $_.dsc
         } else {
@@ -50,7 +50,7 @@ export def gen [tbl] {
     | tree select --strict $tbl
     | $in.node
     | reject 'end'
-    | tree map $cb $bh
+    | tree map $cb $mk
     let nuc = "nu -c 'use comma/main.nu *; use comma/utils.nu *; source ,.nu;"
     let tasks = $vs
     | each {|x|

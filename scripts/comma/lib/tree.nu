@@ -56,24 +56,26 @@ export def select [data --strict] {
     }
 }
 
-export def map [callback branch_handler?] {
+export def map [callback marker?] {
     let t = $in | node
     let _ = $env.comma_index
-    travel [] [] $t $callback $branch_handler $_
+    travel [] [] $t $callback $marker $_
 }
 
-def travel [path g data callback branch_handler _] {
+def travel [path breadcrumb data callback marker _] {
     if $data.end {
-        do $callback $path $g $data $_
+        do $callback $path $breadcrumb $data $_
     } else {
         $data | get $_.sub
         | transpose k v
         | reduce -f [] {|x, a|
             let v = $x.v | node
-            let g = if ($branch_handler | describe -d).type == 'closure' {
-                $g | append (do $branch_handler $v $_)
-            } else { $g }
-            let r = travel ($path | append $x.k) $g $v $callback $branch_handler $_
+            let breadcrumb = if ($marker | describe -d).type == 'closure' {
+                $breadcrumb | append (do $marker $v $_)
+            } else {
+                $breadcrumb
+            }
+            let r = travel ($path | append $x.k) $breadcrumb $v $callback $marker $_
             if ($r | is-empty) {
                 $a
             } else {
