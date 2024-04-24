@@ -298,6 +298,8 @@ export def --wrapped , [
                 | save ",.nu"
         }
     } else if ($args | is-empty) {
+        use lib/info.nu
+        info (resolve comma)
     } else {
         if $print {
             $env.comma_index = ($env.comma_index | upsert $env.comma_index.dry_run true)
