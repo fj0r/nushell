@@ -10,14 +10,9 @@ export def merge [args tbl --opt: record] {
 export def gen [tbl] {
     let argv = $in
     let _ = $env.comma_index
+    use resolve.nu
+    let scope = resolve scope [] (resolve comma 'comma_scope') []
     use tree.nu
-    let mk = {|node, _|
-        if $_.dsc in $node {
-            $node | get $_.dsc
-        } else {
-            ''
-        }
-    }
     let cb = {|pth, g, node, _|
         let indent = ($pth | length)
         if ($_.desc in $node) and ($node | get $_.desc | str contains '!vscode') {
@@ -50,7 +45,7 @@ export def gen [tbl] {
     | tree select --strict $tbl
     | $in.node
     | reject 'end'
-    | tree map $cb $mk
+    | tree map $cb null $scope
     let nuc = "nu -c 'use comma/main.nu *; use comma/utils.nu *; source ,.nu;"
     let tasks = $vs
     | each {|x|

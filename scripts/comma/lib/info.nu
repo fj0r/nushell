@@ -1,13 +1,8 @@
 export def main [tbl] {
     let _ = $env.comma_index
+    use resolve.nu
+    let scope = resolve scope [] (resolve comma 'comma_scope') []
     use tree.nu
-    let bh = {|node, _|
-        if $_.dsc in $node {
-            $node | get $_.dsc
-        } else {
-            ''
-        }
-    }
     let cb = {|pth, g, node, _|
         let indent = ($pth | length)
 
@@ -21,5 +16,5 @@ export def main [tbl] {
             description: $description
         }
     }
-    $tbl | tree map $cb $bh
+    $tbl | tree map $cb null $scope
 }

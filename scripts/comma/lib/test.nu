@@ -135,13 +135,6 @@ export def run [tbl --opt: record] {
     let argv = $in
     let _ = $env.comma_index
     use tree.nu
-    let mk = {|node, _|
-        if $_.dsc in $node {
-            $node | get $_.dsc
-        } else {
-            ''
-        }
-    }
     let cb = {|pth, g, node, _|
         let indent = ($pth | length)
         if $_.exp in $node {
@@ -175,7 +168,7 @@ export def run [tbl --opt: record] {
             {$n: ($i.node | reject 'end') }
         }
     }
-    | tree map $cb $mk
+    | tree map $cb null
     if ($opt.watch? | default false) {
         use run.nu watches
         watches {

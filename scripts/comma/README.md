@@ -14,7 +14,7 @@ When you enter a directory, if a `,.nu` file exists, it will be loaded. (Current
 
 Or `source` any file that defines `$env.comma_scope` and `$env.comma` variables
 
-If there is no `,.nu` file in the current directory, executing `,` without arguments will create a new one from the template. If the file exists, edit it
+If there is no `,.nu` file in the current directory, executing `,` without arguments will create a new one from the template. If the file exists, list commands.
 
 ### Task Definition
 Tasks are written in `$env.comma` and can be nested, and no spaces allowed in name (except testing).
