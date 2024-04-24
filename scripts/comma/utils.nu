@@ -34,6 +34,7 @@ export def batch [
     ...modules
     --bare (-b)
     --init (-i)
+    --value (-v)
 ] {
     let o = $in
     let o = if ($o | describe -d).type == 'list' {
@@ -63,11 +64,23 @@ export def batch [
     $cmd ++= $modules
     $cmd ++= $o
     $cmd = ($cmd | str join (char newline))
+
     print -e $"(ansi $env.comma_index.settings.theme.batch_hint)($cmd)(ansi reset)"
     let begin = date now
-    nu -c $cmd
+
+    mut r = ''
+    if $value {
+        $r = (nu -c $cmd)
+    } else {
+        nu -c $cmd
+    }
+
     let duration = (date now) - $begin
     print -e $"(ansi $env.comma_index.settings.theme.batch_hint)($duration)(ansi reset)"
+
+    if $value {
+        $r
+    }
 }
 
 export def deprecated [old new] {
