@@ -67,8 +67,11 @@ $env.comma = {|_|{
     }
 }}
 
-comma node 'export' { desc: '...' }
-comma action 'export nu_scripts' {|a,s,_|
+'export'
+| comma dir { desc: '...' }
+
+'export nu_scripts'
+| comma fun {|a,s,_|
     let m = $s.manifest | filter {|x| not ($x.disable? | default false) }
     let m = if ($a | is-empty) { $m } else {
         $m | where to in $a
@@ -83,11 +86,13 @@ comma action 'export nu_scripts' {|a,s,_|
     }
 }
 
-comma action 'export comma' {|a,s,_|
+'export comma'
+| comma fun {|a,s,_|
     pp rsync -avp --delete --exclude=.git $'($_.wd)/scripts/comma/' $"($env.HOME)/world/comma"
 }
 
-comma action 'upgrade' {|a,s|
+'upgrade'
+| comma fun {|a,s|
     e $a.0
 } {
     cmp: {|a,s|
@@ -99,7 +104,8 @@ comma action 'upgrade' {|a,s|
     dsc: ',.nu -- commafile'
 }
 
-comma action 'test comma' {
+'test comma'
+| comma fun {
     ', test all' | batch 'comma/test.nu'
     , export nu_scripts
 } {
@@ -110,7 +116,8 @@ comma action 'test comma' {
     dsc: 'copy this to uplevel'
 }
 
-comma action 'test poll' {
+'test poll'
+| comma fun {
     ping 127.0.0.1 -c 3
 } {
     wth: {

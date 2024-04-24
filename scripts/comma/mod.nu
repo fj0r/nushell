@@ -232,6 +232,18 @@ export def --env 'comma scope' [path type val] {
     reg scope $path $type $val
 }
 
+export def --env 'comma dir' [opts] {
+    reg node $in $opts
+}
+
+export def --env 'comma fun' [action opts?] {
+    reg action $in $action $opts
+}
+
+export def --env 'comma val' [type val] {
+    reg scope $in $type $val
+}
+
 export def --wrapped , [
     # flag with parameters is not supported
     --json (-j)

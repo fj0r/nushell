@@ -37,9 +37,10 @@ $env.comma = {|_|{
     }
 }}
 ```
-Or using `comma action` command.
+Or using `comma fun` command.
 ```
-comma action 'dev run' {|a,s,_|
+'dev run'
+| comma fun {|a,s,_|
     nu $a.0
 } {
     watch: { glob: '*.nu', clear: true }
@@ -97,17 +98,20 @@ $env.comma = {|_|{
 }}
 
 ```
-Or using `comma scope/node/action` command.
+Or using `comma val/dir/fun` command.
 ```
-comma scope 'log' filter {|a,s,m,_|
+'log'
+| comma val filter {|a,s,m,_|
     do $_.tips 'run filter' `foo`
 }
 
-comma node 'foo' {
+'foo'
+| comma dir {
     filter: ['log']
 }
 
-comma action 'foo bar' {|a,s,_|
+'foo bar'
+| comma fun {|a,s,_|
     echo 'hello'
 } {
     filter: ['log']
@@ -170,7 +174,8 @@ If `$_.report` exists and the test fails, execute `$_.report` (has a predefined 
 The default template contains `vscode-tasks` and outputs a `.vscode/tasks.json`.
 
 ```
-comma action 'vscode-tasks' {
+'vscode-tasks'
+| comma fun {
     mkdir .vscode
     ', --vscode -j' | batch ',.nu' | save -f .vscode/tasks.json
 } {
@@ -192,7 +197,8 @@ comma action 'vscode-tasks' {
 ### T, F, I & diff
 ### docker image template
 ```
-comma action [build image] {|a,s|
+[build image]
+| comma fun {|a,s|
     ^$env.docker-cli pull $a.0
     let tmp = mktemp
     $"
