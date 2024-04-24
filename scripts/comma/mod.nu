@@ -255,6 +255,7 @@ export def --wrapped , [
     --print (-p)
     --expose (-x) # for test
     --edit (-e)
+    --format: string = tree
     --readme
     ...args:string@'completion'
 ] {
@@ -289,7 +290,7 @@ export def --wrapped , [
     } else if ($args | is-empty) {
         if ([$env.PWD, ',.nu'] | path join | path exists) {
             use lib/info.nu
-            info (resolve comma)
+            info (resolve comma) $format
         } else {
             let tmpl_dir = [$nu.default-config-dir 'scripts' 'comma' 'tmpl'] | path join
             let tmpl = ls $"($tmpl_dir)" | get name | path relative-to $tmpl_dir | input list 'create `,.nu` from'

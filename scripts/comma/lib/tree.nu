@@ -69,21 +69,26 @@ def get_desc [node, _, scope] {
     }
 }
 
-export def map [callback marker? scope?] {
+export def map [callback marker? scope? --with-branch] {
     let t = $in | node
     let _ = $env.comma_index
     let marker = match $marker {
         get_desc => { {|n,i,s| get_desc $n $i $s } }
         _ => $marker
     }
-    travel [] [] $t $callback $marker $_ $scope
+    travel [] [] $t $callback $marker $_ $scope $with_branch
 }
 
-def travel [path breadcrumb data callback marker _ scope] {
+def travel [path breadcrumb data callback marker _ scope with_branch] {
     if $data.end {
-        do $callback $path $breadcrumb $data $_
+        do $callback $path $breadcrumb $data $_ true
     } else {
-        $data | get $_.sub
+        let wb = if $with_branch and ($path | length) > 0 {
+            [(do $callback $path $breadcrumb $data $_ false)]
+        } else {
+            []
+        }
+        let xs = $data | get $_.sub
         | transpose k v
         | reduce -f [] {|x, a|
             let v = $x.v | node
@@ -92,13 +97,16 @@ def travel [path breadcrumb data callback marker _ scope] {
             } else {
                 $breadcrumb
             }
-            let r = travel ($path | append $x.k) $breadcrumb $v $callback $marker $_ $scope
-            if ($r | is-empty) {
-                $a
+            let r = travel ($path | append $x.k) $breadcrumb $v $callback $marker $_ $scope $with_branch
+            let r = if ($r | is-empty) {
+                []
             } else {
-                $a | append $r
+                $r
             }
+            $a
+            | append $r
         }
+        $wb | append $xs
     }
 }
 
