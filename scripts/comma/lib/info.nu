@@ -34,11 +34,13 @@ export def main [tbl format?: string = 'tree'] {
             }
         }
         markdown => {
+            mut r = []
             for i in ($tbl | tree map $cb 'get_desc' $scope --with-branch) {
-                print $"('' | fill -c '#' -w ($i.level)) ($i.path)"
-                print $i.description
-                print (char newline)
+                $r ++= $"('' | fill -c '#' -w ($i.level)) ($i.path)"
+                $r ++= $i.description
+                $r ++= (char newline)
             }
+            $r | str join (char newline)
         }
     }
 }

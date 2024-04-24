@@ -255,7 +255,7 @@ export def --wrapped , [
     --print (-p)
     --expose (-x) # for test
     --edit (-e)
-    --format: string = tree
+    --format: string = tree # tree | table | markdown
     --readme
     ...args:string@'completion'
 ] {
