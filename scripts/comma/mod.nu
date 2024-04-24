@@ -253,7 +253,8 @@ export def --wrapped , [
     --tag (-g)
     --watch (-w)
     --print (-p)
-    --expose (-e) # for test
+    --expose (-x) # for test
+    --edit (-e)
     --readme
     ...args:string@'completion'
 ] {
@@ -283,7 +284,7 @@ export def --wrapped , [
         vscode-tasks merge $args (resolve comma) --opt {json: $json}
     } else if $readme {
         ^$env.EDITOR ([$nu.default-config-dir 'scripts' 'comma' 'README.md'] | path join)
-    } else if ($args | is-empty) {
+    } else if $edit {
         if ([$env.PWD, ',.nu'] | path join | path exists) {
             ^$env.EDITOR ,.nu
         } else {
@@ -296,6 +297,7 @@ export def --wrapped , [
                 | str replace '{{time}}' $time
                 | save ",.nu"
         }
+    } else if ($args | is-empty) {
     } else {
         if $print {
             $env.comma_index = ($env.comma_index | upsert $env.comma_index.dry_run true)

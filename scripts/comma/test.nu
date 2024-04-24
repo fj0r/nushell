@@ -196,7 +196,7 @@ $env.comma = {|_|{
             }
             do $_.test 'run test' {
                 expect: { true }
-                spec: {, -e test example }
+                spec: {, -x test example }
             }
             do $_.test 'run leaf test' {
                 expect: { true }
