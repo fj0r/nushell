@@ -285,8 +285,11 @@ export def --wrapped , [
     } else if $readme {
         ^$env.EDITOR ([$nu.default-config-dir 'scripts' 'comma' 'README.md'] | path join)
     } else if $edit {
+        ^$env.EDITOR ,.nu
+    } else if ($args | is-empty) {
         if ([$env.PWD, ',.nu'] | path join | path exists) {
-            ^$env.EDITOR ,.nu
+            use lib/info.nu
+            info (resolve comma)
         } else {
             let tmpl_dir = [$nu.default-config-dir 'scripts' 'comma' 'tmpl'] | path join
             let tmpl = ls $"($tmpl_dir)" | get name | path relative-to $tmpl_dir | input list 'create `,.nu` from'
@@ -297,9 +300,6 @@ export def --wrapped , [
                 | str replace '{{time}}' $time
                 | save ",.nu"
         }
-    } else if ($args | is-empty) {
-        use lib/info.nu
-        info (resolve comma)
     } else {
         if $print {
             $env.comma_index = ($env.comma_index | upsert $env.comma_index.dry_run true)
