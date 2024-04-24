@@ -87,19 +87,9 @@ def suit [] {
     mut lv = []
     for i in $specs {
         let l = $lv | length
-        let t = $i.path | range ..-2
-        for j in ($t | enumerate) {
-            let desc = $i.g | get $j.index
-            let g = $env.comma_index.settings.test_group
-            if $j.index < $l {
-                let a = $lv | get $j.index
-                if $j.item == $a {
-                } else {
-                    do $g { indent: $j.index title: $j.item desc: $desc}
-                }
-            } else {
-                do $g { indent: $j.index title: $j.item desc: $desc}
-            }
+        if not $i.end {
+            do $env.comma_index.settings.test_group { indent: ($i.indent - 1), title: $i.desc, desc: ($i.g | last)}
+            continue
         }
         let scope = resolve scope null (resolve comma 'comma_scope') [] --mode 'test'
         let args = $i.mock
@@ -126,7 +116,6 @@ def suit [] {
                 scope: $scope
             }
         }
-        $lv = $t
     }
 }
 
@@ -135,24 +124,36 @@ export def run [tbl --opt: record] {
     let argv = $in
     let _ = $env.comma_index
     use tree.nu
-    let cb = {|pth, g, node, _|
+    let cb = {|pth, g, node, _, end|
         let indent = ($pth | length)
-        if $_.exp in $node {
-            let exp = $node | get $_.exp
-            let spec = $node | get $_.act
-            let mock = if $_.mock in $node { $node | get $_.mock }
-            let report = if $_.rpt in $node { $node | get $_.rpt }
-            let desc = $pth | last
+        let desc = $pth | last
+        if $end {
+            if $_.exp in $node {
+                let exp = $node | get $_.exp
+                let spec = $node | get $_.act
+                let mock = if $_.mock in $node { $node | get $_.mock }
+                let report = if $_.rpt in $node { $node | get $_.rpt }
+                {
+                    end: $end
+                    path: $pth
+                    g: $g
+                    fmt: $env.comma_index.settings.test_message
+                    indent: $indent
+                    desc: $desc
+                    expect: $exp
+                    spec: $spec
+                    mock: $mock
+                    report: $report
+                }
+            }
+        } else {
             {
+                end: $end
                 path: $pth
                 g: $g
                 fmt: $env.comma_index.settings.test_message
                 indent: $indent
                 desc: $desc
-                expect: $exp
-                spec: $spec
-                mock: $mock
-                report: $report
             }
         }
     }
@@ -168,7 +169,7 @@ export def run [tbl --opt: record] {
             {$n: ($i.node | reject 'end') }
         }
     }
-    | tree map $cb 'get_desc'
+    | tree map $cb 'get_desc' --with-branch
     if ($opt.watch? | default false) {
         use run.nu watches
         watches {
