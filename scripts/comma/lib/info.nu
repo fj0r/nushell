@@ -1,4 +1,4 @@
-export def main [tbl format?: string = 'tree'] {
+export def main [tbl, format: string = 'tree', all: bool = false] {
     let _ = $env.comma_index
     use resolve.nu
     let scope = resolve scope [] (resolve comma 'comma_scope') []
@@ -19,12 +19,22 @@ export def main [tbl format?: string = 'tree'] {
             description: $description
         }
     }
+    let o = if $format in ['table'] {
+        $tbl | tree map $cb 'get_desc' $scope
+    } else {
+        $tbl | tree map $cb 'get_desc' $scope --with-branch
+    }
+    let o = if $all {
+        $o
+    } else {
+        $o | filter {|x| $x.command | str starts-with '.' | not $in }
+    }
     match $format {
         table => {
-            $tbl | tree map $cb 'get_desc' $scope | select command description
+            $o | select command description
         }
         tree => {
-            for i in ($tbl | tree map $cb 'get_desc' $scope --with-branch) {
+            for i in $o {
                 let d = if ($i.description | is-empty) {
                     ''
                 } else {
@@ -35,10 +45,10 @@ export def main [tbl format?: string = 'tree'] {
         }
         markdown => {
             mut r = []
-            for i in ($tbl | tree map $cb 'get_desc' $scope --with-branch) {
+            for i in $o {
                 $r ++= $"('' | fill -c '#' -w ($i.level)) ($i.path)"
                 $r ++= $i.description
-                $r ++= (char newline)
+                $r ++= ''
             }
             $r | str join (char newline)
         }
