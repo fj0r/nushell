@@ -52,7 +52,12 @@ export def --env action [path action opts?] {
     let opts = if ($opts | is-empty) {{}} else {
         $opts | transpose k v
         | reduce -f {} {|i,a|
-            $a | merge { ($x.idx | get $i.k): ($i.v) }
+            let v = if ($i.v | describe -d).type == 'closure' {
+                {|a,s| do $i.v $a $s $x.idx}
+            } else {
+                $i.v
+            }
+            $a | merge { ($x.idx | get $i.k): $v }
         }
     }
     let o = if ($env.comma | describe -d).type == 'closure' {
