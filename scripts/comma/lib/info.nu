@@ -1,11 +1,11 @@
-export def main [tbl, format: string = 'tree', all: bool = false] {
+export def main [tbl, opts] {
     let _ = $env.comma_index
     use resolve.nu
     let scope = resolve scope [] (resolve comma 'comma_scope') []
     use tree.nu
     let cb = {|pth, g, node, _|
         let level = ($pth | length)
-        let description = if $format == 'table' {
+        let description = if $opts.format == 'table' {
             $g | filter { $in | is-not-empty } | str join ' | '
         } else {
             $g | last
@@ -19,17 +19,17 @@ export def main [tbl, format: string = 'tree', all: bool = false] {
             description: $description
         }
     }
-    let o = if $format in ['table'] {
+    let o = if $opts.format in ['table'] {
         $tbl | tree map $cb 'get_desc' $scope
     } else {
         $tbl | tree map $cb 'get_desc' $scope --with-branch
     }
-    let o = if $all {
+    let o = if $opts.all {
         $o
     } else {
         $o | filter {|x| $x.command | str starts-with '.' | not $in }
     }
-    match $format {
+    match $opts.format {
         table => {
             $o | select command description
         }

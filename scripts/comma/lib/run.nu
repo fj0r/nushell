@@ -39,7 +39,7 @@ export def watches [act argv scope w] {
     }
 }
 
-export def main [tbl --opt: record] {
+export def main [tbl --opt: record --info-opt: record] {
     let n = $in
     use tree.nu
     use resolve.nu
@@ -47,6 +47,9 @@ export def main [tbl --opt: record] {
     let _ = $env.comma_index
     if not $n.node.end {
         do $_.tips "require argument" ($n.node | get $_.sub | columns)
+        use info.nu
+        let n = $n | $in.node | reject 'end'
+        info $n $info_opt
         return
     }
     let flt = if $_.flt in $n.node { [...$n.filter ...($n.node | get $_.flt)] } else { $n.filter }
