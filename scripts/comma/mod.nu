@@ -294,9 +294,13 @@ export def --wrapped , [
             info (resolve comma) {all: $all, format: $format}
         } else {
             let tmpl_dir = [$nu.default-config-dir 'scripts' 'comma' 'tmpl'] | path join
-            let tmpl = ls $"($tmpl_dir)" | get name | path relative-to $tmpl_dir | input list 'create `,.nu` from'
+            let tmpl = ls $"($tmpl_dir)" | get name | path relative-to $tmpl_dir
+            let tix = $tmpl
+            | parse -r '\d+_(?<n>\w+)'
+            | get n
+            | input list -i 'create `,.nu` from'
             let time = date now | format date '%Y-%m-%d{%w}%H:%M:%S'
-            let txt = [$tmpl_dir, $tmpl]
+            let txt = [$tmpl_dir, ($tmpl | get $tix)]
                 | path join
                 | open $in
                 | str replace '{{time}}' $time
