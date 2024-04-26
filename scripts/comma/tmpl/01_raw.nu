@@ -44,10 +44,10 @@ $env.comma = {|_|{
                     -e $"http_proxy=($s.dev.proxy)"
                     -e $"https_proxy=($s.dev.proxy)"
                 ]}
-                let x = [
+                let x = if ($env.DISPLAY? | is-empty) {[]} else {[
                     -e $"DISPLAY=($env.DISPLAY)"
                     -v /tmp/.X11-unix:/tmp/.X11-unix
-                ]
+                ]}
                 let sshkey = cat ([$env.HOME .ssh $s.dev.pubkey] | path join) | split row ' ' | get 1
                 let dev = [
                     -e $"NVIM_WORKDIR=($s.dev.wd)"
