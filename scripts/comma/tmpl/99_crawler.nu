@@ -114,11 +114,14 @@ def handler-page [
     let getter = $handler.getter? | default {|u| http get $u}
     let html = do $getter $url
 
-    let links = $html | query web -q $selector.nav.q -m
-    let links = do $selector.nav.e $links
+    let links = if ($selector.nav? | is-not-empty) {
+        $html
+        | query web -q $selector.nav.q -m
+        | do -i $selector.nav.e $in
+    }
 
     let title = $html
-    | query web -q $selector.title.q -a ($selector.title.a? | default '')
+    | query web -q $selector.title.q
     let title = if ($selector.title.e? | is-empty) { $title } else { do $selector.title.e $title }
 
     lg level 4 get { title: $title }
@@ -164,7 +167,7 @@ def handler-page [
             $"update elements set status = (quote $r) where page_id = ($pid) and uri = (quote $i.uri?);"
             | sqlite3 $s.dbfile
         } else {
-            lg level 5 {title: $title, page: $url, element: $i.uri } err
+            lg level 5 {title: $title, page: $url, element: $i.uri? } err
         }
     }
 
@@ -198,6 +201,39 @@ def handler-page [
 'selector foo'
 | comma val null {
     nav: {
+        q: '.pgntn-page-pagination-block'
+        e: {|e| $e | first | query web -q 'a' -a 'href'}
+    }
+    title: {
+        q: 'header > h1'
+        e: {|e| $e | first | first | str trim }
+    }
+    elm: {
+        q: 'div.bialty-container > p > a'
+        e: {|e| $e | query web -q 'a' -a 'href' | first }
+    }
+}
+
+'handler foo'
+| comma val null {
+    title: {|t| mkdir $t }
+    elm: {|t,p,e|
+        if ($e.uri? | is-empty) {
+            return
+        }
+        lg level 5 'elm handler' {t: $t, p: $p, e: $e.uri?}
+        let n = $e.uri | path parse | $"($in.stem).($in.extension)"
+        let t = [$t $n] | path join
+        lg level 3 save { file: $t }
+        wget -c $e.uri -O $t --content-on-error
+        return 'succ'
+    }
+}
+
+
+'selector bar'
+| comma val null {
+    nav: {
         q: '.paginate-container > div:nth-child(1) > div:nth-child(1)'
         e: {|e| $e | first | query web -q 'a' -a 'href'}
     }
@@ -211,7 +247,7 @@ def handler-page [
     }
 }
 
-'handler foo'
+'handler bar'
 | comma val null {
     #getter: {|u| open gha.html }
     title: {|t| mkdir $t }
@@ -223,7 +259,6 @@ def handler-page [
         let n = $e.uri | path parse | $"($in.stem).html"
         let t = [$t $n] | path join
         lg level 3 save { file: $n }
-        # wget -c $e -O $t --content-on-error
         $e.payload | save -f $t
         return 'succ'
     }
