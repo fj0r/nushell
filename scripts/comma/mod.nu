@@ -71,7 +71,6 @@ export-env {
         })
     }
     $env.comma = {}
-    $env.comma_cache = {}
     $env.comma_index = (
         [
             [children sub s]
