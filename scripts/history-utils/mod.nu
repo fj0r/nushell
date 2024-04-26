@@ -1,5 +1,6 @@
 def quote [...t] {
-    $"'($t | str join '')'"
+    let s = $t | str join '' | str replace -a "'" "''"
+    $"'($s)'"
 }
 
 def flatten_fields [args] {
