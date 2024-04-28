@@ -1,4 +1,7 @@
 export def record_match [pat obj] {
+    if ($obj | is-empty) {
+        return false
+    }
     $pat
     | transpose k v
     | reduce -f true {|i,a|
@@ -10,7 +13,11 @@ export def record_match [pat obj] {
                 $i.v == ($obj | get $i.k)
             }
             record => {
-                record_match $i.v ($obj | get $i.k)
+                if $i.k in $obj {
+                    record_match $i.v ($obj | get $i.k)
+                } else {
+                    false
+                }
             }
             list => {
                 $obj | get $i.k
@@ -20,8 +27,11 @@ export def record_match [pat obj] {
                     $a1 and (record_match {$tk: $i1.1} {$tk: $i1.0} )
                 }
             }
+            _ => {
+                false
+            }
         }
-        | do { $a and $in}
+        | do { $a and $in }
     }
 }
 
@@ -66,7 +76,11 @@ export def 'wifi ssid' [dev=wlan0] {
 export def screens [] {
     # TODO: optimize
     mut monitor = []
-    for i in (xrandr | lines) {
+    let x = xrandr | complete
+    if $x.exit_code > 0 {
+        return
+    }
+    for i in ($x.stdout | lines) {
         let x = $i | parse -r '(?<port>[\w\-]+)\s+connected.*\s+(?<x>\d+)x(?<y>\d+)\+(?<_x>\d+)\+(?<_y>\d+).*'
         if ($x | is-not-empty) {
             let r = $x | get 0
@@ -82,11 +96,15 @@ export def screens [] {
 }
 
 export def 'current screen' [] {
+    let screens = screens
+    if ($screens | is-empty) {
+        return
+    }
     let c = xdotool getmouselocation
     | split row ' '
     | each { $in | split row ':'}
     | reduce -f {} {|i,a| $a | insert $i.0 ($i.1 | into int)}
-    for i in (screens) {
+    for i in $screens {
         let x = $c.x >= $i._x and $c.x < ($i.x + $i._x)
         let y = $c.y >= $i._y and $c.y < ($i.y + $i._y)
         if $x and $y {
