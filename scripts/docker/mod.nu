@@ -25,6 +25,30 @@ def "nu-complete docker ns" [] {
     }
 }
 
+# network
+export def containers-network-list [] {
+    ^$env.docker-cli network ls | from ssv -a
+}
+
+def "nu-complete docker network" [] {
+    containers-network-list | get NAME
+}
+
+def "nu-complete docker network driver" [] {
+    [bridge host none overlay ipvlan macvlan]
+}
+
+export def containers-network-create [
+    name: string
+    --driver(-d): string = 'bridge'@"nu-complete docker network driver"
+] {
+    ^$env.docker-cli network create $name
+}
+
+export def containers-network-remove [network: string@"nu-complete docker network"] {
+    ^$env.docker-cli network rm $network
+}
+
 # list containers
 export def container-list [
     -n: string@"nu-complete docker ns"
@@ -443,14 +467,15 @@ export def container-create [
     --ports(-p): any                                    # { 8080: 80 }
     --envs(-e): any                                     # { FOO: BAR }
     --daemon(-d)
-    --attach(-a): string@"nu-complete docker containers" # attach
+    --join(-j): string@"nu-complete docker containers"  # join
+    --network(-n): string@"nu-complete docker network"  # network
     --workdir(-w): string                               # workdir
     --entrypoint: string                                # entrypoint
     --dry-run
     --with-x
     --privileged(-P)
     --namespace(-n): string@"nu-complete docker ns"
-    image: string@"nu-complete docker images"             # image
+    image: string@"nu-complete docker images"           # image
     ...cmd                                              # command args
 ] {
     let ns = $namespace | with-flag -n
@@ -477,13 +502,16 @@ export def container-create [
     let proxy = if ($proxy|is-empty) { [] } else {
         [-e $"http_proxy=($proxy)" -e $"https_proxy=($proxy)"]
     }
-    let attach = if ($attach|is-empty) { [] } else {
-        let c = $"container:($attach)"
+    let join = if ($join|is-empty) { [] } else {
+        let c = $"container:($join)"
         [--uts $c --ipc $c --pid $c --network $c]
+    }
+    let network = if ($network|is-empty) { [] } else {
+        [--network $network]
     }
     let cache = $cache | with-flag -v
     let args = [
-        $privileged $entrypoint $attach $daemon
+        $privileged $entrypoint $join $daemon
         $ports $envs $ssh $proxy
         $debug $appimage $netadmin $with_x
         $mnt $vols $workdir $cache
@@ -498,26 +526,29 @@ export def container-create [
 
 export alias d = container
 export alias dp = container-list
-export alias di = image-list
+export alias dr = container-create
+export alias dcr = container-remove
+export alias da = container-attach
 export alias dl = container-log
 export alias dlt = container-log-trunc
-export alias da = container-attach
 export alias dcp = container-copy-file
-export alias dcr = container-remove
 export alias dh = container-history
-export alias dsv = image-save
-export alias dld = image-load
-export alias dsp = system-prune
-export alias dspall = system-prune-all
-export alias drmi = image-remove
-export alias dt = image-tag
+export alias di = image-list
 export alias dps = image-push
 export alias dpl = image-pull
+export alias dsv = image-save
+export alias dld = image-load
+export alias dt = image-tag
+export alias drmi = image-remove
+export alias dsp = system-prune
+export alias dspall = system-prune-all
 export alias dvl = volume-list
 export alias dvc = volume-create
 export alias dvi = volume-inspect
 export alias dvr = volume-remove
-export alias dr = container-create
+export alias dn = containers-network-list
+export alias dnc = containers-network-create
+export alias dnr = containers-network-remove
 
 export use registry.nu *
 export use buildah.nu *
