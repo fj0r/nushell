@@ -257,7 +257,7 @@ export def --wrapped container-attach [
     ...args
 ] {
     let ns = $n | with-flag -n
-    if ($args|is-empty) {
+    if ($args | is-empty) {
         ^$env.docker-cli ...$ns exec -it $container /bin/sh -c "[ -e /bin/zsh ] && /bin/zsh || [ -e /bin/bash ] && /bin/bash || /bin/sh"
     } else {
         ^$env.docker-cli ...$ns exec -it $container ...$args
@@ -478,49 +478,49 @@ export def container-create [
     image: string@"nu-complete docker images"           # image
     ...cmd                                              # command args
 ] {
-    let ns = $namespace | with-flag -n
-    let entrypoint = $entrypoint | with-flag --entrypoint
-    let daemon = if $daemon { [-d] } else { [--rm -it] }
-    let mnt = $mnt | with-flag -v
-    let workdir = if ($workdir | is-empty) {[]} else {[-w $workdir -v $"($env.PWD):($workdir)"]}
-    let vols = if ($vols|is-empty) { [] } else { $vols | transpose k v | each {|x| [-v $"(host-path $x.k):($x.v)"]} | flatten }
-    let envs = if ($envs|is-empty) { [] } else { $envs | transpose k v | each {|x| [-e $"($x.k)=($x.v)"]} | flatten }
-    let ports = if ($ports|is-empty) { [] } else { $ports | transpose k v | each {|x| [-p $"($x.k):($x.v)"] } | flatten }
-    let debug = if $debug {[--cap-add=SYS_ADMIN --cap-add=SYS_PTRACE --security-opt seccomp=unconfined]} else {[]}
-    #let appimage = if $appimage {[--device /dev/fuse --security-opt apparmor:unconfined]} else {[]}
-    let privileged = if $privileged {[--privileged]} else {[]}
-    let appimage = if $appimage {[--device /dev/fuse]} else {[]}
-    let netadmin = if $netadmin {[--cap-add=NET_ADMIN --device /dev/net/tun]} else {[]}
-    let with_x = if $with_x {[
-        -e $"DISPLAY=($env.DISPLAY)"
-        -v /tmp/.X11-unix:/tmp/.X11-unix
-        ]} else {[]}
-    let ssh = if ($ssh|is-empty) { [] } else {
+    mut args = []
+
+    $args ++= ($namespace | with-flag -n)
+    $args ++= ($entrypoint | with-flag --entrypoint)
+    if $daemon { $args ++= [-d] } else { $args ++= [--rm -it] }
+    $args ++= ($mnt | with-flag -v)
+    if ($workdir | is-not-empty) {
+        $args ++= [-w $workdir -v $"($env.PWD):($workdir)"]
+    }
+    $args ++= if ($vols | is-empty) { [] } else { $vols | transpose k v | each {|x| [-v $"(host-path $x.k):($x.v)"]} | flatten }
+    $args ++= if ($envs | is-empty) { [] } else { $envs | transpose k v | each {|x| [-e $"($x.k)=($x.v)"]} | flatten }
+    $args ++= if ($ports | is-empty) { [] } else { $ports | transpose k v | each {|x| [-p $"($x.k):($x.v)"] } | flatten }
+    if $debug {
+        $args ++= [--cap-add=SYS_ADMIN --cap-add=SYS_PTRACE --security-opt seccomp=unconfined]
+    }
+    if $appimage { $args ++= [--device /dev/fuse --security-opt apparmor:unconfined] }
+    if $privileged { $args ++= [--privileged] }
+    if $appimage { $args ++= [--device /dev/fuse] }
+    if $netadmin { $args ++= [--cap-add=NET_ADMIN --device /dev/net/tun] }
+    if $with_x {
+        $args ++= [ -e $"DISPLAY=($env.DISPLAY)" -v /tmp/.X11-unix:/tmp/.X11-unix ]
+    }
+    if ($ssh | is-not-empty) {
         let sshkey = cat ([$env.HOME .ssh $ssh] | path join) | split row ' ' | get 1
-        [-e $"ed25519_($sshuser)=($sshkey)"]
+        $args ++= [-e $"ed25519_($sshuser)=($sshkey)"]
     }
-    let proxy = if ($proxy|is-empty) { [] } else {
-        [-e $"http_proxy=($proxy)" -e $"https_proxy=($proxy)"]
+    if ($proxy | is-not-empty) {
+        $args ++= [-e $"http_proxy=($proxy)" -e $"https_proxy=($proxy)"]
     }
-    let join = if ($join|is-empty) { [] } else {
+    if ($join | is-not-empty) {
         let c = $"container:($join)"
-        [--uts $c --ipc $c --pid $c --network $c]
+        $args ++= [--uts $c --ipc $c --pid $c --network $c]
     }
-    let network = if ($network|is-empty) { [] } else {
-        [--network $network]
+    if ($network | is-not-empty) {
+        $args ++= [--network $network]
     }
-    let cache = $cache | with-flag -v
-    let args = [
-        $privileged $entrypoint $join $daemon
-        $ports $envs $ssh $proxy
-        $debug $appimage $netadmin $with_x
-        $mnt $vols $workdir $cache
-    ] | flatten
+    $args ++= ($cache | with-flag -v)
+
     let name = $"($image | split row '/' | last | str replace ':' '-')_(date now | format date %m%d%H%M)"
     if $dry_run {
-        echo ([docker $ns run --name $name $args $image $cmd] | flatten | str join ' ')
+        echo ([docker run --name $name $args $image $cmd] | flatten | str join ' ')
     } else {
-        ^$env.docker-cli ...$ns run --name $name ...$args $image ...($cmd | flatten)
+        ^$env.docker-cli run --name $name ...$args $image ...($cmd | flatten)
     }
 }
 
