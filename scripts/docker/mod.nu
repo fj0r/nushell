@@ -534,7 +534,8 @@ export def container-create [
     }
     if ($join | is-not-empty) {
         let c = $"container:($join)"
-        $args ++= [--uts $c --ipc $c --pid $c --network $c]
+        $args ++= [--uts $c --ipc $c --pid $c]
+        if ($network | is-empty) { $args ++= [--network $c] }
     }
     if ($network | is-not-empty) {
         $args ++= [--network $network]

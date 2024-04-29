@@ -77,7 +77,14 @@ $env.comma = {|_|{
         container: $s.dev.id, workdir: $s.dev.wd
         port: $port, pubkey: $s.dev.pubkey
     } start
-    let privileged = if $s.dev.privileged {[
+
+    pp $env.docker-cli network create $s.dev.id
+
+    mut args = []
+
+    $args ++= [--network $s.dev.id]
+
+    $args ++= if $s.dev.privileged {[
         --privileged
     ]} else {[
         --cap-add=SYS_ADMIN
@@ -86,14 +93,15 @@ $env.comma = {|_|{
         --cap-add=NET_ADMIN
         --device /dev/net/tun
     ]}
-    let proxy = if ($s.dev.proxy? | is-empty) {[]} else {[
-        -e $"http_proxy=($s.dev.proxy)"
-        -e $"https_proxy=($s.dev.proxy)"
-    ]}
-    let x = if ($env.DISPLAY? | is-empty) {[]} else {[
-        -e $"DISPLAY=($env.DISPLAY)"
-        -v /tmp/.X11-unix:/tmp/.X11-unix
-    ]}
+
+    if ($s.dev.proxy? | is-not-empty) {
+        $args ++= [ -e $"http_proxy=($s.dev.proxy)" -e $"https_proxy=($s.dev.proxy)" ]
+    }
+
+    if ($env.DISPLAY? | is-not-empty) {
+        $args ++= [ -e $"DISPLAY=($env.DISPLAY)" -v /tmp/.X11-unix:/tmp/.X11-unix ]
+    }
+
     let sshkey = cat ([$env.HOME .ssh $s.dev.pubkey] | path join) | split row ' ' | get 1
     let dev = [
         -e $"NVIM_WORKDIR=($s.dev.wd)"
@@ -102,18 +110,13 @@ $env.comma = {|_|{
         -p $"($port):9999"
         -e $"ed25519_($s.dev.user)=($sshkey)"
     ]
-    let cu = $s.dev.env | transpose k v
+    $args ++= $dev
+
+    $args ++= ($s.dev.env | transpose k v
     | each {|x| [-e $"($x.k)=($x.v)"]}
-    | flatten
-    pp $env.docker-cli run ...[
-        --name $s.dev.id
-        -d
-        ...$privileged
-        ...$x
-        ...$dev
-        ...$proxy
-        ...$cu
-    ] ...$s.dev.container
+    | flatten)
+
+    pp $env.docker-cli run --name $s.dev.id -d ...$args ...$s.dev.container
 } {
     cmp: {|a,s|
         match ($a | length) {
@@ -125,10 +128,10 @@ $env.comma = {|_|{
 
 'dev down'
 | comma fun {|a,s|
-    let cs = ^$env.docker-cli ps | from ssv -a | get NAMES
-    if $s.dev.id in $cs {
+    let ns = ^$env.docker-cli network ls | from ssv -a | get NAME
+    if $s.dev.id in $ns {
         lg level 2 { container: $s.dev.id } 'stop'
-        pp $env.docker-cli rm -f $s.dev.id
+        pp $env.docker-cli network rm -f $s.dev.id
     } else {
         lg level 3 { container: $s.dev.id } 'not running'
     }
