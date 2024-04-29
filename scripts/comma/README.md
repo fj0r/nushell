@@ -26,6 +26,18 @@ This tree will be traversed during completion. For tasks, you can customize the 
 Customize completion behavior, as well as descriptions, filters, watches, tests, etc. Need to add some special attributes to the record, such as `$_.children`, `$_.action`, `$_.completion` (so `$env.comma` and `$env.comma_scope` accepts a closure to avoid potential naming conflicts).
 
 ```
+'dev run'
+| comma fun {|a,s,_|
+    nu $a.0
+} {
+    watch: { glob: '*.nu', clear: true }
+    completion: { ls *.nu | get name }
+    desc: "develop a nu script"
+}
+```
+
+Which is equivalent to
+```
 $env.comma = {|_|{
     dev: {
         run: {
@@ -36,17 +48,6 @@ $env.comma = {|_|{
         }
     }
 }}
-```
-Or using `comma fun` command.
-```
-'dev run'
-| comma fun {|a,s,_|
-    nu $a.0
-} {
-    watch: { glob: '*.nu', clear: true }
-    completion: { ls *.nu | get name }
-    desc: "develop a nu script"
-}
 ```
 
 These attributes support aliases like:
@@ -81,25 +82,6 @@ $env.comma_scope = {|_|{
 
 `filter` is called when it is declared. If a record is returned, it will be merged back to the $env.comma_scope.
 ```
-$env.comma_scope = {|_|{
-    log: {$_.filter:{|a, s| do $_.tips 'run filter' `foo` }}
-}}
-
-$env.comma = {|_|{
-    foo: {
-        $_.sub: {
-            bar: {
-                $_.action: { echo 'hello' }
-                $_.filter: ['log']
-            }
-        }
-        $_.filter: ['log']
-    }
-}}
-
-```
-Or using `comma val/dir/fun` command.
-```
 'log'
 | comma val filter {|a,s,m,_|
     do $_.tips 'run filter' `foo`
@@ -116,6 +98,26 @@ Or using `comma val/dir/fun` command.
 } {
     filter: ['log']
 }
+```
+
+Which is equivalent to
+```
+$env.comma_scope = {|_|{
+    log: {$_.filter:{|a, s| do $_.tips 'run filter' `foo` }}
+}}
+
+$env.comma = {|_|{
+    foo: {
+        $_.sub: {
+            bar: {
+                $_.action: { echo 'hello' }
+                $_.filter: ['log']
+            }
+        }
+        $_.filter: ['log']
+    }
+}}
+
 ```
 
 #### Dry run

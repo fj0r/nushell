@@ -3,7 +3,7 @@ $env.comma_scope = {|_|{
     computed: {$_.computed:{|a,s,m| $'($s.created)($a)' }}
 }}
 
-'log_args'
+'loga'
 | comma val filter {|a,s,m,_|
     if $m == 'completion' { return }
     do $env.comma_index.tips 'received arguments' $a
@@ -54,7 +54,7 @@ $env.comma = {|_|{
         }
         created: {
             $_.action: {|a, s| $s.computed }
-            $_.filter: [log_args]
+            $_.filter: [loga]
             $_.desc: "created"
         }
         inspect: {|a, s| { index: $_, scope: $s, args: $a } | table -e }
