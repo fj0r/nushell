@@ -95,6 +95,7 @@ def handler-page [
         $html
         | query web -q $selector.nav.q -m
         | do -i $selector.nav.e $in
+        | filter { $in | is-not-empty }
     }
 
     let title = $html
@@ -139,7 +140,7 @@ def handler-page [
     | from json
     for i in $ps {
         lg level 3 extract { title: $title, page: $url, element: $i.uri? }
-        let r = do $handler.elm $title $url $i
+        let r = do $handler.elm $title $url $i $handler
         if ($r | is-not-empty) {
             $"update elements set status = (quote $r) where page_id = ($pid) and uri = (quote $i.uri?);"
             | sqlite3 $s.crawl.dbfile
@@ -194,7 +195,7 @@ def handler-page [
 'crawl handler foo'
 | comma val null {
     title: {|t| mkdir $t }
-    elm: {|t,p,e|
+    elm: {|t,p,e,h|
         if ($e.uri? | is-empty) {
             return
         }
@@ -202,9 +203,11 @@ def handler-page [
         let n = $e.uri | path parse | $"($in.stem).($in.extension)"
         let t = [$t $n] | path join
         lg level 3 save { file: $t }
-        wget -c $e.uri -O $t --content-on-error
+        let cfg = if ($h.wgetrc? | is-empty) {[]} else {[ $"--config=($h.wgetrc)"]}
+        wget ...$cfg -c $e.uri -O $t --content-on-error
         return 'succ'
     }
+    wgetrc: ''
 }
 
 
