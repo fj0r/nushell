@@ -6,13 +6,31 @@ export def ns [] {
     | parse -r '(?<proto>\w+) +(?<recv>[0-9]+) +(?<send>[0-9]+) +(?<local>[0-9.]+):(?<port>[0-9]+) +(?<foreign>[0-9.:]+):(?<f_port>[0-9]+) +(?<state>\w+) +(?<user>[0-9]+) +(?<inode>[0-9]+) +(?<program>.+)'
 }
 
+
+export def ip-route [] {
+    ip route
+    | lines
+    | parse -r ([
+        '(?<default>default via)?'
+        '(?<gateway>[0-9\./]+)'
+        'dev (?<dev>[\w\-]+)'
+        'proto (?<proto>dhcp|kernel scope link)'
+        'src (?<src>[0-9\.]+)'
+    ] | str join '\s*')
+}
+
 export def common-ips [] {
-    let addr = ip route | lines | get 0 | parse -r 'default via (?<gateway>[0-9\.]+) dev (?<dev>\w+)( proto dhcp src (?<lan>[0-9\.]+))?'
-    return {
+    let addr = ip-route
+    mut r = {
         loopback:  'localhost'
         gateway: $addr.gateway.0
-        lan: $addr.lan?.0?
+        lan: $addr.src?.0?
     }
+    let cn = $addr | where dev =~ '(docker|podman|nerdctl)'
+    if ($cn | is-not-empty) {
+        $r.container = $cn.src.0
+    }
+    $r
 }
 
 def "nu-complete proxys" [context: string, offset: int] {
