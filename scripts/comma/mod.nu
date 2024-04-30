@@ -243,6 +243,35 @@ export def --env 'comma val' [type val] {
     reg scope $in $type $val
 }
 
+export def 'comma template' [] {
+    let tmpl_dir = [$nu.default-config-dir 'scripts' 'comma' 'tmpl'] | path join
+    let tmpl = ls $"($tmpl_dir)" | get name | path relative-to $tmpl_dir
+    let txs = $tmpl
+    | parse -r '\d+_(?<n>\w+)'
+    | get n
+    | str replace --all '_' ' '
+    | input list -i -m 'create `,.nu` from'
+    let seg = $txs | each {|x| $tmpl | get $x }
+    | inspect
+    let time = date now | format date '%Y-%m-%d{%w}%H:%M:%S'
+    let nl = char newline
+    let obj = [$env.PWD, ',.nu'] | path join
+    if ($obj | path exists) {
+        $seg
+    } else {
+        [base.nu, ...$seg]
+    }
+    | each {|x|
+        [$tmpl_dir, $x]
+        | path join
+        | open $in
+        | str replace '{{time}}' $time
+        | str trim -c $nl
+        | do { [$"### {{{ ($x)", $in , $"### }}}($nl)"] | str join $nl }
+    }
+    | save -af $obj
+}
+
 export def --wrapped , [
     # flag with parameters is not supported
     --json (-j)
@@ -256,6 +285,7 @@ export def --wrapped , [
     --edit (-e)
     --format: string = tree # tree | table | markdown
     --all (-a) # show hide
+    --template
     --readme
     ...args:string@'completion'
 ] {
@@ -287,23 +317,14 @@ export def --wrapped , [
         ^$env.EDITOR ([$nu.default-config-dir 'scripts' 'comma' 'README.md'] | path join)
     } else if $edit {
         ^$env.EDITOR ,.nu
+    } else if $template {
+        comma template
     } else if ($args | is-empty) {
         if ([$env.PWD, ',.nu'] | path join | path exists) {
             use lib/info.nu
             info (resolve comma) {all: $all, format: $format}
         } else {
-            let tmpl_dir = [$nu.default-config-dir 'scripts' 'comma' 'tmpl'] | path join
-            let tmpl = ls $"($tmpl_dir)" | get name | path relative-to $tmpl_dir
-            let tix = $tmpl
-            | parse -r '\d+_(?<n>\w+)'
-            | get n
-            | input list -i 'create `,.nu` from'
-            let time = date now | format date '%Y-%m-%d{%w}%H:%M:%S'
-            let txt = [$tmpl_dir, ($tmpl | get $tix)]
-                | path join
-                | open $in
-                | str replace '{{time}}' $time
-                | save ",.nu"
+            comma template
         }
     } else {
         if $print {

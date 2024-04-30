@@ -1,14 +1,3 @@
-$env.comma_scope = {|_|{
-    created: '{{time}}'
-    computed: {$_.computed:{|a,s,m| $'($s.created)($a)' }}
-}}
-
-'loga'
-| comma val filter {|a,s,m,_|
-    if $m == 'completion' { return }
-    do $env.comma_index.tips 'received arguments' $a
-}
-
 'dev'
 | comma val null {
     container: [io:x srv]
@@ -27,49 +16,8 @@ $env.comma_scope = {|_|{
     NEOVIDE_SCALE_FACTOR: 0.7
 }
 
-$env.comma = {|_|{
-    .: {
-        .: {
-            $_.action: {|a,s|
-                let act = $a | str join ' '
-                $', ($act)' | batch -i ',.nu'
-            }
-            $_.watch: { glob: ",.nu", clear: true }
-            $_.completion: {|a,s|
-                , -c ...$a
-            }
-            $_.desc: "reload & run ,.nu"
-        }
-        nu: {
-            $_.action: {|a,s| nu $a.0 }
-            $_.watch: { glob: '*.nu', clear: true }
-            $_.completion: { ls *.nu | get name }
-            $_.desc: "develop a nu script"
-        }
-        py: {
-            $_.action: {|a,s| python3 $a.0 }
-            $_.watch: { glob: '*.py', clear: true }
-            $_.completion: { ls *.py| get name }
-            $_.desc: "develop a python script"
-        }
-        created: {
-            $_.action: {|a, s| $s.computed }
-            $_.filter: [loga]
-            $_.desc: "created"
-        }
-        inspect: {|a, s| { index: $_, scope: $s, args: $a } | table -e }
-        vscode-tasks: {
-            $_.action: {
-                mkdir .vscode
-                ', --vscode -j' | batch ',.nu' -v | save -f .vscode/tasks.json
-            }
-            $_.desc: "generate .vscode/tasks.json"
-            $_.watch: { glob: ',.nu' }
-        }
-    }
-}}
 
-'dev up'
+'dev container up'
 | comma fun {|a,s,_|
     , dev down
     let port = $a.0
@@ -126,7 +74,7 @@ $env.comma = {|_|{
     }
 }
 
-'dev down'
+'dev container down'
 | comma fun {|a,s|
     let ns = ^$env.docker-cli network ls | from ssv -a | get NAME
     if $s.dev.id in $ns {
