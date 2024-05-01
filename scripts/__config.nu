@@ -70,10 +70,16 @@ if (which atuin | is-not-empty) {
     source atuin.nu
 }
 
-const plugin_query = ($nu.current-exe | path dirname | path join (
-    if $nu.os-info.family == 'windows' { 'nu_plugin_query.exe' } else { 'nu_plugin_query' }
-))
-register $plugin_query
+# const plugin_msgpackz = (
+#     [($nu.config-path | path dirname), 'plugin.msgpackz'] | path join
+# )
+#
+# const plugin_query = (
+#     $nu.current-exe | path dirname
+#     | path join $"nu_plugin_query(if $nu.os-info.family == 'windows' {'.exe'})"
+# )
+# plugin add $plugin_query
+# plugin use --plugin-config $plugin_msgpackz $plugin_query
 
 
 ########################################
