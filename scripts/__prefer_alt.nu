@@ -22,11 +22,11 @@ export def --env prefer_alt_env [prefer_alt] {
             cut_line_from_start
             upper_case_word
             # d
-            quit_shell
-            cut_word_to_right
+            #quit_shell
+            #cut_word_to_right
             # c
-            cancel_command
-            capitalize_char
+            #cancel_command
+            #capitalize_char
             #z
             undo_change
             undo_or_previous_page_menu
