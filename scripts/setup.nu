@@ -1,24 +1,40 @@
+export-env {
+    $env.CONFIG_FILE_PATH = [
+        {
+            name: nushell
+            bin: nu
+            cfg: [
+                ['etc', 'nushell']
+                ($nu.config-path | path dirname)
+            ]
+        }
+        {
+            name: neovim
+            bin: nvim
+            cfg: [
+                ['etc' 'nvim']
+                [$env.HOME '.config' 'nvim']
+            ]
+        }
+    ]
+}
+
 export def 'config update' [
-    --vim (-v)
+    --rebase(-r)
 ] {
-    print '==> update nushell config'
-    cd ($nu.config-path | path dirname)
-    git pull
-    #git log -1 --date=iso
-    #source '($nu.config-path)'
-    if ($vim) {
-        print '==> update nvim config'
-        for c in [
-            ['etc' 'nvim']
-            [$env.HOME '.config' 'nvim']
-        ] {
-            let p = $c | path join
+    for i in $env.CONFIG_FILE_PATH {
+        if (which $i.bin | is-empty) { continue }
+        print $'==> update ($i.name) config'
+        for j in $i.cfg {
+            let p = $j | path join
             if ($p | path exists) {
-                print $'--> ($p)'
+                print $'--> ($p | str replace $env.HOME "~")'
                 cd $p
-                git pull
+                git pull ...(if $rebase {[--rebase]} else {[]})
+                git log -1 --date=iso
             }
         }
+
     }
 }
 
