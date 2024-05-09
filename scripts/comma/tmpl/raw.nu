@@ -56,8 +56,8 @@ $env.comma = {|_|{
                     -p $"($port):9999"
                     -e $"ed25519_($s.dev.user)=($sshkey)"
                 ]
-                let cu = $s.dev.env | transpose k v
-                | each {|x| [-e $"($x.k)=($x.v)"]}
+                let cu = $s.dev.env
+                | items {|k,v| [-e $"($k)=($v)"]}
                 | flatten
                 pp $env.docker-cli run ...[
                     --name $s.dev.id

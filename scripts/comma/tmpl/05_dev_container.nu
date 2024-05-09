@@ -60,8 +60,8 @@
     ]
     $args ++= $dev
 
-    $args ++= ($s.dev.env | transpose k v
-    | each {|x| [-e $"($x.k)=($x.v)"]}
+    $args ++= ($s.dev.env
+    | items {|k,v| [-e $"($k)=($v)"]}
     | flatten)
 
     pp $env.docker-cli run --name $s.dev.id -d ...$args ...$s.dev.container
