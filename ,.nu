@@ -1,29 +1,4 @@
-$env.comma_scope = {|_|{
-    manifest: [
-        { from: argx/*, to: modules/argx }
-        { from: ssh/*, to: modules/ssh }
-        { from: docker/*, to: modules/docker }
-
-        { from: kubernetes/*, to: modules/kubernetes }
-        { from: lg/*, to: modules/lg }
-
-        { from: git/*, to: modules/gitv2 }
-
-        { from: nvim/*, to: modules/nvim }
-        { from: process/*, to: modules/process }
-
-        { from: just.nu, to: custom-completions/just/just-completions.nu, disable: true }
-        { from: mask.nu, to: custom-completions/mask/mask-completions.nu, disable: true }
-
-        { from: power/*, to: modules/prompt/powerline, disable: false }
-        { from: cwdhist/*, to: modules/cwdhist }
-        { from: history-utils/mod.nu, to: modules/history-utils, disable: false }
-        { from: resolvenv/*, to: modules/resolvenv, disable: true }
-
-        { from: direnv.nu, to: hooks/direnv, disable: true }
-    ]
-    dest: $"($env.HOME)/world/nu_scripts"
-}}
+$env.comma_scope = {}
 
 $env.comma = {|_|{
     .: {
@@ -67,6 +42,34 @@ $env.comma = {|_|{
     }
 }}
 
+'manifest'
+| comma val null [
+    { from: argx/*, to: modules/argx }
+    { from: ssh/*, to: modules/ssh }
+    { from: docker/*, to: modules/docker }
+
+    { from: kubernetes/*, to: modules/kubernetes }
+    { from: lg/*, to: modules/lg }
+
+    { from: git/*, to: modules/gitv2 }
+
+    { from: nvim/*, to: modules/nvim }
+    { from: process/*, to: modules/process }
+
+    { from: just.nu, to: custom-completions/just/just-completions.nu, disable: true }
+    { from: mask.nu, to: custom-completions/mask/mask-completions.nu, disable: true }
+
+    { from: power/*, to: modules/prompt/powerline, disable: false }
+    { from: cwdhist/*, to: modules/cwdhist }
+    { from: history-utils/mod.nu, to: modules/history-utils, disable: false }
+    { from: resolvenv/*, to: modules/resolvenv, disable: true }
+
+    { from: direnv.nu, to: hooks/direnv, disable: true }
+]
+
+'dest'
+| comma val null $"($env.HOME)/world/nu_scripts"
+
 'export'
 | comma dir { desc: '...' }
 
@@ -91,19 +94,6 @@ $env.comma = {|_|{
     pp rsync -avp --delete --exclude=.git $'($_.wd)/scripts/comma/' $"($env.HOME)/world/comma"
 }
 
-'upgrade'
-| comma fun {|a,s|
-    e $a.0
-} {
-    cmp: {|a,s|
-        ls ~/**/,.nu
-        | filter { $in | is-not-empty }
-        | sort-by modified
-        | get name
-    }
-    dsc: ',.nu -- commafile'
-}
-
 'test comma'
 | comma fun {
     ', test all' | batch 'comma/test.nu'
@@ -125,3 +115,4 @@ $env.comma = {|_|{
         clear: true
     }
 }
+

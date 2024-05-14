@@ -1,5 +1,0 @@
-#!/usr/bin/env nu
-
-def main [...file: string] {
-    nve ...$file
-}
