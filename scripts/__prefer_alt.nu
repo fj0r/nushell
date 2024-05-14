@@ -12,9 +12,11 @@ export def --env prefer_alt_env [prefer_alt] {
             move_to_line_start
             # e
             move_to_line_end_or_take_history_hint
+            # r
+            history_menu
             # p
             move_up
-            # t
+            # t -> n
             move_down
             # w
             delete_one_word_backward
