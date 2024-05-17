@@ -217,19 +217,7 @@ def completion [...context] {
     | run complete (resolve comma)
 }
 
-use reg.nu
-
-export def --env 'comma node' [path opts] {
-    reg node $path $opts
-}
-
-export def --env 'comma action' [path action opts?] {
-    reg action $path $action $opts
-}
-
-export def --env 'comma scope' [path type val] {
-    reg scope $path $type $val
-}
+use lib/reg.nu
 
 export def --env 'comma dir' [opts] {
     reg node $in $opts
