@@ -39,8 +39,12 @@ export def 'config update' [
 }
 
 def "nu-complete config scripts" [] {
-    ls -s ([$nu.default-config-dir scripts '**/*.nu'] | path join | into glob)
-    | each {|x| str substring ..-4 }
+    ls ([$nu.default-config-dir scripts '**/*.nu'] | path join | into glob)
+    | each {|x|
+        $x.name
+        | str replace ([$nu.default-config-dir scripts] | path join) ''
+        | str substring 1..<-3
+    }
 }
 
 export def 'config edit' [script: string@"nu-complete config scripts"] {

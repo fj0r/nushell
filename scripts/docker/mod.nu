@@ -469,7 +469,7 @@ def "nu-complete docker run proxy" [] {
 }
 
 def host-path [path] {
-    match ($path | str substring ..1) {
+    match ($path | str substring ..<1) {
         '/' => { $path }
         '=' => { $path | str substring 1.. }
         '~' => { [ $env.HOME ($path | str substring 2..) ] | path join }

@@ -120,7 +120,7 @@ export def _git_log_stat [n]  {
                         let col = if ($i.col | str starts-with 'file') {
                                 'file'
                             } else {
-                                $i.col | str substring ..3
+                                $i.col | str substring ..<3
                             }
                         let num = $i.num | into int
                         $a | upsert $col $num
