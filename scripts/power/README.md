@@ -20,22 +20,35 @@ power init
 ```
 or
 ```
+use power
+use power/plugin/git.nu *
+use power/plugin/kube.nu *
 $env.NU_POWER_SCHEMA = [
     [
-        {source: pwd,   color: '#353230'}
-        {source: git,   color: '#504945'}
-    ]
+        [source, color];
+        [pwd, "#353230"]
+        [git, "#504945"]
+    ],
     [
-        {source: proxy, color: 'dark_gray'}
-        {source: host,  color: '#353230'}
-        {source: kube,  color: '#504945'}
-        {source: time,  color: '#666560'}
+        [source, color];
+        [proxy, dark_gray]
+        [host, "#504945"]
+        [kube, "#393939"]
+        [time, "#353230"]
     ]
 ]
-
-use power/power.nu
-    use power/plugin/git.nu
-    use power/plugin/kube.nu
+power set time {
+    config: { style: compact }
+}
+power set kube {
+    theme: {
+        context: cyan
+    }
+    config: {
+        reverse: true
+        separator: '@'
+    }
+}
 power init
 ```
 `$env.NU_POWER_SCHEMA` support configuring dynamically

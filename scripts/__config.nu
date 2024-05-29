@@ -46,24 +46,36 @@ use network.nu *
 use setup.nu *
 use outdent.nu
 
+
 use power
-    use power/plugin/git.nu *
-    power inject 0 1 {source: git,   color: '#504945'}
-    use power/plugin/kube.nu *
-    power inject 1 2 {source: kube,  color: '#504945'} {
-        theme: {
-            context: cyan
-        }
-        config: {
-            reverse: true
-            separator: '@'
-        }
+use power/plugin/git.nu *
+use power/plugin/kube.nu *
+$env.NU_POWER_SCHEMA = [
+    [
+        [source, color];
+        [pwd, "#353230"]
+        [git, "#504945"]
+    ],
+    [
+        [source, color];
+        [proxy, dark_gray]
+        [host, "#504945"]
+        [kube, "#393939"]
+        [time, "#353230"]
+    ]
+]
+power set time {
+    config: { style: compact }
+}
+power set kube {
+    theme: {
+        context: cyan
     }
-    # use power/lib/utils.nu *
-    # power inject 0 1 {source: atuin, color: '#404040'}
-    power set time {
-        config: { style: compact }
+    config: {
+        reverse: true
+        separator: '@'
     }
+}
 power init
 
 if (which atuin | is-not-empty) {
