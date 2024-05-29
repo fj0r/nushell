@@ -26,15 +26,15 @@ use power/plugin/kube.nu *
 $env.NU_POWER_SCHEMA = [
     [
         [source, color];
-        [pwd, "#353230"]
-        [git, "#504945"]
+        [pwd, xterm_grey23]
+        [git, xterm_grey30]
     ],
     [
         [source, color];
-        [proxy, dark_gray]
-        [host, "#504945"]
-        [kube, "#393939"]
-        [time, "#353230"]
+        [proxy, xterm_grey39]
+        [host, xterm_grey30]
+        [kube, xterm_grey23]
+        [time, xterm_grey27]
     ]
 ]
 power set time {
