@@ -5,7 +5,7 @@ export-env {
             bin: nu
             cfg: [
                 ['etc', 'nushell']
-                ($nu.config-path | path dirname)
+                $nu.default-config-dir
             ]
         }
         {
@@ -39,12 +39,12 @@ export def 'config update' [
 }
 
 def "nu-complete config scripts" [] {
-    ls -s ([($nu.config-path | path dirname) scripts '*.nu'] | path join | into glob)
-    | each {|x| $x.name | str substring ..-3 }
+    ls -s ([$nu.default-config-dir scripts '**/*.nu'] | path join | into glob)
+    | each {|x| str substring ..-4 }
 }
 
 export def 'config edit' [script: string@"nu-complete config scripts"] {
-    let f = ([($nu.config-path | path dirname) scripts $'($script).nu'] | path join)
+    let f = ([$nu.default-config-dir scripts $'($script).nu'] | path join)
     e $f
 }
 
@@ -59,7 +59,13 @@ export def --env 'config table mode' [mode: string@"nu-complete config table-mod
 
 export def 'config reset' [] {
     config nu --default | save -f $nu.config-path
-    echo $"(char newline)source __config.nu" | save -a $nu.config-path
+    [
+        null
+        null
+        "### gen with `config reset`"
+        r#'source ($nu.default-config-dir | path join 'scripts/__config.nu')'#
+    ]
+    | str join (char newline) | save -a $nu.config-path
     config env --default | save -f $nu.env-path
 }
 

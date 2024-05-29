@@ -188,9 +188,9 @@ export def image-list [
                 $a | upsert $x.0 $x.1?
             }
         let id = if $env.docker-cli == 'nerdctl' {
-            $r.RepoDigests.0? | split row ':' | get 1 | str substring 0..12
+            $r.RepoDigests.0? | split row ':' | get 1 | str substring 0..<12
         } else {
-            $r.Id | str substring 0..12
+            $r.Id | str substring 0..<12
         }
         {
             id: $id
