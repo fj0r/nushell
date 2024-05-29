@@ -33,7 +33,7 @@ def _atuin_search_cmd [...flags: string] {
         ([
             `commandline (ATUIN_LOG=error run-external --redirect-stderr atuin search`,
             ($flags | append [--interactive, --] | each {|e| $'"($e)"'}),
-            `(commandline) | complete | $in.stderr | str substring ..-1)`,
+            `(commandline) | complete | $in.stderr | str substring ..<-1)`,
         ] | flatten | str join ' '),
     ] | str join "\n"
 }

@@ -91,7 +91,7 @@ export def "ssc services" [user, kw?: string] {
     | from ssv -a
     | reduce -f [] {|x, a|
         if ($x.UNIT | str ends-with '.service') {
-            $a | append { value: ($x.UNIT | str substring ..-8)
+            $a | append { value: ($x.UNIT | str substring ..<-8)
                           description: $x.DESCRIPTION
                           active: ($x.ACTIVE == 'active')
                         }

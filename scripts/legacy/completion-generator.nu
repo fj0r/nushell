@@ -5,7 +5,7 @@ export def 'from tree' [
 ] {
     let ctx = $in
     let argv = $ctx.0
-        | str substring 0..$ctx.1
+        | str substring 0..<$ctx.1
         | split row -r '\s+'
         | range $cmd_len..
         | where not ($it | str starts-with '-')

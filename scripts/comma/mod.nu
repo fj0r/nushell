@@ -173,7 +173,7 @@ def summary [$tbl] {
 def 'parse argv' [] {
     let context = $in
     $context.0
-    | str substring 0..$context.1
+    | str substring 0..<$context.1
     | split row ';'
     | last
     | str trim -l
