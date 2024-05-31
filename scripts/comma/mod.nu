@@ -233,7 +233,7 @@ export def --env 'comma val' [type val] {
 
 export def 'comma template' [] {
     let tmpl_dir = [$nu.default-config-dir 'scripts' 'comma' 'tmpl'] | path join
-    let tmpl = ls $"($tmpl_dir)" | get name | path relative-to $tmpl_dir
+    let tmpl = ls $"($tmpl_dir)" | get name | path relative-to $tmpl_dir | sort-by name
     let txs = $tmpl
     | parse -r '\d+_(?<n>\w+)'
     | get n
