@@ -37,7 +37,7 @@ use sh.nu *
 use nushell.nu *
 use just.nu *
 use git-cmp.nu *
-#use pwd-overlay.nu *
+use pwd-overlay.nu *
 #use direnv.nu *
 #use completion-generator.nu *
 #use task.nu *
