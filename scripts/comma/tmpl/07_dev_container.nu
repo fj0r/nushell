@@ -19,7 +19,7 @@
 
 'dev container up'
 | comma fun {|a,s,_|
-    , dev down
+    , dev container down
     let port = $a.0
     lg level 3 {
         container: $s.dev.id, workdir: $s.dev.wd
@@ -55,7 +55,7 @@
         -e $"NVIM_WORKDIR=($s.dev.wd)"
         -v $"($_.wd):($s.dev.wd)"
         -w $s.dev.wd
-        -p $"($port):9999"
+        -p $"($port):8080"
         -e $"ed25519_($s.dev.user)=($sshkey)"
     ]
     $args ++= $dev
@@ -79,7 +79,8 @@
     let ns = ^$env.docker-cli network ls | from ssv -a | get NAME
     if $s.dev.id in $ns {
         lg level 2 { container: $s.dev.id } 'stop'
-        pp $env.docker-cli network rm -f $s.dev.id
+        pp $env.docker-cli rm -f $s.dev.id
+        pp $env.docker-cli network rm $s.dev.id
     } else {
         lg level 3 { container: $s.dev.id } 'not running'
     }
