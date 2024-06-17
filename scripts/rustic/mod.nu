@@ -79,9 +79,10 @@ def 'nu-cmp rustic snapshots' [context] {
             let t = char tab
             let id = $y.id | str substring ..7
             let d = $y.time | into datetime | date humanize
+            let l = if ($y.label? | is-empty) { '' } else { $"<($y.label)>"}
             {
                 value: $id
-                description: $"($y.tags)($t)($d)($t)($y.hostname)($t)($y.paths)"
+                description: $"($l)($y.tags)($t)($d)($t)($y.hostname)($t)($y.paths)"
             }
         }
     }
@@ -104,6 +105,12 @@ export extern 'rustic restore' [
 export extern 'rustic ls' [
     -P: string@"nu-cmp rustic config" # Config profile to use. This parses the file `<PROFILE>.toml` in the config directory. [default: "rustic", env: RUSTIC_USE_PROFILE=]
     snapshot: string@"nu-cmp rustic snapshots"
+]
+
+export extern 'rustic forget' [
+    -P: string@"nu-cmp rustic config" # Config profile to use. This parses the file `<PROFILE>.toml` in the config directory. [default: "rustic", env: RUSTIC_USE_PROFILE=]
+    ...snapshot: string@"nu-cmp rustic snapshots"
+    --prune
 ]
 
 export extern 'rustic backup' [
