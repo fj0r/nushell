@@ -68,9 +68,9 @@ def 'parse args' [] {
 def 'nu-cmp rustic snapshots' [context] {
     let c = $context | parse args
     let s = if 'P' in $c.opt {
-        rustic -P $c.opt.P snapshots --json
+        ^rustic -P $c.opt.P snapshots --json
     } else {
-        rustic snapshots --json
+        ^rustic snapshots --json
     }
     let s = $s
     | from json
@@ -96,7 +96,30 @@ export extern 'main' [
 ]
 
 export extern 'rustic restore' [
-    -P: string@"nu-cmp rustic config"
+    -P: string@"nu-cmp rustic config" # Config profile to use. This parses the file `<PROFILE>.toml` in the config directory. [default: "rustic", env: RUSTIC_USE_PROFILE=]
     snapshot: string@"nu-cmp rustic snapshots"
     dest: path
+]
+
+export extern 'rustic ls' [
+    -P: string@"nu-cmp rustic config" # Config profile to use. This parses the file `<PROFILE>.toml` in the config directory. [default: "rustic", env: RUSTIC_USE_PROFILE=]
+    snapshot: string@"nu-cmp rustic snapshots"
+]
+
+export extern 'rustic backup' [
+    -P: string@"nu-cmp rustic config" # Config profile to use. This parses the file `<PROFILE>.toml` in the config directory. [default: "rustic", env: RUSTIC_USE_PROFILE=]
+    src: path
+    --stdin-filename: string # Set filename to be used when backing up from stdin
+    --as-path: string # Manually set backup path in snapshot
+    --with-atime # Save access time for files and directories
+    --ignore-devid # Don't save device ID for files and directories
+    --no-scan # Don't scan the backup source for its size - this disables ETA estimation for backup
+    --json # Output generated snapshot in json format
+    --quiet # Don't show any output
+    --init # Initialize repository, if it doesn't exist yet
+]
+
+export extern 'rustic snapshots' [
+    -P: string@"nu-cmp rustic config" # Config profile to use. This parses the file `<PROFILE>.toml` in the config directory. [default: "rustic", env: RUSTIC_USE_PROFILE=]
+    --all
 ]
