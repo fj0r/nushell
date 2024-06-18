@@ -51,18 +51,15 @@
     }
 
     let sshkey = cat ([$env.HOME .ssh $s.dev.pubkey] | path join) | split row ' ' | get 1
-    let dev = [
+    $args ++= [
         -e $"NVIM_WORKDIR=($s.dev.wd)"
         -v $"($_.wd):($s.dev.wd)"
         -w $s.dev.wd
         -p $"($port):8080"
         -e $"ed25519_($s.dev.user)=($sshkey)"
     ]
-    $args ++= $dev
 
-    $args ++= ($s.dev.env
-    | items {|k,v| [-e $"($k)=($v)"]}
-    | flatten)
+    $args ++= ($s.dev.env | items {|k,v| [-e $"($k)=($v)"]} | flatten)
 
     pp $env.docker-cli run --name $s.dev.id -d ...$args ...$s.dev.container
 } {
