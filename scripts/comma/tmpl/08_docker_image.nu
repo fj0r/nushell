@@ -1,32 +1,40 @@
 'image'
 | comma val null {
-    base: 'node'
-    middle: {
-        name: 'base/node'
+    mid: {
+        name: 'mid/py'
+        base: 'python:3.11-bookworm'
+        workdir: '/app'
+        manifest: 'requirements.txt'
         script: [
-            "npm install"
+            "pip install --break-system-packages --no-cache-dir -r requirements.txt"
         ]
     }
     target: {
-        name: 'node-app'
+        name: 'python-app'
     }
 }
 
-'dev image middle'
+'dev image mid'
 | comma fun {|a,s,_|
+    let m = $s.image.mid
     let f = [
-        $"FROM ($s.image.base)"
+        $"FROM ($m.base)"
+        "ENV PYTHONUNBUFFERED=x"
+        ""
+        $"WORKDIR ($m.workdir)"
+        $"COPY ($m.manifest) ."
         $"RUN set -eux \\"
-        ...($s.image.middle.script | each {|x|
+        ...($m.script | each {|x|
                 let p = if ($x | str trim -l | str starts-with "|") { "  " } else { '; ' }
                 $"  ($p)($x) \\"
             })
         '  ;'
-    ]
-    $f | save -f Dockerfile.base
-    pp $env.docker-cli build -f Dockerfile.base -t $s.image.middle.name .
-    rm -rf Dockerfile.base
-    pp $env.docker-cli push $s.image.middle.name
+        ""
+        $'CMD ["fastapi", "run", "main.py"]'
+    ] | str join (char newline)
+    print $"(ansi grey)($f)(char newline)------(ansi reset)"
+    $f | ^$env.docker-cli build -f - -t $m.name .
+    pp $env.docker-cli push $m.name
 }
 
 'dev image build'
@@ -37,7 +45,7 @@
         --build-arg $"CI_PIPELINE_BEGIN='($n)'"
         --build-arg $"CI_COMMIT_TITLE='($t.1)'"
         --build-arg $"CI_COMMIT_SHA='($t.0)'"
-        --build-arg $"BASE_IMAGE='($s.image.middle.name)'"
+        --build-arg $"BASE_IMAGE='($s.image.mid.name)'"
         -f Dockerfile
         -t $s.image.target.name
     ] .
