@@ -8,6 +8,7 @@
         script: [
             "pip install --break-system-packages --no-cache-dir -r requirements.txt"
         ]
+        cmd: ["fastapi", "run", "main.py"]
     }
     target: {
         name: 'python-app'
@@ -19,8 +20,8 @@
     let m = $s.image.mid
     let f = [
         $"FROM ($m.base)"
-        "ENV PYTHONUNBUFFERED=x"
-        ""
+        $"ENV PYTHONUNBUFFERED=x"
+        $""
         $"WORKDIR ($m.workdir)"
         $"COPY ($m.manifest) ."
         $"RUN set -eux \\"
@@ -28,9 +29,9 @@
                 let p = if ($x | str trim -l | str starts-with "|") { "  " } else { '; ' }
                 $"  ($p)($x) \\"
             })
-        '  ;'
-        ""
-        $'CMD ["fastapi", "run", "main.py"]'
+        $"  ;"
+        $""
+        $"CMD ($m.cmd | to json -r)"
     ] | str join (char newline)
     print $"(ansi grey)($f)(char newline)------(ansi reset)"
     $f | ^$env.docker-cli build -f - -t $m.name .
