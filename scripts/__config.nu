@@ -7,6 +7,8 @@ source $USRENV
 ########################################
 source __env.nu
 
+mkdir -v ($nu.data-dir | path join 'cache')
+
 # settings
 $env.config.show_banner = false
 $env.config.use_kitty_protocol = true
