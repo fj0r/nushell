@@ -45,7 +45,7 @@ def lit [t: string, e] {
                 err: $e
             }
         } | merge {
-            type: id
+            typ: lit
             tag: $t
             ctx: ($o | spy)
         }
@@ -70,7 +70,7 @@ def cap0 [t: string, e] {
                 val: $r
             }
         } | merge {
-            type: id
+            typ: cap
             tag: $t
             ctx: ($o | spy)
         }
@@ -89,12 +89,12 @@ def end-of-line [t: string] {
             }
         } else {
             {
-                len: $i
+                len: ($i + 1) # include "\n"
                 pos: $pos
                 val: (if $i == 0 { '' } else { $o | str substring 0..<($i) })
             }
         } | merge {
-            typ: line
+            typ: eol
             tag: $t
             ctx: ($o | spy)
         }
@@ -117,7 +117,7 @@ def new-line [t=''] {
                 pos: $pos
             }
         } | merge {
-            type: new-line
+            typ: nl
             tag: $t
             ctx: ($o | spy)
         }
@@ -160,20 +160,23 @@ def space [t='', --with-line(-l)] {
 def one-of [t: string, s] {
     {|pos|
         let o = $in
+        mut err = {}
         for i in $s {
             let x = $o | do $i $pos
             if $x.len < 0 {
+                $err = $x
                 continue
             } else {
-                return $x
+                return ($x | merge {typ: $"select:($x.typ)"})
             }
         }
         {
-            typ: choice
+            typ: select
             tag: $t
             len: -1
             pos: $pos
             ctx: ($o | spy)
+            err: $err
         }
     }
 
@@ -184,6 +187,7 @@ def _more [t: string, s, --zero(-z), --one(-o)] {
         let o = $in
         mut p = 0
         mut r = []
+        mut err = {}
         while true {
             if $one and ($r | length) > 0 {
                 break
@@ -191,6 +195,7 @@ def _more [t: string, s, --zero(-z), --one(-o)] {
             let y = $o | str substring $p..
             let x = $y | do $s $p
             if $x.len < 0 {
+                $err = $x
                 break
             } else {
                 $p += $x.len
@@ -201,6 +206,7 @@ def _more [t: string, s, --zero(-z), --one(-o)] {
             {
                 len: -1
                 pos: $pos
+                err: $err
             }
         } else {
             {
@@ -262,9 +268,29 @@ export def one-by-one [t: string, s] {
     }
 }
 
+#let a = rustic --help | complete | get stdout
 
-rustic --help | complete | get stdout
-| do (one-by-one main [
+let b = 'rustic - fast, encrypted, deduplicated backups powered by Rust
+
+Usage: rustic [OPTIONS] <COMMAND>
+
+   
+Commands:
+  backup       Backup to  
+  cat          Show raw
+
+
+Commands:
+  1backup       Backup to
+  1cat          Show raw
+
+Commands:
+  2backup       Backup to
+  2cat          Show raw
+
+'
+
+$b | do (one-by-one main [
     (end-of-line header)
     (space 'x' -l)
     (one-or-more 'body'
@@ -274,9 +300,9 @@ rustic --help | complete | get stdout
                 (lit '' ':')
                 (space '')
                 (end-of-line 'usage')
-                (space '' -l)
             ])
             (one-by-one 'commands' [
+                (space '' -l)
                 (cap0 'h' '(Commands):')
                 (lit '' ':')
                 (new-line)
@@ -286,16 +312,16 @@ rustic --help | complete | get stdout
                         (word '')
                         (space '')
                         (end-of-line 'desc')
-                        (new-line '')
                     ])
                 )
             ])
             (one-by-one 'option' [
+                (space '' -l)
                 (cap0 'option' '(.+):')
                 (lit '' ':')
             ])
         ])
     )
 ])
-| get val.2.val.1
+| get val.2.val
 | table -e
