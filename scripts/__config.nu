@@ -31,6 +31,7 @@ use history-utils *
 use history-utils/backup.nu *
 use resolvenv
 use nvim *
+use netcat *
 use process *
 use system *
 
