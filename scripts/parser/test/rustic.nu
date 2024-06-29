@@ -1,27 +1,5 @@
 use parser *
 
-let a = rustic --help | complete | get stdout
-
-let b = 'rustic - fast, encrypted, deduplicated backups powered by Rust
-
-Usage: rustic [OPTIONS] <COMMAND>
-
-   
-Commands:
-  backup       Backup to  
-  cat          Show raw
-
-
-Commands:
-  1backup       Backup to
-  1cat          Show raw
-
-Commands:
-  2backup       Backup to
-  2cat          Show raw
-
-'
-
 let parse_rustic = (one-by-one main [
     (end-of-line header)
     (space 'x' -l)
@@ -56,6 +34,6 @@ let parse_rustic = (one-by-one main [
     )
 ])
 
-$b | do $parse_rustic
+rustic --help | complete | get stdout | do $parse_rustic
 | get val.2.val
 | table -e

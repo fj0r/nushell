@@ -4,6 +4,29 @@ def spy [l=9] {
     }
 }
 
+
+export def any-char [t: string] {
+    {|pos|
+        let o = $in
+        let i = $o | parse -r '^(?<s>.+)'
+        if ($i | is-not-empty) {
+            {
+                len: ($i.0.s | str length)
+                pos: $pos
+                val: ($i.0.s)
+            }
+        } else {
+            {
+                len: -1
+                pos: $pos
+            }
+        } | merge {
+            typ: mid
+            tag: $t
+        }
+    }
+}
+
 export def word [t: string] {
     {|pos|
         let o = $in
@@ -157,6 +180,14 @@ export def space [t='', --with-line(-l)] {
     }
 }
 
+export def recursive [t: string, n] {
+    {|pos|
+        let o = $in
+        let cls = scope variables | where name == $n | get 0.value
+        $o | do $cls $pos
+    }
+}
+
 export def one-of [t: string, s] {
     {|pos|
         let o = $in
@@ -167,7 +198,7 @@ export def one-of [t: string, s] {
                 $err = $x
                 continue
             } else {
-                return ($x | merge {typ: $"select:($x.typ)"})
+                return ($x | merge {typ: $":($x.typ)", tag: $t})
             }
         }
         {
