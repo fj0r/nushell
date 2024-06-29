@@ -1,18 +1,6 @@
-def _tmp [t: string, e] {
-    {|pos|
-        let o = $in
-        if ($o | is-empty) {
-            {
-            }
-        } else {
-            {
-            }
-        } | merge {
-            type: tmp
-            tag: $t
-            len: -1
-            pos: $pos
-        }
+def spy [l=9] {
+    if false {
+        $in | str substring ..$l
     }
 }
 
@@ -90,10 +78,6 @@ def cap0 [t: string, e] {
 
 }
 
-def spy [l=9] {
-    $in | str substring ..$l
-}
-
 def end-of-line [t: string] {
     {|pos|
         let o = $in
@@ -107,7 +91,7 @@ def end-of-line [t: string] {
             {
                 len: $i
                 pos: $pos
-                val: ($o | str substring 0..<($i))
+                val: (if $i == 0 { '' } else { $o | str substring 0..<($i) })
             }
         } | merge {
             typ: line
@@ -131,6 +115,7 @@ def space [t='', --with-line(-l)] {
             {
                 len: ($i.0.s | str length)
                 pos: $pos
+                val: ''
             }
         } | merge {
             typ: space
@@ -237,7 +222,7 @@ export def one-by-one [t: string, s] {
         {
             typ: seq
             tag: $t
-            len: ($p + ($r | last).len)
+            len: $p
             pos: $pos
             val: $r
             ctx: ($o | spy)
@@ -279,5 +264,5 @@ rustic --help | complete | get stdout
         ])
     )
 ])
-| get val
+| get val.2.val.1
 | table -e
