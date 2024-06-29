@@ -4,7 +4,7 @@ def spy [l=9] {
     }
 }
 
-def word [t: string] {
+export def word [t: string] {
     {|pos|
         let o = $in
         let i = $o | parse -r '^(?<s>[^\s]+)'
@@ -27,7 +27,7 @@ def word [t: string] {
     }
 }
 
-def lit [t: string, e] {
+export def lit [t: string, e] {
     {|pos|
         let o = $in
         let l = $e | str length
@@ -52,7 +52,7 @@ def lit [t: string, e] {
     }
 }
 
-def cap0 [t: string, e] {
+export def cap0 [t: string, e] {
     {|pos|
         let o = $in
         let r = $o | parse -r $"^($e).*"
@@ -78,7 +78,7 @@ def cap0 [t: string, e] {
 
 }
 
-def end-of-line [t: string] {
+export def end-of-line [t: string] {
     {|pos|
         let o = $in
         let i = $o | str index-of (char newline)
@@ -101,7 +101,7 @@ def end-of-line [t: string] {
     }
 }
 
-def new-line [t=''] {
+export def new-line [t=''] {
     {|pos|
         let o = $in
         let i = $o | str substring ..<1
@@ -125,7 +125,7 @@ def new-line [t=''] {
 }
 
 
-def space [t='', --with-line(-l)] {
+export def space [t='', --with-line(-l)] {
     let re = if $with_line { '^(?<s>[ \s\n]+)' } else { '^(?<s>[ \s]+)' }
     {|pos|
         let o = $in
@@ -157,7 +157,7 @@ def space [t='', --with-line(-l)] {
     }
 }
 
-def one-of [t: string, s] {
+export def one-of [t: string, s] {
     {|pos|
         let o = $in
         mut err = {}
@@ -222,15 +222,15 @@ def _more [t: string, s, --zero(-z), --one(-o)] {
     }
 }
 
-def one-or-more [t: string, s] {
+export def one-or-more [t: string, s] {
     $in | _more $t $s
 }
 
-def zero-or-more [t: string, s] {
+export def zero-or-more [t: string, s] {
     $in | _more $t $s --zero
 }
 
-def zero-or-one  [t: string, s] {
+export def zero-or-one  [t: string, s] {
     $in | _more $t $s --one
 }
 
@@ -267,61 +267,3 @@ export def one-by-one [t: string, s] {
         }
     }
 }
-
-#let a = rustic --help | complete | get stdout
-
-let b = 'rustic - fast, encrypted, deduplicated backups powered by Rust
-
-Usage: rustic [OPTIONS] <COMMAND>
-
-   
-Commands:
-  backup       Backup to  
-  cat          Show raw
-
-
-Commands:
-  1backup       Backup to
-  1cat          Show raw
-
-Commands:
-  2backup       Backup to
-  2cat          Show raw
-
-'
-
-$b | do (one-by-one main [
-    (end-of-line header)
-    (space 'x' -l)
-    (one-or-more 'body'
-        (one-of 'section' [
-            (one-by-one 'usage' [
-                (cap0 'usage' '(Usage):')
-                (lit '' ':')
-                (space '')
-                (end-of-line 'usage')
-            ])
-            (one-by-one 'commands' [
-                (space '' -l)
-                (cap0 'h' '(Commands):')
-                (lit '' ':')
-                (new-line)
-                (one-or-more 'cmd'
-                    (one-by-one 'cmd' [
-                        (space '')
-                        (word '')
-                        (space '')
-                        (end-of-line 'desc')
-                    ])
-                )
-            ])
-            (one-by-one 'option' [
-                (space '' -l)
-                (cap0 'option' '(.+):')
-                (lit '' ':')
-            ])
-        ])
-    )
-])
-| get val.2.val
-| table -e
