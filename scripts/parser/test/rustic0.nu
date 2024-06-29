@@ -1,7 +1,4 @@
 use parser *
-
-let a = rustic --help | complete | get stdout
-
 let b = 'rustic - fast, encrypted, deduplicated backups powered by Rust
 
 Usage: rustic [OPTIONS] <COMMAND>
