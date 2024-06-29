@@ -10,7 +10,31 @@ def _tmp [t: string, e] {
         } | merge {
             type: tmp
             tag: $t
+            len: -1
             pos: $pos
+        }
+    }
+}
+
+def word [t: string] {
+    {|pos|
+        let o = $in
+        let i = $o | parse -r '^(?<s>[^\s]+)'
+        if ($i | is-empty) {
+            {
+                len: -1
+                pos: $pos
+            }
+        } else {
+            {
+                len: ($i.0.s | str length)
+                pos: $pos
+                val: $i.0.s
+            }
+        } | merge {
+            typ: word
+            tag: $t
+            ctx: ($o | spy)
         }
     }
 }
@@ -22,18 +46,20 @@ def lit [t: string, e] {
         let a = ($o | str substring 0..<$l)
         if $a == $e {
             {
-                val: $e
                 len: $l
+                pos: $pos
+                val: $e
             }
         } else {
             {
-                err: [$e $a]
                 len: -1
+                pos: $pos
+                err: $e
             }
         } | merge {
             type: id
             tag: $t
-            pos: $pos
+            ctx: ($o | spy)
         }
     }
 }
@@ -44,34 +70,28 @@ def cap0 [t: string, e] {
         let r = $o | parse -r $"^($e).*"
         if ($r | is-empty) {
             {
-                ctx: ($o | str substring ..30)
-                err: $e
                 len: -1
+                pos: $pos
+                err: $e
             }
         } else {
             let r = $r.0.capture0
             {
-                val: $r
                 len: ($r | str length)
+                pos: $pos
+                val: $r
             }
         } | merge {
             type: id
             tag: $t
-            pos: $pos
+            ctx: ($o | spy)
         }
     }
 
 }
 
-def spy [l=30] {
-    {|pos|
-        let o = $in
-        {
-            len: 0
-            val: ($o | str substring ..$l)
-            pos: $pos
-        }
-    }
+def spy [l=9] {
+    $in | str substring ..$l
 }
 
 def end-of-line [t: string] {
@@ -81,21 +101,23 @@ def end-of-line [t: string] {
         if $i < 0 {
             {
                 len: -1
+                pos: $pos
             }
         } else {
             {
-                val: ($o | str substring 0..<($i))
                 len: $i
+                pos: $pos
+                val: ($o | str substring 0..<($i))
             }
         } | merge {
             typ: line
             tag: $t
-            pos: $pos
+            ctx: ($o | spy)
         }
     }
 }
 
-def empty [t='', --with-line(-l), --hide(-h)] {
+def space [t='', --with-line(-l)] {
     let re = if $with_line { '^(?<s>[ \s\n]+)' } else { '^(?<s>[ \s]+)' }
     {|pos|
         let o = $in
@@ -103,15 +125,17 @@ def empty [t='', --with-line(-l), --hide(-h)] {
         if ($i | is-empty) {
             {
                 len: -1
+                pos: $pos
             }
         } else {
             {
                 len: ($i.0.s | str length)
+                pos: $pos
             }
         } | merge {
-            typ: empty
-            pos: $pos
-            hide: $hide
+            typ: space
+            tag: $t
+            ctx: ($o | spy)
         }
     }
 }
@@ -128,10 +152,11 @@ def one-of [t: string, s] {
             }
         }
         {
-            type: choice
+            typ: choice
             tag: $t
             len: -1
             pos: $pos
+            ctx: ($o | spy)
         }
     }
 
@@ -162,13 +187,14 @@ def _more [t: string, s, --zero(-z), --one(-o)] {
             }
         } else {
             {
-                val: $r
                 len: ($p + ($r | last).len)
                 pos: $pos
+                val: $r
             }
         } | merge {
             typ: repeat
             tag: $t
+            ctx: ($o | str substring $p.. | spy)
         }
     }
 }
@@ -197,25 +223,24 @@ export def one-by-one [t: string, s] {
                 return {
                     typ: seq
                     tag: $t
-                    ctx: $r
-                    err: $x
                     len: -1
                     pos: $pos
+                    ctx: ($o | spy)
+                    result: $r
+                    err: $x
                 }
             } else {
                 $p += $x.len
             }
-            # TODO: hide
-            if not ($x.hide? | default false) {
-            }
-                $r ++= $x
+            $r ++= $x
         }
         {
             typ: seq
             tag: $t
-            val: $r
             len: ($p + ($r | last).len)
             pos: $pos
+            val: $r
+            ctx: ($o | spy)
         }
     }
 }
@@ -224,23 +249,26 @@ export def one-by-one [t: string, s] {
 rustic --help | complete | get stdout
 | do (one-by-one main [
     (end-of-line header)
-    (empty 'x' -l -h)
+    (space 'x' -l)
     (one-or-more 'body'
         (one-of 'section' [
             (one-by-one 'usage' [
                 (cap0 'usage' '(Usage):')
                 (lit '' ':')
+                (space '')
                 (end-of-line 'usage')
-                (empty '' -l -h)
+                (space '' -l)
             ])
             (one-by-one 'commands' [
                 (cap0 'cmds' '(Commands):')
                 (lit '' ':')
-                (empty '' -l -h)
+                (end-of-line '')
                 (one-or-more 'cmd'
                     (one-by-one 'cmd' [
-                        
-
+                        (space '' -l)
+                        (word '')
+                        (space '' -l)
+                        (end-of-line 'desc')
                     ])
                 )
             ])
@@ -251,4 +279,5 @@ rustic --help | complete | get stdout
         ])
     )
 ])
+| get val
 | table -e
