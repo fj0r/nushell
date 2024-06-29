@@ -1,5 +1,5 @@
 def spy [l=9] {
-    if false {
+    if true {
         $in | str substring ..$l
     }
 }
@@ -81,7 +81,7 @@ def cap0 [t: string, e] {
 def end-of-line [t: string] {
     {|pos|
         let o = $in
-        let i = $o | str index-of "\n"
+        let i = $o | str index-of (char newline)
         if $i < 0 {
             {
                 len: -1
@@ -101,6 +101,30 @@ def end-of-line [t: string] {
     }
 }
 
+def new-line [t=''] {
+    {|pos|
+        let o = $in
+        let i = $o | str substring ..<1
+        if $i == (char newline) {
+            {
+                len: 1
+                pos: $pos
+                val: ''
+            }
+        } else {
+            {
+                len: -1
+                pos: $pos
+            }
+        } | merge {
+            type: new-line
+            tag: $t
+            ctx: ($o | spy)
+        }
+    }
+}
+
+
 def space [t='', --with-line(-l)] {
     let re = if $with_line { '^(?<s>[ \s\n]+)' } else { '^(?<s>[ \s]+)' }
     {|pos|
@@ -112,10 +136,18 @@ def space [t='', --with-line(-l)] {
                 pos: $pos
             }
         } else {
-            {
-                len: ($i.0.s | str length)
-                pos: $pos
-                val: ''
+            let v = $i.0.s
+            if (not $with_line) and ($v | str index-of (char newline)) >= 0 {
+                {
+                    len: -1
+                    pos: $pos
+                }
+            } else {
+                {
+                    len: ($v | str length)
+                    pos: $pos
+                    val: ''
+                }
             }
         } | merge {
             typ: space
@@ -245,15 +277,16 @@ rustic --help | complete | get stdout
                 (space '' -l)
             ])
             (one-by-one 'commands' [
-                (cap0 'cmds' '(Commands):')
+                (cap0 'h' '(Commands):')
                 (lit '' ':')
-                (end-of-line '')
+                (new-line)
                 (one-or-more 'cmd'
                     (one-by-one 'cmd' [
-                        (space '' -l)
+                        (space '')
                         (word '')
-                        (space '' -l)
+                        (space '')
                         (end-of-line 'desc')
+                        (new-line '')
                     ])
                 )
             ])
