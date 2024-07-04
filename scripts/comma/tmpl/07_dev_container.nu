@@ -1,7 +1,7 @@
 'dev'
 | comma val null {
     container: [io:x srv]
-    id: ($env.comma_index.wd | path parse | get stem)
+    id: $"($env.comma_index.wd | path parse | get stem)-dev"
     wd: '/world'
     pubkey: 'id_ed25519.pub'
     user: root
