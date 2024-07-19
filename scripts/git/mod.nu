@@ -301,15 +301,18 @@ export def gm [
     --abort (-a)
     --continue (-c)
     --quit (-q)
-    --no-squash (-n) # git merge (no)--squash
+    --squash (-s)
+    --fast-farward (-f)
 ] {
-    let x = if $no_squash { [] } else { [--squash] }
+    mut args = []
+    if $squash { $args ++= [--squash] }
+    if $fast_farward { $args ++= [--ff] } else { $args ++= [--no-ff] }
     if ($branch | is-empty) {
-        git merge ...$x $"origin/(git_main_branch)"
+        git merge ...$args $"origin/(git_main_branch)"
     } else {
-        git merge ...$x $branch
+        git merge ...$args $branch
     }
-    if not $no_squash {
+    if $squash {
         git commit -v
     }
 }
