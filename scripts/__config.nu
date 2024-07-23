@@ -48,6 +48,7 @@ use pwd-overlay.nu *
 use network.nu *
 use setup.nu *
 use rustic *
+use ollama *
 use outdent.nu
 
 

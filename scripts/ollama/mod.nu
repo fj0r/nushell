@@ -1,0 +1,74 @@
+export-env {
+    $env.OLLAMA_HOST = 'http://localhost:11434'
+    $env.OLLAMA_CHAT = {}
+}
+
+def 'nu-complete models' [] {
+    http get $"($env.OLLAMA_HOST)/api/tags"
+    | get models
+    | each {{value: $in.name, description: $in.modified_at}}
+}
+
+export def 'ollama info' [model: string@'nu-complete models'] {
+    http post -t application/json $"($env.OLLAMA_HOST)/api/show" {name: $model}
+}
+
+export def 'ollama embed' [model: string@'nu-complete models', input: string] {
+    http post -t application/json $"($env.OLLAMA_HOST)/api/embeddings" {
+        model: $model, prompt: $input
+    }
+    | get embedding
+}
+
+
+export def 'ollama gen' [
+    model: string@'nu-complete models'
+    prompt: string
+    --full(-f)
+] {
+    let r = http post -t application/json $"($env.OLLAMA_HOST)/api/generate" {
+        model: $model, prompt: $prompt, stream: false
+    }
+    if $full {
+        $r
+    } else {
+        $r.response
+    }
+}
+
+
+export def --env 'ollama chat' [
+    model: string@'nu-complete models'
+    message: string
+    --image(-i): path
+    --full(-f)
+    --reset(-r)
+] {
+    let img = if ($image | is-empty) { {} } else { {images: [(open $image | encode base64)]} }
+    let msg = {
+                role: 'user'
+                content: $message
+                ...$img
+            }
+    if ($env.OLLAMA_CHAT | is-empty) {
+        $env.OLLAMA_CHAT = ($env.OLLAMA_CHAT | insert $model [])
+    }
+    if $reset {
+        $env.OLLAMA_CHAT = ($env.OLLAMA_CHAT | update $model [])
+    }
+    $env.OLLAMA_CHAT = ($env.OLLAMA_CHAT | update $model {|x| $x | get $model | append $msg})
+    let r = http post -t application/json $"($env.OLLAMA_HOST)/api/chat" {
+        model: $model
+        messages: [
+            ...($env.OLLAMA_CHAT | get $model)
+            $msg
+        ]
+        stream: false
+    }
+    $env.OLLAMA_CHAT = ($env.OLLAMA_CHAT | update $model {|x| $x | get $model | append $r.message})
+    if $full {
+        $r
+    } else {
+        $r.message.content
+    }
+}
