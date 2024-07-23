@@ -13,7 +13,10 @@ export def 'ollama info' [model: string@'nu-complete models'] {
     http post -t application/json $"($env.OLLAMA_HOST)/api/show" {name: $model}
 }
 
-export def 'ollama embed' [model: string@'nu-complete models', input: string] {
+export def 'ollama embed' [
+    model: string@'nu-complete models'
+    input: string
+] {
     http post -t application/json $"($env.OLLAMA_HOST)/api/embeddings" {
         model: $model, prompt: $input
     }
@@ -24,10 +27,20 @@ export def 'ollama embed' [model: string@'nu-complete models', input: string] {
 export def 'ollama gen' [
     model: string@'nu-complete models'
     prompt: string
+    --image(-i): path
     --full(-f)
 ] {
+    let content = $in | default ''
+    let img = if ($image | is-empty) {
+        {}
+    } else {
+        {images: [(open $image | encode base64)]}
+    }
     let r = http post -t application/json $"($env.OLLAMA_HOST)/api/generate" {
-        model: $model, prompt: $prompt, stream: false
+        model: $model
+        prompt: ($prompt | str replace '{}' $content)
+        stream: false
+        ...$img
     }
     if $full {
         $r
@@ -44,12 +57,17 @@ export def --env 'ollama chat' [
     --full(-f)
     --reset(-r)
 ] {
-    let img = if ($image | is-empty) { {} } else { {images: [(open $image | encode base64)]} }
+    let content = $in | default ''
+    let img = if ($image | is-empty) {
+        {}
+    } else {
+        {images: [(open $image | encode base64)]}
+    }
     let msg = {
-                role: 'user'
-                content: $message
-                ...$img
-            }
+        role: 'user'
+        content: ($message | str replace '{}' $content)
+        ...$img
+    }
     if ($env.OLLAMA_CHAT | is-empty) {
         $env.OLLAMA_CHAT = ($env.OLLAMA_CHAT | insert $model [])
     }
