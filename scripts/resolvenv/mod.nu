@@ -37,8 +37,8 @@ export def record_match [pat obj] {
 
 # [pattern object action] : list<table<any, any, any>>
 export def rx_match [obj tbl] {
-    mut default = null
-    mut action = null
+    mut default = { null }
+    mut action = { null }
     for i in $tbl {
         if ($i.0 | describe -d).type == 'string' {
             $default = $i.1
