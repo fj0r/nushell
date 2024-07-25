@@ -90,3 +90,41 @@ export def --env 'ollama chat' [
         $r.message.content
     }
 }
+
+
+export def --env 'ollama live' [
+    model: string@'nu-complete models'
+    message: string
+    --image(-i): path
+    --full(-f)
+] {
+    let content = $in | default ''
+    let img = if ($image | is-empty) {
+        {}
+    } else {
+        {images: [(open $image | encode base64)]}
+    }
+    let msg = {
+        role: 'user'
+        content: ($message | str replace '{}' $content)
+        ...$img
+    }
+    let data = {
+        model: $model
+        messages: [
+            $msg
+        ]
+        stream: true
+    }
+    curl ...[
+        -sL
+        -X POST
+        -H 'Content-Type: application/json'
+        $"($env.OLLAMA_HOST)/api/chat"
+        -d $"($data | to json -r)"
+    ]
+    | from json -o
+    | each { print -n $in.message.content }
+
+    ''
+}
