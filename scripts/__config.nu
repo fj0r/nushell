@@ -33,7 +33,7 @@ use resolvenv
 use nvim *
 use netcat *
 use process *
-use system *
+use os *
 
 
 use sh.nu *
