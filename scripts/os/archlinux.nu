@@ -1,9 +1,5 @@
-def 'nu-complete aur' [ctx] {
-    let k = $ctx | split row ' ' | last | str trim
-    if ($k | str length) < 2 {
-        return
-    }
-    let d = paru -Ss $k | lines
+def parse_pkg_list [] {
+    let d = $in
     mut r = []
     mut cur = {}
     let char = {
@@ -19,7 +15,7 @@ def 'nu-complete aur' [ctx] {
         if ($i mod 2) == 0 {
             $cur = ($d
                 | get $i
-                | parse -r '(?<t>.+?)/(?<n>.+?) (?<v>.+?) \[(?<c>.+?)\](?<x>.+)?'
+                | parse -r '(?<t>[^ ]+)/(?<n>[^ ]+) (?<v>[^ ]+)( \[(?<c>.+?)\])?(?<x>.+)?'
                 | first
                 )
         } else {
@@ -40,7 +36,28 @@ def 'nu-complete aur' [ctx] {
     $r
 }
 
-export def --wrapped pa [...args: string@"nu-complete aur"] {
+def 'nu-complete aur' [ctx] {
+    let k = $ctx | split row ' ' | last | str trim
+    if ($k | str length) < 2 {
+        return
+    }
+    paru -Ss $k | lines | parse_pkg_list
+}
+
+
+def 'nu-complete installed' [ctx] {
+    let k = $ctx | split row ' ' | last | str trim
+    if ($k | str length) < 2 {
+        return
+    }
+    paru -Qs $k | lines | parse_pkg_list
+}
+
+
+export def --wrapped pa [
+    --remove (-R): string@"nu-complete installed"
+    ...args: string@"nu-complete aur"
+] {
     if ($args | is-empty) {
         paru -Syu
     } else if ($args | all { not ($in | str starts-with '-') }) {
