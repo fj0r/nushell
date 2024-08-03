@@ -58,7 +58,9 @@ export def --wrapped pa [
     --remove (-R): string@"nu-complete installed"
     ...args: string@"nu-complete aur"
 ] {
-    if ($args | is-empty) {
+    if ($remove | is-not-empty) {
+        paru -Rsu $remove
+    } else if ($args | is-empty) {
         paru -Syu
     } else if ($args | all { not ($in | str starts-with '-') }) {
         paru -S ...$args
