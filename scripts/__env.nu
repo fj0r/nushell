@@ -4,30 +4,28 @@ $env.ENV_CONVERSIONS.LD_LIBRARY_PATH = {
     to_string: { |v| if ($v | is-empty) { "" } else { $v | path expand | str join (char esep) } }
 }
 
+def --env merge-path [path] {
+    let p = $path
+    | each { glob $in }
+    | flatten
+    | filter {|x| $x not-in $env.PATH }
+    for x in $p {
+        $env.PATH = ($env.PATH | prepend $x)
+    }
+}
+
+
 if $nu.os-info.family == 'windows'  {
     $env.HOME = $env.HOMEPATH
+} else {
+    merge-path [
+        $'($env.HOME)/.cargo/bin'
+        $'($env.HOME)/.ghcup/bin'
+        $'($env.HOME)/.local/bin'
+        '/opt/*/bin'
+        $'($env.LS_ROOT?)/*/bin'
+    ]
 }
-
-def --env merge-path [path] {
-    let windows = $nu.os-info.family == 'windows'
-    mut ep = if $windows { $env.Path } else { $env.PATH }
-    #mut ep = $path | split row (char esep)
-    let path = $path | each { glob $in } | flatten
-    for x in $path {
-        if $x not-in $ep {
-            $ep = ($ep | prepend $x)
-        }
-    }
-    if $windows { $env.Path = $ep } else { $env.PATH = $ep }
-}
-
-merge-path [
-    $'($env.HOME)/.cargo/bin'
-    $'($env.HOME)/.ghcup/bin'
-    $'($env.HOME)/.local/bin'
-    '/opt/*/bin'
-    $'($env.LS_ROOT?)/*/bin'
-]
 
 $env.LD_LIBRARY_PATH = (if ($env.LD_LIBRARY_PATH? | is-empty) { [] } else { $env.LD_LIBRARY_PATH })
 $env.LD_LIBRARY_PATH = (do -i {
