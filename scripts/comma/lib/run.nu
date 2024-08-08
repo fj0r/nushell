@@ -65,6 +65,7 @@ export def main [tbl --opt: record --info-opt: record] {
     }
     let act = $n.node | get $_.act
     let scope = resolve scope $n.rest (resolve comma 'comma_scope') $flt --mode 'main'
+    let scope = {_opt: $opt, ...$scope}
 
     if ($wth | is-empty) {
         do $act $n.rest $scope

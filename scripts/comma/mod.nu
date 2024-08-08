@@ -319,6 +319,6 @@ export def --wrapped , [
             $env.comma_index = ($env.comma_index | upsert $env.comma_index.dry_run true)
         }
         use lib/run.nu
-        $args | flatten | run (resolve comma) --opt {watch: $watch} --info-opt {all: $all, format: tree}
+        $args | flatten | run (resolve comma) --opt {watch: $watch, print: $print} --info-opt {all: $all, format: tree}
     }
 }
