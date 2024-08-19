@@ -1,0 +1,12 @@
+- type: fastapi
+  manifest: requirements.txt
+  base: python:3.11-bookworm
+  workdir: /app
+  env:
+    PYTHONUNBUFFERED: x
+  scripts:
+    - pip install --break-system-packages --no-cache-dir -r requirements.txt
+  cmd:
+    - fastapi
+    - run
+    - main.py
