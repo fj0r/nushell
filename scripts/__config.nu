@@ -1,10 +1,5 @@
-########################################
-const USRENV = '~/.env.nu'
-const USRENV = if ($USRENV | path expand | path exists) {
-    $USRENV
-} else { 'dummy.nu' }
-source $USRENV
-########################################
+const __dyn_load = if ('~/.env.nu' | path exists) { '~/.env.nu' } else { 'dummy.nu' }
+source $__dyn_load
 source __env.nu
 
 mkdir -v ($nu.data-dir | path join 'cache')
@@ -99,13 +94,8 @@ if (which atuin | is-not-empty) {
 # plugin use --plugin-config $plugin_msgpackz $plugin_query
 
 
-########################################
-const USRCFG = '~/.nu'
-const USRCFG = if ($USRCFG | path expand | path exists) {
-    $USRCFG
-} else { 'dummy.nu' }
-source $USRCFG
-########################################
+const __dyn_load = if ('~/.nu' | path exists) { '~/.nu' } else { 'dummy.nu' }
+source $__dyn_load
 
 use __prefer_alt.nu prefer_alt_env
 prefer_alt_env $env.PREFER_ALT?
