@@ -17,10 +17,10 @@ export def 'ollama embed' [
     model: string@'nu-complete models'
     input: string
 ] {
-    http post -t application/json $"($env.OLLAMA_HOST)/api/embeddings" {
-        model: $model, prompt: $input
+    http post -t application/json $"($env.OLLAMA_HOST)/api/embed" {
+        model: $model, input: [$input]
     }
-    | get embedding
+    | get embeddings.0
 }
 
 
