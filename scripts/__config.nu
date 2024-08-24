@@ -7,11 +7,14 @@ mkdir -v ($nu.data-dir | path join 'cache')
 # settings
 $env.config.show_banner = false
 $env.config.use_kitty_protocol = true
+$env.config.filesize.metric = true
+$env.config.datetime_format.normal = '%m/%d/%y %H:%M:%S'
+$env.config.datetime_format.table = '%m/%d/%y %H:%M:%S'
 $env.config.history.file_format = "sqlite"
 $env.config.history.isolation = true
 $env.config.table.header_on_separator = true
 $env.config.table.mode = 'compact' #light compact
-$env.config.table.padding.left = 0
+$env.config.table.padding = 0
 
 
 # config
