@@ -49,6 +49,7 @@ use setup.nu *
 use rustic *
 use ollama *
 use outdent.nu
+use devcontainer *
 
 
 use power

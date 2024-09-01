@@ -89,6 +89,13 @@ $env.comma = {|_|{
     }
 }
 
+'import devcontainer'
+| comma fun {|a,s,_|
+    for i in [mod.nu] {
+        cp -r $"($env.HOME)/world/dev-container/($i)" scripts/devcontainer/
+    }
+}
+
 'export comma'
 | comma fun {|a,s,_|
     pp rsync -avp --delete --exclude=.git $'($_.wd)/scripts/comma/' $"($env.HOME)/world/comma"
