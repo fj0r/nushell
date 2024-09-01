@@ -19,7 +19,7 @@
         -v $"($_.wd)/data:/var/lib/registry"
     ]
 
-    pp $env.docker-cli run --name $s.dev.id -d ...$args ...$s.dev.container
+    pp $env.CONTCTL run --name $s.dev.id -d ...$args ...$s.dev.container
 } {
     cmp: {|a,s|
         match ($a | length) {
@@ -31,10 +31,10 @@
 
 'container down'
 | comma fun {|a,s|
-    let ns = ^$env.docker-cli ps | from ssv -a | get NAMES
+    let ns = ^$env.CONTCTL ps | from ssv -a | get NAMES
     if $s.dev.id in $ns {
         lg level 2 { container: $s.dev.id } 'stop'
-        pp $env.docker-cli rm -f $s.dev.id
+        pp $env.CONTCTL rm -f $s.dev.id
     } else {
         lg level 3 { container: $s.dev.id } 'not running'
     }

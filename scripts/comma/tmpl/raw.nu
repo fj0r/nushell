@@ -59,7 +59,7 @@ $env.comma = {|_|{
                 let cu = $s.dev.env
                 | items {|k,v| [-e $"($k)=($v)"]}
                 | flatten
-                pp $env.docker-cli run ...[
+                pp $env.CONTCTL run ...[
                     --name $s.dev.id
                     -d
                     ...$privileged
@@ -77,10 +77,10 @@ $env.comma = {|_|{
             }
         }
         down: {|a,s|
-            let cs = ^$env.docker-cli ps | from ssv -a | get NAMES
+            let cs = ^$env.CONTCTL ps | from ssv -a | get NAMES
             if $s.dev.id in $cs {
                 lg level 2 { container: $s.dev.id } 'stop'
-                pp $env.docker-cli rm -f $s.dev.id
+                pp $env.CONTCTL rm -f $s.dev.id
             } else {
                 lg level 3 { container: $s.dev.id } 'not running'
             }

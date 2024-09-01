@@ -172,20 +172,20 @@ def 'build plan' [--rm --latest] {
     }
     | flatten
 
-    $plan.dockerfile | ^$env.DOCKERCLI build ...$args -f - -t $plan.tag $plan.ctx
-    ^$env.DOCKERCLI push $plan.tag
+    $plan.dockerfile | ^$env.CONTCTL build ...$args -f - -t $plan.tag $plan.ctx
+    ^$env.CONTCTL push $plan.tag
 
     if $latest {
         let latest = $"($plan.tag | split row ':' | first):latest"
-        ^$env.DOCKERCLI tag $plan.tag $latest
-        ^$env.DOCKERCLI push $latest
+        ^$env.CONTCTL tag $plan.tag $latest
+        ^$env.CONTCTL push $latest
         if $rm {
-            ^$env.DOCKERCLI rmi $latest
+            ^$env.CONTCTL rmi $latest
         }
     }
 
     if $rm {
-        ^$env.DOCKERCLI rmi $plan.tag
+        ^$env.CONTCTL rmi $plan.tag
     }
 }
 
@@ -222,7 +222,7 @@ export def 'main' [manifest? --dry-run --example] {
     let o = $in
     if $example {
         [
-            $"$env.DOCKERCLI = 'podman'"
+            $"$env.CONTCTL = 'podman'"
             $"cd <project>"
             ({
                 registry: registry.s

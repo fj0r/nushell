@@ -34,15 +34,15 @@
         $"CMD ($m.cmd | to json -r)"
     ] | str join (char newline)
     print $"(ansi grey)($f)(char newline)------(ansi reset)"
-    $f | ^$env.docker-cli build -f - -t $m.name .
-    pp $env.docker-cli push $m.name
+    $f | ^$env.CONTCTL build -f - -t $m.name .
+    pp $env.CONTCTL push $m.name
 }
 
 'dev image build'
 | comma fun {|a,s,_|
     let n = date now | format date "%Y-%m-%d %H:%M:%S"
     let t = git log --reverse -n 1 --pretty=%h»¦«%s | split row '»¦«'
-    pp $env.docker-cli build ...[
+    pp $env.CONTCTL build ...[
         --build-arg $"CI_PIPELINE_BEGIN='($n)'"
         --build-arg $"CI_COMMIT_TITLE='($t.1)'"
         --build-arg $"CI_COMMIT_SHA='($t.0)'"
@@ -50,5 +50,5 @@
         -f Dockerfile
         -t $s.image.target.name
     ] .
-    pp $env.docker-cli push $s.image.target.name
+    pp $env.CONTCTL push $s.image.target.name
 }

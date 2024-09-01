@@ -201,7 +201,7 @@ The default template contains `vscode-tasks` and outputs a `.vscode/tasks.json`.
 ```
 [build image]
 | comma fun {|a,s|
-    ^$env.docker-cli pull $a.0
+    ^$env.CONTCTL pull $a.0
     let tmp = mktemp
     $"
     FROM ($a.0)
@@ -217,9 +217,9 @@ The default template contains `vscode-tasks` and outputs a `.vscode/tasks.json`.
     | do $_.outdent
     | save -f $tmp
 
-    ^$env.docker-cli build -f $tmp -t $a.1 .
+    ^$env.CONTCTL build -f $tmp -t $a.1 .
     rm -f $tmp
-    ^$env.docker-cli push $a.1
+    ^$env.CONTCTL push $a.1
 } {
     cmp: {|a,s|
         match ($a | length) {
