@@ -16,6 +16,7 @@ export use helm.nu *
 export use conf.nu *
 export use resources.nu *
 export use compose.nu *
+export use kadm.nu *
 
 def krefine [kind] {
     let obj = $in
@@ -559,9 +560,6 @@ export def "kclean stucked ns" [ns: string] {
 }
 
 export alias "kclean finalizer" = kubectl patch -p '{\"metadata\":{\"finalizers\":null}}'
-
-export alias "kadm check" = kubeadm certs check-expiration
-export alias "kadm renew" = kubeadm certs renew all
 
 ### cert-manager
 export def kgcert [] {
