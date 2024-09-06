@@ -1,6 +1,7 @@
 export-env {
     $env.OLLAMA_HOST = "http://localhost:11434"
     $env.OLLAMA_CHAT = {}
+    $env.OLLAMA_HOME = [$env.HOME .ollama] | path join
 }
 
 def "nu-complete models" [] {
@@ -141,4 +142,75 @@ export def similarity [a b] {
         }
     }
     | $in.p / (($in.a | math sqrt) * ($in.b | math sqrt))
+}
+
+
+def "nu-complete ollama model" [] {
+    cd $"($env.OLLAMA_HOME)/models/manifests/"
+    ls **/* | where type == file | get name
+}
+
+export def "ollama export" [
+    model: string@"nu-complete ollama model"
+    target
+    --home: string
+] {
+    if ($target | path exists) {
+        if ([y n] | input list "already exists, remove it?") == 'y' {
+            rm -rf $target
+        } else {
+            return
+        }
+    }
+    mkdir $target
+
+    let base = {
+        blob: ([$env.OLLAMA_HOME models blobs] | path join)
+        manifests: ([$env.OLLAMA_HOME models manifests] | path join)
+    }
+
+    let tg = {
+        bin: ([$target model.bin] | path join)
+        model: ([$target Modelfile] | path join)
+        source: ([$target source.txt] | path join)
+    }
+
+    $model | split row '/' | $"($in | range 0..<-1 | str join '/'):($in | last)" | save $tg.source
+
+
+    let manifests = open ([$base.manifests $model] | path join) | from json
+
+    for i in $manifests.layers {
+
+        let digest = $i.digest
+        let type = $i.mediaType | split row '.' | last
+        let blob = [$base.blob ($i.digest | str replace ':' '-')] | path join
+        match $type {
+            model => {
+                cp $blob $tg.bin
+                $"FROM ./model.bin(char newline)" | save -a $tg.model
+            }
+            params => {
+                let p = open $blob | from json
+                $p
+                | items {|k,v| {k: $k, v: $v} }
+                | each {|x| $x.v | each {|y| $'PARAMETER ($x.k) "($y)"' } }
+                | flatten
+                | str join (char newline)
+                | $"(char newline)($in)"
+                | save -a $tg.model
+            }
+            _ => {
+                $'(char newline)($type | str upcase) """(cat $blob)"""' | save -a $tg.model
+            }
+        }
+    }
+
+    print 'success'
+}
+
+export def "ollama import" [dir] {
+    cd $dir
+    let model = cat source.txt
+    ollama create $model
 }
