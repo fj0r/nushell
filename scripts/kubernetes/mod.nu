@@ -298,7 +298,20 @@ export def --wrapped ka [
     } else {
         [-c $container]
     }
-    kubectl exec ...$n -it $pod ...$c -- ...(if ($args|is-empty) {['bash']} else { $args })
+    let args = if ($args | is-empty) {
+        let cmd = [
+            '/usr/local/bin/nu'
+            '/bin/nu'
+            '/bin/bash'
+            '/bin/sh'
+        ]
+        | str join ' '
+        | $"for sh in ($in); do if [ -e $sh ]; then exec $sh; fi; done"
+        ['/bin/sh' -c $cmd]
+    } else {
+        $args
+    }
+    kubectl exec ...$n -it $pod ...$c -- ...$args
 }
 
 # kubectl logs

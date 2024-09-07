@@ -283,7 +283,15 @@ export def --wrapped container-attach [
 ] {
     let ns = $n | with-flag -n
     if ($args | is-empty) {
-        ^$env.CONTCTL ...$ns exec -it $container /bin/sh -c "[ -e /bin/zsh ] && /bin/zsh || [ -e /bin/bash ] && /bin/bash || /bin/sh"
+        let cmd = [
+            '/usr/local/bin/nu'
+            '/bin/nu'
+            '/bin/bash'
+            '/bin/sh'
+        ]
+        | str join ' '
+        | $"for sh in ($in); do if [ -e $sh ]; then exec $sh; fi; done"
+        ^$env.CONTCTL ...$ns exec -it $container /bin/sh -c $cmd
     } else {
         ^$env.CONTCTL ...$ns exec -it $container ...$args
     }
