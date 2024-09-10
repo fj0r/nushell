@@ -2,7 +2,7 @@ export def "nu-complete git log" [] {
     git log -n 32 --pretty=%h»¦«%s
     | lines
     | split column "»¦«" value description
-    | each {|x| $x | update value $"($x.value)"}
+    | each { $"($in.value) # ($in.description)"}
 }
 
 export def "nu-complete git log all" [] {

@@ -1,5 +1,7 @@
-def "nu-complete ps" [] {
-    ps -l | each {|x| { value: $"($x.pid)", description: $x.command } }
+def 'nu-complete ps' [] {
+    ps -l | each {|x|
+        { value: $"($x.pid | fill -c ' ' -w 5) # ($x.name)", description: $x.command }
+    }
 }
 
 export def wait-pid [pid: string@"nu-complete ps"] {
