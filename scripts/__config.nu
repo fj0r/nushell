@@ -46,7 +46,7 @@ use pwd-overlay.nu *
 use network.nu *
 use setup.nu *
 use rustic *
-use ollama *
+use llm *
 use outdent.nu
 use devcontainer *
 

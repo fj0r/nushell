@@ -55,7 +55,6 @@ export def --env "ollama chat" [
     model: string@"nu-complete models"
     message: string
     --image(-i): path
-    --full(-f)
     --reset(-r)
 ] {
     let content = $in | default ""
@@ -69,80 +68,36 @@ export def --env "ollama chat" [
         content: ($message | str replace "{}" $content)
         ...$img
     }
-    if ($env.OLLAMA_CHAT | is-empty) {
+    if ($env.OLLAMA_CHAT | is-empty) or ($model not-in $env.OLLAMA_CHAT) {
         $env.OLLAMA_CHAT = ($env.OLLAMA_CHAT | insert $model [])
     }
     if $reset {
         $env.OLLAMA_CHAT = ($env.OLLAMA_CHAT | update $model [])
+        print '✨'
     }
     $env.OLLAMA_CHAT = ($env.OLLAMA_CHAT | update $model {|x| $x | get $model | append $msg})
+
     let r = http post -t application/json $"($env.OLLAMA_HOST)/api/chat" {
         model: $model
         messages: [
             ...($env.OLLAMA_CHAT | get $model)
             $msg
         ]
-        stream: false
-    }
-    $env.OLLAMA_CHAT = ($env.OLLAMA_CHAT | update $model {|x| $x | get $model | append $r.message})
-    if $full {
-        $r
-    } else {
-        $r.message.content
-    }
-}
-
-
-export def --env "ollama live" [
-    model: string@"nu-complete models"
-    message: string
-    --image(-i): path
-    --full(-f)
-] {
-    let content = $in | default ""
-    let img = if ($image | is-empty) {
-        {}
-    } else {
-        {images: [(open $image | encode base64)]}
-    }
-    let msg = {
-        role: "user"
-        content: ($message | str replace "{}" $content)
-        ...$img
-    }
-    let data = {
-        model: $model
-        messages: [
-            $msg
-        ]
         stream: true
     }
-    curl ...[
-        -sL
-        -X POST
-        -H "Content-Type: application/json"
-        $"($env.OLLAMA_HOST)/api/chat"
-        -d $"($data | to json -r)"
-    ]
-    | from json -o
-    | each { print -n $in.message.content }
-
-    ""
+    | reduce -f {msg: '', token: 0} {|i,a|
+        let x = $i | parse -r '.*?(?<data>\{.*)' | get 0.data | from json
+        let m = $x.message.content
+        print -n $m
+        $a
+        | update msg {|x| $x.msg + $m }
+        | update token {|x| $x.token + 1 }
+    }
+    let r = {role: 'assistant', content: $r.msg, token: $r.token}
+    $env.OLLAMA_CHAT = ($env.OLLAMA_CHAT | update $model {|x| $x | get $model | append $r })
 }
 
-export def similarity [a b] {
-    if ($a | length) != ($b | length) {
-        print "The lengths of the vectors must be equal."
-    }
-    $a | zip $b | reduce -f {p: 0, a: 0, b: 0} {|i,a|
-        {
-            p: ($a.p + ($i.0 * $i.1))
-            a: ($a.a + ($i.0 * $i.0))
-            b: ($a.b + ($i.1 * $i.1))
-        }
-    }
-    | $in.p / (($in.a | math sqrt) * ($in.b | math sqrt))
-}
+
 
 
 def "nu-complete ollama model" [] {
