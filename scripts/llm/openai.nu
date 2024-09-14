@@ -23,6 +23,8 @@ export def --env "openai chat" [
     --image(-i): path
     --reset(-r)
     --forget(-f)
+    --placehold(-p): string = '{}'
+    --debug
 ] {
     let content = $in | default ""
     let img = if ($image | is-empty) {
@@ -32,8 +34,11 @@ export def --env "openai chat" [
     }
     let msg = {
         role: "user"
-        content: ($message | str replace "{}" $content)
+        content: ($message | str replace -m $placehold $content)
         ...$img
+    }
+    if $debug {
+        print $"(ansi grey)($msg.content)(ansi reset)"
     }
     if not $forget {
         if ($env.OPENAI_CHAT | is-empty) or ($model not-in $env.OPENAI_CHAT) {
@@ -79,4 +84,31 @@ export def "openai embed" [
         model: $model, input: [$input], encoding_format: 'float'
     }
     | get data.0.embedding
+}
+
+
+def 'nu-complete role' [ctx] {
+    $env.OPENAI_PROMPT | items {|k, v| {value: $k, description: $v.description? } }
+}
+
+export def 'assistant' [
+    role: string@"nu-complete role"
+    input?: string
+    --model(-m): string@"nu-complete models"
+    --debug
+] {
+    let input = if ($in | is-empty) { $input } else { $in }
+    let placehold = $"<(random chars -l 6)>"
+    let role = $env.OPENAI_PROMPT | get $role
+    let model = if ($model | is-empty) {
+        $role | get model
+    } else {
+        $model
+    }
+    let prompt = $role | get prompt | each {if ($in == '{}') { $placehold } else { $in } } | str join (char newline)
+    if $debug {
+        $input | openai chat $model -p $placehold --debug $prompt
+    } else {
+        $input | openai chat $model -p $placehold $prompt
+    }
 }

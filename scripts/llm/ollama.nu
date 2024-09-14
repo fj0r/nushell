@@ -57,6 +57,8 @@ export def --env "ollama chat" [
     --image(-i): path
     --reset(-r)
     --forget(-f)
+    --placehold(-p): string = '{}'
+    --debug
 ] {
     let content = $in | default ""
     let img = if ($image | is-empty) {
@@ -66,8 +68,11 @@ export def --env "ollama chat" [
     }
     let msg = {
         role: "user"
-        content: ($message | str replace "{}" $content)
+        content: ($message | str replace -m $placehold $content)
         ...$img
+    }
+    if $debug {
+        print $"(ansi grey)($msg.content)(ansi reset)"
     }
     if not $forget {
         if ($env.OLLAMA_CHAT | is-empty) or ($model not-in $env.OLLAMA_CHAT) {

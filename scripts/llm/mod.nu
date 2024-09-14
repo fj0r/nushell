@@ -1,6 +1,7 @@
 export-env {
     use ollama.nu *
     use openai.nu *
+    use prompt.nu *
 }
 
 export use ollama.nu *
@@ -20,3 +21,4 @@ export def 'similarity cosine' [a b] {
     }
     | $in.p / (($in.a | math sqrt) * ($in.b | math sqrt))
 }
+
