@@ -56,6 +56,7 @@ export def --env "ollama chat" [
     message: string
     --image(-i): path
     --reset(-r)
+    --forget(-f)
 ] {
     let content = $in | default ""
     let img = if ($image | is-empty) {
@@ -68,19 +69,21 @@ export def --env "ollama chat" [
         content: ($message | str replace "{}" $content)
         ...$img
     }
-    if ($env.OLLAMA_CHAT | is-empty) or ($model not-in $env.OLLAMA_CHAT) {
-        $env.OLLAMA_CHAT = ($env.OLLAMA_CHAT | insert $model [])
+    if not $forget {
+        if ($env.OLLAMA_CHAT | is-empty) or ($model not-in $env.OLLAMA_CHAT) {
+            $env.OLLAMA_CHAT = ($env.OLLAMA_CHAT | insert $model [])
+        }
+        if $reset {
+            $env.OLLAMA_CHAT = ($env.OLLAMA_CHAT | update $model [])
+            print '✨'
+        }
+        $env.OLLAMA_CHAT = ($env.OLLAMA_CHAT | update $model {|x| $x | get $model | append $msg})
     }
-    if $reset {
-        $env.OLLAMA_CHAT = ($env.OLLAMA_CHAT | update $model [])
-        print '✨'
-    }
-    $env.OLLAMA_CHAT = ($env.OLLAMA_CHAT | update $model {|x| $x | get $model | append $msg})
 
     let r = http post -t application/json $"($env.OLLAMA_HOST)/api/chat" {
         model: $model
         messages: [
-            ...($env.OLLAMA_CHAT | get $model)
+            ...(if $forget { [] } else { $env.OLLAMA_CHAT | get $model })
             $msg
         ]
         stream: true
@@ -93,8 +96,10 @@ export def --env "ollama chat" [
         | update msg {|x| $x.msg + $m }
         | update token {|x| $x.token + 1 }
     }
-    let r = {role: 'assistant', content: $r.msg, token: $r.token}
-    $env.OLLAMA_CHAT = ($env.OLLAMA_CHAT | update $model {|x| $x | get $model | append $r })
+    if not $forget {
+        let r = {role: 'assistant', content: $r.msg, token: $r.token}
+        $env.OLLAMA_CHAT = ($env.OLLAMA_CHAT | update $model {|x| $x | get $model | append $r })
+    }
 }
 
 

@@ -22,6 +22,7 @@ export def --env "openai chat" [
     message: string
     --image(-i): path
     --reset(-r)
+    --forget(-f)
 ] {
     let content = $in | default ""
     let img = if ($image | is-empty) {
@@ -34,21 +35,23 @@ export def --env "openai chat" [
         content: ($message | str replace "{}" $content)
         ...$img
     }
-    if ($env.OPENAI_CHAT | is-empty) or ($model not-in $env.OPENAI_CHAT) {
-        $env.OPENAI_CHAT = ($env.OPENAI_CHAT | insert $model [])
+    if not $forget {
+        if ($env.OPENAI_CHAT | is-empty) or ($model not-in $env.OPENAI_CHAT) {
+            $env.OPENAI_CHAT = ($env.OPENAI_CHAT | insert $model [])
+        }
+        if $reset {
+            $env.OPENAI_CHAT = ($env.OPENAI_CHAT | update $model [])
+            print '✨'
+        }
+        $env.OPENAI_CHAT = ($env.OPENAI_CHAT | update $model {|x| $x | get $model | append $msg})
     }
-    if $reset {
-        $env.OPENAI_CHAT = ($env.OPENAI_CHAT | update $model [])
-        print '✨'
-    }
-    $env.OPENAI_CHAT = ($env.OPENAI_CHAT | update $model {|x| $x | get $model | append $msg})
 
     let r = http post -t application/json --headers [
         Authorization $"Bearer ($env.OPENAI_API_KEY)"
     ] $"($env.OPENAI_HOST)/v1/chat/completions" {
         model: $model
         messages: [
-            ...($env.OPENAI_CHAT | get $model)
+            ...(if $forget { [] } else { $env.OPENAI_CHAT | get $model })
             $msg
         ]
         stream: true
@@ -61,8 +64,10 @@ export def --env "openai chat" [
         | update msg {|x| $x.msg + $m }
         | update token {|x| $x.token + 1 }
     }
-    let r = {role: 'assistant', content: $r.msg, token: $r.token}
-    $env.OPENAI_CHAT = ($env.OPENAI_CHAT | update $model {|x| $x | get $model | append $r })
+    if not $forget {
+        let r = {role: 'assistant', content: $r.msg, token: $r.token}
+        $env.OPENAI_CHAT = ($env.OPENAI_CHAT | update $model {|x| $x | get $model | append $r })
+    }
 }
 
 
