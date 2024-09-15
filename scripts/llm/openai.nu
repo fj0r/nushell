@@ -63,7 +63,9 @@ export def --env "ai chat" [
         stream: true
     }
     | reduce -f {msg: '', token: 0} {|i,a|
-        let x = $i | parse -r '.*?(?<data>\{.*)' | get 0.data | from json
+        let x = $i | parse -r '.*?(?<data>\{.*)'
+        if ($x | is-empty) { return $a }
+        let x = $x | get 0.data | from json
         let m = $x.choices | each { $in.delta.content } | str join
         print -n $m
         $a
