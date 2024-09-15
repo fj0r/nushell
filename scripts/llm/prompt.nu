@@ -33,6 +33,15 @@ export-env {
             ]
             description: 'Summarize from git differences'
         }
+        'api-doc': {
+            prompt: [
+                "{} Inquire about the usage of the API and provide an example."
+                "```"
+                "{}"
+                "```"
+            ]
+            placeholder: [ $expert ]
+        }
         'debug': {
             prompt: [
                 "{} Analyze the causes of the error and provide suggestions for correction."
