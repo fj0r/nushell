@@ -58,6 +58,7 @@ export def --env "ollama chat" [
     --reset(-r)
     --forget(-f)
     --placehold(-p): string = '{}'
+    --out(-o)
     --debug
 ] {
     let content = $in | default ""
@@ -93,6 +94,7 @@ export def --env "ollama chat" [
         ]
         stream: true
     }
+    | lines
     | reduce -f {msg: '', token: 0} {|i,a|
         let x = $i | parse -r '.*?(?<data>\{.*)'
         if ($x | is-empty) { return $a }
@@ -107,7 +109,7 @@ export def --env "ollama chat" [
         let r = {role: 'assistant', content: $r.msg, token: $r.token}
         $env.OLLAMA_CHAT = ($env.OLLAMA_CHAT | update $model {|x| $x | get $model | append $r })
     }
-    $r.msg
+    if $out { $r.msg }
 }
 
 

@@ -24,6 +24,7 @@ export def --env "ai chat" [
     --reset(-r)
     --forget(-f)
     --placehold(-p): string = '{}'
+    --out(-o)
     --debug
 ] {
     let content = $in | default ""
@@ -62,6 +63,7 @@ export def --env "ai chat" [
         ]
         stream: true
     }
+    | lines
     | reduce -f {msg: '', token: 0} {|i,a|
         let x = $i | parse -r '.*?(?<data>\{.*)'
         if ($x | is-empty) { return $a }
@@ -76,7 +78,7 @@ export def --env "ai chat" [
         let r = {role: 'assistant', content: $r.msg, token: $r.token}
         $env.OPENAI_CHAT = ($env.OPENAI_CHAT | update $model {|x| $x | get $model | append $r })
     }
-    $r.msg
+    if $out { $r.msg }
 }
 
 
@@ -98,6 +100,7 @@ def 'nu-complete role' [ctx] {
 export def 'ai do' [
     role: string@"nu-complete role"
     input?: string
+    --out(-o)
     --model(-m): string@"nu-complete models"
     --debug
 ] {
@@ -116,9 +119,6 @@ export def 'ai do' [
             $x
         }
     } | str join (char newline)
-    if $debug {
-        $input | ai chat $model -p $placehold --debug $prompt
-    } else {
-        $input | ai chat $model -p $placehold $prompt
-    }
+
+    $input | ai chat $model -p $placehold --out=$out --debug=$debug $prompt
 }
