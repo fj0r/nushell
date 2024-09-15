@@ -1,22 +1,22 @@
 export-env {
     $env.OPENAI_PROMPT = {
-        'json2SQL': {
+        'json-to-sql': {
             prompt: [
-                "分析以下json内容，转换为创建表的SQL语句:"
+                "Analyze the following JSON data to convert it into a SQL statement for creating a table:"
                 "```"
                 "{}"
                 "```"
-            ]
-            model: 'qwen2:1.5b'
-            description: '分析json内容，转换为创建表的SQL语句'
-        }
-        'zh2en': {
+            ],
+            model: 'qwen2:1.5b',
+            description: 'Analyze JSON content, converting it into a SQL create table statement'
+        },
+        'trans-to-en': {
             prompt: [
-                "将以下内容翻译成英文:"
+                "Translate the following text into English:"
                 "{}"
-            ]
-            model: 'qwen2:1.5b'
-            description: '翻译成英文'
+            ],
+            model: 'qwen2:1.5b',
+            description: 'Translation to English'
         }
 
     }

@@ -17,7 +17,7 @@ def "nu-complete models" [] {
 }
 
 
-export def --env "openai chat" [
+export def --env "ai chat" [
     model: string@"nu-complete models"
     message: string
     --image(-i): path
@@ -76,7 +76,7 @@ export def --env "openai chat" [
 }
 
 
-export def "openai embed" [
+export def "ai embed" [
     model: string@"nu-complete models"
     input: string
 ] {
@@ -91,7 +91,7 @@ def 'nu-complete role' [ctx] {
     $env.OPENAI_PROMPT | items {|k, v| {value: $k, description: $v.description? } }
 }
 
-export def 'assistant' [
+export def 'ai do' [
     role: string@"nu-complete role"
     input?: string
     --model(-m): string@"nu-complete models"
@@ -107,8 +107,8 @@ export def 'assistant' [
     }
     let prompt = $role | get prompt | each {if ($in == '{}') { $placehold } else { $in } } | str join (char newline)
     if $debug {
-        $input | openai chat $model -p $placehold --debug $prompt
+        $input | ai chat $model -p $placehold --debug $prompt
     } else {
-        $input | openai chat $model -p $placehold $prompt
+        $input | ai chat $model -p $placehold $prompt
     }
 }
