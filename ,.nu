@@ -52,6 +52,7 @@ $env.comma = {|_|{
     { from: lg/*, to: modules/lg }
 
     { from: git/*, to: modules/gitv2 }
+    { from: llm/*, to: modules/ai }
 
     { from: nvim/*, to: modules/nvim }
 
