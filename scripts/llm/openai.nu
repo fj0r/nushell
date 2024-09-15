@@ -38,7 +38,8 @@ export def --env "ai chat" [
         ...$img
     }
     if $debug {
-        print $"(ansi grey)($msg.content)(ansi reset)"
+        print $"(ansi grey)($message)\n---\n($placehold)\n---(ansi reset)"
+        print $"(ansi grey)($msg.content)\n---(ansi reset)"
     }
     if not $forget {
         if ($env.OPENAI_CHAT | is-empty) or ($model not-in $env.OPENAI_CHAT) {
@@ -105,7 +106,13 @@ export def 'ai do' [
     } else {
         $model
     }
-    let prompt = $role | get prompt | each {if ($in == '{}') { $placehold } else { $in } } | str join (char newline)
+    let prompt = $role | get prompt | each {|x|
+        if ($x | str replace -ar "['\"`]+" '' | $in == '{}') {
+            $x | str replace '{}' $placehold
+        } else {
+            $x
+        }
+    } | str join (char newline)
     if $debug {
         $input | ai chat $model -p $placehold --debug $prompt
     } else {

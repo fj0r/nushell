@@ -13,7 +13,9 @@ export-env {
         'trans-to-en': {
             prompt: [
                 "Translate the following text into English:"
+                "```"
                 "{}"
+                "```"
             ],
             model: 'qwen2:1.5b',
             description: 'Translation to English'
