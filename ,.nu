@@ -45,7 +45,7 @@ $env.comma = {|_|{
 'manifest'
 | comma val null [
     { from: argx/*, to: modules/argx }
-    { from: ssh/*, to: modules/ssh }
+    { from: ssh/*, to: modules/network, disable: true }
     { from: docker/*, to: modules/docker }
 
     { from: kubernetes/*, to: modules/kubernetes }

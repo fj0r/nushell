@@ -302,7 +302,7 @@ export def --wrapped , [
         use lib/vscode-tasks.nu
         vscode-tasks merge $args (resolve comma) --opt {json: $json}
     } else if $readme {
-        ^$env.EDITOR ([$nu.default-config-dir 'scripts' 'comma' 'README.md'] | path join)
+        cat ([$nu.default-config-dir 'scripts' 'comma' 'README.md'] | path join)
     } else if $edit {
         ^$env.EDITOR ,.nu
     } else if $template {
