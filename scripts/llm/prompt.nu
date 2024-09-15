@@ -27,6 +27,23 @@ export-env {
             ]
             description: 'Summarize from git differences'
         }
+        'debug': {
+            prompt: [
+                "{}Analyze the causes of the error and provide suggestions for correction."
+                "```"
+                "{}"
+                "```"
+            ]
+            placeholder: [
+                {
+                    rust: 'You are a Rust language expert. '
+                    js: 'You are a Javascript language expert. '
+                    python: 'You are a Python language expert. '
+                    nushell: 'You are a Nushell language expert. '
+                }
+            ]
+            description: 'Programming language experts help you debug.'
+        }
         'trans-to-en': {
             prompt: [
                 "Translate the following text into English:"
