@@ -76,6 +76,7 @@ export def --env "ai chat" [
         let r = {role: 'assistant', content: $r.msg, token: $r.token}
         $env.OPENAI_CHAT = ($env.OPENAI_CHAT | update $model {|x| $x | get $model | append $r })
     }
+    $r.msg
 }
 
 

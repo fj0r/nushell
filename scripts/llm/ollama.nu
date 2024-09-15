@@ -107,6 +107,7 @@ export def --env "ollama chat" [
         let r = {role: 'assistant', content: $r.msg, token: $r.token}
         $env.OLLAMA_CHAT = ($env.OLLAMA_CHAT | update $model {|x| $x | get $model | append $r })
     }
+    $r.msg
 }
 
 
