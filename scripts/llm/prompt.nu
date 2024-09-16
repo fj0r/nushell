@@ -26,7 +26,7 @@ export-env {
         }
         'git-diff-summary': {
             prompt: [
-                "Extract commit logs from git differences, summarizing only the content changes in files while ignoring hash changes."
+                "Extract commit logs from git differences, summarizing only the content changes in files while ignoring hash changes, and generate a title."
                 "```"
                 "{}"
                 "```"

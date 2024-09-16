@@ -1,24 +1,24 @@
 export-env {
-    $env.OLLAMA_HOST = "http://localhost:11434"
+    $env.OLLAMA_BASEURL = "http://localhost:11434"
     $env.OLLAMA_CHAT = {}
     $env.OLLAMA_HOME = [$env.HOME .ollama] | path join
 }
 
 def "nu-complete models" [] {
-    http get $"($env.OLLAMA_HOST)/api/tags"
+    http get $"($env.OLLAMA_BASEURL)/api/tags"
     | get models
     | each {{value: $in.name, description: $in.modified_at}}
 }
 
 export def "ollama info" [model: string@"nu-complete models"] {
-    http post -t application/json $"($env.OLLAMA_HOST)/api/show" {name: $model}
+    http post -t application/json $"($env.OLLAMA_BASEURL)/api/show" {name: $model}
 }
 
 export def "ollama embed" [
     model: string@"nu-complete models"
     input: string
 ] {
-    http post -t application/json $"($env.OLLAMA_HOST)/api/embed" {
+    http post -t application/json $"($env.OLLAMA_BASEURL)/api/embed" {
         model: $model, input: [$input]
     }
     | get embeddings.0
@@ -37,7 +37,7 @@ export def "ollama gen" [
     } else {
         {images: [(open $image | encode base64)]}
     }
-    let r = http post -t application/json $"($env.OLLAMA_HOST)/api/generate" {
+    let r = http post -t application/json $"($env.OLLAMA_BASEURL)/api/generate" {
         model: $model
         prompt: ($prompt | str replace "{}" $content)
         stream: false
@@ -86,7 +86,7 @@ export def --env "ollama chat" [
         $env.OLLAMA_CHAT = ($env.OLLAMA_CHAT | update $model {|x| $x | get $model | append $msg})
     }
 
-    let r = http post -t application/json $"($env.OLLAMA_HOST)/api/chat" {
+    let r = http post -t application/json $"($env.OLLAMA_BASEURL)/api/chat" {
         model: $model
         messages: [
             ...(if $forget { [] } else { $env.OLLAMA_CHAT | get $model })

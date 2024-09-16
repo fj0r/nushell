@@ -1,5 +1,5 @@
 export-env {
-    $env.OPENAI_HOST = "http://localhost:11434"
+    $env.OPENAI_BASEURL = "http://localhost:11434/v1"
     $env.OPENAI_CHAT = {}
     $env.OPENAI_API_KEY = 'secret'
     $env.OPENAI_ORG_ID = ''
@@ -12,7 +12,7 @@ def "nu-complete models" [] {
         Authorization $"Bearer ($env.OPENAI_API_KEY)"
         OpenAI-Organization $env.OPENAI_ORG_ID
         OpenAI-Project $env.OPENAI_PROJECT_ID
-    ] $"($env.OPENAI_HOST)/v1/models"
+    ] $"($env.OPENAI_BASEURL)/models"
     | get data.id
 }
 
@@ -55,7 +55,7 @@ export def --env "ai chat" [
 
     let r = http post -t application/json --headers [
         Authorization $"Bearer ($env.OPENAI_API_KEY)"
-    ] $"($env.OPENAI_HOST)/v1/chat/completions" {
+    ] $"($env.OPENAI_BASEURL)/chat/completions" {
         model: $model
         messages: [
             ...(if $forget { [] } else { $env.OPENAI_CHAT | get $model })
@@ -86,7 +86,7 @@ export def "ai embed" [
     model: string@"nu-complete models"
     input: string
 ] {
-    http post -t application/json $"($env.OPENAI_HOST)/v1/embeddings" {
+    http post -t application/json $"($env.OPENAI_BASEURL)/embeddings" {
         model: $model, input: [$input], encoding_format: 'float'
     }
     | get data.0.embedding
