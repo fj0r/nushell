@@ -52,8 +52,8 @@ export def "ollama gen" [
 
 
 export def --env "ollama chat" [
-    model: string@"nu-complete models"
     message: string
+    --model(-m): string@"nu-complete models"
     --image(-i): path
     --reset(-r)
     --forget(-f)
@@ -121,8 +121,8 @@ def "nu-complete ollama model" [] {
 }
 
 export def "ollama export" [
-    model: string@"nu-complete ollama model"
     target
+    --model(-m): string@"nu-complete ollama model"
     --home: string
 ] {
     if ($target | path exists) {

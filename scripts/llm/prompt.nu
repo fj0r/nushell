@@ -16,11 +16,18 @@ export-env {
         }
         'json-to-sql': {
             prompt: [
-                "Analyze the following JSON data to convert it into a SQL statement for creating a table:"
+                "Analyze the following JSON data to convert it into a SQL statement for creating a table, using {} dialect:"
                 "```"
                 "{}"
                 "```"
             ],
+            placeholder: [
+                {
+                    postgres: PostgreSQL
+                    mysql: Mysql
+                    sqlite: Sqlite
+                }
+            ]
             model: 'qwen2:1.5b',
             description: 'Analyze JSON content, converting it into a SQL create table statement'
         }

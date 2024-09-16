@@ -2,6 +2,7 @@ export-env {
     $env.OPENAI_BASEURL = "http://localhost:11434/v1"
     $env.OPENAI_CHAT = {}
     $env.OPENAI_API_KEY = 'secret'
+    $env.OPENAI_TEMPERATURE = 0.5
     $env.OPENAI_ORG_ID = ''
     $env.OPENAI_PROJECT_ID = ''
 }
@@ -18,8 +19,8 @@ def "nu-complete models" [] {
 
 
 export def --env "ai chat" [
-    model: string@"nu-complete models"
     message: string
+    --model(-m): string@"nu-complete models"
     --image(-i): path
     --reset(-r)
     --forget(-f)
@@ -61,6 +62,7 @@ export def --env "ai chat" [
             ...(if $forget { [] } else { $env.OPENAI_CHAT | get $model })
             $msg
         ]
+        temprature: $env.OPENAI_TEMPERATURE
         stream: true
     }
     | lines
@@ -83,8 +85,8 @@ export def --env "ai chat" [
 
 
 export def "ai embed" [
-    model: string@"nu-complete models"
     input: string
+    --model(-m): string@"nu-complete models"
 ] {
     http post -t application/json $"($env.OPENAI_BASEURL)/embeddings" {
         model: $model, input: [$input], encoding_format: 'float'
@@ -135,5 +137,5 @@ export def 'ai do' [
         $a | str replace '{}' (($role.placeholder? | get $i.index) | get $i.item)
     }
 
-    $input | ai chat $model -p $placehold --out=$out --debug=$debug $prompt
+    $input | ai chat -m $model -p $placehold --out=$out --debug=$debug $prompt
 }
