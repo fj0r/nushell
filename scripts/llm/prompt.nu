@@ -5,6 +5,24 @@ export-env {
         python: 'You are a Python language expert.'
         nushell: 'You are a Nushell language expert.'
     }
+    $env.OPENAI_API = {
+        ollama: {
+            baseurl: "http://localhost:11434/v1"
+            temperature:  0.5
+            api_key: ''
+            org_id: ''
+            project_id: ''
+        }
+            chat: [
+                {
+                    model: 'xx'
+                    role: 'user'
+                    message: ''
+                    time: '2024-09-16T14:02:04.423250121'
+                    token: 11
+                }
+            ]
+    }
     $env.OPENAI_PROMPT = {
         'json-to-jsonschema': {
             prompt: [
@@ -16,7 +34,7 @@ export-env {
         }
         'json-to-sql': {
             prompt: [
-                "Analyze the following JSON data to convert it into a SQL statement for creating a table, using {} dialect:"
+                "Analyze the following JSON data to convert it into a SQL statement for creating a table, using {} dialect, do not explain.:"
                 "```"
                 "{}"
                 "```"

@@ -1,4 +1,7 @@
+use common.nu *
+
 export-env {
+    $env.OPENAI_PROVIDER = 'ollama'
     $env.OPENAI_BASEURL = "http://localhost:11434/v1"
     $env.OPENAI_CHAT = {}
     $env.OPENAI_API_KEY = 'secret'
@@ -26,9 +29,21 @@ export def --env "ai chat" [
     --forget(-f)
     --placehold(-p): string = '{}'
     --out(-o)
+    --editor(-e)
+    --temp(-t): string = 'send-message.XXX'
     --debug
 ] {
     let content = $in | default ""
+    let content = if $editor {
+        let tf = mktemp -t $temp
+        $content | save -f $tf
+        ^$env.EDITOR $tf
+        let c = open $tf
+        rm -f $tf
+        $c
+    } else {
+        $content
+    }
     let img = if ($image | is-empty) {
         {}
     } else {
@@ -114,10 +129,15 @@ export def 'ai do' [
     ...args: string@"nu-complete role"
     --out(-o)
     --model(-m): string@"nu-complete models"
+    --editor(-e)
     --debug
 ] {
-    let input = if ($in | is-empty) { $args | last } else { $in }
-    let argv = if ($in | is-empty) { $args | range 1..<-1 } else { $args | range 1.. }
+    let input = if ($in | is-empty) {
+        if $editor { '' } else { $args | last }
+    } else { $in }
+    let argv = if ($in | is-empty) {
+        if $editor { $args | range 1..<-2 } else { $args | range 1..<-1 }
+    } else { $args | range 1.. }
     let role = $env.OPENAI_PROMPT | get $args.0
     let placehold = $"<(random chars -l 6)>"
     let model = if ($model | is-empty) {
@@ -137,5 +157,5 @@ export def 'ai do' [
         $a | str replace '{}' (($role.placeholder? | get $i.index) | get $i.item)
     }
 
-    $input | ai chat -m $model -p $placehold --out=$out --debug=$debug $prompt
+    $input | ai chat -m $model -p $placehold --editor=$editor --temp prompt-XXX --out=$out --debug=$debug $prompt
 }
