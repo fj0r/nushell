@@ -18,6 +18,6 @@ OpenAI and Ollama Clients
 - [x] API management
     - [x] sqlite
     - [x] switching
-    - [ ] del provider/prompt
+    - [x] del provider/prompt
 
 Control some options with the following code.

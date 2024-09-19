@@ -47,6 +47,12 @@ export def "nu-complete provider" [] {
     }
 }
 
+export def "nu-complete prompt" [] {
+    open $env.OPENAI_DB
+    | query db $"select name from prompt"
+    | get name
+}
+
 export def "nu-complete temperature" [] {
     let s = data session
     let tr = ($s.temp_max - $s.temp_min) / 5

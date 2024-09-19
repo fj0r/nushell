@@ -29,6 +29,18 @@ export def 'ai config add prompt' [o] {
     | db-upsert --do-nothing $env.OPENAI_DB 'prompt' 'name'
 }
 
+export def 'ai config del provider' [
+    name: string@"nu-complete provider"
+] {
+    open $env.OPENAI_DB | query db $'delete from provider where name = (Q $name)'
+}
+
+export def 'ai config del prompt' [
+    name: string@"nu-complete prompt"
+] {
+    open $env.OPENAI_DB | query db $'delete from prompt where name = (Q $name)'
+}
+
 export def 'ai config switch temperature' [
     o: string@"nu-complete temperature"
     --global(-g)
