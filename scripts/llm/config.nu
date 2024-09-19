@@ -17,10 +17,16 @@ export def 'ai show tools history' [num=10] {
 }
 
 export def 'ai config add provider' [o] {
-    let o = $o | select name baseurl api_key model_default org_id project_id temp_max
-    data query $"insert into provider \(($o | columns | str join ',')\)
-        VALUES \(($o | values | each {Q $in} | str join ',')\)
-        ON CONFLICT\(name\) DO NOTHING;"
+    $o | select name baseurl api_key model_default org_id project_id temp_max
+    | db-upsert --do-nothing $env.OPENAI_DB 'provider' 'name'
+}
+
+export def 'ai config add prompt' [o] {
+    {system: '', placeholder: '', description: ''}
+    | merge $o
+    | update placeholder {|x| $x.placeholder | to json -r}
+    | select name system template placeholder description
+    | db-upsert --do-nothing $env.OPENAI_DB 'prompt' 'name'
 }
 
 export def 'ai config switch provider' [

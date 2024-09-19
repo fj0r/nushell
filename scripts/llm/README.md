@@ -8,12 +8,12 @@ OpenAI and Ollama Clients
   - Refer to [prompt.nu](prompt.nu) for definition guidelines
   - Default model can be overridden using `--model`
   - line containing placeholders in the prompt can only include `{}` and quotation marks
-  - [ ] template placeholders default ""
+  - [x] template placeholders default ""
 - [ ] output language
 - Importing and exporting of Ollama models
 - Connection details managed through environment variables
 - [x] ai do support input long text using editor
-- [ ] system context setting
+- [x] system context setting
 - [ ] temperature range
 - [x] API management
     - [x] sqlite
