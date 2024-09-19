@@ -47,7 +47,7 @@ export def --env "ai chat" [
     let img = if ($image | is-empty) {
         {}
     } else {
-        {images: [(open $image | encode base64)]}
+        {images: [(open $image | encode new-base64)]}
     }
     let msg = {
         role: "user"

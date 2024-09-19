@@ -69,7 +69,7 @@ def __cwdhist_switching [] {
 export def empty-sqlite [] {
     # sqlite3 empty.db "VACUUM;"; cat empty.db | gzip | encode base64
     'H4sIAAAAAAAAAwsO9MksSVVIyy/KTSxRMGYQYGBkZHBQUGBgYGCEYhhAZhMLGBn0ihbwglgCZOgeBaNgFIyCUTAKRsEoGAWjYBSMglEwCkYBVQAANHgbMAAQAAA='
-    | decode base64 --binary | gzip -d
+    | decode new-base64 | gzip -d
 }
 
 export def 'cwd history delete' [cwd] {
