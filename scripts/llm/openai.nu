@@ -6,13 +6,6 @@ export-env {
     $env.OPENAI_SESSION = date now | format date '%FT%H:%M:%S.%f'
     data init
     data session $env.OPENAI_SESSION
-
-    $env.OPENAI_BASEURL = "http://localhost:11434/v1"
-    $env.OPENAI_CHAT = {}
-    $env.OPENAI_API_KEY = 'secret'
-    $env.OPENAI_TEMPERATURE = 0.5
-    $env.OPENAI_ORG_ID = ''
-    $env.OPENAI_PROJECT_ID = ''
 }
 
 
@@ -26,7 +19,7 @@ def "nu-complete models" [] {
     | get data.id
 }
 
-export def 'ai set model' [
+export def 'ai config set model' [
     model: string@"nu-complete models"
     --global(-g)
 ] {
@@ -39,8 +32,8 @@ export def 'ai set model' [
     }
 }
 
-export def 'ai add provider' [o] {
-    let o = $o | select name baseurl api_key model org_id project_id
+export def 'ai config add provider' [o] {
+    let o = $o | select name baseurl api_key model org_id project_id temp_max
     data query $"insert into provider \(($o | columns | str join ',')\)
         VALUES \(($o | values | each {$"'($in)'"} | str join ',')\)
         ON CONFLICT\(name\) DO NOTHING;"
@@ -182,7 +175,7 @@ export def 'ai do' [
 }
 
 def "nu-complete config" [context] {
-    let ctx = $context | split row -r '\s+' | range 2..
+    let ctx = $context | split row -r '\s+' | range 3..
     if ($ctx | length) < 2 {
         return [provider, prompt]
     } else {
@@ -190,7 +183,7 @@ def "nu-complete config" [context] {
     }
 }
 
-export def "ai config" [
+export def "ai config edit" [
     table: string@"nu-complete config"
     pk: string@"nu-complete config"
 ] {
