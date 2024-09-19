@@ -3,8 +3,8 @@ use common.nu *
 export def --env init [] {
     let db = [$nu.data-dir 'openai.db'] | path join
     $env.OPENAI_DB = $db
-    if ($db | path exists) { return }
-    {foo: bar} | into sqlite -t _ $db
+    if ($env.OPENAI_DB | path exists) { return }
+    {foo: bar} | into sqlite -t _ $env.OPENAI_DB
     for s in [
         "CREATE TABLE IF NOT EXISTS provider (
             name TEXT PRIMARY KEY,
@@ -18,11 +18,10 @@ export def --env init [] {
             project_id TEXT DEFAULT ''
         );"
         "CREATE TABLE IF NOT EXISTS sessions (
-            id TEXT,
+            created TEXT,
             provider TEXT NOT NULL,
             model TEXT NOT NULL,
-            temperature REAL NOT NULL,
-            created TEXT
+            temperature REAL NOT NULL
         );"
         "CREATE TABLE IF NOT EXISTS prompt (
             name TEXT PRIMARY KEY,
@@ -51,7 +50,17 @@ export def --env init [] {
         ('synonyms', '', '解释以下词语的区别，并介绍相关的近义词和反义词\n```{}```', '', '近义词解析'),
         ('trans-to', '', 'Translate the following text into {}:\n```\n{}\n```', '[{\"en\":\"English\",\"zh\":\"Chinese\"}]', 'Translation into the specified language');"
     ] {
-        open $db | query db $s
+        open $env.OPENAI_DB | query db $s
+    }
+}
+
+export def session [created] {
+    for s in [
+        $"INSERT INTO sessions \(created, provider, model, temperature\)
+        SELECT '($created)', name, model, temperature
+        FROM provider where name = '($env.OPENAI_PROVIDER)';"
+    ] {
+        open $env.OPENAI_DB | query db $s
     }
 }
 
@@ -66,3 +75,11 @@ export def edit [table pk] {
     | db-upsert $env.OPENAI_DB $table name $pk
 }
 
+export def query [s] {
+    let r = open $env.OPENAI_DB | query db $s
+    if ($r | length) > 0 {
+        $r | first
+    } else {
+        {}
+    }
+}

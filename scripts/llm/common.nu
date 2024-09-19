@@ -30,6 +30,6 @@ export def db-upsert [db table pkn pk] {
     let r = $in
     open $db | query db $"
         INSERT INTO ($table)\(($r | columns | str join ',')\)
-        VALUES\(($r | values | each { $"'($in)'"} | str join ',')\)
+        VALUES\(($r | values | each {$"'($in)'"} | str join ',')\)
         ON CONFLICT\(($pkn)\) DO UPDATE SET ($r| items {|k,v | $"($k)='($v)'" } | str join ',');"
 }
