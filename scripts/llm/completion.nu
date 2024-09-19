@@ -47,3 +47,8 @@ export def "nu-complete provider" [] {
     }
 }
 
+export def "nu-complete temperature" [] {
+    let s = data session
+    let tr = ($s.temp_max - $s.temp_min) / 5
+    0..5 | each { $in * $tr }
+}

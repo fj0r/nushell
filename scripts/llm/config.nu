@@ -29,6 +29,19 @@ export def 'ai config add prompt' [o] {
     | db-upsert --do-nothing $env.OPENAI_DB 'prompt' 'name'
 }
 
+export def 'ai config switch temperature' [
+    o: string@"nu-complete temperature"
+    --global(-g)
+] {
+    if $global {
+        data query $"update provider set temp_default = '($o)'
+            where name = \(select provider from sessions where created = '($env.OPENAI_SESSION)'\)"
+    } else {
+        data query $"update sessions set temperature = '($o)'
+            where created = '($env.OPENAI_SESSION)'"
+    }
+}
+
 export def 'ai config switch provider' [
     o: string@"nu-complete provider"
     --global(-g)

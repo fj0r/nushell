@@ -56,7 +56,7 @@ export def --env "ai chat" [
             ...(if $forget { [] } else { data messages })
             $msg
         ]
-        temprature: $s.temperature
+        temperature: $s.temperature
         stream: true
     }
     | lines
