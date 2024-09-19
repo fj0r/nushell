@@ -15,9 +15,9 @@ OpenAI and Ollama Clients
 - [x] ai do support input long text using editor
 - [ ] system context setting
 - [ ] temperature range
-- [ ] API management
-    - [ ] sqlite
-    - [ ] switching
+- [x] API management
+    - [x] sqlite
+    - [x] switching
 
 Control some options with the following code.
 ```

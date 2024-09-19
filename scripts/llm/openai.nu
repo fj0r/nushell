@@ -93,7 +93,7 @@ export def 'ai do' [
     let s = data session
     let role = open $env.OPENAI_DB | query db $"select * from prompt where name = '($args.0)'" | first
     let placehold = $"<(random chars -l 6)>"
-    let prompt = $role | get template | each {|x|
+    let prompt = $role | get template | lines | each {|x|
         if ($x | str replace -ar "['\"`]+" '' | $in == '{}') {
             $x | str replace '{}' $placehold
         } else {
