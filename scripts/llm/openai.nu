@@ -37,8 +37,13 @@ export def --env "ai chat" [
     let ct = $message | str replace -m $placehold $content
     let msg = { role: "user", content: $ct, ...$img }
     if $debug {
-        print $"(ansi grey)($message)\n---\n($placehold)\n---(ansi reset)"
-        print $"(ansi grey)($msg.content)\n---(ansi reset)"
+        let xxx = [
+            '' 'message' $message
+            'placeholder' $placehold
+            'content' $msg.content
+            'final' $ct
+        ] | str join "\n------\n"
+        print $"(ansi grey)($xxx)(ansi reset)"
     }
     if not $forget {
         data record $s.created $s.provider $model 'user' $ct 0 $tag
@@ -98,7 +103,8 @@ export def 'ai do' [
     let plc = $role.placeholder? | from json
     let prompt = $argv | enumerate
     | reduce -f $prompt {|i,a|
-        $a | str replace '{}' (($plc | get $i.index) | get $i.item)
+        let x = ($plc | get $i.index) | get $i.item
+        $a | str replace '{}' $x
     }
 
     $input | ai chat -m $model -p $placehold --editor=$editor --temp prompt-XXX --out=$out --tag tool --debug=$debug $prompt
