@@ -16,12 +16,11 @@ export def 'nu-complete role' [ctx] {
     let len = $args | length
     match $len {
         1 => {
-            $env.OPENAI_PROMPT | items {|k, v| {value: $k, description: $v.description? } }
+            open $env.OPENAI_DB | query db "select name as value, description from prompt"
         }
         _ => {
-            let role = $env.OPENAI_PROMPT | get $args.0
-            let ph = $role.placeholder? | get ($len - 2)
-            $ph | columns
+            let d = open $env.OPENAI_DB | query db $"select * from prompt where name = '($args.0)'"
+            $d | first | get placeholder | from json | get ($len - 2) | columns
         }
     }
 }

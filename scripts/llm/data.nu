@@ -43,7 +43,8 @@ export def --env init [] {
             role TEXT,
             content TEXT,
             token INTEGER,
-            created TEXT
+            created TEXT,
+            tag TEXT
         );"
         "CREATE INDEX idx_messages ON messages (session_id);"
 
@@ -52,7 +53,7 @@ export def --env init [] {
         "INSERT INTO prompt (name, system, template, placeholder, description) VALUES
         ('json-to-jsonschema', '', 'Analyze the following JSON data to convert it into a jsonschema:\n```{}```', '', 'Analyze JSON content, converting it into a jsonschema'),
         ('json-to-sql', '', 'Analyze the following JSON data to convert it into a SQL statement for creating a table, using {} dialect, do not explain.:\n```\n{}\n```', '[{\"postgres\":\"PostgreSQL\",\"mysql\":\"Mysql\",\"sqlite\":\"Sqlite\"}]', 'Analyze JSON content, converting it into a SQL create table statement'),
-        ('json-to', '', 'Analyze the following JSON data to convert it into a {} {}:\n```\n{}\n```', '[{\"rust\":\"You are a Rust language expert.\",\"js\":\"You are a Javascript language expert.\",\"python\":\"You are a Python language expert.\",\"nushell\":\"You are a Nushell language expert.\"},{\"type\":\"Type\",\"struct\":\"Struct\",\"class\":\"Class\",\"trait\":\"Trait\",\"interface\":\"Interface\"}]', 'Analyze JSON content, converting it into'),
+        ('json-to', '', 'Analyze the following JSON data to convert it into a {} {}:\n```\n{}\n```', '[{\"rust\":\"Rust\",\"js\":\"Javascript\",\"python\":\"Python\",\"nushell\":\"Nushell\"},{\"type\":\"Type\",\"struct\":\"Struct\",\"class\":\"Class\",\"trait\":\"Trait\",\"interface\":\"Interface\"}]', 'Analyze JSON content, converting it into'),
         ('git-diff-summary', '', 'Extract commit logs from git differences, summarizing only the content changes in files while ignoring hash changes, and generate a title.\n```\n{}\n```', '', 'Summarize from git differences'),
         ('api-doc', '', '{} Inquire about the usage of the API and provide an example.\n```\n{}\n```', '[{\"rust\":\"You are a Rust language expert.\",\"js\":\"You are a Javascript language expert.\",\"python\":\"You are a Python language expert.\",\"nushell\":\"You are a Nushell language expert.\"}]', ''),
         ('debug', '', '{} Analyze the causes of the error and provide suggestions for correction.\n```\n{}\n```', '[{\"rust\":\"You are a Rust language expert.\",\"js\":\"You are a Javascript language expert.\",\"python\":\"You are a Python language expert.\",\"nushell\":\"You are a Nushell language expert.\"}]', 'Programming language experts help you debug.'),
@@ -99,10 +100,10 @@ export def session [] {
         on p.name = s.provider where s.created = (Q $env.OPENAI_SESSION);"
 }
 
-export def record [session, provider, model, role, content, token] {
+export def record [session, provider, model, role, content, token, tag] {
     let n = date now | format date '%FT%H:%M:%S.%f'
-    query $"insert into messages \(session_id, provider, model, role, content, token, created\)
-        VALUES \((Q $session), (Q $provider), (Q $model), (Q $role), (Q $content), (Q $token), (Q $n)\);"
+    query $"insert into messages \(session_id, provider, model, role, content, token, created, tag\)
+        VALUES \((Q $session), (Q $provider), (Q $model), (Q $role), (Q $content), (Q $token), (Q $n), (Q $tag)\);"
 }
 
 export def messages [num = 10] {

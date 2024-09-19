@@ -18,6 +18,7 @@ export def --env "ai chat" [
     --out(-o)
     --editor(-e)
     --temp(-t): string = 'send-message.XXX'
+    --tag: string = ''
     --debug
 ] {
     let content = $in | default ""
@@ -40,7 +41,7 @@ export def --env "ai chat" [
         print $"(ansi grey)($msg.content)\n---(ansi reset)"
     }
     if not $forget {
-        data record $s.created $s.provider $model 'user' $ct 0
+        data record $s.created $s.provider $model 'user' $ct 0 $tag
     }
     let r = http post -t application/json --headers [
         Authorization $"Bearer ($s.api_key)"
@@ -65,23 +66,11 @@ export def --env "ai chat" [
         | update token {|x| $x.token + 1 }
     }
     if not $forget {
-        data record $s.created $s.provider $model 'assistant' $r.msg $r.token
+        data record $s.created $s.provider $model 'assistant' $r.msg $r.token $tag
     }
     if $out { $r.msg }
 }
 
-
-export def "ai embed" [
-    input: string
-    --model(-m): string@"nu-complete models"
-] {
-    let s = data session
-    let model = if ($model | is-empty) { $s.model } else { $model }
-    http post -t application/json $"($s.baseurl)/embeddings" {
-        model: $model, input: [$input], encoding_format: 'float'
-    }
-    | get data.0.embedding
-}
 
 export def 'ai do' [
     ...args: string@"nu-complete role"
@@ -96,20 +85,33 @@ export def 'ai do' [
     let argv = if ($in | is-empty) {
         if $editor { $args | range 1..<-2 } else { $args | range 1..<-1 }
     } else { $args | range 1.. }
-    let role = $env.OPENAI_PROMPT | get $args.0
+    let s = data session
+    let role = open $env.OPENAI_DB | query db $"select * from prompt where name = '($args.0)'" | first
     let placehold = $"<(random chars -l 6)>"
-    let prompt = $role | get prompt | each {|x|
+    let prompt = $role | get template | each {|x|
         if ($x | str replace -ar "['\"`]+" '' | $in == '{}') {
             $x | str replace '{}' $placehold
         } else {
             $x
         }
     } | str join (char newline)
+    let plc = $role.placeholder? | from json
     let prompt = $argv | enumerate
     | reduce -f $prompt {|i,a|
-        $a | str replace '{}' (($role.placeholder? | get $i.index) | get $i.item)
+        $a | str replace '{}' (($plc | get $i.index) | get $i.item)
     }
 
-    $input | ai chat -m $model -p $placehold --editor=$editor --temp prompt-XXX --out=$out --debug=$debug $prompt
+    $input | ai chat -m $model -p $placehold --editor=$editor --temp prompt-XXX --out=$out --tag tool --debug=$debug $prompt
 }
 
+export def "ai embed" [
+    input: string
+    --model(-m): string@"nu-complete models"
+] {
+    let s = data session
+    let model = if ($model | is-empty) { $s.model } else { $model }
+    http post -t application/json $"($s.baseurl)/embeddings" {
+        model: $model, input: [$input], encoding_format: 'float'
+    }
+    | get data.0.embedding
+}
