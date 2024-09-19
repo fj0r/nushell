@@ -13,7 +13,6 @@ export def --env "ai chat" [
     message: string
     --model(-m): string@"nu-complete models"
     --image(-i): path
-    --reset(-r)
     --forget(-f)
     --placehold(-p): string = '{}'
     --out(-o)
@@ -42,13 +41,6 @@ export def --env "ai chat" [
         print $"(ansi grey)($msg.content)\n---(ansi reset)"
     }
     if not $forget {
-        if ($env.OPENAI_CHAT | is-empty) or ($model not-in $env.OPENAI_CHAT) {
-            $env.OPENAI_CHAT = ($env.OPENAI_CHAT | insert $model [])
-        }
-        if $reset {
-            $env.OPENAI_CHAT = ($env.OPENAI_CHAT | update $model [])
-            print '✨'
-        }
         $env.OPENAI_CHAT = ($env.OPENAI_CHAT | update $model {|x| $x | get $model | append $msg})
     }
 

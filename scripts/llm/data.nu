@@ -10,8 +10,8 @@ export def --env init [] {
             name TEXT PRIMARY KEY,
             baseurl TEXT NOT NULL,
             api_key TEXT DEFAULT '',
-            model TEXT DEFAULT 'qwen2:1.5b',
-            temperature REAL DEFAULT 0.5,
+            model_default TEXT DEFAULT 'qwen2:1.5b',
+            temp_default REAL DEFAULT 0.5,
             temp_min REAL DEFAULT 0,
             temp_max REAL NOT NULL,
             org_id TEXT DEFAULT '',
@@ -40,7 +40,7 @@ export def --env init [] {
             token INTEGER,
             created TEXT
         );"
-        "INSERT INTO provider (name, baseurl, temp_max) VALUES ('ollama', 'http://localhost:11434/v1', 1);"
+        "INSERT INTO provider (name, baseurl, temp_max, active) VALUES ('ollama', 'http://localhost:11434/v1', 1, 1);"
 
         "INSERT INTO prompt (name, system, template, placeholder, description) VALUES
         ('json-to-jsonschema', '', 'Analyze the following JSON data to convert it into a jsonschema:\n```{}```', '', 'Analyze JSON content, converting it into a jsonschema'),
@@ -59,7 +59,7 @@ export def --env init [] {
 export def make-session [created] {
     for s in [
         $"INSERT INTO sessions \(created, provider, model, temperature\)
-        SELECT '($created)', name, model, temperature
+        SELECT '($created)', name, model_default, temp_default
         FROM provider where active = 1 limit 1;"
     ] {
         open $env.OPENAI_DB | query db $s
@@ -89,4 +89,11 @@ export def query [s] {
 export def session [] {
     query $"select * from provider as p join sessions as s
         on p.name = s.provider where s.created = '($env.OPENAI_SESSION)';"
+}
+
+export def record [role, message, token=0] {
+    let s = session
+    let n = date now | format date '%FT%H:%M:%S.%f'
+    query $"insert into messages \(session_id,provider,model, role, message, token, created\)
+        VALUES \('($s.created)', '($s.provider)', '($s.model)', '($role)', '($message)', '($token)'\);"
 }
