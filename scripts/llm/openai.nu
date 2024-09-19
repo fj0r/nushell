@@ -1,4 +1,5 @@
 use common.nu *
+use data.nu *
 
 export-env {
     $env.OPENAI_PROVIDER = 'ollama'
@@ -8,6 +9,7 @@ export-env {
     $env.OPENAI_TEMPERATURE = 0.5
     $env.OPENAI_ORG_ID = ''
     $env.OPENAI_PROJECT_ID = ''
+    init
 }
 
 
