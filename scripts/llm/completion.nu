@@ -1,6 +1,7 @@
+use data.nu *
+
 export def "nu-complete models" [] {
-    let r = data query $"select * from provider as p join sessions as s
-        on p.name = s.provider where s.created = '($env.OPENAI_SESSION)';"
+    let r = data session
     http get --headers [
         Authorization $"Bearer ($r.api_key)"
         OpenAI-Organization $r.org_id

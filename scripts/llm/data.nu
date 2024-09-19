@@ -56,7 +56,7 @@ export def --env init [] {
     }
 }
 
-export def session [created] {
+export def make-session [created] {
     for s in [
         $"INSERT INTO sessions \(created, provider, model, temperature\)
         SELECT '($created)', name, model, temperature
@@ -84,4 +84,9 @@ export def query [s] {
     } else {
         {}
     }
+}
+
+export def session [] {
+    query $"select * from provider as p join sessions as s
+        on p.name = s.provider where s.created = '($env.OPENAI_SESSION)';"
 }

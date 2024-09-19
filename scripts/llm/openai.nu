@@ -6,7 +6,7 @@ export use config.nu *
 export-env {
     $env.OPENAI_SESSION = date now | format date '%FT%H:%M:%S.%f'
     data init
-    data session $env.OPENAI_SESSION
+    data make-session $env.OPENAI_SESSION
 }
 
 export def --env "ai chat" [
