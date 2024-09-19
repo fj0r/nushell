@@ -31,28 +31,26 @@ export def --env "ai chat" [
     } else {
         {images: [(open $image | encode new-base64)]}
     }
-    let msg = {
-        role: "user"
-        content: ($message | str replace -m $placehold $content)
-        ...$img
-    }
+    let s = data session
+    let model = if ($model | is-empty) { $s.model } else { $model }
+    let ct = $message | str replace -m $placehold $content
+    let msg = { role: "user", content: $ct, ...$img }
     if $debug {
         print $"(ansi grey)($message)\n---\n($placehold)\n---(ansi reset)"
         print $"(ansi grey)($msg.content)\n---(ansi reset)"
     }
     if not $forget {
-        $env.OPENAI_CHAT = ($env.OPENAI_CHAT | update $model {|x| $x | get $model | append $msg})
+        data record $s.created $s.provider $model 'user' $ct 0
     }
-
     let r = http post -t application/json --headers [
-        Authorization $"Bearer ($env.OPENAI_API_KEY)"
-    ] $"($env.OPENAI_BASEURL)/chat/completions" {
+        Authorization $"Bearer ($s.api_key)"
+    ] $"($s.baseurl)/chat/completions" {
         model: $model
         messages: [
-            ...(if $forget { [] } else { $env.OPENAI_CHAT | get $model })
+            ...(if $forget { [] } else { data messages })
             $msg
         ]
-        temprature: $env.OPENAI_TEMPERATURE
+        temprature: $s.temprature
         stream: true
     }
     | lines
@@ -67,8 +65,7 @@ export def --env "ai chat" [
         | update token {|x| $x.token + 1 }
     }
     if not $forget {
-        let r = {role: 'assistant', content: $r.msg, token: $r.token}
-        $env.OPENAI_CHAT = ($env.OPENAI_CHAT | update $model {|x| $x | get $model | append $r })
+        data record $s.created $s.provider $model 'assistant' $r.msg $r.token
     }
     if $out { $r.msg }
 }
@@ -78,7 +75,9 @@ export def "ai embed" [
     input: string
     --model(-m): string@"nu-complete models"
 ] {
-    http post -t application/json $"($env.OPENAI_BASEURL)/embeddings" {
+    let s = data session
+    let model = if ($model | is-empty) { $s.model } else { $model }
+    http post -t application/json $"($s.baseurl)/embeddings" {
         model: $model, input: [$input], encoding_format: 'float'
     }
     | get data.0.embedding
@@ -99,11 +98,6 @@ export def 'ai do' [
     } else { $args | range 1.. }
     let role = $env.OPENAI_PROMPT | get $args.0
     let placehold = $"<(random chars -l 6)>"
-    let model = if ($model | is-empty) {
-        $role | get model
-    } else {
-        $model
-    }
     let prompt = $role | get prompt | each {|x|
         if ($x | str replace -ar "['\"`]+" '' | $in == '{}') {
             $x | str replace '{}' $placehold

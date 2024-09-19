@@ -1,12 +1,12 @@
 use data.nu *
 
 export def "nu-complete models" [] {
-    let r = data session
+    let s = data session
     http get --headers [
-        Authorization $"Bearer ($r.api_key)"
-        OpenAI-Organization $r.org_id
-        OpenAI-Project $r.project_id
-    ] $"($r.baseurl)/models"
+        Authorization $"Bearer ($s.api_key)"
+        OpenAI-Organization $s.org_id
+        OpenAI-Project $s.project_id
+    ] $"($s.baseurl)/models"
     | get data.id
 }
 
@@ -33,6 +33,18 @@ export def "nu-complete config" [context] {
         return [provider, prompt]
     } else {
         open $env.OPENAI_DB | query db $'select name from ($ctx.0)' | get name
+    }
+}
+
+export def "nu-complete provider" [] {
+    let current = open $env.OPENAI_DB
+    | query db $"select provider from sessions where created = '($env.OPENAI_SESSION)'"
+    | get provider
+    open $env.OPENAI_DB | query db $'select name, active from provider'
+    | each {|x|
+        let a = if $x.active > 0 {'*'} else {''}
+        let c = if $x.name in $current {'+'} else {''}
+        {value: $x.name, description: $"($c)($a)"}
     }
 }
 

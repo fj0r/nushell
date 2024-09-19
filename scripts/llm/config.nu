@@ -1,6 +1,10 @@
 use data.nu
 use completion.nu *
 
+export def 'ai show session' [] {
+    data session
+}
+
 export def 'ai config add provider' [o] {
     let o = $o | select name baseurl api_key model_default org_id project_id temp_max
     data query $"insert into provider \(($o | columns | str join ',')\)
@@ -8,11 +12,21 @@ export def 'ai config add provider' [o] {
         ON CONFLICT\(name\) DO NOTHING;"
 }
 
-export def 'ai config switch provider' [o] {
-    let o = $o | select name baseurl api_key model_default org_id project_id temp_max
-    data query $"insert into provider \(($o | columns | str join ',')\)
-        VALUES \(($o | values | each {$"'($in)'"} | str join ',')\)
-        ON CONFLICT\(name\) DO NOTHING;"
+export def 'ai config switch provider' [
+    o: string@"nu-complete provider"
+    --global(-g)
+] {
+    if $global {
+        let tx = $"BEGIN;
+            update provider set active = 0;
+            update provider set active = 1 where name = '($o)';
+            COMMIT;"
+        data query $"update provider set active = 0;"
+        data query $"update provider set active = 1 where name = '($o)';"
+    } else {
+        data query $"update sessions set provider = '($o)'
+            where created = '($env.OPENAI_SESSION)'"
+    }
 }
 
 export def 'ai config set model' [

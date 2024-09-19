@@ -36,7 +36,7 @@ export def --env init [] {
             provider TEXT,
             model TEXT,
             role TEXT,
-            message TEXT,
+            content TEXT,
             token INTEGER,
             created TEXT
         );"
@@ -91,9 +91,12 @@ export def session [] {
         on p.name = s.provider where s.created = '($env.OPENAI_SESSION)';"
 }
 
-export def record [role, message, token=0] {
-    let s = session
+export def record [session, provider, model, role, content, token=0] {
     let n = date now | format date '%FT%H:%M:%S.%f'
-    query $"insert into messages \(session_id,provider,model, role, message, token, created\)
-        VALUES \('($s.created)', '($s.provider)', '($s.model)', '($role)', '($message)', '($token)'\);"
+    query $"insert into messages \(session_id,provider,model, role, content, token, created\)
+        VALUES \('($session)', '($provider)', '($model)', '($role)', '($content)', '($token)'\);"
+}
+
+export def messages [num = 10] {
+    query $"select * from messages where session_id = '($env.OPENAI_SESSION)' limit ($num)"
 }
