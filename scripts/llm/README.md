@@ -9,11 +9,10 @@ OpenAI and Ollama Clients
   - Default model can be overridden using `--model`
   - line containing placeholders in the prompt can only include `{}` and quotation marks
   - [ ] template placeholders default ""
-  - [x] edit prompt using $EDITOR
 - [ ] output language
 - Importing and exporting of Ollama models
 - Connection details managed through environment variables
-- [ ] ai do support input long text using editor
+- [x] ai do support input long text using editor
 - [ ] system context setting
 - [ ] temperature range
 - [ ] API management

@@ -3,13 +3,14 @@ use data.nu *
 
 export-env {
     $env.OPENAI_PROVIDER = 'ollama'
+    init
+
     $env.OPENAI_BASEURL = "http://localhost:11434/v1"
     $env.OPENAI_CHAT = {}
     $env.OPENAI_API_KEY = 'secret'
     $env.OPENAI_TEMPERATURE = 0.5
     $env.OPENAI_ORG_ID = ''
     $env.OPENAI_PROJECT_ID = ''
-    init
 }
 
 

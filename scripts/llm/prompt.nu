@@ -79,13 +79,17 @@ export-env {
         }
         'trans-to-en': {
             prompt: [
-                "Translate the following text into English:"
+                "Translate the following text into {}:"
                 "```"
                 "{}"
                 "```"
             ],
+            placeholder: [{
+                en: English
+                zh: Chinese
+            }]
             model: 'qwen2:1.5b',
-            description: 'Translation to English'
+            description: 'Translation into the specified language'
         }
     }
 }
