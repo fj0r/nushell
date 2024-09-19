@@ -1,9 +1,9 @@
 use common.nu *
-use data.nu *
+use data.nu
 
 export-env {
     $env.OPENAI_PROVIDER = 'ollama'
-    init
+    data init
 
     $env.OPENAI_BASEURL = "http://localhost:11434/v1"
     $env.OPENAI_CHAT = {}
@@ -24,6 +24,22 @@ def "nu-complete models" [] {
 }
 
 
+def "nu-complete config" [context] {
+    let ctx = $context | split row -r '\s+' | range 2..
+    if ($ctx | length) < 2 {
+        return [provider, prompt]
+    } else {
+        open $env.OPENAI_DB | query db $'select name from ($ctx.0)' | get name
+    }
+}
+
+export def "ai config" [
+    table: string@"nu-complete config"
+    pk: string@"nu-complete config"
+] {
+    data edit $table $pk
+}
+
 export def --env "ai chat" [
     message: string
     --model(-m): string@"nu-complete models"
@@ -38,12 +54,7 @@ export def --env "ai chat" [
 ] {
     let content = $in | default ""
     let content = if $editor {
-        let tf = mktemp -t $temp
-        $content | save -f $tf
-        ^$env.EDITOR $tf
-        let c = open $tf
-        rm -f $tf
-        $c
+        $content | block-editor $temp
     } else {
         $content
     }

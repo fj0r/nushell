@@ -15,3 +15,21 @@ export def 'similarity cosine' [a b] {
 export def 'json-to-string' [json] {
     $json | to json -r | str replace '"' '\"' -a
 }
+
+export def block-editor [temp] {
+    let content = $in
+    let tf = mktemp -t $temp
+    $content | save -f $tf
+    ^$env.EDITOR $tf
+    let c = open $tf --raw
+    rm -f $tf
+    $c
+}
+
+export def db-upsert [db table pkn pk] {
+    let r = $in
+    open $db | query db $"
+        INSERT INTO ($table)\(($r | columns | str join ',')\)
+        VALUES\(($r | values | each { $"'($in)'"} | str join ',')\)
+        ON CONFLICT\(($pkn)\) DO UPDATE SET ($r| items {|k,v | $"($k)='($v)'" } | str join ',');"
+}

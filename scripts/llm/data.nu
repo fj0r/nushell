@@ -1,3 +1,5 @@
+use common.nu *
+
 export def --env init [] {
     let db = [$nu.data-dir 'openai.db'] | path join
     $env.OPENAI_DB = $db
@@ -52,3 +54,15 @@ export def --env init [] {
         open $db | query db $s
     }
 }
+
+export def edit [table pk] {
+    open $env.OPENAI_DB
+    | query db $"select * from ($table) where name = '($pk)'"
+    | first
+    | to yaml
+    | $"### config ($table)#($pk) \n($in)"
+    | block-editor $"config-($table).XXX.yml"
+    | from yaml
+    | db-upsert $env.OPENAI_DB $table name $pk
+}
+
