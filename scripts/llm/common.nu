@@ -26,10 +26,15 @@ export def block-editor [temp] {
     $c
 }
 
+export def Q [...t] {
+    let s = $t | str join '' | str replace -a "'" "''"
+    $"'($s)'"
+}
+
 export def db-upsert [db table pkn pk] {
     let r = $in
     open $db | query db $"
         INSERT INTO ($table)\(($r | columns | str join ',')\)
-        VALUES\(($r | values | each {$"'($in)'"} | str join ',')\)
-        ON CONFLICT\(($pkn)\) DO UPDATE SET ($r| items {|k,v | $"($k)='($v)'" } | str join ',');"
+        VALUES\(($r | values | each {Q $in} | str join ',')\)
+        ON CONFLICT\(($pkn)\) DO UPDATE SET ($r| items {|k,v | $"($k)=(Q $v)" } | str join ',');"
 }

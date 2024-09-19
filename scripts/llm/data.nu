@@ -1,5 +1,6 @@
 use common.nu *
 
+
 export def --env init [] {
     let db = [$nu.data-dir 'openai.db'] | path join
     $env.OPENAI_DB = $db
@@ -18,12 +19,15 @@ export def --env init [] {
             project_id TEXT DEFAULT '',
             active BOOLEAN DEFAULT 0
         );"
+        "CREATE INDEX idx_provider ON provider (name);"
+        "CREATE INDEX idx_active ON provider (active);"
         "CREATE TABLE IF NOT EXISTS sessions (
             created TEXT,
             provider TEXT NOT NULL,
             model TEXT NOT NULL,
             temperature REAL NOT NULL
         );"
+        "CREATE INDEX idx_sessions ON sessions (created);"
         "CREATE TABLE IF NOT EXISTS prompt (
             name TEXT PRIMARY KEY,
             system TEXT,
@@ -31,6 +35,7 @@ export def --env init [] {
             placeholder TEXT,
             description TEXT
         );"
+        "CREATE INDEX idx_prompt ON prompt (name);"
         "CREATE TABLE IF NOT EXISTS messages (
             session_id TEXT,
             provider TEXT,
@@ -40,6 +45,8 @@ export def --env init [] {
             token INTEGER,
             created TEXT
         );"
+        "CREATE INDEX idx_messages ON messages (session_id);"
+
         "INSERT INTO provider (name, baseurl, temp_max, active) VALUES ('ollama', 'http://localhost:11434/v1', 1, 1);"
 
         "INSERT INTO prompt (name, system, template, placeholder, description) VALUES
@@ -59,7 +66,7 @@ export def --env init [] {
 export def make-session [created] {
     for s in [
         $"INSERT INTO sessions \(created, provider, model, temperature\)
-        SELECT '($created)', name, model_default, temp_default
+        SELECT (Q $created), name, model_default, temp_default
         FROM provider where active = 1 limit 1;"
     ] {
         open $env.OPENAI_DB | query db $s
@@ -68,7 +75,7 @@ export def make-session [created] {
 
 export def edit [table pk] {
     open $env.OPENAI_DB
-    | query db $"select * from ($table) where name = '($pk)'"
+    | query db $"select * from ($table) where name = (Q $pk)"
     | first
     | to yaml
     | $"### config ($table)#($pk) \n($in)"
@@ -89,16 +96,16 @@ export def query [s] {
 
 export def session [] {
     query $"select * from provider as p join sessions as s
-        on p.name = s.provider where s.created = '($env.OPENAI_SESSION)';"
+        on p.name = s.provider where s.created = (Q $env.OPENAI_SESSION);"
 }
 
 export def record [session, provider, model, role, content, token] {
     let n = date now | format date '%FT%H:%M:%S.%f'
     query $"insert into messages \(session_id, provider, model, role, content, token, created\)
-        VALUES \('($session)', '($provider)', '($model)', '($role)', '($content)', '($token)', '($n)'\);"
+        VALUES \((Q $session), (Q $provider), (Q $model), (Q $role), (Q $content), (Q $token), (Q $n)\);"
 }
 
 export def messages [num = 10] {
     open $env.OPENAI_DB
-    | query db $"select role, content from messages where session_id = '($env.OPENAI_SESSION)' limit ($num)"
+    | query db $"select role, content from messages where session_id = (Q $env.OPENAI_SESSION) limit ($num)"
 }

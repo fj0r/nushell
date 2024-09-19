@@ -1,8 +1,14 @@
 use data.nu
+use common.nu *
 use completion.nu *
 
 export def 'ai show session' [] {
     data session
+}
+
+export def 'ai show history' [] {
+    open $env.OPENAI_DB
+    | query db $"select role, content, created from messages where session_id = (Q $env.OPENAI_SESSION)"
 }
 
 export def 'ai config add provider' [o] {
