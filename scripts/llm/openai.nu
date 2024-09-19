@@ -1,44 +1,13 @@
 use common.nu *
+use completion.nu *
 use data.nu
+export use config.nu *
 
 export-env {
-    $env.OPENAI_PROVIDER = 'ollama'
     $env.OPENAI_SESSION = date now | format date '%FT%H:%M:%S.%f'
     data init
     data session $env.OPENAI_SESSION
 }
-
-
-def "nu-complete models" [] {
-    let r = data query $"select * from provider where name = '($env.OPENAI_PROVIDER)'"
-    http get --headers [
-        Authorization $"Bearer ($r.api_key)"
-        OpenAI-Organization $r.org_id
-        OpenAI-Project $r.project_id
-    ] $"($r.baseurl)/models"
-    | get data.id
-}
-
-export def 'ai config set model' [
-    model: string@"nu-complete models"
-    --global(-g)
-] {
-    if $global {
-        data query $"update provider set model = '($model)'
-            where name = '($env.OPENAI_PROVIDER)'"
-    } else {
-        data query $"update session set model = '($model)'
-            where created = '($env.OPENAI_SESSION)'"
-    }
-}
-
-export def 'ai config add provider' [o] {
-    let o = $o | select name baseurl api_key model org_id project_id temp_max
-    data query $"insert into provider \(($o | columns | str join ',')\)
-        VALUES \(($o | values | each {$"'($in)'"} | str join ',')\)
-        ON CONFLICT\(name\) DO NOTHING;"
-}
-
 
 export def --env "ai chat" [
     message: string
@@ -123,22 +92,6 @@ export def "ai embed" [
     | get data.0.embedding
 }
 
-
-def 'nu-complete role' [ctx] {
-    let args = $ctx | split row '|' | last | str trim -l | split row ' ' | range 2..
-    let len = $args | length
-    match $len {
-        1 => {
-            $env.OPENAI_PROMPT | items {|k, v| {value: $k, description: $v.description? } }
-        }
-        _ => {
-            let role = $env.OPENAI_PROMPT | get $args.0
-            let ph = $role.placeholder? | get ($len - 2)
-            $ph | columns
-        }
-    }
-}
-
 export def 'ai do' [
     ...args: string@"nu-complete role"
     --out(-o)
@@ -174,18 +127,3 @@ export def 'ai do' [
     $input | ai chat -m $model -p $placehold --editor=$editor --temp prompt-XXX --out=$out --debug=$debug $prompt
 }
 
-def "nu-complete config" [context] {
-    let ctx = $context | split row -r '\s+' | range 3..
-    if ($ctx | length) < 2 {
-        return [provider, prompt]
-    } else {
-        open $env.OPENAI_DB | query db $'select name from ($ctx.0)' | get name
-    }
-}
-
-export def "ai config edit" [
-    table: string@"nu-complete config"
-    pk: string@"nu-complete config"
-] {
-    data edit $table $pk
-}

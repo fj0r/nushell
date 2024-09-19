@@ -15,7 +15,8 @@ export def --env init [] {
             temp_min REAL DEFAULT 0,
             temp_max REAL NOT NULL,
             org_id TEXT DEFAULT '',
-            project_id TEXT DEFAULT ''
+            project_id TEXT DEFAULT '',
+            active BOOLEAN DEFAULT 0
         );"
         "CREATE TABLE IF NOT EXISTS sessions (
             created TEXT,
@@ -32,6 +33,7 @@ export def --env init [] {
         );"
         "CREATE TABLE IF NOT EXISTS messages (
             session_id TEXT,
+            provider TEXT,
             model TEXT,
             role TEXT,
             message TEXT,
@@ -58,7 +60,7 @@ export def session [created] {
     for s in [
         $"INSERT INTO sessions \(created, provider, model, temperature\)
         SELECT '($created)', name, model, temperature
-        FROM provider where name = '($env.OPENAI_PROVIDER)';"
+        FROM provider where active = 1 limit 1;"
     ] {
         open $env.OPENAI_DB | query db $s
     }
