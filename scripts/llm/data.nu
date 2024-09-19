@@ -78,6 +78,7 @@ export def edit [table pk] {
 }
 
 export def query [s] {
+    #print $s
     let r = open $env.OPENAI_DB | query db $s
     if ($r | length) > 0 {
         $r | first
@@ -91,12 +92,13 @@ export def session [] {
         on p.name = s.provider where s.created = '($env.OPENAI_SESSION)';"
 }
 
-export def record [session, provider, model, role, content, token=0] {
+export def record [session, provider, model, role, content, token] {
     let n = date now | format date '%FT%H:%M:%S.%f'
-    query $"insert into messages \(session_id,provider,model, role, content, token, created\)
-        VALUES \('($session)', '($provider)', '($model)', '($role)', '($content)', '($token)'\);"
+    query $"insert into messages \(session_id, provider, model, role, content, token, created\)
+        VALUES \('($session)', '($provider)', '($model)', '($role)', '($content)', '($token)', '($n)'\);"
 }
 
 export def messages [num = 10] {
-    query $"select * from messages where session_id = '($env.OPENAI_SESSION)' limit ($num)"
+    open $env.OPENAI_DB
+    | query db $"select role, content from messages where session_id = '($env.OPENAI_SESSION)' limit ($num)"
 }

@@ -1,4 +1,4 @@
-use data.nu *
+use data.nu
 
 export def "nu-complete models" [] {
     let s = data session

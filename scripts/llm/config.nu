@@ -29,7 +29,7 @@ export def 'ai config switch provider' [
     }
 }
 
-export def 'ai config set model' [
+export def 'ai config switch model' [
     model: string@"nu-complete models"
     --global(-g)
 ] {
@@ -37,7 +37,7 @@ export def 'ai config set model' [
         data query $"update provider set model_default = '($model)'
             where name = \(select provider from sessions where created = '($env.OPENAI_SESSION)'\)"
     } else {
-        data query $"update session set model = '($model)'
+        data query $"update sessions set model = '($model)'
             where created = '($env.OPENAI_SESSION)'"
     }
 }
