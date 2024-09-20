@@ -60,15 +60,7 @@ export-env {
     use utils.nu
     # batch mode
     if ($env.config? | is-not-empty) {
-        $env.config = ( $env.config | upsert hooks.env_change.PWD { |config|
-            let o = ($config | get -i hooks.env_change.PWD)
-            let val = (comma file)
-            if $o == null {
-                $val
-            } else {
-                $o | append $val
-            }
-        })
+        $env.config.hooks.env_change.PWD ++= comma file
     }
     $env.comma = {}
     $env.comma_index = (

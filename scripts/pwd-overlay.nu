@@ -19,8 +19,5 @@ def pwd_overlay [] {
 }
 
 export-env {
-    if 'PWD' not-in $env.config.hooks.env_change {
-        $env.config.hooks.env_change.PWD = []
-    }
     $env.config.hooks.env_change.PWD ++= pwd_overlay
 }
