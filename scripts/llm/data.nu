@@ -108,5 +108,5 @@ export def record [session, provider, model, role, content, token, tag] {
 
 export def messages [num = 10] {
     open $env.OPENAI_DB
-    | query db $"select role, content from messages where session_id = (Q $env.OPENAI_SESSION) limit ($num)"
+    | query db $"select role, content from messages where session_id = (Q $env.OPENAI_SESSION) and tag = '' limit ($num)"
 }
