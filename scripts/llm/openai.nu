@@ -97,15 +97,10 @@ export def 'ai do' [
     ...args: string@"nu-complete role"
     --out(-o)
     --model(-m): string@"nu-complete models"
-    --edit(-e)
     --debug
 ] {
-    let input = if ($in | is-empty) {
-        if $edit { '' } else { $args | last }
-    } else { $in }
-    let argv = if ($in | is-empty) {
-        if $edit { $args | range 1..<-2 } else { $args | range 1..<-1 }
-    } else { $args | range 1.. }
+    let input = $in
+    let edit = $input | is-empty
     let s = data session
     let role = open $env.OPENAI_DB | query db $"select * from prompt where name = '($args.0)'" | first
     let placehold = $"<(random chars -l 6)>"
@@ -117,7 +112,7 @@ export def 'ai do' [
         }
     } | str join (char newline)
     let plc = $role.placeholder? | from json
-    let prompt = $argv | enumerate
+    let prompt = $args | range 1.. | enumerate
     | reduce -f $prompt {|i,a|
         let x = ($plc | get $i.index) | get $i.item
         $a | str replace '{}' $x
