@@ -80,7 +80,7 @@ export def edit [table pk] {
     | first
     | to yaml
     | $"### config ($table)#($pk) \n($in)"
-    | block-editor $"config-($table).XXX.yml"
+    | block-edit $"config-($table).XXX.yml"
     | from yaml
     | db-upsert $env.OPENAI_DB $table name
 }

@@ -9,21 +9,21 @@ export-env {
     data make-session $env.OPENAI_SESSION
 }
 
-export def --env "ai chat" [
+export def "ai send" [
     message: string
     --model(-m): string@"nu-complete models"
     --image(-i): path
     --forget(-f)
     --placehold(-p): string = '{}'
     --out(-o)
-    --editor(-e)
+    --edit(-e)
     --temp(-t): string = 'send-message.XXX'
     --tag: string = ''
     --debug
 ] {
     let content = $in | default ""
-    let content = if $editor {
-        $content | block-editor $temp
+    let content = if $edit {
+        $content | block-edit $temp
     } else {
         $content
     }
@@ -76,19 +76,37 @@ export def --env "ai chat" [
     if $out { $r.msg }
 }
 
+export def "ai chat" [
+    --model(-m): string@"nu-complete models"
+] {
+    let s = data session
+    let model = if ($model | is-empty) { $s.model } else { $model }
+    let p = $'😎 '
+    let ci = ansi grey
+    let cr = ansi reset
+    let cm = ansi yellow
+    let nl = char newline
+    while true {
+        let a = input $"($ci)($p)"
+        print -n $"✨ ($cm)"
+        ai send -m $model $a
+        print $cr
+    }
+}
+
 
 export def 'ai do' [
     ...args: string@"nu-complete role"
     --out(-o)
     --model(-m): string@"nu-complete models"
-    --editor(-e)
+    --edit(-e)
     --debug
 ] {
     let input = if ($in | is-empty) {
-        if $editor { '' } else { $args | last }
+        if $edit { '' } else { $args | last }
     } else { $in }
     let argv = if ($in | is-empty) {
-        if $editor { $args | range 1..<-2 } else { $args | range 1..<-1 }
+        if $edit { $args | range 1..<-2 } else { $args | range 1..<-1 }
     } else { $args | range 1.. }
     let s = data session
     let role = open $env.OPENAI_DB | query db $"select * from prompt where name = '($args.0)'" | first
@@ -107,7 +125,10 @@ export def 'ai do' [
         $a | str replace '{}' $x
     }
 
-    $input | ai chat -m $model -p $placehold --editor=$editor --temp prompt-XXX --out=$out --tag tool --debug=$debug $prompt
+    $input | (ai send -p $placehold
+        --temp prompt-XXX --tag tool
+        --edit=$edit --out=$out --debug=$debug
+        -m $model $prompt)
 }
 
 export def "ai embed" [

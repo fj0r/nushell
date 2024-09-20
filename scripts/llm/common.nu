@@ -16,7 +16,7 @@ export def 'json-to-string' [json] {
     $json | to json -r | str replace '"' '\"' -a
 }
 
-export def block-editor [temp] {
+export def block-edit [temp] {
     let content = $in
     let tf = mktemp -t $temp
     $content | save -f $tf
