@@ -86,9 +86,14 @@ export def "ai chat" [
     let nl = char newline
     while true {
         let a = input $"($ci)($p)"
-        print -n $"✨ ($cm)"
-        ai send -m $model $a
-        print $cr
+        match $a {
+            '\q' | 'exit' | 'quit' => { break }
+            _ => {
+                print -n $"✨ ($cm)"
+                ai send -m $model $a
+                print $cr
+            }
+        }
     }
 }
 
