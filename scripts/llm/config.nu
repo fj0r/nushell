@@ -29,6 +29,30 @@ export def 'ai config add prompt' [o] {
     | db-upsert --do-nothing $env.OPENAI_DB 'prompt' 'name'
 }
 
+export def "ai config edit" [
+    table: string@"nu-complete config"
+    pk: string@"nu-complete config"
+] {
+    data edit $table $pk
+}
+
+export def 'ai config update provider' [name: string@"nu-complete provider"] {
+    ai config edit provider $name
+}
+
+export def 'ai config update prompt' [name: string@"nu-complete prompt"] {
+    open $env.OPENAI_DB
+    | query db $"select * from prompt where name = (Q $name)"
+    | first
+    | update placeholder {|x| $x.placeholder | from json}
+    | to yaml
+    | block-edit $"update-prompt-($name).XXX.yml"
+    | from yaml
+    | update placeholder {|x| $x.placeholder | to json -r}
+    | select name system template placeholder description
+    | db-upsert $env.OPENAI_DB 'prompt' 'name'
+}
+
 export def 'ai config del provider' [
     name: string@"nu-complete provider"
 ] {
@@ -85,9 +109,3 @@ export def 'ai config switch model' [
 }
 
 
-export def "ai config edit" [
-    table: string@"nu-complete config"
-    pk: string@"nu-complete config"
-] {
-    data edit $table $pk
-}
