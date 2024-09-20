@@ -158,7 +158,7 @@ export def gig [--empty-dir] {
             '!.gitignore'
         ] | str join (char newline) | save .gitignore
     } else {
-        ^$env.EDITOR $"(git rev-parse --show-toplevel)/.gitignore"
+        ^$env.EDITOR ([(git rev-parse --show-toplevel) .gitignore] | path join)
     }
 }
 
@@ -239,7 +239,7 @@ export def gp [
     }
 }
 
-# git add, rm and restore
+# git add and restore
 export def ga [
     ...file:          path
     --all (-A)
@@ -254,11 +254,7 @@ export def ga [
     --source (-o):  string
 ] {
     mut args = []
-    if $delete {
-        if $cached { $args ++= [--cached] }
-        if $force { $args ++= [--force] }
-        git rm ...$args -r ...$file
-    } else if $restore {
+    if $restore {
         $args ++= ($source | with-flag --source)
         if $staged { $args ++= [--staged]}
         $args ++= if ($file | is-empty) { [.] } else { $file }
@@ -274,6 +270,30 @@ export def ga [
     }
 
 }
+
+# git delete
+export def gdel [
+    ...file:          path
+    --force (-f)
+    --cached (-c)
+    --history (-h)
+] {
+    mut args = []
+    if $history {
+        let f = $file | str join " "
+        (git filter-branch --force --index-filter
+            $'git rm --cached --ignore-unmatch ($f)'
+            --prune-empty --tag-name-filter cat
+            -- --all)
+        rm -rf ([(git rev-parse --show-toplevel) .git/refs/original/] | path join)
+        ggc
+    } else {
+        if $cached { $args ++= [--cached] }
+        if $force { $args ++= [--force] }
+        git rm ...$args -r ...$file
+    }
+}
+
 
 # git commit
 export def gc [
@@ -474,7 +494,7 @@ export def gha [] {
 
 export def ggc [] {
     git reflog expire --all --expire=now
-    git gc --prune=now --aggressive
+    git gc --aggressive --prune=now
 }
 
 export alias gcl = git config --list
