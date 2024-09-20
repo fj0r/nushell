@@ -27,6 +27,7 @@ export def "ai send" [
     } else {
         $content
     }
+    let content = $message | str replace -m $placehold $content
     let img = if ($image | is-empty) {
         {}
     } else {
@@ -34,19 +35,16 @@ export def "ai send" [
     }
     let s = data session
     let model = if ($model | is-empty) { $s.model } else { $model }
-    let ct = $message | str replace -m $placehold $content
-    let msg = { role: "user", content: $ct, ...$img }
     if $debug {
         let xxx = [
             '' 'message' $message
             'placeholder' $placehold
-            'content' $msg.content
-            'final' $ct
+            'content' $content
         ] | str join "\n------\n"
         print $"(ansi grey)($xxx)(ansi reset)"
     }
     if not $forget {
-        data record $s.created $s.provider $model 'user' $ct 0 $tag
+        data record $s.created $s.provider $model 'user' $content 0 $tag
     }
     let r = http post -t application/json --headers [
         Authorization $"Bearer ($s.api_key)"
@@ -54,7 +52,7 @@ export def "ai send" [
         model: $model
         messages: [
             ...(if $forget { [] } else { data messages })
-            $msg
+            { role: "user", content: $content, ...$img }
         ]
         temperature: $s.temperature
         stream: true
