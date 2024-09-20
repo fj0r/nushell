@@ -88,10 +88,11 @@ export def 'ai config switch provider' [
             update provider set active = 1 where name = '($o)';
             COMMIT;"
         data query $"update provider set active = 0;"
-        data query $"update provider set active = 1 where name = '($o)';"
+        data query $"update provider set active = 1 where name = (Q $o);"
     } else {
-        data query $"update sessions set provider = '($o)'
-            where created = '($env.OPENAI_SESSION)'"
+        data query $"update sessions set provider = (Q $o),
+            model = \(select model_default from provider where name = (Q $o)\)
+            where created = (Q $env.OPENAI_SESSION)"
     }
 }
 
@@ -100,11 +101,11 @@ export def 'ai config switch model' [
     --global(-g)
 ] {
     if $global {
-        data query $"update provider set model_default = '($model)'
-            where name = \(select provider from sessions where created = '($env.OPENAI_SESSION)'\)"
+        data query $"update provider set model_default = (Q $model)
+            where name = \(select provider from sessions where created = (Q $env.OPENAI_SESSION)\)"
     } else {
-        data query $"update sessions set model = '($model)'
-            where created = '($env.OPENAI_SESSION)'"
+        data query $"update sessions set model = (Q $model)
+            where created = (Q $env.OPENAI_SESSION)"
     }
 }
 
