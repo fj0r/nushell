@@ -77,7 +77,7 @@ export-env {
     $env.cwd_history_file = ([$nu.data-dir 'cache'] | path join 'nu_cwd_history.sqlite')
 
     if not ($env.cwd_history_file | path exists) {
-        {foo: bar} | into sqlite -t _ $env.cwd_history_file
+        {_: '.'} | into sqlite -t _ $env.cwd_history_file
         open $env.cwd_history_file | query db "create table if not exists cwd_history (
             cwd text primary key,
             count int default 1,

@@ -5,7 +5,7 @@ export def --env init [] {
     let db = [$nu.data-dir 'openai.db'] | path join
     $env.OPENAI_DB = $db
     if ($env.OPENAI_DB | path exists) { return }
-    {foo: bar} | into sqlite -t _ $env.OPENAI_DB
+    {_: '.'} | into sqlite -t _ $env.OPENAI_DB
     for s in [
         "CREATE TABLE IF NOT EXISTS provider (
             name TEXT PRIMARY KEY,
