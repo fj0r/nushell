@@ -10,13 +10,17 @@ def "nu-complete models" [] {
     | each {{value: $in.name, description: $in.modified_at}}
 }
 
-export def "ollama info" [model: string@"nu-complete models"] {
+export def "ollama info" [--model(-m): string@"nu-complete models"] {
     http post -t application/json $"($env.OLLAMA_BASEURL)/api/show" {name: $model}
 }
 
+export def "ollama delete" [--model(-m): string@"nu-complete models"] {
+    http delete -t application/json $"($env.OLLAMA_BASEURL)/api/delete" -d {name: $model}
+}
+
 export def "ollama embed" [
-    model: string@"nu-complete models"
     input: string
+    --model(-m): string@"nu-complete models"
 ] {
     http post -t application/json $"($env.OLLAMA_BASEURL)/api/embed" {
         model: $model, input: [$input]
@@ -26,8 +30,8 @@ export def "ollama embed" [
 
 
 export def "ollama gen" [
-    model: string@"nu-complete models"
     prompt: string
+    --model(-m): string@"nu-complete models"
     --image(-i): path
     --full(-f)
 ] {
