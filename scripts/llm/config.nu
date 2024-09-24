@@ -2,16 +2,16 @@ use data.nu
 use common.nu *
 use completion.nu *
 
-export def 'ai show session' [] {
+export def 'ai session' [] {
     data session
 }
 
-export def 'ai show history' [] {
+export def 'ai history chat' [] {
     open $env.OPENAI_DB
     | query db $"select session_id, role, content, created from messages where session_id = (Q $env.OPENAI_SESSION) and tag = ''"
 }
 
-export def 'ai show tools history' [num=10] {
+export def 'ai history do' [num=10] {
     open $env.OPENAI_DB
     | query db $"select session_id, role, content, created from messages where tag = 'tool' order by created desc limit (Q $num)"
 }
@@ -65,7 +65,7 @@ export def 'ai config del prompt' [
     open $env.OPENAI_DB | query db $'delete from prompt where name = (Q $name)'
 }
 
-export def 'ai config switch temperature' [
+export def 'ai change temperature' [
     o: string@"nu-complete temperature"
     --global(-g)
 ] {
@@ -78,7 +78,7 @@ export def 'ai config switch temperature' [
     }
 }
 
-export def 'ai config switch provider' [
+export def 'ai change provider' [
     o: string@"nu-complete provider"
     --global(-g)
 ] {
@@ -96,7 +96,7 @@ export def 'ai config switch provider' [
     }
 }
 
-export def 'ai config switch model' [
+export def 'ai change model' [
     model: string@"nu-complete models"
     --global(-g)
 ] {
