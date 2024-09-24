@@ -98,7 +98,7 @@ def 'plan base' [
 ] {
     let f = [
         $"FROM ($conf.base)"
-        $"ENV PYTHONUNBUFFERED=x"
+        ...(if ($conf.env? | is-empty) {[]} else { $conf.env | items {|k, v| $"ENV ($k)=($v)" } })
         $""
         $"WORKDIR ($conf.workdir)"
         $"COPY ($conf.manifest) ."
@@ -176,7 +176,7 @@ def 'build plan' [--rm --latest] {
     ^$env.CONTCTL push $plan.tag
 
     if $latest {
-        let latest = $"($plan.tag | split row ':' | first):latest"
+        let latest = $plan.tag | split row ':' | range 0..<-1 | append 'latest' | str join ':'
         ^$env.CONTCTL tag $plan.tag $latest
         ^$env.CONTCTL push $latest
         if $rm {
@@ -190,25 +190,19 @@ def 'build plan' [--rm --latest] {
 }
 
 
-def 'merge config' [manifest] {
+def 'merge config' [type] {
     let preset = [$env.FILE_PWD preset.yml] | path join
-    let g = if ($preset | path exists) {
-        print $"(ansi grey)use: ($preset)(ansi reset)"
-        open $preset
-    } else {
-        print $"(ansi grey)use: $env.DEVCONTAINER_PRESET(ansi reset)"
-        $env.DEVCONTAINER_PRESET
-    }
+    let g = $env.DEVCONTAINER_PRESET
+    | append (if ($preset | path exists) { open $preset } else { [] })
+
     let p = if ('proj.yml' | path exists) {
         open 'proj.yml'
     } else {
         {}
     }
-    let c = if ($p.type? | is-not-empty) {
-        $g | where type == $p.type
-    } else {
-        $g | where manifest == $manifest
-    }
+
+    let c = $g
+    | where type == if ($p.type? | is-not-empty) { $p.type } else { $type }
     | first
 
     let x = {
@@ -218,7 +212,7 @@ def 'merge config' [manifest] {
     $c | merge $p | merge $x
 }
 
-export def 'main' [manifest? --dry-run --example] {
+export def 'main' [type? --dry-run --example] {
     let o = $in
     if $example {
         [
@@ -253,13 +247,15 @@ export def 'main' [manifest? --dry-run --example] {
         args: $o.args
     }
 
+    let conf = merge config $type
+    const base_tag = '__'
+
+    let manifest = $conf.manifest
     if ($manifest | path exists | not $in) {
         print $"($manifest) not exists"
         return
     }
 
-    let conf = merge config $manifest
-    const base_tag = '__'
 
     let baseimg_date = image created $"http://($o.reg)" $o.repo $base_tag
     let manifest_date = file modified $manifest

@@ -1,0 +1,9 @@
+- [OpenAI and Ollama clients](scripts/llm/README.md)
+- [Comma](scripts/comma/README.md) task and test runner of nu script
+- [Kubernetes](scripts/kubernetes/)
+- [Docker](scripts/docker/)
+- [git](scripts/git/README.md)
+- [powerline prompt](scripts/power/README.md)
+- [ssh](scripts/ssh/)
+- [dev-container](scripts/devcontainer/) work with ci
+- [nvim](scripts/nvim/)

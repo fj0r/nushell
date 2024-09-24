@@ -21,3 +21,21 @@ OpenAI and Ollama Clients
     - [x] del provider/prompt
 
 Control some options with the following code.
+```
+ai config add provider {
+    name: deepseek
+    baseurl: 'https://api.deepseek.com/v1'
+    model_default: 'deepseek-coder'
+    api_key: sk-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+    org_id: ''
+    project_id: ''
+    temp_max: 1.5
+}
+
+ai config add prompt {
+    name: 'git-diff-summary'
+    template: "Extract commit logs from git differences, summarizing only the content changes in files while ignoring hash changes, and generate a title:\n```\n{}\n```"
+    placeholder: ''
+    description: 'Summarize from git differences'
+}
+```
