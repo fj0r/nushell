@@ -67,8 +67,16 @@ export def 'todo tag' [
 }
 
 export def 'todo edit' [
-    id: int
+    id: int@cmp-todo-id
 ] {
+    run $"select * from todo where id = ($id);"
+    | first
+    | to yaml
+    | $"### Do not change the `id` \n($in)"
+    | block-edit $"todo.XXX.yml"
+    | from yaml
+    | update updated (date now | format date '%FT%H:%M:%S')
+    | db-upsert $env.TODO_DB todo id
 
 }
 
