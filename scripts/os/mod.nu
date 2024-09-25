@@ -5,3 +5,4 @@ export use process.nu *
 export use kill.nu *
 export use clip.nu *
 export use network.nu *
+export use proxy.nu *
