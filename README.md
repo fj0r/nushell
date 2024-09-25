@@ -1,4 +1,5 @@
 - [OpenAI and Ollama clients](scripts/llm/README.md)
+- [TODO](scripts/todo/README.md)
 - [Comma](scripts/comma/README.md) task and test runner of nu script
 - [Kubernetes](scripts/kubernetes/)
 - [Docker](scripts/docker/)
