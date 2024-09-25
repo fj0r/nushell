@@ -107,7 +107,17 @@ export def 'todo delete' [
     --with-tag(-w)
     ...tags: string@cmp-delete
 ] {
-    print $tags
+    let ts = $tags | each { Q $in } | str join ','
+    run $"delete from todo where id in \(
+        select t.todo_id as id from todo_tags as t join tags as g
+            on g.id = t.tag_id where g.name in \(($ts)\)
+    \)"
+    run $"delete from todo_tags where tag_id in \(
+        select id from tags where name in \(($ts)\)
+    \);"
+    if $with_tag {
+        run $"delete from tags where name in \($ts\);"
+    }
 }
 
 export def 'todo add-tag' [...name] {
