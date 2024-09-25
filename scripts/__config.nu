@@ -43,7 +43,6 @@ use pwd-overlay.nu *
 #use completion-generator.nu *
 #use task.nu *
 
-use network.nu *
 use setup.nu *
 use rustic *
 use llm *

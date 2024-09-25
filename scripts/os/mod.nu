@@ -3,3 +3,5 @@ export use power.nu *
 export use archlinux.nu *
 export use process.nu *
 export use kill.nu *
+export use clip.nu *
+export use network.nu *
