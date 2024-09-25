@@ -1,5 +1,6 @@
 use completion.nu *
 use common.nu *
+use format.nu *
 
 export def 'todo add' [
     --important(-i): int@cmp-level
@@ -33,6 +34,7 @@ export def 'todo add' [
     let id = run $"insert into todo \(($keys)\) values \(($vals)\) returning id;"
     | first
     | get id
+    print $"(ansi grey)Todo created successfully: ($id)(ansi reset)"
 
     if ($tag | is-not-empty) {
         let tags = $tag | each { Q $in } | str join ','
@@ -81,10 +83,10 @@ export def 'todo edit' [
 }
 
 export def 'todo move' [
-    id: int
-    to: int
+    id: int@cmp-todo-id
+    to: int@cmp-todo-id
 ] {
-
+    run $"update todo set parent_id = ($to) where id = ($id);"
 }
 
 export def 'todo list' [
@@ -94,7 +96,16 @@ export def 'todo list' [
     --urgent(-u): int
     --duration(-d): duration
 ] {
-
+    run $"select * from todo as t
+        left outer join todo_tags as l on t.id = l.todo_id
+        left outer join tags as g on l.tag_id = g.id
+        order by t.created
+    ;"
+    | rename todo
+    | select todo parent_id title description created updated deadline important urgent delegate name
+    | group-by todo
+    | items {|k, x| $x | first | insert tags ($x | get name) }
+    | todo format
 }
 
 export def 'todo now' [
