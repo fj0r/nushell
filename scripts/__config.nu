@@ -27,6 +27,7 @@ use docker *
 use cwdhist *
 use comma *
 use llm *
+use todo *
 use history-utils *
 use history-utils/backup.nu *
 use resolvenv
