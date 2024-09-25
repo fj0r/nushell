@@ -1,4 +1,4 @@
-use data.nu
+use sqlite.nu *
 use common.nu *
 use completion.nu *
 
