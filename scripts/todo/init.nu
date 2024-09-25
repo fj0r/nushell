@@ -12,6 +12,7 @@ export def --env start [] {
             id INTEGER PRIMARY KEY,
             name TEXT NOT NULL UNIQUE
         );"
+        "INSERT INTO tags (name) VALUES ('trash');"
         "CREATE TABLE IF NOT EXISTS todo (
             id INTEGER PRIMARY KEY,
             parent_id INTEGER DEFAULT 0,
@@ -26,8 +27,9 @@ export def --env start [] {
             done BOOLEAN DEFAULT 0
         );"
         "CREATE TABLE IF NOT EXISTS todo_tags (
-            todo_id INTEGER,
-            tag_id INTEGER
+            todo_id INTEGER NOT NULL,
+            tag_id INTEGER NOT NULL,
+            PRIMARY KEY (todo_id, tag_id)
         );"
     ] {
         open $env.TODO_DB | query db $s

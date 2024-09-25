@@ -8,7 +8,7 @@ export def 'todo add' [
     --tag(-t): list<string@cmp-tag>
     --duration(-d): duration
     --done(-D)
-    title: string
+    title?: string
 ] {
     let now = date now | format date '%FT%H:%M:%S'
     let title = if ($title | is-empty) { 'untitled' } else { $title }
@@ -30,15 +30,13 @@ export def 'todo add' [
     | each { Q $in }
     | str join ','
 
-    let id = open $env.TODO_DB
-    | query db $"insert into todo \(($keys)\) values \(($vals)\) returning id;"
+    let id = run $"insert into todo \(($keys)\) values \(($vals)\) returning id;"
     | first
     | get id
 
     if ($tag | is-not-empty) {
         let tags = $tag | each { Q $in } | str join ','
-        open $env.TODO_DB
-        | query db $"insert into todo_tags
+        run $"insert into todo_tags
             select ($id), t.id from tags as t where name in \(($tags)\);"
     }
 }
@@ -48,24 +46,24 @@ export def 'todo done' [
     --reverse(-r)
 ] {
     let d = if $reverse { 0 } else { 1 }
-    open $env.TODO_DB | $'update todo set done = ($d) where id = ($id);'
+    run $'update todo set done = ($d) where id = ($id);'
 }
 
 export def 'todo tag' [
     id: int@cmp-todo-id
-    --tag(-t)
+    --tag(-t): string@cmp-tag
     --remove(-r)
 ] {
     let tags = $tag | each { Q $in } | str join ','
     let s = if $remove {
-        $"delete from todo_tags where todo_id = ($id) and tag_id in \(($tags)\);"
+        $"delete from todo_tags where todo_id = ($id) and tag_id in \(select id from tags where name in \(($tags)\)\);"
     } else {
         $"insert into todo_tags
         select ($id), t.id from tags as t where name in \(($tags)\)
-        on conflict (todo_id, tag_id) do nothing
+        on conflict \(todo_id, tag_id\) do nothing
         ;"
     }
-    open $env.TODO_DB | query db $s
+    run $s
 }
 
 export def 'todo edit' [
@@ -104,10 +102,11 @@ export def 'todo delete' [
     print $tags
 }
 
-export def 'todo add tag' [] {
-
+export def 'todo add-tag' [...name] {
+    let ns = $name | each { $"\((Q $in)\)" } | str join ','
+    run $"insert into tags \(name\) values ($ns);"
 }
 
-export def 'todo rename tag' [] {
-
+export def 'todo rename-tag' [from:string@cmp-tag to] {
+    run $"update tags set name = (Q $to) where name = (Q $from)"
 }
