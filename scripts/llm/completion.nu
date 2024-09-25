@@ -53,6 +53,12 @@ export def "nu-complete prompt" [] {
     | get name
 }
 
+export def "nu-complete system" [] {
+    open $env.OPENAI_DB
+    | query db $"select name from prompt where system != ''"
+    | get name
+}
+
 export def "nu-complete temperature" [] {
     let s = data session
     let tr = ($s.temp_max - $s.temp_min) / 5

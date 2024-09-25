@@ -12,6 +12,7 @@ export-env {
 export def "ai send" [
     message: string
     --model(-m): string@"nu-complete models"
+    --system: string
     --image(-i): path
     --forget(-f)
     --placehold(-p): string = '{}'
@@ -36,6 +37,7 @@ export def "ai send" [
     let s = data session
     let model = if ($model | is-empty) { $s.model } else { $model }
     data record $s.created $s.provider $model 'user' $content 0 $tag
+    let sys = if ($system | is-empty) { [] } else { [{role: "system", content: $system}] }
     let req = if $forget {
         [{ role: "user", content: $content, ...$img }]
     } else {
@@ -43,7 +45,7 @@ export def "ai send" [
     }
     let req = {
         model: $model
-        messages: $req
+        messages: ($sys | $req)
         temperature: $s.temperature
         stream: true
     }
@@ -77,21 +79,33 @@ export def "ai send" [
 
 export def "ai chat" [
     --model(-m): string@"nu-complete models"
+    --system: string@"nu-complete system"
 ] {
     let s = data session
     let model = if ($model | is-empty) { $s.model } else { $model }
+    let system = if ($system | is-empty) { '' } else {
+        open $env.OPENAI_DB
+        | query db $"select system from prompt where name = '($system)'"
+        | first
+    }
     let p = $'😎 '
     let ci = ansi grey
     let cr = ansi reset
     let cm = ansi yellow
     let nl = char newline
+    mut init = $system | is-not-empty
     while true {
         let a = input $"($ci)($p)"
         match $a {
             '\q' | 'exit' | 'quit' => { break }
             _ => {
                 print -n $"✨ ($cm)"
-                ai send -m $model $a
+                if $init {
+                    $init = false
+                    ai send -m $model --system $system $a
+                } else {
+                    ai send -m $model $a
+                }
                 print $cr
             }
         }
