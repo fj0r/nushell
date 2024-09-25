@@ -35,6 +35,18 @@ export def "ai send" [
     }
     let s = data session
     let model = if ($model | is-empty) { $s.model } else { $model }
+    data record $s.created $s.provider $model 'user' $content 0 $tag
+    let req = if $forget {
+        [{ role: "user", content: $content, ...$img }]
+    } else {
+        data messages
+    }
+    let req = {
+        model: $model
+        messages: $req
+        temperature: $s.temperature
+        stream: true
+    }
     if $debug {
         let xxx = [
             '' 'message' $message
@@ -42,21 +54,12 @@ export def "ai send" [
             'content' $content
         ] | str join "\n------\n"
         print $"(ansi grey)($xxx)(ansi reset)"
-    }
-    if not $forget {
-        data record $s.created $s.provider $model 'user' $content 0 $tag
+        print $"======req======"
+        print $"(ansi grey)($req | table -e)(ansi reset)"
     }
     let r = http post -t application/json --headers [
         Authorization $"Bearer ($s.api_key)"
-    ] $"($s.baseurl)/chat/completions" {
-        model: $model
-        messages: [
-            ...(if $forget { [] } else { data messages })
-            { role: "user", content: $content, ...$img }
-        ]
-        temperature: $s.temperature
-        stream: true
-    }
+    ] $"($s.baseurl)/chat/completions" $req
     | lines
     | reduce -f {msg: '', token: 0} {|i,a|
         let x = $i | parse -r '.*?(?<data>\{.*)'
@@ -68,9 +71,7 @@ export def "ai send" [
         | update msg {|x| $x.msg + $m }
         | update token {|x| $x.token + 1 }
     }
-    if not $forget {
-        data record $s.created $s.provider $model 'assistant' $r.msg $r.token $tag
-    }
+    data record $s.created $s.provider $model 'assistant' $r.msg $r.token $tag
     if $out { $r.msg }
 }
 
@@ -125,7 +126,7 @@ export def 'ai do' [
     | str replace --all '{}' ''
 
     $input | (ai send -p $placehold
-        --temp prompt-XXX --tag tool
+        --temp prompt-XXX --tag tool --forget
         --edit=$edit --out=$out --debug=$debug
         -m $model $prompt)
 }
