@@ -26,6 +26,7 @@ use kubernetes *
 use docker *
 use cwdhist *
 use comma *
+use llm *
 use history-utils *
 use history-utils/backup.nu *
 use resolvenv
@@ -45,7 +46,6 @@ use pwd-overlay.nu *
 
 use setup.nu *
 use rustic *
-use llm *
 use outdent.nu
 use devcontainer *
 

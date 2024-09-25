@@ -38,4 +38,19 @@ ai config add prompt {
     placeholder: ''
     description: 'Summarize from git differences'
 }
+
+ai config add prompt {
+    name: 'bilingual-translation'
+    template: "The following content may be in {} or {}, identify which language it belongs to and translate it into the another.\nDo not explain what language it is, just provide the translation.\n```\n{}\n```"
+    placeholder: [
+        {
+            en: English
+        }
+        {
+            zh: Chinese
+            jp: Japanese
+        }
+    ]
+    description: ''
+}
 ```
