@@ -122,6 +122,7 @@ export def 'ai do' [
         let x = ($plc | get $i.index) | get $i.item
         $a | str replace '{}' $x
     }
+    | str replace --all '{}' ''
 
     $input | (ai send -p $placehold
         --temp prompt-XXX --tag tool
