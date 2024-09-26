@@ -133,13 +133,17 @@ export def 'todo show' [
     | str join ', '
 
     mut cond = []
+    if not $all {
+        let x = [':trash'] | cat-to-tag-id | run $in | get 0.id
+        $cond ++= $"todo.id not in \(select todo_id from todo_tag where tag_id in \(($x)\)\)"
+    }
     if ($tags | is-not-empty) {
         let tag_cond = $tags | cat-to-tag-id --and=(not $all)
         dbg -t tag-cond $debug $tag_cond
         let tag_id = run $tag_cond
         | get id
         | str join ', '
-        #$cond ++= $"todo_tag.tag_id in \(($tag_id)\)"
+        #$cond ++= $"todo_tag.tag_id not in \(1\)"
         $cond ++= $"todo.id in \(select todo_id from todo_tag where tag_id in \(($tag_id)\)\)"
     }
     let now = date now
