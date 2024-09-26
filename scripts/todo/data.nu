@@ -137,19 +137,22 @@ export def 'todo now' [
 
 }
 
-export def 'todo cat delete' [
+# delete todo in categories
+export def 'todo cat purge' [
     --level(-L): string@cmp-del-level
     ...tags: string@cmp-category
 ] {
-    let sub = $tags | split-cat | cat-to-tag-id
-    let id = run $"delete from todo_tag where tag_id in \(($sub)\) returning todo_id;"
-    | get todo_id
-    run $"delete from todo where id in \(($id | str join ',')\)"
+    let ns = $tags | split-cat
+    let tag_id = run ($ns | cat-to-tag-id) | get id
+    let id = run $"delete from todo where id in \(
+        select todo_id from todo_tag where tag_id in \(($tag_id | str join ', ')\)
+        \) returning id" | get id
+    run $"delete from todo_tag where todo_id in \(($id | str join ', ')\)"
     if $level in [tag category] {
-
+        run $"delete from tag where id in \(($tag_id | str join ', ')\)"
     }
     if $level in [category] {
-        run $"delete from tag where name in \($ts\);"
+        run $"delete from category where name in \(($ns | columns | each {Q $in} | str join ', ')\);"
     }
 }
 
