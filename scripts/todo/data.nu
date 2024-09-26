@@ -120,16 +120,24 @@ export def 'todo show' [
         done, important, urgent
     ]
     let fields = [
-        "t.id as id", parent_id,
+        "todo.id as id", parent_id,
         title, description, ...$sortable , delegate,
-        "c.name || ':' || g.name as tag"
+        "category.name || ':' || tag.name as tag"
     ] | str join ', '
 
     let sort = if ($sort | is-empty) { ['created'] } else { $sort }
-    | each { $"t.($in)" }
+    | each { $"todo.($in)" }
     | str join ', '
 
     mut cond = []
+    if ($tags | is-not-empty) {
+        let tag_cond = $tags | split-cat | cat-to-tag-id --and=(not $all)
+    print $"(ansi grey)($tag_cond)(ansi reset)"
+        let tag_id = run $tag_cond
+        | get id
+        | str join ', '
+        $cond ++= $"todo.id in \(select todo_id from todo_tag where tag_id in \(($tag_id)\)\)"
+    }
     let now = date now
     if ($important | is-not-empty) { $cond ++= $"important >= ($important)"}
     if ($urgent | is-not-empty) { $cond ++= $"urgent >= ($urgent)"}
@@ -138,13 +146,16 @@ export def 'todo show' [
     if ($deadline | is-not-empty) { $cond ++= $"deadline >= ($now - $deadline | fmt-date | Q $in)"}
     let $cond = if ($cond | is-empty) { '' } else { $cond | str join ' and ' | $"where ($in)" }
 
-    run $"select ($fields) from todo as t
-        left outer join todo_tag as l on t.id = l.todo_id
-        left outer join tag as g on l.tag_id = g.id
-        left outer join category as c on g.category_id = c.id
-        ($cond) order by ($sort)
-    ;"
+    print $"(ansi grey)($cond)(ansi reset)"
+    let stmt = $"select ($fields) from todo
+        left outer join todo_tag on todo.id = todo_tag.todo_id
+        left outer join tag on todo_tag.tag_id = tag.id
+        left outer join category on tag.category_id = category.id
+        ($cond) order by ($sort);"
+    #print $stmt
+    run $stmt
     | group-by id
+    #| print ($in | table -e)
     | items {|k, x| $x | first | insert tags ($x | get tag) | reject tag }
     | todo format
 }
