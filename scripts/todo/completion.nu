@@ -24,13 +24,9 @@ export def 'cmp-tag' [] {
 }
 
 export def 'cmp-category' [] {
-    let c = run 'select name from category;'
-    | get name
-    | each { $"($in):" }
-    let t = run 'select c.name as category, t.name as tag
+    run 'select c.name as category, t.name as tag
         from category as c
         join tag as t on t.category_id = c.id'
     | each { $"($in.category):($in.tag)" }
-    $c | append $t
 }
 

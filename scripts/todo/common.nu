@@ -22,6 +22,15 @@ export def split-tag [] {
     | reduce -f {} {|i,a| $a | insert $i.cat $i.tag }
 }
 
+export def tag-to-cond [a b] {
+    $in
+    | items {|k, v|
+        let t = $v | each {Q $in} | str join ','
+        $"($a) = (Q $k) and ($b) in \(($t)\)"
+    }
+    | str join ' or '
+}
+
 export def db-upsert [db table pk --do-nothing] {
     let r = $in
     let d = if $do_nothing { 'NOTHING' } else {

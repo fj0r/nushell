@@ -48,11 +48,11 @@ export def 'todo add' [
     print $"(ansi grey)Todo created successfully: ($id)(ansi reset)"
 
     if ($tag | is-not-empty) {
-        let tags = $tag | each { Q $in } | str join ','
+        let cond = $tag | split-tag | tag-to-cond 'c.name' 't.name'
         run $"insert into todo_tag
             select ($id), t.id from tag as t
             join category as c on t.category_id = c.id
-            where name in \(($tags)\);"
+            where ($cond);"
     }
 }
 
@@ -65,18 +65,25 @@ export def 'todo done' [
     run $'update todo set done = ($d) where id = ($id);'
 }
 
+# todo tag
 export def 'todo tag' [
     id: int@cmp-todo-id
-    --tag(-t): string@cmp-category
+    --tag(-t): list<string@cmp-category>
     --remove(-r)
 ] {
-    let tags = $tag | each { Q $in } | str join ','
+    let cond = $tag | split-tag | tag-to-cond 'c.name' 't.name'
     let s = if $remove {
-        $"delete from todo_tag where todo_id = ($id) and tag_id in \(select id from tag where name in \(($tags)\)\);"
+        $"delete from todo_tag where todo_id = ($id) and tag_id in \(
+            select t.id from tag as t
+            join category as c on t.category_id = c.id
+            where ($cond)
+        \);"
     } else {
         $"insert into todo_tag
-        select ($id), t.id from tag as t where name in \(($tags)\)
-        on conflict \(todo_id, tag_id\) do nothing
+          select ($id), t.id from tag as t
+          join category as c on t.category_id = c.id
+          where ($cond)
+          on conflict \(todo_id, tag_id\) do nothing
         ;"
     }
     run $s
