@@ -13,7 +13,7 @@ export def block-edit [temp] {
     $c
 }
 
-export def split-tag [] {
+export def split-cat [] {
     $in
     | each { split column ':' c tag  }
     | flatten
@@ -22,13 +22,19 @@ export def split-tag [] {
     | reduce -f {} {|i,a| $a | insert $i.cat $i.tag }
 }
 
-export def tag-to-cond [a b] {
+export def cat-to-cond [a b] {
     $in
     | items {|k, v|
         let t = $v | each {Q $in} | str join ','
         $"($a) = (Q $k) and ($b) in \(($t)\)"
     }
     | str join ' or '
+}
+
+export def cat-to-tag-id [...c] {
+    let cond = $in | cat-to-cond 'c.name' 't.name'
+    let s = [...$c, 't.id'] | str join ', '
+    $"select ($s) from tag as t join category as c on t.category_id = c.id where ($cond)"
 }
 
 export def db-upsert [db table pk --do-nothing] {

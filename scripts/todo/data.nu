@@ -48,11 +48,8 @@ export def 'todo add' [
     print $"(ansi grey)Todo created successfully: ($id)(ansi reset)"
 
     if ($tag | is-not-empty) {
-        let cond = $tag | split-tag | tag-to-cond 'c.name' 't.name'
-        run $"insert into todo_tag
-            select ($id), t.id from tag as t
-            join category as c on t.category_id = c.id
-            where ($cond);"
+        let sub = $tag | split-cat | cat-to-tag-id $id
+        run $"insert into todo_tag ($sub);"
     }
 }
 
@@ -71,18 +68,12 @@ export def 'todo tag' [
     --tag(-t): list<string@cmp-category>
     --remove(-r)
 ] {
-    let cond = $tag | split-tag | tag-to-cond 'c.name' 't.name'
     let s = if $remove {
-        $"delete from todo_tag where todo_id = ($id) and tag_id in \(
-            select t.id from tag as t
-            join category as c on t.category_id = c.id
-            where ($cond)
-        \);"
+        let sub = $tag | split-cat | cat-to-tag-id
+        $"delete from todo_tag where todo_id = ($id) and tag_id in \(($sub)\);"
     } else {
-        $"insert into todo_tag
-          select ($id), t.id from tag as t
-          join category as c on t.category_id = c.id
-          where ($cond)
+        let sub = $tag | split-cat | cat-to-tag-id $id
+        $"insert into todo_tag ($sub)
           on conflict \(todo_id, tag_id\) do nothing
         ;"
     }
@@ -146,26 +137,25 @@ export def 'todo now' [
 
 }
 
-export def 'todo delete' [
-    --with-tag(-w)
-    ...tags: string@cmp-delete
+export def 'todo cat delete' [
+    --level(-L): string@cmp-del-level
+    ...tags: string@cmp-category
 ] {
-    let ts = $tags | each { Q $in } | str join ','
-    run $"delete from todo where id in \(
-        select t.todo_id as id from todo_tag as t join tag as g
-            on g.id = t.tag_id where g.name in \(($ts)\)
-    \)"
-    run $"delete from todo_tag where tag_id in \(
-        select id from tag where name in \(($ts)\)
-    \);"
-    if $with_tag {
+    let sub = $tags | split-cat | cat-to-tag-id
+    let id = run $"delete from todo_tag where tag_id in \(($sub)\) returning todo_id;"
+    | get todo_id
+    run $"delete from todo where id in \(($id | str join ',')\)"
+    if $level in [tag category] {
+
+    }
+    if $level in [category] {
         run $"delete from tag where name in \($ts\);"
     }
 }
 
 # add categories
 export def 'todo cat add' [...categories] {
-    let ns = $categories | split-tag
+    let ns = $categories | split-cat
     let c = $ns | columns | each { $"\((Q $in)\)" } | str join ','
     let c = run $"insert into category \(name\) values ($c)
         on conflict \(name\) do update set name = EXCLUDED.name
@@ -178,6 +168,6 @@ export def 'todo cat add' [...categories] {
     }
 }
 
-export def 'todo cat rename' [from:string@cmp-tag to] {
+export def 'todo cat rename' [from:string@cmp-category to] {
     run $"update tag set name = (Q $to) where name = (Q $from)"
 }

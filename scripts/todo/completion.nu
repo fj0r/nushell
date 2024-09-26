@@ -8,6 +8,10 @@ export def 'cmp-level' [] {
     0..<5
 }
 
+export def 'cmp-del-level' [] {
+    [tag category]
+}
+
 export def 'cmp-todo-id' [] {
     run 'select id, title from todo;'
     | each { $"($in.id) # ($in.title)" }
