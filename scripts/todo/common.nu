@@ -35,6 +35,12 @@ export def cat-to-cond [a b] {
     | str join ' or '
 }
 
+export def dbg [switch content -t:string] {
+    if $switch {
+        print $"(ansi grey)($t)│($content)(ansi reset)"
+    }
+}
+
 export def cat-to-tag-id [...c, --and] {
     let cond = $in | cat-to-cond 'c.name' 't.name'
     let s = [...$c, 't.id'] | str join ', '

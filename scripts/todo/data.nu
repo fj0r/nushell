@@ -114,6 +114,8 @@ export def 'todo show' [
     --created: duration
     --deadline: duration
     --sort(-s): list<string@cmp-sort>
+    --raw
+    --debug
 ] {
     let sortable = [
         created, updated, deadline,
@@ -132,10 +134,11 @@ export def 'todo show' [
     mut cond = []
     if ($tags | is-not-empty) {
         let tag_cond = $tags | split-cat | cat-to-tag-id --and=(not $all)
-    print $"(ansi grey)($tag_cond)(ansi reset)"
+        dbg -t tag-cond $debug $tag_cond
         let tag_id = run $tag_cond
         | get id
         | str join ', '
+        #$cond ++= $"todo_tag.tag_id in \(($tag_id)\)"
         $cond ++= $"todo.id in \(select todo_id from todo_tag where tag_id in \(($tag_id)\)\)"
     }
     let now = date now
@@ -146,18 +149,18 @@ export def 'todo show' [
     if ($deadline | is-not-empty) { $cond ++= $"deadline >= ($now - $deadline | fmt-date | Q $in)"}
     let $cond = if ($cond | is-empty) { '' } else { $cond | str join ' and ' | $"where ($in)" }
 
-    print $"(ansi grey)($cond)(ansi reset)"
+    dbg $debug $cond -t cond
     let stmt = $"select ($fields) from todo
         left outer join todo_tag on todo.id = todo_tag.todo_id
         left outer join tag on todo_tag.tag_id = tag.id
         left outer join category on tag.category_id = category.id
         ($cond) order by ($sort);"
-    #print $stmt
-    run $stmt
+    dbg $debug $stmt -t stmt
+    let r = run $stmt
     | group-by id
-    #| print ($in | table -e)
     | items {|k, x| $x | first | insert tags ($x | get tag) | reject tag }
-    | todo format
+
+    if $raw { $r } else { $r | todo format }
 }
 
 
