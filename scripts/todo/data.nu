@@ -6,7 +6,7 @@ export def 'todo add' [
     --important(-i): int@cmp-level
     --urgent(-u): int@cmp-level
     --parent(-p): int@cmp-todo-id
-    --tag(-t): list<string@cmp-tag>
+    --tag(-t): list<string@cmp-category>
     --duration(-d): duration
     --done(-D)
     title?: string
@@ -38,8 +38,8 @@ export def 'todo add' [
 
     if ($tag | is-not-empty) {
         let tags = $tag | each { Q $in } | str join ','
-        run $"insert into todo_tags
-            select ($id), t.id from tags as t where name in \(($tags)\);"
+        run $"insert into todo_tag
+            select ($id), t.id from tag as t where name in \(($tags)\);"
     }
 }
 
@@ -53,20 +53,21 @@ export def 'todo done' [
 
 export def 'todo tag' [
     id: int@cmp-todo-id
-    --tag(-t): string@cmp-tag
+    --tag(-t): string@cmp-category
     --remove(-r)
 ] {
     let tags = $tag | each { Q $in } | str join ','
     let s = if $remove {
-        $"delete from todo_tags where todo_id = ($id) and tag_id in \(select id from tags where name in \(($tags)\)\);"
+        $"delete from todo_tag where todo_id = ($id) and tag_id in \(select id from tag where name in \(($tags)\)\);"
     } else {
-        $"insert into todo_tags
-        select ($id), t.id from tags as t where name in \(($tags)\)
+        $"insert into todo_tag
+        select ($id), t.id from tag as t where name in \(($tags)\)
         on conflict \(todo_id, tag_id\) do nothing
         ;"
     }
     run $s
 }
+
 
 export def 'todo edit' [
     id: int@cmp-todo-id
@@ -97,14 +98,14 @@ export def 'todo list' [
     --duration(-d): duration
 ] {
     run $"select * from todo as t
-        left outer join todo_tags as l on t.id = l.todo_id
-        left outer join tags as g on l.tag_id = g.id
+        left outer join todo_tag as l on t.id = l.todo_id
+        left outer join tag as g on l.tag_id = g.id
         order by t.created
     ;"
     | rename todo
     | select todo parent_id title description created updated deadline important urgent delegate name
     | group-by todo
-    | items {|k, x| $x | first | insert tags ($x | get name) }
+    | items {|k, x| $x | first | insert tags ($x | get name) | reject name }
     | todo format
 }
 
@@ -120,22 +121,31 @@ export def 'todo delete' [
 ] {
     let ts = $tags | each { Q $in } | str join ','
     run $"delete from todo where id in \(
-        select t.todo_id as id from todo_tags as t join tags as g
+        select t.todo_id as id from todo_tag as t join tag as g
             on g.id = t.tag_id where g.name in \(($ts)\)
     \)"
-    run $"delete from todo_tags where tag_id in \(
-        select id from tags where name in \(($ts)\)
+    run $"delete from todo_tag where tag_id in \(
+        select id from tag where name in \(($ts)\)
     \);"
     if $with_tag {
-        run $"delete from tags where name in \($ts\);"
+        run $"delete from tag where name in \($ts\);"
     }
 }
 
-export def 'todo add-tag' [...name] {
-    let ns = $name | each { $"\((Q $in)\)" } | str join ','
-    run $"insert into tags \(name\) values ($ns);"
+export def 'todo cat add' [...categories] {
+    let ns = $categories | each { split column ':' c t  } | flatten  | group-by c
+    let c = $ns | columns | each { $"\((Q $in)\)" } | str join ','
+    let c = run $"insert into category \(name\) values ($c)
+        on conflict \(name\) do update set name = EXCLUDED.name
+        returning id, name;"
+    for i in $c {
+        let t = $ns | get $i.name -s | get t
+        let t = $t | each { $"\(($i.id), (Q $in)\)" } | str join ','
+        run $"insert into tag \(category_id, name\) values ($t)
+            on conflict \(category_id, name\) do nothing;"
+    }
 }
 
-export def 'todo rename-tag' [from:string@cmp-tag to] {
-    run $"update tags set name = (Q $to) where name = (Q $from)"
+export def 'todo cat rename' [from:string@cmp-tag to] {
+    run $"update tag set name = (Q $to) where name = (Q $from)"
 }

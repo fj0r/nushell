@@ -1,3 +1,5 @@
+use common.nu *
+
 export def 'cmp-delete' [] {
     [trash]
 }
@@ -7,19 +9,27 @@ export def 'cmp-level' [] {
 }
 
 export def 'cmp-todo-id' [] {
-    open $env.TODO_DB
-    | query db 'select id, title from todo;'
+    run 'select id, title from todo;'
     | each { $"($in.id) # ($in.title)" }
 }
 
 export def 'cmp-tag-id' [] {
-    open $env.TODO_DB
-    | query db 'select id, name from tags;'
+    run 'select id, name from tag;'
     | each { $"($in.id) # ($in.name)" }
 }
 
 export def 'cmp-tag' [] {
-    open $env.TODO_DB
-    | query db 'select name from tags;'
+    run 'select name from tag;'
     | get name
 }
+
+export def 'cmp-category' [] {
+    let c = run 'select name from category;'
+    | get name
+    | each { $"($in):" }
+    let t = run 'select c.name as category, t.name as tag
+        from category as c
+        join tag as t on t.category_id = c.id'
+    | each { $"($in.category):($in.tag)" }
+}
+

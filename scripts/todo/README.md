@@ -1,0 +1,3 @@
+- [ ] Non-interactive mode
+- [ ] Tag category
+- [ ] List filtering
