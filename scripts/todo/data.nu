@@ -48,7 +48,7 @@ export def 'todo add' [
     print $"(ansi grey)Todo created successfully: ($id)(ansi reset)"
 
     if ($tag | is-not-empty) {
-        let sub = $tag | split-cat | cat-to-tag-id $id
+        let sub = $tag | cat-to-tag-id $id
         run $"insert into todo_tag ($sub);"
     }
 }
@@ -69,10 +69,10 @@ export def 'todo tag' [
     --remove(-r)
 ] {
     let s = if $remove {
-        let sub = $tag | split-cat | cat-to-tag-id
+        let sub = $tag | cat-to-tag-id
         $"delete from todo_tag where todo_id = ($id) and tag_id in \(($sub)\);"
     } else {
-        let sub = $tag | split-cat | cat-to-tag-id $id
+        let sub = $tag | cat-to-tag-id $id
         $"insert into todo_tag ($sub)
           on conflict \(todo_id, tag_id\) do nothing
         ;"
@@ -114,6 +114,7 @@ export def 'todo show' [
     --created: duration
     --deadline: duration
     --sort(-s): list<string@cmp-sort>
+    --undone(-U)
     --raw
     --debug
 ] {
@@ -133,7 +134,7 @@ export def 'todo show' [
 
     mut cond = []
     if ($tags | is-not-empty) {
-        let tag_cond = $tags | split-cat | cat-to-tag-id --and=(not $all)
+        let tag_cond = $tags | cat-to-tag-id --and=(not $all)
         dbg -t tag-cond $debug $tag_cond
         let tag_id = run $tag_cond
         | get id
@@ -170,7 +171,7 @@ export def 'todo cat purge' [
     ...tags: string@cmp-category
 ] {
     let ns = $tags | split-cat
-    let tag_id = run ($ns | cat-to-tag-id) | get id
+    let tag_id = run ($tags | cat-to-tag-id) | get id
     let id = run $"delete from todo where id in \(
         select todo_id from todo_tag where tag_id in \(($tag_id | str join ', ')\)
         \) returning id" | get id
