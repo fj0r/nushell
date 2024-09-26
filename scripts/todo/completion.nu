@@ -31,5 +31,6 @@ export def 'cmp-category' [] {
         from category as c
         join tag as t on t.category_id = c.id'
     | each { $"($in.category):($in.tag)" }
+    $c | append $t
 }
 

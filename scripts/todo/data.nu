@@ -9,14 +9,24 @@ export def 'todo add' [
     --tag(-t): list<string@cmp-category>
     --duration(-d): duration
     --done(-D)
+    --desc: string=''
+    --batch(-b)
     title?: string
 ] {
     let now = date now | format date '%FT%H:%M:%S'
     let title = if ($title | is-empty) { 'untitled' } else { $title }
-    let data = $"($title)\n" | block-edit $"add-todo-XXX.todo" | lines
-    let title = $data | first
-    let description = $data | range 1.. | str join (char newline)
-
+    let data = if not $batch {
+        let input = $"($title)\n($desc)" | block-edit $"add-todo-XXX.todo" | lines
+        {
+            title: ($input | first)
+            desc: ($input | range 1.. | str join (char newline))
+        }
+    } else {
+        {
+            title: $title
+            desc: $desc
+        }
+    }
     mut attrs = {}
     if ($important | is-not-empty) { $attrs.important = $important }
     if ($urgent | is-not-empty) { $attrs.urgent = $urgent }
@@ -27,7 +37,7 @@ export def 'todo add' [
     let keys = [created, updated, title, description, ...($attrs | columns)]
     | str join ','
 
-    let vals = [$now, $now, $title, $description, ...($attrs | values)]
+    let vals = [$now, $now, $data.title, $data.desc, ...($attrs | values)]
     | each { Q $in }
     | str join ','
 
