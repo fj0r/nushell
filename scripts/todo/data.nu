@@ -2,6 +2,7 @@ use completion.nu *
 use common.nu *
 use format.nu *
 
+# add todo
 export def 'todo add' [
     --important(-i): int@cmp-level
     --urgent(-u): int@cmp-level
@@ -49,10 +50,13 @@ export def 'todo add' [
     if ($tag | is-not-empty) {
         let tags = $tag | each { Q $in } | str join ','
         run $"insert into todo_tag
-            select ($id), t.id from tag as t where name in \(($tags)\);"
+            select ($id), t.id from tag as t
+            join category as c on t.category_id = c.id
+            where name in \(($tags)\);"
     }
 }
 
+# done todo
 export def 'todo done' [
     id: int@cmp-todo-id
     --reverse(-r)
@@ -142,14 +146,15 @@ export def 'todo delete' [
     }
 }
 
+# add categories
 export def 'todo cat add' [...categories] {
-    let ns = $categories | each { split column ':' c t  } | flatten  | group-by c
+    let ns = $categories | split-tag
     let c = $ns | columns | each { $"\((Q $in)\)" } | str join ','
     let c = run $"insert into category \(name\) values ($c)
         on conflict \(name\) do update set name = EXCLUDED.name
         returning id, name;"
     for i in $c {
-        let t = $ns | get $i.name -s | get t
+        let t = $ns | get $i.name -s
         let t = $t | each { $"\(($i.id), (Q $in)\)" } | str join ','
         run $"insert into tag \(category_id, name\) values ($t)
             on conflict \(category_id, name\) do nothing;"

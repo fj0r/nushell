@@ -13,6 +13,15 @@ export def block-edit [temp] {
     $c
 }
 
+export def split-tag [] {
+    $in
+    | each { split column ':' c tag  }
+    | flatten
+    | group-by c
+    | items {|k,v| {cat: $k, tag: ($v | get tag)} }
+    | reduce -f {} {|i,a| $a | insert $i.cat $i.tag }
+}
+
 export def db-upsert [db table pk --do-nothing] {
     let r = $in
     let d = if $do_nothing { 'NOTHING' } else {
