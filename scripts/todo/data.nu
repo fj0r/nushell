@@ -90,6 +90,7 @@ export def 'todo tag' [
 }
 
 
+# todo edit
 export def 'todo edit' [
     id: int@cmp-todo-id
 ] {
@@ -104,6 +105,7 @@ export def 'todo edit' [
 
 }
 
+# todo move
 export def 'todo move' [
     id: int@cmp-todo-id
     to: int@cmp-todo-id
@@ -111,22 +113,30 @@ export def 'todo move' [
     run $"update todo set parent_id = ($to) where id = ($id);"
 }
 
+# todo list
 export def 'todo list' [
+    ...tags: any@cmp-category
     --all(-a)
     --tag(-t): list<string>
     --important(-i): int
     --urgent(-u): int
     --duration(-d): duration
 ] {
-    run $"select * from todo as t
+    let f = [
+        "t.id as id", parent_id,
+        title, description, done,
+        created, updated, deadline,
+        important, urgent, delegate,
+        "c.name || ':' || g.name as tag"
+    ] | str join ', '
+    run $"select ($f) from todo as t
         left outer join todo_tag as l on t.id = l.todo_id
         left outer join tag as g on l.tag_id = g.id
+        left outer join category as c on g.category_id = c.id
         order by t.created
     ;"
-    | rename todo
-    | select todo parent_id title description created updated deadline important urgent delegate name
-    | group-by todo
-    | items {|k, x| $x | first | insert tags ($x | get name) | reject name }
+    | group-by id
+    | items {|k, x| $x | first | insert tags ($x | get tag) | reject tag }
     | todo format
 }
 

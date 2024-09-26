@@ -18,7 +18,8 @@ export def --env start [] {
             name TEXT NOT NULL,
             UNIQUE (category_id, name) ON CONFLICT REPLACE
         );"
-        "INSERT INTO tag (category_id, name) VALUES (-1, 'trash');"
+        "INSERT INTO category (id, name) VALUES (1, '');"
+        "INSERT INTO tag (category_id, name) VALUES (1, 'trash');"
         "CREATE TABLE IF NOT EXISTS todo (
             id INTEGER PRIMARY KEY,
             parent_id INTEGER DEFAULT -1,
