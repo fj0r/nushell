@@ -8,13 +8,12 @@ export def 'todo add' [
     --urgent(-u): int@cmp-level
     --parent(-p): int@cmp-todo-id
     --tag(-t): list<string@cmp-category>
-    --duration(-d): duration
+    --deadline(-d): duration
     --done(-D)
     --desc: string=''
     --batch(-b)
     title?: string
 ] {
-    let now = date now | format date '%FT%H:%M:%S'
     let title = if ($title | is-empty) { 'untitled' } else { $title }
     let data = if not $batch {
         let input = $"($title)\n($desc)" | block-edit $"add-todo-XXX.todo" | lines
@@ -32,12 +31,13 @@ export def 'todo add' [
     if ($important | is-not-empty) { $attrs.important = $important }
     if ($urgent | is-not-empty) { $attrs.urgent = $urgent }
     if ($parent | is-not-empty) { $attrs.parent_id = $parent }
-    if ($duration | is-not-empty) { $attrs.deadline = (date now) + $duration | format date '%FT%H:%M:%S' }
+    if ($deadline | is-not-empty) { $attrs.deadline = (date now) + $deadline | fmt-date }
     if ($done | is-not-empty) { $attrs.done = (if $done { 1 } else { 0 }) }
 
     let keys = [created, updated, title, description, ...($attrs | columns)]
     | str join ','
 
+    let now = date now | fmt-date
     let vals = [$now, $now, $data.title, $data.desc, ...($attrs | values)]
     | each { Q $in }
     | str join ','
@@ -91,7 +91,7 @@ export def 'todo edit' [
     | $"### Do not change the `id` \n($in)"
     | block-edit $"todo.XXX.yml"
     | from yaml
-    | update updated (date now | format date '%FT%H:%M:%S')
+    | update updated (date now | fmt-date)
     | db-upsert $env.TODO_DB todo id
 
 }
@@ -104,38 +104,51 @@ export def 'todo move' [
     run $"update todo set parent_id = ($to) where id = ($id);"
 }
 
-# todo list
-export def 'todo list' [
+# todo show
+export def 'todo show' [
     ...tags: any@cmp-category
     --all(-a)
-    --tag(-t): list<string>
-    --important(-i): int
-    --urgent(-u): int
-    --duration(-d): duration
+    --important(-i): int@cmp-level
+    --urgent(-u): int@cmp-level
+    --updated: duration
+    --created: duration
+    --deadline: duration
+    --sort(-s): list<string@cmp-sort>
 ] {
-    let f = [
-        "t.id as id", parent_id,
-        title, description, done,
+    let sortable = [
         created, updated, deadline,
-        important, urgent, delegate,
+        done, important, urgent
+    ]
+    let fields = [
+        "t.id as id", parent_id,
+        title, description, ...$sortable , delegate,
         "c.name || ':' || g.name as tag"
     ] | str join ', '
-    run $"select ($f) from todo as t
+
+    let sort = if ($sort | is-empty) { ['created'] } else { $sort }
+    | each { $"t.($in)" }
+    | str join ', '
+
+    mut cond = []
+    let now = date now
+    if ($important | is-not-empty) { $cond ++= $"important >= ($important)"}
+    if ($urgent | is-not-empty) { $cond ++= $"urgent >= ($urgent)"}
+    if ($updated | is-not-empty) { $cond ++= $"updated >= ($now - $updated | fmt-date | Q $in)"}
+    if ($created | is-not-empty) { $cond ++= $"created >= ($now - $created | fmt-date | Q $in)"}
+    if ($deadline | is-not-empty) { $cond ++= $"deadline >= ($now - $deadline | fmt-date | Q $in)"}
+    let $cond = if ($cond | is-empty) { '' } else { $cond | str join ' and ' | $"where ($in)" }
+
+    run $"select ($fields) from todo as t
         left outer join todo_tag as l on t.id = l.todo_id
         left outer join tag as g on l.tag_id = g.id
         left outer join category as c on g.category_id = c.id
-        order by t.created
+        ($cond) order by ($sort)
     ;"
     | group-by id
     | items {|k, x| $x | first | insert tags ($x | get tag) | reject tag }
     | todo format
 }
 
-export def 'todo now' [
-
-] {
-
-}
 
 # delete todo in categories
 export def 'todo cat purge' [

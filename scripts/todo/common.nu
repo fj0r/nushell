@@ -22,6 +22,10 @@ export def split-cat [] {
     | reduce -f {} {|i,a| $a | insert $i.cat $i.tag }
 }
 
+export def fmt-date [] {
+    $in | format date '%FT%H:%M:%S'
+}
+
 export def cat-to-cond [a b] {
     $in
     | items {|k, v|

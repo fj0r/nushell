@@ -12,6 +12,10 @@ export def 'cmp-del-level' [] {
     [tag category]
 }
 
+export def 'cmp-sort' [] {
+    [created, updated, deadline, done, important, urgent]
+}
+
 export def 'cmp-todo-id' [] {
     run 'select id, title from todo;'
     | each { $"($in.id) # ($in.title)" }
