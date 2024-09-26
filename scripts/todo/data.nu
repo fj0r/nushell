@@ -45,7 +45,7 @@ export def 'todo add' [
     let id = run $"insert into todo \(($keys)\) values \(($vals)\) returning id;"
     | first
     | get id
-    print $"(ansi grey)Todo created successfully: ($id)(ansi reset)"
+    dbg true -t 'todo created successfully' $id
 
     if ($tag | is-not-empty) {
         let sub = $tag | cat-to-tag-id $id
@@ -179,13 +179,22 @@ export def 'todo cat purge' [
     let id = run $"delete from todo where id in \(
         select todo_id from todo_tag where tag_id in \(($tag_id | str join ', ')\)
         \) returning id" | get id
-    run $"delete from todo_tag where todo_id in \(($id | str join ', ')\)"
+    dbg true -t 'delete todo' $id
+    let tid = run $"delete from todo_tag where todo_id in \(($id | str join ', ')\)
+        returning todo_id, tag_id"
+    dbg true -t 'delete todo_tag' $tid
     if $level in [tag category] {
         run $"delete from tag where id in \(($tag_id | str join ', ')\)"
+        dbg true -t 'delete tag' $tag_id
     }
     if $level in [category] {
         run $"delete from category where name in \(($ns | columns | each {Q $in} | str join ', ')\);"
+        dbg true -t 'delete category' ($ns | columns)
     }
+}
+
+export def 'todo clean' [] {
+    todo cat purge :trash
 }
 
 # add categories
