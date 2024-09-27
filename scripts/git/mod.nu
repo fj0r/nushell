@@ -82,10 +82,10 @@ export def gb [
                 }
             }
         } else {
-            if $branch in $bs and (agree 'branch will be delete!') {
+            if $branch in $bs and (agree $'branch `($branch)` will be delete!') {
                     git branch -D $branch
             }
-            if $"($remote)/($branch)" in $remote_branches and (agree 'delete remote branch?!') {
+            if $"($remote)/($branch)" in $remote_branches and (agree $'remote branch `($branch)` will be delete!') {
                 git branch -D -r $'($remote)/($branch)'
                 git push $remote -d $branch
             }
