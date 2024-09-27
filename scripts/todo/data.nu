@@ -115,6 +115,7 @@ export def 'todo show' [
     --deadline: duration
     --sort(-s): list<string@cmp-sort>
     --undone(-U)
+    --md(-M)
     --raw
     --debug
 ] {
@@ -165,7 +166,7 @@ export def 'todo show' [
     | group-by id
     | items {|k, x| $x | first | insert tags ($x | get tag) | reject tag }
 
-    if $raw { $r } else { $r | todo format }
+    if $raw { $r } else { $r | todo format --md=$md }
 }
 
 
