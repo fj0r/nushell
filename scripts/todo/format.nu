@@ -4,19 +4,19 @@ export def 'todo format' [] {
 }
 
 def 'to tree' [] {
-    let o = $in
+    let o = $in | each { $in | insert sub [] }
     mut x = $o | reduce -f {} {|i,a|
-        let n = $i | select parent_id | insert sub []
-        $a | insert ($i.id | into string) $n
+        $a | insert ($i.id | into string) $i
     }
-    return $x
-    for i in ($x | transpose k v) {
-        if ($i.v.parent_id != -1) {
-            let p = [$i.v.parent_id sub]|into cell-path
-            $x | upsert $p ($x | get $p | append $i.k)
+    for i in $o {
+        if ($i.parent_id != -1) {
+            let p = [($i.parent_id | into string) sub] | into cell-path
+            $x = $x | upsert $p ($x | get $p | append $i)
         }
     }
-
+    $x
+    | items {|k,v| if $v.parent_id == -1 { $v } }
+    | filter {$in | is-not-empty}
 }
 
 def 'fmt branches' [] {
