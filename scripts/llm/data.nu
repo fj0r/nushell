@@ -47,7 +47,7 @@ export def --env init [] {
         );"
         "CREATE INDEX idx_messages ON messages (session_id);"
 
-        "INSERT INTO provider (name, baseurl, temp_max, active) VALUES ('ollama', 'http://localhost:11434/v1', 1, 1);"
+        "INSERT INTO provider (name, baseurl, model_default, temp_max, active) VALUES ('ollama', 'http://localhost:11434/v1', 'llama3.2:latest', 1, 1);"
 
         "INSERT INTO prompt (name, system, template, placeholder, description) VALUES
         ('json-to', '', 'Analyze the following JSON data to convert it into a {} {}.\nDo not explain.\n```\n{}\n```', '[{\"jsonschema\":\"JsonSchema\",\"rs\":\"Rust\",\"hs\":\"Haskell\",\"ts\":\"TypeScript\",\"py\":\"Python pydantic\",\"nu\":\"Nushell\",\"psql\":\"PostgreSQL\",\"mysql\":\"MySQL\",\"slite\":\"Sqlite\"},{\"type\":\"Type\",\"struct\":\"Struct\",\"class\":\"Class\",\"trait\":\"Trait\",\"interface\":\"Interface\",\"table\":\"Table\"}]', 'Analyze JSON content, converting it into'),
