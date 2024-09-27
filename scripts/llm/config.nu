@@ -14,6 +14,7 @@ export def 'ai history chat' [] {
 export def 'ai history do' [num=10] {
     open $env.OPENAI_DB
     | query db $"select session_id, role, content, created from messages where tag = 'tool' order by created desc limit (Q $num)"
+    | reverse
 }
 
 export def 'ai config add provider' [o] {
