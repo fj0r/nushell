@@ -1,6 +1,6 @@
 export def 'todo format' [] {
     let i = $in
-    $i | to tree
+    $i | to tree | fmt tree
 }
 
 def 'to tree' [] {
@@ -19,10 +19,16 @@ def 'to tree' [] {
     | filter {$in | is-not-empty}
 }
 
-def 'fmt branches' [] {
-
+def 'fmt tree' [level:int=0 --indent(-i):int = 4] {
+    for i in $in {
+        let n = '' | fill -c ' ' -w ($level * $indent)
+        $i | reject sub | fmt leaves $n | print $in
+        if ($i.sub | is-not-empty) {
+            $i.sub | fmt tree ($level + 1)
+        }
+    }
 }
 
-def 'fmt leaves' [--indent(-i)] {
-
+def 'fmt leaves' [indent] {
+    $in | to yaml | lines | each { $"($indent)($in)"} | str join (char newline)
 }
