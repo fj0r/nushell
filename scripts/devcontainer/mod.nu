@@ -41,7 +41,7 @@ export-env {
             }
             scripts: [
                 "npm config set registry http://nexus.s/repository/npm/"
-                "sed -i 's/^\\s*\"resolved\"\\s*:.*$//g' package-lock.json"
+                "if [ -f \"package-lock.json\" ]; then sed -i 's/^\\s*\"resolved\"\\s*:.*$//g' package-lock.json; fi"
                 "npm i"
                 "mv node_modules /opt"
                 "ln -s /opt/node_modules node_modules"
