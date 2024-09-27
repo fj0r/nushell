@@ -41,7 +41,24 @@ export-env {
             }
             scripts: [
                 "npm config set registry http://nexus.s/repository/npm/"
-                "if [ -f \"package-lock.json\" ]; then sed -i 's/^\\s*\"resolved\"\\s*:.*$//g' package-lock.json; fi"
+                "npm i"
+                "mv node_modules /opt"
+                "ln -s /opt/node_modules node_modules"
+            ]
+        }
+        {
+            type: npm-lock
+            manifest: package-lock.json
+            base: "node:lts-slim"
+            workdir: /app
+            env: {
+                LANG: "C.UTF-8"
+                LC_ALL: "C.UTF-8"
+                TIMEZONE: Asia/Shanghai
+            }
+            scripts: [
+                "npm config set registry http://nexus.s/repository/npm/"
+                "sed -i 's/^\\s*\"resolved\"\\s*:.*$//g' package-lock.json"
                 "npm i"
                 "mv node_modules /opt"
                 "ln -s /opt/node_modules node_modules"
