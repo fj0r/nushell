@@ -10,6 +10,7 @@ export-env {
         kind: [kind {|x|$x| str downcase}]
         apiVersion: [apiVersion]
         labels: [metadata labels]
+        annotations: [metadata annotations]
         created: [metadata creationTimestamp {|x|$x | into datetime}]
     }
     let ids = {...$id, namespace: [metadata namespace] }
@@ -176,7 +177,6 @@ export-env {
             }
             ingresses: {
                 ...$ids
-                annotations: [metadata annotations]
                 rules: {
                     _: [spec rules]
                     host: [host]
