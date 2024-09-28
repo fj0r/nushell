@@ -54,6 +54,8 @@ export def --env init [] {
         ('git-diff-summary', '', 'Extract commit logs from git differences, summarizing only the content changes in files while ignoring hash changes, and generate a title.\n```\n{}\n```', '', 'Summarize from git differences'),
         ('api-doc', '', '{} Inquire about the usage of the API and provide an example.\n```\n{}\n```', '[{\"rust\":\"You are a Rust language expert.\",\"javascript\":\"You are a Javascript language expert.\",\"python\":\"You are a Python language expert.\",\"nushell\":\"You are a Nushell language expert.\",\"sql\":\"You are a Database expert.\"}]', ''),
         ('debug', '', '{} Analyze the causes of the error and provide suggestions for correction.\n```\n{}\n```', '[{\"rust\":\"You are a Rust language expert.\",\"javascript\":\"You are a Javascript language expert.\",\"python\":\"You are a Python language expert.\",\"nushell\":\"You are a Nushell language expert.\"}]', 'Programming language experts help you debug.'),
+        ('dictionary', '', 'Explain the meaning, usage, list synonyms and antonyms of the following words:\n```{}```', '', 'dictionary'),
+        ('dictionary-zh', '', '解释以下单词含义，用法，并列出同义词，近义词和反义词:\n```{}```', '', 'dictionary'),
         ('synonyms', '', '解释以下词语的区别，并介绍相关的近义词和反义词\n```{}```', '', '近义词解析'),
         ('trans-to', '', 'Translate the following text into {}:\n```\n{}\n```', '[{\"en\":\"English\",\"zh\":\"Chinese\"}]', 'Translation into the specified language');"
     ] {

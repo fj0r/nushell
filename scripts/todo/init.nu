@@ -30,6 +30,7 @@ export def --env start [] {
             deadline TEXT,
             important INTEGER DEFAULT -1,
             urgent INTEGER DEFAULT -1,
+            challenge INTEGER DEFAULT -1,
             delegate TEXT DEFAULT '',
             done BOOLEAN DEFAULT -1
         );"

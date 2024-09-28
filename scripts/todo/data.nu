@@ -9,7 +9,7 @@ export def 'todo add' [
     --parent(-p): int@cmp-todo-id
     --tag(-t): list<string@cmp-category>
     --deadline(-d): duration
-    --done(-D)
+    --done(-x)
     --desc: string=''
     --batch(-b)
     title?: string
