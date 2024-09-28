@@ -55,11 +55,12 @@ export def 'todo add' [
 
 # done todo
 export def 'todo done' [
-    id: int@cmp-todo-id
+    ...id: int@cmp-todo-id
     --reverse(-r)
 ] {
     let d = if $reverse { 0 } else { 1 }
-    run $'update todo set done = ($d) where id = ($id);'
+    let now = date now | fmt-date
+    run $"update todo set done = ($d), updated = (Q $now) where id in \(($id | str join ',')\);"
 }
 
 # todo tag

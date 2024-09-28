@@ -6,22 +6,23 @@ export def 'todo format' [--md] {
 }
 
 def 'to tree' [] {
-    let o = $in | each { $in | insert sub [] }
-    mut x = $o | reduce -f {} {|i,a|
-        $a | insert ($i.id | into string) $i
-    }
-    for i in $o {
-        if ($i.parent_id != -1) {
-            let p = [($i.parent_id | into string) sub] | into cell-path
-            $x = $x | upsert $p ($x | get $p | append $i)
-        }
-    }
-    $x
-    | items {|k,v| if $v.parent_id == -1 { $v } }
-    | filter {$in | is-not-empty}
+    let r = $in | group-by parent_id
+    to-tree ($r | get '-1') $r
 }
 
-def 'fmt tree' [level:int=0 --indent(-i):int = 4 --md] {
+def to-tree [r o] {
+    $r | each {|i|
+        let k = $i.id | into string
+        let t = if $k in $o {
+            to-tree ($o | get $k) $o
+        } else {
+            []
+        }
+        $i | insert sub $t
+    }
+}
+
+def 'fmt tree' [level:int=0 --indent(-i):int=4 --md] {
     for i in $in {
         let n = '' | fill -c ' ' -w ($level * $indent)
         $i | reject sub | fmt leaves $n --md=$md | each { print $in }
