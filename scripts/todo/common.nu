@@ -17,8 +17,9 @@ export def split-cat [] {
     $in
     | each { split column ':' c tag  }
     | flatten
+    | update tag { $in | split row '/' }
     | group-by c
-    | items {|k,v| {cat: $k, tag: ($v | get tag)} }
+    | items {|k,v| {cat: $k, tag: ($v | get tag | flatten)} }
     | reduce -f {} {|i,a| $a | insert $i.cat $i.tag }
 }
 

@@ -94,7 +94,7 @@ def 'fmt tags' [] {
     $in
     | split-cat
     | items {|k,v|
-        $"(ansi green)($k):(ansi grey)($v | str join ',')"
+        $"(ansi green)($k):(ansi grey)($v | str join '/')"
     }
     | str join ' '
     | $"($in)(ansi reset)"

@@ -115,7 +115,7 @@ export def 'todo show' [
     --created: duration
     --deadline: duration
     --sort(-s): list<string@cmp-sort>
-    --undone(-U)
+    --unfinished(-n)
     --md(-M)
     --raw
     --debug
@@ -154,6 +154,7 @@ export def 'todo show' [
     if ($updated | is-not-empty) { $cond ++= $"updated >= ($now - $updated | fmt-date | Q $in)"}
     if ($created | is-not-empty) { $cond ++= $"created >= ($now - $created | fmt-date | Q $in)"}
     if ($deadline | is-not-empty) { $cond ++= $"deadline >= ($now - $deadline | fmt-date | Q $in)"}
+    if ($unfinished) { $cond ++= $"done = 0" }
     let $cond = if ($cond | is-empty) { '' } else { $cond | str join ' and ' | $"where ($in)" }
 
     dbg $debug $cond -t cond
