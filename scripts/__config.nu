@@ -24,7 +24,6 @@ use lg
 use perform-or-print *
 use git *
 use git/shortcut.nu *
-use ssh *
 use kubernetes *
 use kubernetes/shortcut.nu *
 use docker *
@@ -33,25 +32,25 @@ use llm *
 use llm/shortcut.nu *
 use todo *
 use todo/shortcut.nu *
+use project *
+use ssh *
+use cwdhist *
+use parser
+use devcontainer
+
+# autoload
+use os *
+use nvim *
+use netcat *
+use nushell.nu *
+use setup.nu *
 use history-utils *
 use history-utils/backup.nu *
 use resolvenv
-use nvim *
-use netcat *
-use os *
-use project *
-use setup.nu *
-use cwdhist *
-
-
-overlay use nushell.nu
-#use just.nu *
-use parser
 use git-cmp.nu *
-#use completion-generator.nu *
-
 use rustic *
-overlay use devcontainer
+#use just.nu *
+#use completion-generator.nu *
 
 
 use power
