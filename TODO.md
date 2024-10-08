@@ -1,4 +1,4 @@
-- [ ] $env.MYVIMRC #49
+- [x] $env.MYVIMRC #49
 - [ ] migrate from comma to project-overlay #56
     - [x] watch updating (for dev) #57
         - [x] watch __ #106
@@ -8,8 +8,8 @@
         - [x] config/nushell #109
         - [x] typst #124
         - [x] deployment #126
-        - [ ] risingwave #127
-        - [ ] meilisearch #128
+        - [x] risingwave #127
+        - [x] meilisearch #128
         - [x] ansible #134
     - [x] Find __.nu in all parent directories. #104
         - [x] replace-cmpl <file> #107
@@ -27,6 +27,7 @@
     - [x] get-sign to obtain the most matching (longest(sorted last)) option #132
     - [x] kubectl complete update _args index #133
 - [ ] Modularize #136
+    - [ ] autoload #156
 - [x] Shortcut.nu #148
     - [x] kubernetes #149
     - [x] git #150

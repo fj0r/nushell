@@ -5,6 +5,7 @@
         - [x] Test re-adding :trash after deleting it. #73
     - [x] Filter finished #81
     - [x] Category without tag is equivalent to all tags #87
+        - [x] Enable `--empty-as-all` of `cat-to-tag-id` only in `Todo list` #181
 - [ ] Actions #22
     - [x] Category #11
         - [x] Allow creation of multiple tags under one category at once #13

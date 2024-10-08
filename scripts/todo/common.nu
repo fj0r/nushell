@@ -27,11 +27,11 @@ export def fmt-date [] {
     $in | format date '%FT%H:%M:%S'
 }
 
-export def cat-to-cond [a b] {
+export def cat-to-cond [a b --empty-as-all] {
     $in
     | split-cat
     | items {|k, v|
-        let t = if '' in $v {
+        let t = if '' in $v and $empty_as_all {
             # Category without tag is equivalent to all tags
             ''
         } else {
@@ -44,9 +44,10 @@ export def cat-to-cond [a b] {
 
 export def cat-to-tag-id [
     ...c
+    --empty-as-all
     --and
 ] {
-    let cond = $in | cat-to-cond 'c.name' 't.name'
+    let cond = $in | cat-to-cond --empty-as-all=$empty_as_all 'c.name' 't.name'
     let s = [...$c, 't.id'] | str join ', '
     $"select ($s) from tag as t join category as c on t.category_id = c.id where ($cond)"
 }
