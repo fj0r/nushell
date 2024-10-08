@@ -1,15 +1,16 @@
 - [ ] Filter #10
     - [x] Enable filtering by category #15
-    - [ ] Enable `AND`, `NOT` tags #17
+    - [x] Enable `&AND`, `!NOT` tags #17
         - [x] `cat-to-tag-id` no longer includes `split-cat` #185
-        - [ ] Filter labels in the result set #186
+        - [x] Filter labels in the result set #186
             - [x] cat-filter #187
-            - [ ] filter `todo list` #188
+            - [x] filter `todo list` #188
     - [x] Automatically filter out `trash` tag #18
         - [x] Test re-adding :trash after deleting it. #73
     - [x] Filter finished #81
     - [x] Category without tag is equivalent to all tags #87
         - [x] Enable `--empty-as-all` of `cat-to-tag-id` only in `Todo list` #181
+    - [ ] Completion of &tag and !tag #189
 - [ ] Actions #22
     - [x] Category #11
         - [x] Allow creation of multiple tags under one category at once #13

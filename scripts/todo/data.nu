@@ -221,12 +221,15 @@ export def 'todo list' [
     | str join ', '
 
     mut cond = []
+    mut flt = {}
     if not $all {
         let x = [':trash'] | split-cat | cat-to-tag-id | run $in | get -i 0.id
         $cond ++= $"todo.id not in \(select todo_id from todo_tag where tag_id in \(($x)\)\)"
     }
     if ($tags | is-not-empty) {
-        let tag_cond = $tags | split-cat | cat-to-tag-id --empty-as-all --and=(not $all)
+        let sc = $tags | split-cat
+        let tag_cond = $sc | cat-to-tag-id --empty-as-all --and=(not $all)
+        $flt = $sc | cat-filter
         dbg -t tag-cond $debug $tag_cond
         let tag_id = run $tag_cond
         | get id
@@ -259,6 +262,19 @@ export def 'todo list' [
     let r = run $stmt
     | group-by id
     | items {|k, x| $x | first | insert tags ($x | get tag) | reject tag }
+
+
+    let flt = $flt
+    let r = if ($flt.and | is-not-empty) or ($flt.not | is-not-empty) {
+        $r
+        | filter {|x|
+            not ($flt.not | any {|y| $y in $x.tags })
+            and ($flt.and | all {|y| $y in $x.tags })
+        }
+    } else {
+        $r
+    }
+
 
     if $raw { $r } else { $r | todo format --md=$md }
 }
