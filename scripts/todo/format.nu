@@ -77,7 +77,6 @@ def 'fmt leaves' [
         }
     }
 
-    #let hs = (term size).columns - ($title | str plain | str length -g) - ($meta | str plain | str length)
     let header = [...$title ...$tags ...$meta]
     | filter { $in | is-not-empty }
     | str join ' '

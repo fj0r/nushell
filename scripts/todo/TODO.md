@@ -55,6 +55,7 @@
         - [x] Different styles for timeout and no deadline #85
     - [ ] Change `print message` to return the `message` data structure #101
     - [ ] Mind Map #145
+    - [ ] Optimize `fmt leaves` #183
 - [x] Data #29
     - [x] Challenge #30
         - [x] Data structure #36
