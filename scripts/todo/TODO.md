@@ -1,8 +1,9 @@
-- [ ] Filter #10
+- [x] Filter #10
     - [x] Enable filtering by category #15
-    - [ ] Enable `AND`, `NOT` tags #17
+    - [x] Enable `AND`, `NOT` tags #17
         - [x] `cat-to-tag-id` no longer includes `split-cat` #185
-        - [ ] Filter labels in the result set #186
+        - [x] Filter labels in the result set #186
+            - [x] cat-filter #187
     - [x] Automatically filter out `trash` tag #18
         - [x] Test re-adding :trash after deleting it. #73
     - [x] Filter finished #81

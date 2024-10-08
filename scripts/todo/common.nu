@@ -1,6 +1,5 @@
-export def Q [...t] {
-    let s = $t | str join '' | str replace -a "'" "''"
-    $"'($s)'"
+export def fmt-date [] {
+    $in | format date '%FT%H:%M:%S'
 }
 
 export def block-edit [temp] {
@@ -13,6 +12,11 @@ export def block-edit [temp] {
     $c
 }
 
+export def Q [...t] {
+    let s = $t | str join '' | str replace -a "'" "''"
+    $"'($s)'"
+}
+
 export def split-cat [] {
     $in
     | each { split column ':' c tag  }
@@ -23,8 +27,27 @@ export def split-cat [] {
     | reduce -f {} {|i,a| $a | insert $i.cat $i.tag }
 }
 
-export def fmt-date [] {
-    $in | format date '%FT%H:%M:%S'
+export def cat-filter [] {
+    let x = $in
+    mut r = {
+        not: []
+        and: []
+    }
+    for i in ($x | transpose k v) {
+        let p = $i.k | str substring ..<1
+        if $p not-in ['&', '!'] { continue }
+        let k = $i.k | str substring 1..
+        let v = $i.v | each { $"($k):($in)" }
+        match $p {
+            '&' => {
+                $r.and ++= $v
+            }
+            '!' => {
+                $r.not ++= $v
+            }
+        }
+    }
+    $r
 }
 
 export def cat-to-cond [a b --empty-as-all] {
