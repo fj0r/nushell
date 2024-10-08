@@ -29,8 +29,8 @@ export def fmt-date [] {
 
 export def cat-to-cond [a b --empty-as-all] {
     $in
-    | split-cat
     | items {|k, v|
+        if ($k | str substring ..<1) in ['&', '!'] { return '' }
         let t = if '' in $v and $empty_as_all {
             # Category without tag is equivalent to all tags
             ''
@@ -39,6 +39,7 @@ export def cat-to-cond [a b --empty-as-all] {
         } 
         $"\(($a) = (Q $k)($t)\)"
     }
+    | filter {|x| $x | is-not-empty }
     | str join ' or '
 }
 

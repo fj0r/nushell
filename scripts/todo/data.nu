@@ -91,7 +91,7 @@ export def 'todo add' [
     }
     if ($tag | is-not-empty) {
         for id in $ids {
-            let sub = $tag | cat-to-tag-id $id
+            let sub = $tag | split-cat | cat-to-tag-id $id
             run $"insert into todo_tag ($sub);"
         }
     }
@@ -137,11 +137,11 @@ export def 'todo attrs' [
 
     if ($tag | is-not-empty) {
         if $remove {
-            let sub = $tag | cat-to-tag-id
+            let sub = $tag | split-cat | cat-to-tag-id
             run $"delete from todo_tag where todo_id in \(($ids | str join ',')\) and tag_id in \(($sub)\);"
         } else {
             for id in $ids {
-                let sub = $tag | cat-to-tag-id $id
+                let sub = $tag | split-cat | cat-to-tag-id $id
                 run $"insert into todo_tag ($sub)
                   on conflict \(todo_id, tag_id\) do nothing
                 ;"
@@ -222,11 +222,11 @@ export def 'todo list' [
 
     mut cond = []
     if not $all {
-        let x = [':trash'] | cat-to-tag-id | run $in | get -i 0.id
+        let x = [':trash'] | split-cat | cat-to-tag-id | run $in | get -i 0.id
         $cond ++= $"todo.id not in \(select todo_id from todo_tag where tag_id in \(($x)\)\)"
     }
     if ($tags | is-not-empty) {
-        let tag_cond = $tags | cat-to-tag-id --empty-as-all --and=(not $all)
+        let tag_cond = $tags | split-cat | cat-to-tag-id --empty-as-all --and=(not $all)
         dbg -t tag-cond $debug $tag_cond
         let tag_id = run $tag_cond
         | get id
@@ -270,7 +270,7 @@ export def 'todo cat clean' [
     ...tags: string@cmpl-category
 ] {
     let ns = $tags | split-cat
-    let tag_id = run ($tags | cat-to-tag-id) | get id
+    let tag_id = run ($tags | split-cat | cat-to-tag-id) | get id
     let id = run $"delete from todo where id in \(
         select todo_id from todo_tag where tag_id in \(($tag_id | str join ', ')\)
         \) returning id" | get id
