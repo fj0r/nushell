@@ -25,7 +25,7 @@ def 'uplevel done' [pid now done:bool] {
 }
 
 # add todo
-export def 'todo add' [
+export def todo-add [
     --important(-i): int@cmpl-level
     --urgent(-u): int@cmpl-level
     --challenge(-c): int@cmpl-level
@@ -97,12 +97,12 @@ export def 'todo add' [
     }
 
     for id in $ids {
-        todo done $id --reverse=(not $done)
+        todo-done $id --reverse=(not $done)
     }
 }
 
 # todo set
-export def 'todo attrs' [
+export def todo-attrs [
     ...ids: int@cmpl-todo-id
     --important(-i): int@cmpl-level
     --urgent(-u): int@cmpl-level
@@ -131,7 +131,7 @@ export def 'todo attrs' [
 
     if ($done | is-not-empty) {
         for id in $ids {
-            todo done $id --reverse=($done == 0)
+            todo-done $id --reverse=($done == 0)
         }
     }
 
@@ -151,7 +151,7 @@ export def 'todo attrs' [
 }
 
 # done todo
-export def 'todo done' [
+export def todo-done [
     ...id: int@cmpl-todo-id
     --reverse(-r)
 ] {
@@ -166,7 +166,7 @@ export def 'todo done' [
 }
 
 # todo edit
-export def 'todo edit' [
+export def todo-edit [
     id: int@cmpl-todo-id
 ] {
     run $"select * from todo where id = ($id);"
@@ -181,7 +181,7 @@ export def 'todo edit' [
 }
 
 # todo move
-export def 'todo move' [
+export def todo-move [
     id: int@cmpl-todo-id
     to: int@cmpl-todo-id
 ] {
@@ -189,7 +189,7 @@ export def 'todo move' [
 }
 
 # todo list
-export def 'todo list' [
+export def todo-list [
     ...tags: any@cmpl-category
     --all(-a)
     --important(-i): int@cmpl-level
@@ -281,7 +281,7 @@ export def 'todo list' [
 
 
 # delete todo in categories
-export def 'todo cat clean' [
+export def todo-cat-clean [
     --level(-L): string@cmpl-del-level
     ...tags: string@cmpl-category
 ] {
@@ -305,7 +305,7 @@ export def 'todo cat clean' [
 }
 
 # add categories
-export def 'todo cat add' [...categories] {
+export def todo-cat-add [...categories] {
     let ns = $categories | split-cat
     let c = $ns | columns | each { $"\((Q $in)\)" } | str join ','
     let c = run $"insert into category \(name\) values ($c)
@@ -319,11 +319,11 @@ export def 'todo cat add' [...categories] {
     }
 }
 
-export def 'todo cat rename' [from:string@cmpl-category to] {
+export def todo-cat-rename [from:string@cmpl-category to] {
     run $"update tag set name = (Q $to) where name = (Q $from)"
 }
 
-export def 'todo title' [id: int@cmpl-todo-id] {
+export def todo-title [id: int@cmpl-todo-id] {
     run $'select title from todo where id = ($id);'
     | get 0.title
 }

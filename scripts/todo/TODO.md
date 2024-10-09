@@ -72,7 +72,8 @@
         - [x] When no tag is specified, `:untagged` is added by default. #59
         - [x] remove/add `:untagged` when todo tag #60
 - [ ] Integration #63
-    - [ ] More convenient interaction modes #68
+    - [x] More convenient interaction modes #68
+        - [x] kebab-case #201
     - [ ] Import/Export(TODO.md) #69
     - [x] Shortcut #70
     - [x] Todo Commit #76
@@ -83,10 +84,7 @@
         - [x] alias: tc #77
         - [x] Edit #151
 - [ ] Scratch.nu #190
-    - [ ] 环境变量存储路径 #191
     - [ ] Edit or Output #192
-    - [ ] 第一行作为标题(数据库) #193
-    - [ ] 时间作为文件名 #194
     - [ ] Get last n #195
     - [x] New table `scratch`, `scratch_tag` #199
         - [x] Meta tag `:scratch` #197
