@@ -28,8 +28,8 @@ def cmpl-mod [] {
     $manifest | get to
 }
 
-
-export def 'export nu_scripts' [...mod:string@cmpl-mod] {
+export def 'dump nu_scripts' [...mod:string@cmpl-mod] {
+    use git *
     let m = $manifest | filter {|x| not ($x.disable? | default false) }
     let m = if ($mod | is-empty) { $m } else {
         $m | where to in $mod
@@ -58,9 +58,10 @@ export def 'export nu_scripts' [...mod:string@cmpl-mod] {
 
 }
 
-export def it-hooks [x args] {
-    print $x
-    print $args
+export def git-hooks [x args] {
+    if $x == 'post-commit' {
+        dump nu_scripts
+    }
 }
 
 export def replace-cmpl [file --dry-run] {
