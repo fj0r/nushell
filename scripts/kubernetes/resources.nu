@@ -1,4 +1,10 @@
-use complete *
+use complete.nu *
+
+### ctx
+export def "kube-config" [] {
+    let file = if ($env.KUBECONFIG? | is-empty) { $"($env.HOME)/.kube/config" } else { $env.KUBECONFIG }
+    { path: $file, data: (cat $file | from yaml) }
+}
 
 ### refine kubernetes resources
 export def kube-refine [
