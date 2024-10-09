@@ -30,6 +30,7 @@ def cmpl-mod [] {
 
 export def 'dump nu_scripts' [...mod:string@cmpl-mod] {
     use git *
+    use git/shortcut.nu *
     let m = $manifest | filter {|x| not ($x.disable? | default false) }
     let m = if ($mod | is-empty) { $m } else {
         $m | where to in $mod
