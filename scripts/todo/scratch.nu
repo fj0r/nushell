@@ -1,7 +1,7 @@
 use common.nu *
 
 def cmpl-scratch-id [] {
-    run $"select id as value, title as description from scratch order by updated desc;"
+    run $"select id as value, title || ' <' || type || '>' as description from scratch order by updated desc;"
 }
 
 export def scratch-add [--type(-t): string] {
