@@ -58,7 +58,7 @@ export def 'export nu_scripts' [...mod:string@cmpl-mod] {
 
 }
 
-export def git-hooks [x args] {
+export def it-hooks [x args] {
     print $x
     print $args
 }
