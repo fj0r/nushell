@@ -118,31 +118,31 @@ export def kube-get [
     --wide (-W)
     --all (-a)
 ] {
-    let n = if $all {
-                [-A]
-            } else if ($namespace | is-empty) {
-                []
-            } else {
-                [-n $namespace]
-            }
+    let ns = if $all {
+        [-A]
+    } else if ($namespace | is-empty) {
+        []
+    } else {
+        [-n $namespace]
+    }
     if ($resource | is-empty) {
         let l = $selector | with-flag -l
         if ($jsonpath | is-empty) {
             let wide = if $wide {[-o wide]} else {[]}
             if $verbose {
-                kubectl get -o json ...$n $kind ...$l | from json
+                kubectl get -o json ...$ns $kind ...$l | from json
                 | get items
                 | krefine $kind
             } else if $watch {
-                kubectl get ...$n $kind ...$l ...$wide --watch
+                kubectl get ...$ns $kind ...$l ...$wide --watch
             } else {
-                kubectl get ...$n $kind ...$l ...$wide | from ssv -a | normalize-column-names
+                kubectl get ...$ns $kind ...$l ...$wide | from ssv -a | normalize-column-names
             }
         } else {
-            kubectl get ...$n $kind $"--output=jsonpath={($jsonpath)}" | from json
+            kubectl get ...$ns $kind $"--output=jsonpath={($jsonpath)}" | from json
         }
     } else {
-        let o = kubectl get ...$n $kind $resource -o json | from json
+        let o = kubectl get ...$ns $kind $resource -o json | from json
         if $verbose { $o } else { $o | krefine $kind }
     }
 }

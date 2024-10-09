@@ -11,7 +11,7 @@ export def 'todo commit' [
     todo list -m $tag | save -f $file
     git add .
     mut a = []
-    if $amend { $a ++= [--amend] }
+    if $amend { $a ++= [ --amend ] }
     git commit ...$a -m $"(todo title $todo) #($todo)"
 }
 
