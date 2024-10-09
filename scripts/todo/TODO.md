@@ -83,8 +83,12 @@
         - [x] alias: tc #77
         - [x] Edit #151
 - [ ] Scratch.nu #190
+    - [ ] 环境变量存储路径 #191
     - [ ] Edit or Output #192
+    - [ ] 第一行作为标题(数据库) #193
+    - [ ] 时间作为文件名 #194
     - [ ] Get last n #195
-    - [x] Meta tag `:scratch` #197
-    - [x] Add column `type` into table `todo` #198
     - [x] New table `scratch`, `scratch_tag` #199
+        - [x] Meta tag `:scratch` #197
+        - [x] Add column `type` into table `todo` #198
+    - [x] Scratch new/edit/out #200

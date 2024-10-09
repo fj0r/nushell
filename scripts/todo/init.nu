@@ -44,8 +44,8 @@ export def --env start [] {
         "CREATE TABLE IF NOT EXISTS scratch (
             id INTEGER PRIMARY KEY,
             parent_id INTEGER DEFAULT -1,
-            type TEXT DEFAULT '',
             title TEXT NOT NULL,
+            type TEXT DEFAULT '',
             content TEXT DEFAULT '',
             created TEXT DEFAULT (strftime('%Y-%m-%dT%H:%M:%S','now')),
             updated TEXT DEFAULT (strftime('%Y-%m-%dT%H:%M:%S','now')),
