@@ -35,19 +35,22 @@ export def 'export nu_scripts' [...mod:string@cmpl-mod] {
         $m | where to in $mod
     }
     let l = git-last-commit
+    let o = $"($env.PWD)/scripts"
     for x in $m {
         let t = $'($env.dest)/($x.to)'
         if ($t | path exists | not $in) { mkdir $t }
-        rsync -avP --delete $'($env.PWD)/scripts/($x.from)' $'($env.dest)/($x.to)'
+        rsync -avP --delete $'($o)/($x.from)' --exclude='.git'  $t
         cd $t
-        if (git-is-repo) {
-            git-init $"git@github.com:fj0r/($x.to).nu.git"
+        if not (git-is-repo) {
+            git-init $"git@github-fjord:fj0r/($x.to).nu.git"
             gp
         } else {
-            if (git-need-push) {
+            if (git-changes | is-not-empty) {
                 ga .
                 gc $l.message
                 gp
+            } else {
+                $"(ansi yellow)($x.to)(ansi reset) no changes"
             }
         }
     }
