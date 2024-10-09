@@ -221,7 +221,7 @@ export def 'todo list' [
     | str join ', '
 
     mut cond = []
-    mut flt = {}
+    mut flt = {and: [], not: []}
     if not $all {
         let x = [':trash'] | split-cat | cat-to-tag-id | run $in | get -i 0.id
         $cond ++= $"todo.id not in \(select todo_id from todo_tag where tag_id in \(($x)\)\)"
