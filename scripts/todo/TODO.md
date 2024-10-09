@@ -91,3 +91,4 @@
         - [x] Meta tag `:scratch` #197
         - [x] Add column `type` into table `todo` #198
     - [x] Scratch new/edit/out #200
+    - [x] The default type is `md` #208

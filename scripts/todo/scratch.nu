@@ -4,7 +4,7 @@ def cmpl-scratch-id [] {
     run $"select id as value, title || ' <' || type || '>' as description from scratch order by updated desc;"
 }
 
-export def scratch-add [--type(-t): string] {
+export def scratch-add [--type(-t): string='md'] {
     let now = date now | fmt-date
     let input = $"" | block-edit $"scratch-XXX.($type)" | lines
     let d = {
@@ -17,9 +17,10 @@ export def scratch-add [--type(-t): string] {
     run $"insert into scratch \(($d | columns | str join ',')\)
         values \(($d | values | each {Q $in} | str join ',')\)
         returning id;"
+    | first
 }
 
-export def scratch-edit [id?:int@cmpl-scratch-id --type(-t):string] {
+export def scratch-edit [id?:int@cmpl-scratch-id --type(-t):string='md'] {
     let id = if ($id | is-empty) {
         run $"select id from scratch order by updated desc limit 1;"
         | get 0.id
@@ -42,7 +43,7 @@ export def scratch-edit [id?:int@cmpl-scratch-id --type(-t):string] {
         $"($k) = (Q $v)"
     }
     | str join ','
-    run $"update scratch set ($d) where id = ($id);"
+    run $"update scratch set ($d) where id = ($id);" | first
 }
 
 export def scratch-out [id?:int@cmpl-scratch-id] {
