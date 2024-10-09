@@ -38,3 +38,4 @@
     - [ ] Hooks #203
         - [x] list-hooks #204
         - [ ] install-hooks #205
+        - [x] cmpl-hooks #206
