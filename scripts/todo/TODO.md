@@ -83,9 +83,9 @@
         - [x] Done the relevant todo #66
         - [x] alias: tc #77
         - [x] Edit #151
-- [ ] Scratch.nu #190
-    - [ ] Edit or Output #192
-    - [ ] Get last n #195
+- [x] Scratch.nu #190
+    - [x] Edit or Output #192
+    - [x] If no id is provided, get the latest #195
     - [x] New table `scratch`, `scratch_tag` #199
         - [x] Meta tag `:scratch` #197
         - [x] Add column `type` into table `todo` #198

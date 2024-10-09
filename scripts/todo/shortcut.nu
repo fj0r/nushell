@@ -36,3 +36,6 @@ export alias tm = todo-move
 export alias tca = todo-cat-add
 export alias tcc = todo-cat-clean
 export alias tcr = todo-cat-rename
+export alias sa = scratch-add
+export alias se = scratch-edit
+export alias so = scratch-out
