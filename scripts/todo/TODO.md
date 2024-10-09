@@ -85,6 +85,7 @@
         - [x] alias: tc #77
         - [x] Edit #151
     - [x] rename data to core #207
+    - [x] Add `Quick Start` #215
 - [x] Scratch.nu #190
     - [x] Edit or Output #192
     - [x] If no id is provided, get the latest #195
