@@ -86,3 +86,4 @@
     - [ ] Edit or Output #192
     - [ ] Get last n #195
     - [x] Meta tag `:scratch` #197
+    - [x] Add column `type` into table `todo` #198

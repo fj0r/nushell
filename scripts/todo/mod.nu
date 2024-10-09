@@ -5,3 +5,4 @@ export-env {
 }
 
 export use data.nu *
+export use scratch.nu *

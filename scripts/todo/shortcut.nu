@@ -1,5 +1,7 @@
 use completion.nu *
 use data.nu *
+use scratch.nu *
+
 export def 'todo commit' [
     tag: string@cmpl-category
     --todo(-t): int@cmpl-todo-id

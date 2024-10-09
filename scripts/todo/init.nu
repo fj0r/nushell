@@ -34,7 +34,8 @@ export def --env start [] {
             urgent INTEGER DEFAULT -1,
             challenge INTEGER DEFAULT -1,
             delegate TEXT DEFAULT '',
-            done BOOLEAN DEFAULT -1
+            done BOOLEAN DEFAULT -1,
+            type TEXT DEFAULT ''
         );"
         "CREATE TABLE IF NOT EXISTS todo_tag (
             todo_id INTEGER NOT NULL,
