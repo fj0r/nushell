@@ -34,13 +34,29 @@ export def --env start [] {
             urgent INTEGER DEFAULT -1,
             challenge INTEGER DEFAULT -1,
             delegate TEXT DEFAULT '',
-            done BOOLEAN DEFAULT -1,
-            type TEXT DEFAULT ''
+            done BOOLEAN DEFAULT -1
         );"
         "CREATE TABLE IF NOT EXISTS todo_tag (
             todo_id INTEGER NOT NULL,
             tag_id INTEGER NOT NULL,
             PRIMARY KEY (todo_id, tag_id)
+        );"
+        "CREATE TABLE IF NOT EXISTS scratch (
+            id INTEGER PRIMARY KEY,
+            parent_id INTEGER DEFAULT -1,
+            type TEXT DEFAULT '',
+            title TEXT NOT NULL,
+            content TEXT DEFAULT '',
+            created TEXT DEFAULT (strftime('%Y-%m-%dT%H:%M:%S','now')),
+            updated TEXT DEFAULT (strftime('%Y-%m-%dT%H:%M:%S','now')),
+            important INTEGER DEFAULT -1,
+            urgent INTEGER DEFAULT -1,
+            challenge INTEGER DEFAULT -1
+        );"
+        "CREATE TABLE IF NOT EXISTS scratch_tag (
+            scratch_id INTEGER NOT NULL,
+            tag_id INTEGER NOT NULL,
+            PRIMARY KEY (scratch_id, tag_id)
         );"
     ] {
         open $env.TODO_DB | query db $s

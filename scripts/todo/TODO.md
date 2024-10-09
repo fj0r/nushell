@@ -87,3 +87,4 @@
     - [ ] Get last n #195
     - [x] Meta tag `:scratch` #197
     - [x] Add column `type` into table `todo` #198
+    - [x] New table `scratch`, `scratch_tag` #199

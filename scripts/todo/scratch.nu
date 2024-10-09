@@ -6,10 +6,14 @@ export def 'todo scratch' [
     --type(-t):string='txt'
     --output(-o)
 ] {
-    if ($id | is-empty) {
-        todo add -t [:scratch] -e
+    if $output {
 
     } else {
+        if ($id | is-empty) {
+            let input = $"" | block-edit $"scratch-XXX.todo"
 
+        } else {
+
+        }
     }
 }
