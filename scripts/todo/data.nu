@@ -223,7 +223,7 @@ export def todo-list [
     mut cond = []
     mut flt = {and: [], not: []}
     if not $all {
-        let x = [':trash' ':scratch'] | split-cat | cat-to-tag-id | run $in | get -i 0.id
+        let x = [':trash'] | split-cat | cat-to-tag-id | run $in | get -i 0.id
         $cond ++= $"todo.id not in \(select todo_id from todo_tag where tag_id in \(($x)\)\)"
     }
     if ($tags | is-not-empty) {
