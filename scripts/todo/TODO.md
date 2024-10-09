@@ -12,6 +12,7 @@
     - [x] Category without tag is equivalent to all tags #87
         - [x] Enable `--empty-as-all` of `cat-to-tag-id` only in `Todo list` #181
     - [ ] Completion of &tag and !tag #189
+    - [ ] List unfinished tasks, sorted by deadline #214
 - [ ] Actions #22
     - [x] Category #11
         - [x] Allow creation of multiple tags under one category at once #13
