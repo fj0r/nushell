@@ -82,3 +82,7 @@
         - [x] Done the relevant todo #66
         - [x] alias: tc #77
         - [x] Edit #151
+- [ ] Scratch.nu #190
+    - [ ] Edit or Output #192
+    - [ ] Get last n #195
+    - [x] Meta tag `:scratch` #197

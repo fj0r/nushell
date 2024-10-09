@@ -8,6 +8,7 @@ export def --env start [] {
     if ($env.TODO_DB | path exists) { return }
     {_: '.'} | into sqlite -t _ $env.TODO_DB
     for s in [
+        "DROP TABLE _;"
         "CREATE TABLE IF NOT EXISTS category (
             id INTEGER PRIMARY KEY,
             name TEXT NOT NULL UNIQUE
@@ -20,6 +21,7 @@ export def --env start [] {
         );"
         "INSERT INTO category (id, name) VALUES (1, '');"
         "INSERT INTO tag (category_id, name) VALUES (1, 'trash');"
+        "INSERT INTO tag (category_id, name) VALUES (2, 'scratch');"
         "CREATE TABLE IF NOT EXISTS todo (
             id INTEGER PRIMARY KEY,
             parent_id INTEGER DEFAULT -1,
