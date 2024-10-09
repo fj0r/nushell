@@ -58,6 +58,11 @@ export def 'export nu_scripts' [...mod:string@cmpl-mod] {
 
 }
 
+export def git-hooks [x args] {
+    print $x
+    print $args
+}
+
 export def replace-cmpl [file --dry-run] {
     let r = cat $file
     | lines

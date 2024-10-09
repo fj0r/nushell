@@ -38,20 +38,30 @@ def cmpl-hooks [] {
     $env.GIT_HOOKS | columns
 }
 
-export def git-install-hooks [...hooks:string@cmpl-hooks] {
+export def git-install-hooks [...hooks:string@cmpl-hooks --mod(-m)="__"] {
     let c = git-cdup
     if ($c | describe) == nothing { return }
     let hp = [$c .git hooks] | path join
+    let rp = [$env.PWD $c] | path join | path expand
     let hs = $env.GIT_HOOKS | transpose k v
     let hs = if ($hooks | is-empty) { $hs } else { $hs | where k in $hooks }
     for h in $hs {
+        let p = [$hp $h.k] | path join
         [
             "#!/bin/env nu"
+            $"use ../../($mod).nu"
+            "cd ($env.CURRENT_FILE | path split | range 0..<-3 | path join)"
             ""
-            $"git-hooks ($h.k)"
+            "export def main [...argv:string] {"
+            $"    if (scope commands | where name == '($mod) git-hooks' | is-empty) {"
+            "        print $'(ansi grey)The `git-hooks` function is undefined.(ansi reset)'"
+            "    } else {"
+            $"        ($mod) git-hooks '($h.k)' $argv"
+            "    }"
+            "}"
         ]
         | str join (char newline)
-        #| save -f ([$hs $h.k] | path join)
-        print ([$hp $h.k] | path join)
+        | save -f $p
+        chmod +x $p
     }
 }
