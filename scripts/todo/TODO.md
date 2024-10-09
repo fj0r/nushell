@@ -92,3 +92,4 @@
         - [x] Add column `type` into table `todo` #198
     - [x] Scratch new/edit/out #200
     - [x] The default type is `md` #208
+    - [x] Adjust return value of sa/se #209

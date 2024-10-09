@@ -60,8 +60,10 @@ export def 'dump nu_scripts' [...mod:string@cmpl-mod] {
 }
 
 export def git-hooks [x args] {
-    if $x == 'post-commit' {
-        dump nu_scripts
+    if $x == 'pre-push' {
+        if $args.1 == 'git@github-fjord:fj0r/nushell.git' {
+            dump nu_scripts
+        }
     }
 }
 

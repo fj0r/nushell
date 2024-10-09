@@ -1,7 +1,8 @@
 use common.nu *
 
 def cmpl-scratch-id [] {
-    run $"select id as value, title || ' <' || type || '>' as description from scratch order by updated desc;"
+    run $"select id as value, title || ' <' || type || '>' as description
+        from scratch order by updated desc limit 10;"
 }
 
 export def scratch-add [--type(-t): string='md'] {
@@ -43,7 +44,7 @@ export def scratch-edit [id?:int@cmpl-scratch-id --type(-t):string='md'] {
         $"($k) = (Q $v)"
     }
     | str join ','
-    run $"update scratch set ($d) where id = ($id);" | first
+    run $"update scratch set ($d) where id = ($id) returning id;" | first
 }
 
 export def scratch-out [id?:int@cmpl-scratch-id] {
