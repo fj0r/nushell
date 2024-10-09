@@ -4,5 +4,5 @@ export-env {
     init theme
 }
 
-export use data.nu *
+export use core.nu *
 export use scratch.nu *

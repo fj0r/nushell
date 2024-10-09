@@ -1,5 +1,5 @@
 use completion.nu *
-use data.nu *
+use core.nu *
 use scratch.nu *
 
 export def todo-commit [

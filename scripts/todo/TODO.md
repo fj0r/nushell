@@ -83,6 +83,7 @@
         - [x] Done the relevant todo #66
         - [x] alias: tc #77
         - [x] Edit #151
+    - [x] rename data to core #207
 - [x] Scratch.nu #190
     - [x] Edit or Output #192
     - [x] If no id is provided, get the latest #195
