@@ -1,6 +1,7 @@
-use utils.nu *
+use common.nu *
 use complete.nu *
 export use stat.nu *
+export use utils.nu *
 
 def sum_prefix [p] {
     $in | items {|k,v| if ($k | str starts-with $p) { $v } else { 0 } } | math sum

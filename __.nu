@@ -1,38 +1,55 @@
 const manifest = [
-    { from: argx/*, to: argx }
-    { from: ssh/*, to: ssh }
-    { from: docker/*, to: docker }
-    { from: devcontainer/*, to: devcontainer }
-    { from: kubernetes/*, to: kubernetes }
+    { from: argx/, to: argx }
+    { from: ssh/, to: ssh }
+    { from: docker/, to: docker }
+    { from: devcontainer/, to: devcontainer }
+    { from: kubernetes/, to: kubernetes }
 
-    { from: lg/*, to: lg }
-    { from: todo/*, to: todo }
-    { from: git/*, to: git }
-    { from: llm/*, to: ai }
+    { from: lg/, to: lg }
+    { from: todo/, to: todo }
+    { from: git/, to: git }
+    { from: llm/, to: ai }
 
-    { from: nvim/*, to: nvim }
+    { from: nvim/, to: nvim, disable: true }
 
-    { from: power/*, to: powerline, disable: false }
-    { from: cwdhist/*, to: cwdhist }
-    { from: history-utils/*, to: history-utils, disable: false }
-    { from: resolvenv/*, to: resolvenv }
+    { from: power/, to: powerline, disable: false }
+    { from: cwdhist/, to: cwdhist }
+    { from: history-utils/, to: history-utils, disable: true}
+    { from: resolvenv/, to: resolvenv, disable: true }
 
-    { from: project/*, to: project }
+    { from: project/, to: project }
 ]
 
-const dest = [~ world nu_scripts] | path join
+export-env {
+    $env.dest = [$env.HOME world nu_scripts] | path join
+}
 
 def cmpl-mod [] {
     $manifest | get to
 }
+
 
 export def 'export nu_scripts' [...mod:string@cmpl-mod] {
     let m = $manifest | filter {|x| not ($x.disable? | default false) }
     let m = if ($mod | is-empty) { $m } else {
         $m | where to in $mod
     }
+    let l = git-last-commit
     for x in $m {
-        cp -r ($'($env.PWD)/scripts/($x.from)' | into glob) $'($dest)/($x.to)'
+        let t = $'($env.dest)/($x.to)'
+        if ($t | path exists | not $in) { mkdir $t }
+        rsync -avP --delete $'($env.PWD)/scripts/($x.from)' $'($env.dest)/($x.to)'
+        cd $t
+        if (git-is-repo) {
+            git-init $"git@github.com:fj0r/($x.to).nu.git"
+            gp
+        } else {
+            if (git-need-push) {
+                ga .
+                gc $l.message
+                gp
+            }
+        }
     }
 
 }

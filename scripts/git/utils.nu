@@ -1,19 +1,22 @@
-export def agree [
-    prompt
-    --default-not (-n)
-] {
-    let prompt = if ($prompt | str ends-with '!') {
-        $'(ansi red)($prompt)(ansi reset)'
-    } else {
-        $'($prompt)'
+def git-init [remote] {
+    git init --initial-branch main
+    git add .
+    git commit -m 'init'
+    git remote add origin $remote
+}
+
+def git-is-repo [] {
+    (git rev-parse --is-inside-work-tree | complete).exit_code == 0
+}
+
+def git-changes [] {
+    do -i { git --no-optional-locks status --porcelain=1 | lines }
+}
+
+def git-last-commit [] {
+    let d = git log --reverse -n 1 --pretty=%h»¦«%s | split row '»¦«'
+    {
+        hash: $d.0
+        message: $d.1
     }
-    (if $default_not { [no yes] } else { [yes no] } | input list $prompt) == 'yes'
-}
-
-export def tips [msg] {
-    print -e $"(ansi light_gray)($msg)(ansi reset)"
-}
-
-export def --wrapped with-flag [...flag] {
-    if ($in | is-empty) { [] } else { [...$flag $in] }
 }
