@@ -37,6 +37,7 @@ export def 'export nu_scripts' [...mod:string@cmpl-mod] {
     let l = git-last-commit
     let o = $"($env.PWD)/scripts"
     for x in $m {
+        print $"(ansi yellow)### ($x.to).nu(ansi reset)"
         let t = $'($env.dest)/($x.to)'
         if ($t | path exists | not $in) { mkdir $t }
         rsync -avP --delete $'($o)/($x.from)' --exclude='.git'  $t
