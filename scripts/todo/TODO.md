@@ -13,6 +13,7 @@
         - [x] Enable `--empty-as-all` of `cat-to-tag-id` only in `Todo list` #181
     - [ ] Completion of &tag and !tag #189
     - [ ] List unfinished tasks, sorted by deadline #214
+    - [ ] Allows setting a specified tag to be hidden. #223
 - [ ] Actions #22
     - [x] Category #11
         - [x] Allow creation of multiple tags under one category at once #13
@@ -75,6 +76,7 @@
 - [ ] Integration #63
     - [x] More convenient interaction modes #68
         - [x] kebab-case #201
+        - [x] Interactive cleaning :trash `tclean` #224
     - [ ] Import/Export(TODO.md) #69
     - [x] Shortcut #70
     - [x] Todo Commit #76

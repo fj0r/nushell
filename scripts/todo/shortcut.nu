@@ -25,10 +25,21 @@ export def todo-trash [] {
     todo-list ':trash' --all
 }
 
+export def tclean [] {
+    let a = todo-list ':trash' --all
+    print $a
+    if ($a | is-empty) { return }
+    let p = $'(ansi grey)------(char newline)Perform cleanup?(ansi reset)'
+    let c = [yes no] | input list $p | str starts-with 'y'
+    if $c {
+        todo-cat-clean ':trash'
+    }
+}
+
 export def tn [parent --previous(-p)] {
     if $previous { scratch-out } else { scratch-add }
     | ai-do trans-to en -o
-    | todo-add $in -p $parent
+    | todo-add $in -p $parent --edit
 }
 
 export alias tc = todo-commit
@@ -37,7 +48,6 @@ export alias tt = todo-attrs
 export alias tl = todo-list
 export alias td = todo-done
 export alias te = todo-edit
-export alias tclean = todo-clean
 export alias tm = todo-move
 export alias tca = todo-cat-add
 export alias tcc = todo-cat-clean
