@@ -42,7 +42,9 @@
             - [x] Improve repo path detection #227
             - [x] outdent #232
             - [x] The `git-hooks` function now accepts a new argument `ctx`, replacing the former `argv`. #233
+            - [x] install default hooks #236
         - [x] cmpl-hooks #206
+        - [x] uninstall-hooks #235
     - [x] git-sync #216
         - [x] An option to control whether to execute rsync. #222
         - [x] Simplify git-sync function by merging conditions #228
