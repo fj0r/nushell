@@ -20,7 +20,7 @@ def skip-empty-lines [] {
 
 export def scratch-add [--type(-t): string='md'] {
     let now = date now | fmt-date
-    let input = $"" | block-edit $"scratch-XXX.($type)" | lines
+    let input = $"(char newline)(char newline)" | block-edit $"scratch-XXX.($type)" --line 2 | lines
     let content = $input | range 1.. | skip-empty-lines | str join (char newline)
     let d = {
         title: ($input | first)
