@@ -31,6 +31,7 @@ def cmpl-mod [] {
 export def 'dump nu_scripts' [...mod:string@cmpl-mod] {
     use git *
     use git/shortcut.nu *
+    use lg
     let m = $manifest | filter {|x| not ($x.disable? | default false) }
     let m = if ($mod | is-empty) { $m } else {
         $m | where to in $mod
@@ -38,7 +39,7 @@ export def 'dump nu_scripts' [...mod:string@cmpl-mod] {
     let l = git-last-commit
     let o = $"($env.PWD)/scripts"
     for x in $m {
-        print $"(ansi grey)### ($x.to).nu(ansi reset)"
+        lg level 0 $"($x.to).nu"
         let t = $'($env.dest)/($x.to)'
         if ($t | path exists | not $in) { mkdir $t }
         git-sync $'($o)/($x.from)' $t --push --init=$"git@github-fjord:fj0r/($x.to).nu.git"
