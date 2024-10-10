@@ -39,3 +39,4 @@
         - [x] list-hooks #204
         - [x] install-hooks #205
         - [x] cmpl-hooks #206
+    - [x] git-sync #216

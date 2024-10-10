@@ -41,20 +41,7 @@ export def 'dump nu_scripts' [...mod:string@cmpl-mod] {
         print $"(ansi yellow)### ($x.to).nu(ansi reset)"
         let t = $'($env.dest)/($x.to)'
         if ($t | path exists | not $in) { mkdir $t }
-        rsync -avP --delete $'($o)/($x.from)' --exclude='.git'  $t
-        cd $t
-        if not (git-is-repo) {
-            git-init $"git@github-fjord:fj0r/($x.to).nu.git"
-            gp
-        } else {
-            if (git-changes | is-not-empty) {
-                ga .
-                gc $l.message
-                gp
-            } else {
-                $"(ansi yellow)($x.to)(ansi reset) no changes"
-            }
-        }
+        git-sync $'($o)/($x.from)' $t --push --init=$"git@github-fjord:fj0r/($x.to).nu.git"
     }
 
 }
