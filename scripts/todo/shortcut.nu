@@ -25,6 +25,12 @@ export def todo-trash [] {
     todo-list ':trash' --all
 }
 
+export def tn [parent --previous(-p)] {
+    if $previous { scratch-out } else { scratch-add }
+    | ai-do trans-to en -o
+    | todo-add $in -p $parent
+}
+
 export alias tc = todo-commit
 export alias ta = todo-add
 export alias tt = todo-attrs
