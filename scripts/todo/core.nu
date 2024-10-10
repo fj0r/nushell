@@ -37,7 +37,16 @@ export def todo-add [
     --edit(-e)
     title?: string
 ] {
-    let title = if ($title | is-empty) { 'untitled' } else { $title }
+    let o = $in
+    let title = if ($title | is-empty) {
+        if ($o | is-empty) {
+            'untitled'
+        } else {
+            $o
+        }
+    } else {
+        $title
+    }
     let data = if $edit {
         let input = $"($title)\n($desc)" | block-edit $"add-todo-XXX.todo" | split row "\n---\n"
         $input | each {|x|

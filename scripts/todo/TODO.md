@@ -40,6 +40,7 @@
     - [ ] When `todo cat clean`, if there are additional tags, only the tags will be cleared. #123
     - [ ] Discussion #146
     - [x] Noninteraction mode as default in `Todo add` #147
+    - [x] `todo-add` can read the title from stdin. #230
 - [ ] Display #24
     - [x] Convert to tree #25
         - [x] Multi-level tree test #33

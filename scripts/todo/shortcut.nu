@@ -39,7 +39,7 @@ export def tclean [] {
 export def tn [parent --previous(-p)] {
     if $previous { scratch-out } else { scratch-add }
     | ai-do trans-to en -o
-    | todo-add $in -p $parent --edit
+    | todo-add -p $parent --edit
 }
 
 export alias tc = todo-commit

@@ -38,13 +38,14 @@ export def 'dump nu_scripts' [...mod:string@cmpl-mod] {
     }
     let l = git-last-commit
     let o = $"($env.PWD)/scripts"
+    lg level 1 'begin'
     for x in $m {
         lg level 0 $"($x.to).nu"
         let t = $'($env.dest)/($x.to)'
         if ($t | path exists | not $in) { mkdir $t }
         git-sync $'($o)/($x.from)' $t --push --init=$"git@github-fjord:fj0r/($x.to).nu.git"
     }
-    lg level 1 'done'
+    lg level 1 'end'
 }
 
 export def git-hooks [x args] {
