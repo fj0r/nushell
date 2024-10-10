@@ -8,17 +8,18 @@ def cmpl-scratch-id [] {
 export def scratch-add [--type(-t): string='md'] {
     let now = date now | fmt-date
     let input = $"" | block-edit $"scratch-XXX.($type)" | lines
+    let content = $input | range 1.. | str join (char newline)
     let d = {
         title: ($input | first)
         type: $type
-        content: ($input | range 1.. | str join (char newline))
+        content: $content
         created: $now
         updated: $now
     }
     run $"insert into scratch \(($d | columns | str join ',')\)
         values \(($d | values | each {Q $in} | str join ',')\)
         returning id;"
-    | first
+    $content
 }
 
 export def scratch-edit [id?:int@cmpl-scratch-id --type(-t):string='md'] {
@@ -34,9 +35,10 @@ export def scratch-edit [id?:int@cmpl-scratch-id --type(-t):string='md'] {
     | str join (char newline)
     | block-edit $"scratch-XXX.($type)"
     | lines
+    let content = $input | range 1.. | str join (char newline)
     let d = {
         title: ($input | first)
-        content: ($input | range 1.. | str join (char newline))
+        content: $content
         type: $type
         updated: (date now | fmt-date)
     }
@@ -44,7 +46,8 @@ export def scratch-edit [id?:int@cmpl-scratch-id --type(-t):string='md'] {
         $"($k) = (Q $v)"
     }
     | str join ','
-    run $"update scratch set ($d) where id = ($id) returning id;" | first
+    run $"update scratch set ($d) where id = ($id) returning id;"
+    $content
 }
 
 export def scratch-out [id?:int@cmpl-scratch-id] {
