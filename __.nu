@@ -54,6 +54,10 @@ export def git-hooks [act ctx] {
             dump nu_scripts
         }
     }
+    if false {
+        use lg
+        lg msg {act: $act, workdir: $ctx.workdir}
+    }
 }
 
 export def replace-cmpl [file --dry-run] {
