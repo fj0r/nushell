@@ -42,3 +42,4 @@
         - [x] cmpl-hooks #206
     - [x] git-sync #216
         - [x] An option to control whether to execute rsync. #222
+        - [x] Simplify git-sync function by merging conditions #228
