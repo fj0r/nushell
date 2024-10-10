@@ -3,7 +3,7 @@ export-env {
         {
             condition: {|_, after| '__' in (overlay list) and (find-project $after | is-empty) }
             code: "
-                overlay hide __ --keep-env [ PWD ]
+                overlay hide __ --keep-env [ PWD OLDPWD ]
                 print $'(ansi default_italic)(ansi grey)unload overlay (ansi default_bold)__(ansi reset)'
             "
         }
