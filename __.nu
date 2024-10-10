@@ -44,7 +44,7 @@ export def 'dump nu_scripts' [...mod:string@cmpl-mod] {
         if ($t | path exists | not $in) { mkdir $t }
         git-sync $'($o)/($x.from)' $t --push --init=$"git@github-fjord:fj0r/($x.to).nu.git"
     }
-
+    lg level 1 'done'
 }
 
 export def git-hooks [x args] {
