@@ -277,8 +277,9 @@ export def todo-list [
     let r = if ($flt.and | is-not-empty) or ($flt.not | is-not-empty) {
         $r
         | filter {|x|
-            not ($flt.not | any {|y| $y in $x.tags })
-            and ($flt.and | all {|y| $y in $x.tags })
+            let n = not ($flt.not | any {|y| $y in $x.tags })
+            let a = $flt.and | all {|y| $y in $x.tags }
+            $n and $a
         }
     } else {
         $r
