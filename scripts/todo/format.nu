@@ -1,8 +1,8 @@
 use common.nu *
 
-export def 'todo format' [--md] {
+export def 'todo format' [--md --md-list] {
     let i = $in
-    $i | to tree | fmt tree --md=$md
+    $i | to tree | fmt tree --md=$md --md-list=$md_list
 }
 
 def 'to tree' [] {
@@ -26,15 +26,15 @@ def to-tree [r o] {
     }
 }
 
-def 'fmt tree' [level:int=0 --indent(-i):int=4 --md] {
+def 'fmt tree' [level:int=0 --indent(-i):int=4 --md --md-list] {
     mut out = []
     for i in $in {
         let n = '' | fill -c ' ' -w ($level * $indent)
-        for j in ($i | reject sub | fmt leaves $n --md=$md) {
+        for j in ($i | reject sub | fmt leaves $n --md=$md --md-list=$md_list) {
             $out ++= $j
         }
         if ($i.sub | is-not-empty) {
-            $out ++= $i.sub | fmt tree ($level + 1) --md=$md
+            $out ++= $i.sub | fmt tree ($level + 1) --md=$md --md-list=$md_list
         }
     }
     $out | flatten | str join (char newline)
@@ -43,6 +43,7 @@ def 'fmt tree' [level:int=0 --indent(-i):int=4 --md] {
 def 'fmt leaves' [
     indent
     --md
+    --md-list
 ] {
     let o = $in
     let color = $env.TODO_THEME.color
@@ -50,7 +51,9 @@ def 'fmt leaves' [
     let endent = $"($indent)   "
 
     let done = $env.TODO_THEME.symbol.box | get ($md | into int) | get $o.done
-    let title = if $md {
+    let title = if $md_list {
+        [$"($indent)-" $o.title $"#($o.id)"]
+    } else if $md {
         [$"($indent)-" $done $o.title $"#($o.id)"]
     } else {
         [$indent $done $"(ansi $color.title)($o.title)" $"(ansi $color.id)#($o.id)"]

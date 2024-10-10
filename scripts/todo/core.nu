@@ -212,6 +212,7 @@ export def todo-list [
     --finished(-f)
     --untagged(-U)
     --md(-m)
+    --md-list(-l)
     --raw
     --debug
 ] {
@@ -286,7 +287,7 @@ export def todo-list [
     }
 
 
-    if $raw { $r } else { $r | todo format --md=$md }
+    if $raw { $r } else { $r | todo format --md=$md --md-list=$md_list }
 }
 
 

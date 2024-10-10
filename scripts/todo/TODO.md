@@ -50,6 +50,7 @@
     - [x] Format nodes #27
     - [x] Output in Markdown format #28
         - [x] remove tail space #61
+        - [x] List format (no checkbox) #237
     - [x] Policy for displaying dangling nodes #40
     - [x] Display issue when tags is empty #41
     - [x] Details should be more prominent than metadata #47

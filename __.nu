@@ -54,13 +54,16 @@ export def git-hooks [act ctx] {
             dump nu_scripts
         }
     }
+    if $act == 'fsmonitor-watchman' {
+        print $act
+    }
     if false {
         use lg
         lg msg {act: $act, workdir: $ctx.workdir}
     }
 }
 
-export def replace-cmpl [file --dry-run] {
+export def rename-cmpl-func [file --dry-run] {
     let r = cat $file
     | lines
     | each {|x|
