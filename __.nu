@@ -48,9 +48,9 @@ export def 'dump nu_scripts' [...mod:string@cmpl-mod] {
     lg level 1 'end'
 }
 
-export def git-hooks [x args] {
-    if $x == 'pre-push' {
-        if $args.1 == 'git@github-fjord:fj0r/nushell.git' {
+export def git-hooks [act ctx] {
+    if $act == 'pre-push' {
+        if $ctx.repo == 'git@github-fjord:fj0r/nushell.git' {
             dump nu_scripts
         }
     }
