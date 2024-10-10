@@ -58,8 +58,9 @@ def 'fmt leaves' [
     } else {
         [$indent $done $"(ansi $color.title)($o.title)" $"(ansi $color.id)#($o.id)"]
     }
+    let verbose = not $md and not $md_list
 
-    let tags = if (not $md) and ($o.tags? | is-not-empty) {
+    let tags = if $verbose and ($o.tags? | is-not-empty) {
         $o.tags
         | filter { $in | is-not-empty }
         | split-cat
@@ -75,7 +76,7 @@ def 'fmt leaves' [
             string => {$y | str length}
             _ => -1
         }
-        if not $md and $z > 0 {
+        if $verbose and $z > 0 {
             $"(ansi ($color | get $x))(do ($formatter | get $x) $y $o)"
         }
     }
@@ -83,9 +84,9 @@ def 'fmt leaves' [
     let header = [...$title ...$tags ...$meta]
     | filter { $in | is-not-empty }
     | str join ' '
-    |  if $md { $in } else { $"($in)(ansi reset)" }
+    |  if $verbose { $"($in)(ansi reset)" } else { $in }
 
-    let body = if not $md {
+    let body = if $verbose {
         $o.description
         | lines
         | each {$"($endent)(ansi $color.description)($in)(ansi reset)"}
@@ -93,4 +94,3 @@ def 'fmt leaves' [
 
     [$header ...$body]
 }
-
