@@ -37,6 +37,7 @@
 - [x] Git #202
     - [x] Hooks #203
         - [x] list-hooks #204
+            - [x] List only valid hooks. #234
         - [x] install-hooks #205
             - [x] Improve repo path detection #227
             - [x] outdent #232
