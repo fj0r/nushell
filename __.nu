@@ -38,7 +38,7 @@ export def 'dump nu_scripts' [...mod:string@cmpl-mod] {
     let l = git-last-commit
     let o = $"($env.PWD)/scripts"
     for x in $m {
-        print $"(ansi yellow)### ($x.to).nu(ansi reset)"
+        print $"(ansi grey)### ($x.to).nu(ansi reset)"
         let t = $'($env.dest)/($x.to)'
         if ($t | path exists | not $in) { mkdir $t }
         git-sync $'($o)/($x.from)' $t --push --init=$"git@github-fjord:fj0r/($x.to).nu.git"

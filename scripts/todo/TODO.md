@@ -87,7 +87,7 @@
     - [x] rename data to core #207
     - [x] Add `Quick Start` #215
     - [x] Pipe to `todo-add` #217
-- [x] Scratch.nu #190
+- [ ] Scratch.nu #190
     - [x] Edit or Output #192
     - [x] If no id is provided, get the latest #195
     - [x] New table `scratch`, `scratch_tag` #199
@@ -97,3 +97,4 @@
     - [x] The default type is `md` #208
     - [x] Adjust return value of sa/se #209
         - [x] Return `content` #218
+    - [x] Content ignore leading empty lines #221
