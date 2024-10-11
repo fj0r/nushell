@@ -1,8 +1,11 @@
 use common.nu *
 
-export def 'todo format' [--md --md-list] {
-    let i = $in
-    $i | to tree | fmt tree --md=$md --md-list=$md_list
+export def todo-format [--md --md-list] {
+    $in | to tree | fmt tree --md=$md --md-list=$md_list
+}
+
+export def todo-tree [] {
+    $in | to tree
 }
 
 def 'to tree' [] {
@@ -22,7 +25,7 @@ def to-tree [r o] {
         } else {
             []
         }
-        $i | insert sub $t
+        $i | insert children $t
     }
 }
 
@@ -30,11 +33,11 @@ def 'fmt tree' [level:int=0 --indent(-i):int=4 --md --md-list] {
     mut out = []
     for i in $in {
         let n = '' | fill -c ' ' -w ($level * $indent)
-        for j in ($i | reject sub | fmt leaves $n --md=$md --md-list=$md_list) {
+        for j in ($i | reject children | fmt leaves $n --md=$md --md-list=$md_list) {
             $out ++= $j
         }
-        if ($i.sub | is-not-empty) {
-            $out ++= $i.sub | fmt tree ($level + 1) --md=$md --md-list=$md_list
+        if ($i.children | is-not-empty) {
+            $out ++= $i.children | fmt tree ($level + 1) --md=$md --md-list=$md_list
         }
     }
     $out | flatten | str join (char newline)

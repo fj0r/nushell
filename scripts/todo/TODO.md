@@ -82,6 +82,12 @@
         - [x] kebab-case #201
         - [x] Interactive cleaning :trash `tclean` #224
     - [ ] Import/Export(TODO.md) #69
+        - [x] Export json #242
+        - [ ] Import #243
+            - [ ] id collision #245
+            - [ ] Restore tag #246
+            - [ ] Mounting Node (Parent) #247
+            - [ ] Maintain the tree structure #248
     - [x] Shortcut #70
     - [x] Todo Commit #76
         - [x] Fill in the #todo in the README.md file #64

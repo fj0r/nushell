@@ -100,8 +100,8 @@ export def todo-add [
     }
     if ($tag | is-not-empty) {
         for id in $ids {
-            let sub = $tag | split-cat | cat-to-tag-id $id
-            run $"insert into todo_tag ($sub);"
+            let children = $tag | split-cat | cat-to-tag-id $id
+            run $"insert into todo_tag ($children);"
         }
     }
 
@@ -146,12 +146,12 @@ export def todo-attrs [
 
     if ($tag | is-not-empty) {
         if $remove {
-            let sub = $tag | split-cat | cat-to-tag-id
-            run $"delete from todo_tag where todo_id in \(($ids | str join ',')\) and tag_id in \(($sub)\);"
+            let children = $tag | split-cat | cat-to-tag-id
+            run $"delete from todo_tag where todo_id in \(($ids | str join ',')\) and tag_id in \(($children)\);"
         } else {
             for id in $ids {
-                let sub = $tag | split-cat | cat-to-tag-id $id
-                run $"insert into todo_tag ($sub)
+                let children = $tag | split-cat | cat-to-tag-id $id
+                run $"insert into todo_tag ($children)
                   on conflict \(todo_id, tag_id\) do nothing
                 ;"
             }
@@ -287,7 +287,7 @@ export def todo-list [
     }
 
 
-    if $raw { $r } else { $r | todo format --md=$md --md-list=$md_list }
+    if $raw { $r } else { $r | todo-format --md=$md --md-list=$md_list }
 }
 
 
@@ -338,3 +338,10 @@ export def todo-title [id: int@cmpl-todo-id] {
     run $'select title from todo where id = ($id);'
     | get 0.title
 }
+
+export def todo-export [
+    ...tags: any@cmpl-category
+] {
+    todo-list ...$tags --raw | todo-tree | to json
+}
+
