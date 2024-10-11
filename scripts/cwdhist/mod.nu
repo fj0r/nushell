@@ -74,10 +74,11 @@ export def 'cwd history delete' [cwd] {
 
 export-env {
     $env.cwd_history_full = false
-    $env.cwd_history_file = ([$nu.data-dir 'cache'] | path join 'nu_cwd_history.sqlite')
+    $env.cwd_history_file = $nu.data-dir | path join 'cwd_history.sqlite'
 
     if not ($env.cwd_history_file | path exists) {
         {_: '.'} | into sqlite -t _ $env.cwd_history_file
+        print $"(ansi grey)created database: $env.cwd_history_file(ansi reset)"
         open $env.cwd_history_file | query db "create table if not exists cwd_history (
             cwd text primary key,
             count int default 1,
