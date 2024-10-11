@@ -1,7 +1,7 @@
 use complete.nu *
 
 export def kube-conf-import [name: string, path: string] {
-    let k = (kube-config)
+    let k = kube-config
     mut d = $k.data
     let i = cat $path | from yaml
     let c = {
@@ -19,7 +19,7 @@ export def kube-conf-import [name: string, path: string] {
 }
 
 export def kube-conf-delete [name: string@cmpl-kube-ctx] {
-    let kc = (kube-config)
+    let kc = kube-config
     let d = $kc.data
     let ctx = $d | get contexts | where name == $name | get 0
     let rctx = $d | get contexts | where name != $name

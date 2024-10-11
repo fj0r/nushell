@@ -1,9 +1,15 @@
 use argx
 use utils.nu *
 
+### ctx
+export def kube-config [] {
+    let file = if ($env.KUBECONFIG? | is-empty) { $"($env.HOME)/.kube/config" } else { $env.KUBECONFIG }
+    { path: $file, data: (cat $file | from yaml) }
+}
+
 export def cmpl-kube-ctx [] {
-    let k = (kube-config)
-    let cache = ([$nu.data-dir 'cache' 'k8s'] | path join $'($k.path | path basename).json')
+    let k = kube-config
+    let cache = [$nu.cache-dir 'k8s'] | path join $'($k.path | path basename).json'
     let data = ensure-cache-by-lines $cache $k.path { ||
         let clusters = $k.data | get clusters | select name cluster.server | rename name server
         let data = $k.data
@@ -37,8 +43,8 @@ export def cmpl-kube-ns [] {
 }
 
 export def cmpl-kube-kind [] {
-    let ctx = (kube-config)
-    let cache = ([$nu.data-dir 'cache' 'k8s-api-resources'] | path join $'($ctx.data.current-context).json')
+    let ctx = kube-config
+    let cache = ([$nu.cache-dir 'k8s-api-resources'] | path join $'($ctx.data.current-context).json')
     ensure-cache-by-lines $cache $ctx.path {||
         kubectl api-resources | from ssv -a
         | each {|x| {value: $x.NAME description: $x.SHORTNAMES} }

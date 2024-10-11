@@ -84,7 +84,7 @@ export def kube-change-namespace [namespace: string@cmpl-kube-ns] {
 export def --env kube-change-context-clone [name: string@cmpl-kube-ctx] {
     let dist = $"($env.HOME)/.kube/config.d"
     mkdir $dist
-    kconf export $name | save -fr $"($dist)/($name)"
+    kube-conf-export $name | save -fr $"($dist)/($name)"
     $env.KUBECONFIG = $"($dist)/($name)"
 }
 

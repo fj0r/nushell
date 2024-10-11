@@ -28,6 +28,12 @@
     - [x] kubectl complete update _args index #133
 - [ ] Modularize #136
     - [ ] autoload #156
+    - [x] adjust $env.cwd_history_file #249
+    - [ ] Adjust cache path #250
+        - [x] k8s #251
+        - [x] k8s-api-resources #252
+        - [ ] power #253
+        - [ ] ssh.json #254
 - [x] Shortcut.nu #148
     - [x] kubernetes #149
     - [x] git #150

@@ -27,9 +27,9 @@ export def --wrapped with-flag [...flag] {
 }
 
 export def `kcache flush` [] {
-    rm -rf ~/.cache/nu-complete/k8s/
+    rm -rf ($nu.cache-dir | path join 'k8s')
     nu-complete kube ctx
-    rm -rf ~/.cache/nu-complete/k8s-api-resources/
+    rm -rf ($nu.cache-dir | path join 'k8s-api-resources')
 }
 
 export def kube-shortnames [] {

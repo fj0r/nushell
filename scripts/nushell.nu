@@ -20,3 +20,18 @@ export def inspect-file [file:path='~/.cache/nonstdout'] {
     $x | to yaml | save -f $file
     $x
 }
+
+export def nonstdout [--view(-v) --append(-a)] {
+    let o = $in
+    let f = '~/.cache/nonstdout'
+    if $view {
+        tail -f ($f | path expand)
+    } else {
+        if $append {
+            $o | save -a -f $f
+        } else {
+            $o | save -f $f
+        }
+    }
+}
+
