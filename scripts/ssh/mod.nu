@@ -56,8 +56,8 @@ def fmt-group [p] {
     $p | str replace $"($env.HOME)/.ssh/" ''
 }
 
-def "ssh-hosts" [] {
-    let cache = ([$nu.data-dir 'cache'] | path join 'ssh.json')
+def ssh-hosts [] {
+    let cache = $nu.cache-dir | path join 'ssh.json'
     ensure-cache $cache [~/.ssh/config ~/.ssh/config*/* ] { ||
         let data = (ssh-list | each {|x|
                 let uri = $"($x.User)@($x.HostName):($x.Port)"
@@ -81,7 +81,7 @@ def "ssh-hosts" [] {
 }
 
 def cmpl-ssh [] {
-    let data = (ssh-hosts)
+    let data = ssh-hosts
     $data.completion
     | each { |x|
         let uri = ($x.uri | fill -a l -w $data.max.uri -c ' ')

@@ -33,7 +33,7 @@
         - [x] k8s #251
         - [x] k8s-api-resources #252
         - [ ] power #253
-        - [ ] ssh.json #254
+        - [x] ssh.json #254
 - [x] Shortcut.nu #148
     - [x] kubernetes #149
     - [x] git #150
