@@ -2,29 +2,23 @@ export def fmt-date [] {
     $in | format date '%FT%H:%M:%S'
 }
 
+def variants-edit [file? --line:int] {
+    if ($line | is-empty) {
+        ^$env.EDITOR $file
+    } else {
+        if ($env.EDITOR | find vim | is-not-empty) {
+            ^$env.EDITOR $"+($line)" $file
+        } else {
+            ^$env.EDITOR $file
+        }
+    }
+}
+
 export def block-edit [temp --line:int] {
     let content = $in
     let tf = mktemp -t $temp
     $content | save -f $tf
-    if ($line | is-not-empty) {
-        for x in [
-            [
-                {$env.EDITOR | find vim | is-not-empty}
-                {^$env.EDITOR $"+($line)" $tf}
-            ]
-            [
-                {true}
-                {^$env.EDITOR $tf}
-            ]
-        ] {
-            if (do $x.0) {
-                do $x.1
-                break
-            }
-        }
-    } else {
-        ^$env.EDITOR $tf
-    }
+    variants-edit $tf --line $line
     let c = open $tf --raw
     rm -f $tf
     $c

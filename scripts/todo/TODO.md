@@ -105,4 +105,5 @@
     - [x] Content ignore leading empty lines #221
     - [x] Set Default Title #225
         - [x] Open the editor and location to the second line. #226
+        - [x] Variants-edit #238
     - [x] `scratch-add` can read content from stdin. #229
