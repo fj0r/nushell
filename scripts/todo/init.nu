@@ -7,6 +7,7 @@ export def --env start [] {
     $env.TODO_DB = $db
     if ($env.TODO_DB | path exists) { return }
     {_: '.'} | into sqlite -t _ $env.TODO_DB
+    print $"(ansi grey)created database: $env.TODO_DB(ansi reset)"
     for s in [
         "DROP TABLE _;"
         "CREATE TABLE IF NOT EXISTS category (

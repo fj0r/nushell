@@ -2,7 +2,12 @@ const __dyn_load = if ('~/.env.nu' | path exists) { '~/.env.nu' } else { 'dummy.
 source $__dyn_load
 source __env.nu
 
-mkdir -v ($nu.data-dir | path join 'cache')
+let cache_dir = $nu.data-dir | path join 'cache'
+if not ($cache_dir | path exists) {
+    mkdir $cache_dir
+    print $"(ansi grey)created directory: $nu.data-dir/cache(ansi reset)"
+}
+
 
 # settings
 $env.config.show_banner = false

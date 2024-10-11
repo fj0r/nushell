@@ -76,6 +76,7 @@
         - [x] sql insertion #58
         - [x] When no tag is specified, `:untagged` is added by default. #59
         - [x] remove/add `:untagged` when todo tag #60
+    - [x] Tips about initializing the database #239
 - [ ] Integration #63
     - [x] More convenient interaction modes #68
         - [x] kebab-case #201
