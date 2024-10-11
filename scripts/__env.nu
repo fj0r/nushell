@@ -40,6 +40,7 @@ $env.LD_LIBRARY_PATH = (do -i {
 })
 
 $env.TERM = 'screen-256color'
+$env.EDITOR = 'nvim'
 for s in ['/usr/local/bin', '/usr/bin'] {
     let p = [$s, 'nu'] | path join
     if (which $p | is-not-empty) {
