@@ -81,7 +81,7 @@
     - [x] More convenient interaction modes #68
         - [x] kebab-case #201
         - [x] Interactive cleaning :trash `tclean` #224
-    - [ ] Import/Export(TODO.md) #69
+    - [ ] Import/Export #69
         - [x] Export json #242
         - [ ] Import #243
             - [ ] id collision #245
@@ -114,3 +114,4 @@
         - [x] Open the editor and location to the second line. #226
         - [x] Variants-edit #238
     - [x] `scratch-add` can read content from stdin. #229
+- [ ] Count.nu #255
