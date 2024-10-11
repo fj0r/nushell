@@ -115,3 +115,5 @@
         - [x] Variants-edit #238
     - [x] `scratch-add` can read content from stdin. #229
 - [ ] Count.nu #255
+    - [ ] Only count leaf node #256
+    - [x] New column named `value` with type `REAL` #257
