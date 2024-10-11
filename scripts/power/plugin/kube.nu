@@ -14,10 +14,10 @@ def "kube ctx" [] {
     mut cache = ''
     mut file = ''
     if ($env.KUBECONFIG? | is-empty) {
-        $cache = ([$nu.data-dir 'cache' 'power'] | path join 'kube.json')
+        $cache = ([$nu.cache-dir 'power'] | path join 'kube.json')
         $file = $"($env.HOME)/.kube/config"
     } else {
-        $cache = ([$nu.data-dir 'cache' 'power'] | path join $"kube-($env.KUBECONFIG | str replace -a '/' ':').json")
+        $cache = ([$nu.cache-dir 'power'] | path join $"kube-($env.KUBECONFIG | str replace -a '/' ':').json")
         $file = $env.KUBECONFIG
     }
     if not ($file | path exists) { return null }
