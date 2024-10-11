@@ -15,6 +15,9 @@ $env.config.table.header_on_separator = true
 $env.config.table.mode = 'compact' #light compact
 $env.config.table.padding = 0
 
+if not ($nu.data-dir | path exists) { mkdir $nu.data-dir }
+if not ($nu.cache-dir | path exists) { mkdir $nu.cache-dir }
+
 source __plugin.nu
 
 # const plugin_msgpackz = (
