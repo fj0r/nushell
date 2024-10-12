@@ -82,6 +82,7 @@ export def --env theme [] {
         }
         symbol: {
             box: [['☐' '🗹'],['[ ]' '[x]']]
+            md_list: '-'
         }
         formatter: {
             created: {|x| $x | into datetime | date humanize }

@@ -55,9 +55,9 @@ def 'fmt leaves' [
 
     let done = $env.TODO_THEME.symbol.box | get ($md | into int) | get $o.done
     let title = if $md_list {
-        [$"($indent)-" $o.title $"#($o.id)"]
+        [$"($indent)($env.TODO_THEME.symbol.md_list)" $o.title $"#($o.id)"]
     } else if $md {
-        [$"($indent)-" $done $o.title $"#($o.id)"]
+        [$"($indent)($env.TODO_THEME.symbol.md_list)" $done $o.title $"#($o.id)"]
     } else {
         [$indent $done $"(ansi $color.title)($o.title)" $"(ansi $color.id)#($o.id)"]
     }

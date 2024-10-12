@@ -14,9 +14,10 @@
         - [x] Enable `--empty-as-all` of `cat-to-tag-id` only in `Todo list` #181
     - [ ] Completion of &tag and !tag #189
     - [ ] List unfinished tasks, sorted by deadline #214
-    - [x] Allows setting a specified tag to be hidden. #223
+    - [ ] Allows setting a specified tag to be hidden. #223
         - [x] Add column `hidden` #280
         - [x] Filter category where `hidden` is true when querying. #281
+        - [ ] Toggle hidden of category #282
 - [ ] Actions #22
     - [x] Category #11
         - [x] Allow creation of multiple tags under one category at once #13
@@ -62,6 +63,7 @@
         - [x] Refactor 'fmt leaves' #79
         - [x] Use variable substitution for actual values #80
         - [x] $env.TODO_THEME.symbol.box #100
+        - [x] $env.TODO_THEME.symbol.md_list #283
     - [x] Eye-pleasing default theme #82
     - [x] Deadline #83
         - [x] Done Todo do not show deadline #84
