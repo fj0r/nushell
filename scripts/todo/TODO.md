@@ -88,7 +88,9 @@
     - [ ] Import/Export #69
         - [x] Export json #242
         - [ ] Import #243
-            - [ ] id collision #245
+            - [x] id collision #245
+                - [x] switch $env.TODO_DB #284
+                    - [x] Allow setting .TODO_DB #285
             - [ ] Restore tag #246
             - [ ] Mounting Node (Parent) #247
             - [ ] Maintain the tree structure #248

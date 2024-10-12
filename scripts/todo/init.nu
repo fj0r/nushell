@@ -3,8 +3,9 @@ use common.nu *
 
 
 export def --env start [] {
-    let db = [$nu.data-dir '2do.db'] | path join
-    $env.TODO_DB = $db
+    if 'TODO_DB' not-in $env {
+        $env.TODO_DB = [$nu.data-dir 'todo.db'] | path join
+    }
     if ($env.TODO_DB | path exists) { return }
     {_: '.'} | into sqlite -t _ $env.TODO_DB
     print $"(ansi grey)created database: $env.TODO_DB(ansi reset)"
