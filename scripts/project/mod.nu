@@ -1,25 +1,39 @@
+const _enter = "
+    print $'(ansi default_italic)(ansi grey)`__.nu` as overlay (ansi default_bold)__(ansi reset)'
+    overlay use -r __.nu as __ -p
+    cd $after
+    [yaml, toml]
+    | reduce -f {} {|i,a|
+        let f = $'__.($i)'
+        if ($f | path exists) { $a | merge (open $f) } else { $a }
+    }
+    | merge (
+        if ('.env' | path exists) {
+            open .env
+            | lines
+            | parse -r '(?<k>.+?)\\s*=\\s*(?<v>.+)'
+            | reduce -f {} {|x, acc| $acc | insert $x.k $x.v}
+        } else {
+            {}
+        }
+    )
+    | load-env
+"
+
+const _leave = "
+    overlay hide __ --keep-env [ PWD OLDPWD ]
+    print $'(ansi default_italic)(ansi grey)unload overlay (ansi default_bold)__(ansi reset)'
+"
+
 export-env {
     $env.config.hooks.env_change.PWD ++= [
         {
             condition: {|_, after| '__' in (overlay list) and (find-project $after | is-empty) }
-            code: "
-                overlay hide __ --keep-env [ PWD OLDPWD ]
-                print $'(ansi default_italic)(ansi grey)unload overlay (ansi default_bold)__(ansi reset)'
-            "
+            code: $_leave
         }
         {
             condition: {|_, after| $after | path join __.nu | path exists }
-            code: "
-                print $'(ansi default_italic)(ansi grey)`__.nu` as overlay (ansi default_bold)__(ansi reset)'
-                overlay use -r __.nu as __ -p
-                cd $after
-                [yaml, toml]
-                | reduce -f {} {|i,a|
-                    let f = $'__.($i)'
-                    if ($f | path exists) { $a | merge (open $f) } else { $a }
-                }
-                | load-env
-            "
+            code: $_enter
         }
     ]
 }
