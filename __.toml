@@ -1,0 +1,69 @@
+dest = "~/world/nu_scripts"
+
+[[manifest]]
+from = "direnv/"
+to = "direnv"
+
+[[manifest]]
+from = "argx/"
+to = "argx"
+
+[[manifest]]
+from = "ssh/"
+to = "ssh"
+
+[[manifest]]
+from = "docker/"
+to = "docker"
+
+[[manifest]]
+from = "devcontainer/"
+to = "devcontainer"
+
+[[manifest]]
+from = "kubernetes/"
+to = "kubernetes"
+
+[[manifest]]
+from = "lg/"
+to = "lg"
+
+[[manifest]]
+from = "todo/"
+to = "todo"
+
+[[manifest]]
+from = "git/"
+to = "git"
+
+[[manifest]]
+from = "llm/"
+to = "ai"
+
+[[manifest]]
+from = "nvim/"
+to = "nvim"
+disable = true
+
+[[manifest]]
+from = "power/"
+to = "powerline"
+disable = false
+
+[[manifest]]
+from = "cwdhist/"
+to = "cwdhist"
+
+[[manifest]]
+from = "history-utils/"
+to = "history-utils"
+disable = true
+
+[[manifest]]
+from = "resolvenv/"
+to = "resolvenv"
+disable = true
+
+[[manifest]]
+from = "project/"
+to = "project"

@@ -1,38 +1,12 @@
-const manifest = [
-    { from: argx/, to: argx }
-    { from: ssh/, to: ssh }
-    { from: docker/, to: docker }
-    { from: devcontainer/, to: devcontainer }
-    { from: kubernetes/, to: kubernetes }
-
-    { from: lg/, to: lg }
-    { from: todo/, to: todo }
-    { from: git/, to: git }
-    { from: llm/, to: ai }
-
-    { from: nvim/, to: nvim, disable: true }
-
-    { from: power/, to: powerline, disable: false }
-    { from: cwdhist/, to: cwdhist }
-    { from: history-utils/, to: history-utils, disable: true}
-    { from: resolvenv/, to: resolvenv, disable: true }
-
-    { from: project/, to: project }
-]
-
-export-env {
-    $env.dest = [$env.HOME world nu_scripts] | path join
-}
-
 def cmpl-mod [] {
-    $manifest | get to
+    $env.manifest | get to
 }
 
 export def 'dump nu_scripts' [...mod:string@cmpl-mod] {
     use git *
     use git/shortcut.nu *
     use lg
-    let m = $manifest | filter {|x| not ($x.disable? | default false) }
+    let m = $env.manifest | filter {|x| not ($x.disable? | default false) }
     let m = if ($mod | is-empty) { $m } else {
         $m | where to in $mod
     }
@@ -43,7 +17,7 @@ export def 'dump nu_scripts' [...mod:string@cmpl-mod] {
         lg level 0 $"($x.to).nu"
         let t = $'($env.dest)/($x.to)'
         if ($t | path exists | not $in) { mkdir $t }
-        git-sync $'($o)/($x.from)' $t --push --init=$"git@github-fjord:fj0r/($x.to).nu.git"
+        git-sync $'($o)/($x.from)' ($t | path expand) --push --init=$"git@github-fjord:fj0r/($x.to).nu.git"
     }
     lg level 1 'end'
 }
