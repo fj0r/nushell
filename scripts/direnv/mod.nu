@@ -1,4 +1,4 @@
-export def --env main [] {
+export def --env main [mod?:string="__"] {
     let _ = if ('.env' | path exists) {
         open .env
         | lines
@@ -9,7 +9,7 @@ export def --env main [] {
 
     [yaml, toml]
     | reduce -f {} {|i,a|
-        let f = $'__.($i)'
+        let f = $'($mod).($i)'
         if ($f | path exists) { $a | merge (open $f) } else { $a }
     }
     | merge $_

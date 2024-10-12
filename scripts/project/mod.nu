@@ -13,7 +13,7 @@ export-env {
     $env.config.hooks.env_change.PWD ++= [
         {
             condition: {|_, after| '__' in (overlay list) and (find-project $after | is-empty) }
-            code: $"($_leave)(char newline)(if (scope commands | where name == 'direnv' | is-not-empty ) { 'direnv' })"
+            code: $"($_leave)(char newline)(if (scope commands | where name == 'direnv' | is-not-empty ) { 'direnv __' })"
         }
         {
             condition: {|_, after| $after | path join __.nu | path exists }
