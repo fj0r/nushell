@@ -1,23 +1,20 @@
-const _enter = "
-    print $'(ansi default_italic)(ansi grey)`__.nu` as overlay (ansi default_bold)__(ansi reset)'
-    overlay use -r __.nu as __ -p
-    cd $after
-"
-
-const _leave = "
-    overlay hide __ --keep-env [ PWD OLDPWD ]
-    print $'(ansi default_italic)(ansi grey)unload overlay (ansi default_bold)__(ansi reset)'
-"
-
 export-env {
     $env.config.hooks.env_change.PWD ++= [
         {
             condition: {|_, after| '__' in (overlay list) and (find-project $after | is-empty) }
-            code: $"($_leave)(char newline)(if (scope commands | where name == 'direnv' | is-not-empty ) { 'direnv __' })"
+            code: $"
+                overlay hide __ --keep-env [ PWD OLDPWD ]
+                print '(ansi default_italic)(ansi grey)unload overlay (ansi default_bold)__(ansi reset)'
+            "
         }
         {
             condition: {|_, after| $after | path join __.nu | path exists }
-            code: $_enter
+            code: $"
+                print '(ansi default_italic)(ansi grey)`__.nu` as overlay (ansi default_bold)__(ansi reset)'
+                overlay use -r __.nu as __ -p
+                cd $after
+                (if (scope commands | where name == 'direnv' | is-not-empty ) { 'direnv __' })
+            "
         }
     ]
 }
