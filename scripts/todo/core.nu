@@ -208,8 +208,8 @@ export def todo-list [
     --created: duration
     --deadline: duration
     --sort(-s): list<string@cmpl-sort>
-    --unfinished(-n)
-    --finished(-f)
+    --work-in-process(-W)
+    --finished(-F)
     --untagged(-U)
     --md(-m)
     --md-list(-l)
@@ -261,7 +261,7 @@ export def todo-list [
     if ($updated | is-not-empty) { $cond ++= $"updated >= ($now - $updated | fmt-date | Q $in)"}
     if ($created | is-not-empty) { $cond ++= $"created >= ($now - $created | fmt-date | Q $in)"}
     if ($deadline | is-not-empty) { $cond ++= $"deadline >= ($now - $deadline | fmt-date | Q $in)"}
-    if ($unfinished) { $cond ++= $"done = 0" }
+    if ($work_in_process) { $cond ++= $"done = 0" }
     if ($finished) { $cond ++= $"done = 1" }
     let $cond = if ($cond | is-empty) { '' } else { $cond | str join ' and ' | $"where ($in)" }
 
