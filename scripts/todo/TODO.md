@@ -14,7 +14,9 @@
         - [x] Enable `--empty-as-all` of `cat-to-tag-id` only in `Todo list` #181
     - [ ] Completion of &tag and !tag #189
     - [ ] List unfinished tasks, sorted by deadline #214
-    - [ ] Allows setting a specified tag to be hidden. #223
+    - [x] Allows setting a specified tag to be hidden. #223
+        - [x] Add column `hidden` #280
+        - [x] Filter category where `hidden` is true when querying. #281
 - [ ] Actions #22
     - [x] Category #11
         - [x] Allow creation of multiple tags under one category at once #13
@@ -117,3 +119,4 @@
 - [ ] Count.nu #255
     - [ ] Only count leaf node #256
     - [x] New column named `value` with type `REAL` #257
+    - [ ] How to calculate when both child nodes and parent nodes have values #258

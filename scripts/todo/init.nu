@@ -12,7 +12,8 @@ export def --env start [] {
         "DROP TABLE _;"
         "CREATE TABLE IF NOT EXISTS category (
             id INTEGER PRIMARY KEY,
-            name TEXT NOT NULL UNIQUE
+            name TEXT NOT NULL UNIQUE,
+            hidden BOOLEAN DEFAULT 0
         );"
         "CREATE TABLE IF NOT EXISTS tag (
             id INTEGER PRIMARY KEY,
@@ -20,7 +21,7 @@ export def --env start [] {
             name TEXT NOT NULL,
             UNIQUE (category_id, name) ON CONFLICT REPLACE
         );"
-        "INSERT INTO category (id, name) VALUES (1, '');"
+        "INSERT INTO category (id, name, hidden) VALUES (1, '', 1);"
         "INSERT INTO tag (category_id, name) VALUES (1, 'trash');"
         "CREATE TABLE IF NOT EXISTS todo (
             id INTEGER PRIMARY KEY,
