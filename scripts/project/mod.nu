@@ -13,6 +13,12 @@ export-env {
                 print $'(ansi default_italic)(ansi grey)`__.nu` as overlay (ansi default_bold)__(ansi reset)'
                 overlay use -r __.nu as __ -p
                 cd $after
+                [yaml, toml]
+                | reduce -f {} {|i,a|
+                    let f = $'__.($i)'
+                    if ($f | path exists) { $a | merge (open $f) } else { $a }
+                }
+                | load-env
             "
         }
     ]
