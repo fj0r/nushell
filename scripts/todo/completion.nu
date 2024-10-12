@@ -31,6 +31,10 @@ export def 'cmpl-tag' [] {
     | get name
 }
 
+export def 'cmpl-cat' [] {
+    run $"select id as value, name || '(char tab)' || hidden as description from category"
+}
+
 export def 'cmpl-category' [] {
     run 'select c.name as category, t.name as tag
         from category as c

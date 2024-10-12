@@ -337,6 +337,10 @@ export def todo-cat-rename [from:string@cmpl-category to] {
     run $"update tag set name = (Q $to) where name = (Q $from)"
 }
 
+export def todo-cat-hidden [cat:string@cmpl-cat] {
+    run $"update category set hidden = not hidden where id = ($cat)"
+}
+
 export def todo-title [id: int@cmpl-todo-id] {
     run $'select title from todo where id = ($id);'
     | get 0.title
