@@ -54,3 +54,5 @@
     - [x] git-sync #216
         - [x] An option to control whether to execute rsync. #222
         - [x] Simplify git-sync function by merging conditions #228
+- [x] direnv #286
+    - [ ] project use direnv #287

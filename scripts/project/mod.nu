@@ -2,22 +2,9 @@ const _enter = "
     print $'(ansi default_italic)(ansi grey)`__.nu` as overlay (ansi default_bold)__(ansi reset)'
     overlay use -r __.nu as __ -p
     cd $after
-    [yaml, toml]
-    | reduce -f {} {|i,a|
-        let f = $'__.($i)'
-        if ($f | path exists) { $a | merge (open $f) } else { $a }
+    if (scope commands | where name == 'direnv' | is-not-empty ) {
+        direnv
     }
-    | merge (
-        if ('.env' | path exists) {
-            open .env
-            | lines
-            | parse -r '(?<k>.+?)\\s*=\\s*(?<v>.+)'
-            | reduce -f {} {|x, acc| $acc | insert $x.k $x.v}
-        } else {
-            {}
-        }
-    )
-    | load-env
 "
 
 const _leave = "

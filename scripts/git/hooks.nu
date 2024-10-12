@@ -84,9 +84,20 @@ export def git-install-hooks [
                 print $'\(ansi grey\)The `($fun)` function is undefined.\(ansi reset\)'
             } else {
                 let wd = $env.CURRENT_FILE
-                | path split | split list '.git' | range ..<-1 | flatten | path join
+                | path split
+                | split list '.git'
+                | range ..<-1
+                | flatten
+                | path join
+
                 cd $wd
+
+                if \(scope commands | where name == 'direnv' | is-not-empty \) {
+                    direnv
+                }
+
                 let cm = git log --reverse -n 1 --pretty=%h»¦«%s | split row '»¦«'
+
                 ($mod) ($fun) '($h.k)' {
                     workdir: $env.PWD
                     hash: $cm.0
