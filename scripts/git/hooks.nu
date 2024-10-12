@@ -66,6 +66,7 @@ export def git-install-hooks [
     ...hooks:string@cmpl-hooks
     --mod(-m)="__"
     --fun(-f)="git-hooks"
+    --direnv
 ] {
     let c = git-cdup
     if ($c | describe) == nothing { return }
@@ -92,9 +93,7 @@ export def git-install-hooks [
 
                 cd $wd
 
-                if \(scope commands | where name == 'direnv' | is-not-empty \) {
-                    direnv
-                }
+                (if $direnv { 'use direnv; direnv' })
 
                 let cm = git log --reverse -n 1 --pretty=%h»¦«%s | split row '»¦«'
 

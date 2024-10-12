@@ -49,6 +49,7 @@
             - [x] outdent #232
             - [x] The `git-hooks` function now accepts a new argument `ctx`, replacing the former `argv`. #233
             - [x] install default hooks #236
+            - [x] `--direnv` generates direnv related statements #288
         - [x] cmpl-hooks #206
         - [x] uninstall-hooks #235
     - [x] git-sync #216
