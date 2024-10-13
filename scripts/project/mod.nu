@@ -2,25 +2,30 @@ export-env {
     $env.config.hooks.env_change.PWD ++= [
         {
             condition: {|_, after| '__' in (overlay list) and (find-project $after | is-empty) }
-            code: $"
-                overlay hide __ --keep-env [ PWD OLDPWD ]
-                print '(ansi default_italic)(ansi grey)unload overlay (ansi default_bold)__(ansi reset)'
-            "
+            code: ([
+                $"overlay hide __ --keep-env [ PWD OLDPWD ]"
+                $"print '(ansi default_italic)(ansi grey)unload overlay (ansi default_bold)__(ansi reset)'"
+            ] | str join (char newline))
         }
         {
             condition: {|_, after| $after | path join __.nu | path exists }
-            code: $"
-                print '(ansi default_italic)(ansi grey)`__.nu` as overlay (ansi default_bold)__(ansi reset)'
-                overlay use -r __.nu as __ -p
-                cd $after
-                (if (scope commands | where name == 'direnv' | is-not-empty ) { 'direnv __' })
-            "
+            code: ([
+                $"print '(ansi default_italic)(ansi grey)`__.nu` as overlay (ansi default_bold)__(ansi reset)'"
+                $"overlay use -r __.nu as __ -p"
+                $"cd $after"
+                (if ('direnv' | cmd exists ) { 'direnv __' })
+            ] | str join (char newline))
         }
     ]
 }
 
 export def 'scope project' [] {
     scope modules | where name == '__' | get -i 0
+}
+
+def 'cmd exists' [] {
+    let o = $in
+    scope commands | where name == $o | is-not-empty
 }
 
 export def 'watch-modify' [
@@ -42,7 +47,18 @@ export def 'watch-modify' [
 # overlay use -r __.nu as __ -p
 export def --wrapped 'watch __' [...cmd] {
     watch-modify -c -g '__.nu' {
-        nu -c $"overlay use -r __.nu as __ -p; __ ($cmd |str join ' ')"
+        [
+            ...(if ('direnv' | cmd exists) {
+                [
+                    'use direnv'
+                    'direnv __'
+                ]
+            } else { [] })
+            'overlay use -r __.nu as __ -p'
+            $'__ ($cmd |str join " ")'
+        ]
+        | str join (char newline)
+        | nu -c $in
     }
 }
 
