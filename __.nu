@@ -2,7 +2,7 @@ def cmpl-mod [] {
     $env.manifest | get to
 }
 
-export def 'dump nu_scripts' [...mod:string@cmpl-mod] {
+export def 'dump nu_scripts' [...mod:string@cmpl-mod --reverse(-r)] {
     use git *
     use git/shortcut.nu *
     use lg
@@ -10,16 +10,52 @@ export def 'dump nu_scripts' [...mod:string@cmpl-mod] {
     let m = if ($mod | is-empty) { $m } else {
         $m | where to in $mod
     }
-    let l = git-last-commit
     let o = $"($env.PWD)/scripts"
     lg level 1 'begin'
     for x in $m {
         lg level 0 $"($x.to).nu"
         let t = $'($env.dest)/($x.to)'
         if ($t | path exists | not $in) { mkdir $t }
-        git-sync $'($o)/($x.from)' ($t | path expand) --push --init=$"git@github-fjord:fj0r/($x.to).nu.git"
+        let t = [$t $x.to] | path join
+        if $reverse {
+            cd $t
+            gp
+            git-sync $t $'($o)/($x.from)'
+        } else {
+            git-sync $'($o)/($x.from)' $t --push --init=$"git@github-fjord:fj0r/($x.to).nu.git"
+        }
     }
     lg level 1 'end'
+}
+
+export def 'add nupm.nuon' [] {
+    for d in $env.manifest {
+        cd $env.dest
+        let d = $d.to
+        if ([$d nupm.nuon] | path join | path exists) or not ([$d .git] | path join | path exists) {
+            continue
+        }
+        lg level 1 $d
+        mv $d _
+        mkdir $d
+        mv $"_/.git" $d
+        mkdir $"($d)/($d)"
+        mv ("_/*" | into glob) $"($d)/($d)"
+        rm _
+        let m = {
+          "name": $d
+          "version": "1.0.0"
+          "description": ""
+          "maintainers": ["@fj0r"]
+          "type": "module"
+          "license": "MIT License"
+        } | to nuon -i 2
+        $m | save $"($d)/nupm.nuon"
+        cd $d
+        ga
+        gc 'Package for nupm'
+        gp
+    }
 }
 
 export def git-hooks [act ctx] {

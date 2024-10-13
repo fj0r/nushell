@@ -1,69 +1,69 @@
 dest = "~/world/nu_scripts"
 
 [[manifest]]
-from = "direnv/"
+from = "direnv"
 to = "direnv"
 
 [[manifest]]
-from = "argx/"
+from = "argx"
 to = "argx"
 
 [[manifest]]
-from = "ssh/"
+from = "ssh"
 to = "ssh"
 
 [[manifest]]
-from = "docker/"
+from = "docker"
 to = "docker"
 
 [[manifest]]
-from = "devcontainer/"
+from = "devcontainer"
 to = "devcontainer"
 
 [[manifest]]
-from = "kubernetes/"
+from = "kubernetes"
 to = "kubernetes"
 
 [[manifest]]
-from = "lg/"
+from = "lg"
 to = "lg"
 
 [[manifest]]
-from = "todo/"
+from = "todo"
 to = "todo"
 
 [[manifest]]
-from = "git/"
+from = "git"
 to = "git"
 
 [[manifest]]
-from = "llm/"
+from = "llm"
 to = "ai"
 
 [[manifest]]
-from = "nvim/"
+from = "nvim"
 to = "nvim"
 disable = true
 
 [[manifest]]
-from = "power/"
+from = "power"
 to = "powerline"
 disable = false
 
 [[manifest]]
-from = "cwdhist/"
+from = "cwdhist"
 to = "cwdhist"
 
 [[manifest]]
-from = "history-utils/"
+from = "history-utils"
 to = "history-utils"
 disable = true
 
 [[manifest]]
-from = "resolvenv/"
+from = "resolvenv"
 to = "resolvenv"
 disable = true
 
 [[manifest]]
-from = "project/"
+from = "project"
 to = "project"
