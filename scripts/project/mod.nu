@@ -23,6 +23,11 @@ export def 'scope project' [] {
     scope modules | where name == '__' | get -i 0
 }
 
+def 'cmpl-cmd' [] {
+    let p = scope project
+    [...$p.commands.name ...$p.aliases.name]
+}
+
 def 'cmd exists' [] {
     let o = $in
     scope commands | where name == $o | is-not-empty
@@ -45,7 +50,7 @@ export def 'watch-modify' [
 }
 
 # overlay use -r __.nu as __ -p
-export def --wrapped 'watch __' [...cmd] {
+export def --wrapped 'watch __' [...cmd:string@cmpl-cmd] {
     watch-modify -c -g '__.nu' {
         [
             ...(if ('direnv' | cmd exists) {
