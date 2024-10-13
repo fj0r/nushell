@@ -7,7 +7,7 @@ export def --env main [mod?:string="__"] {
     }
     | default {}
 
-    [yaml, toml]
+    [yaml, toml, nuon]
     | reduce -f {} {|i,a|
         let f = $'($mod).($i)'
         if ($f | path exists) { $a | merge (open $f) } else { $a }
