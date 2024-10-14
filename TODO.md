@@ -29,6 +29,7 @@
 - [ ] Modularize #136
     - [ ] autoload #156
     - [x] adjust $env.cwd_history_file #249
+        - [x] Change env name to uppercase #295
     - [x] Adjust cache path #250
         - [x] k8s #251
         - [x] k8s-api-resources #252

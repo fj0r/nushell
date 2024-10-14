@@ -3,8 +3,44 @@ def quote [...t] {
     $"'($s)'"
 }
 
-def __cwdhist_menu [] {
-    {
+export def 'cwd history delete' [cwd] {
+    open $env.CWD_HISTORY_FILE
+    | query db $"delete from cwd_history where cwd = (quote $cwd);"
+}
+
+export-env {
+    $env.CWD_HISTORY_FULL = false
+    $env.CWD_HISTORY_FILE = $nu.data-dir | path join 'cwd_history.sqlite'
+
+    if not ($env.CWD_HISTORY_FILE | path exists) {
+        {_: '.'} | into sqlite -t _ $env.CWD_HISTORY_FILE
+        print $"(ansi grey)created database: $env.CWD_HISTORY_FILE(ansi reset)"
+        open $env.CWD_HISTORY_FILE | query db "create table if not exists cwd_history (
+            cwd text primary key,
+            count int default 1,
+            recent datetime default (datetime('now', 'localtime'))
+        );"
+    }
+
+    $env.config.hooks.env_change.PWD ++= {|_, dir|
+        if $dir == $nu.home-path { return }
+        let suffix = (do --ignore-errors { $dir | path relative-to  $nu.home-path })
+        let path = if ($suffix | is-empty) {
+            $dir
+        } else {
+            ['~', $suffix] | path join
+        }
+        open $env.CWD_HISTORY_FILE
+        | query db $"
+            insert into cwd_history\(cwd\)
+                values \((quote $path)\)
+            on conflict\(cwd\)
+            do update set
+                count = count + 1,
+                recent = datetime\('now', 'localtime');"
+    }
+
+    $env.config.menus ++= {
         name: cwdhist_menu
         only_buffer_difference: true
         marker: "| "
@@ -20,7 +56,7 @@ def __cwdhist_menu [] {
         source: { |buffer, position|
             #$"[($position)]($buffer);(char newline)" | save -a ~/.cache/cwdhist.log
             let t = quote '%' ($buffer | split row ' ' | last) '%'
-            if $env.cwd_history_full {
+            if $env.CWD_HISTORY_FULL {
                 open $nu.history-path | query db $"
                     select cwd as value, count\(*\) as cnt
                     from history
@@ -30,7 +66,7 @@ def __cwdhist_menu [] {
                     limit 50
                     ;"
             } else {
-                open $env.cwd_history_file | query db $"
+                open $env.CWD_HISTORY_FILE | query db $"
                     select cwd as value, count
                     from cwd_history
                     where cwd like ($t)
@@ -40,75 +76,24 @@ def __cwdhist_menu [] {
             }
         }
     }
-}
-
-def __cwdhist_keybinding [] {
-    {
-        name: cwdhist_menu
-        modifier: alt
-        keycode: char_o
-        mode: [emacs, vi_normal, vi_insert]
-        event: [
-            { send: menu name: cwdhist_menu }
-        ]
-    }
-}
-
-def __cwdhist_switching [] {
-    {
-        name: cwdhist_switching
-        modifier: shift_alt
-        keycode: char_o
-        mode: [emacs, vi_normal, vi_insert]
-        event: [
-            { send: ExecuteHostCommand, cmd: '$env.cwd_history_full = (not $env.cwd_history_full)' }
-        ]
-    }
-}
-
-
-export def 'cwd history delete' [cwd] {
-    open $env.cwd_history_file
-    | query db $"delete from cwd_history where cwd = (quote $cwd);"
-}
-
-export-env {
-    $env.cwd_history_full = false
-    $env.cwd_history_file = $nu.data-dir | path join 'cwd_history.sqlite'
-
-    if not ($env.cwd_history_file | path exists) {
-        {_: '.'} | into sqlite -t _ $env.cwd_history_file
-        print $"(ansi grey)created database: $env.cwd_history_file(ansi reset)"
-        open $env.cwd_history_file | query db "create table if not exists cwd_history (
-            cwd text primary key,
-            count int default 1,
-            recent datetime default (datetime('now', 'localtime'))
-        );"
-    }
-
-    let __cwdhist_hook = {|_, dir|
-        if $dir == $nu.home-path { return }
-        let suffix = (do --ignore-errors { $dir | path relative-to  $nu.home-path })
-        let path = if ($suffix | is-empty) {
-            $dir
-        } else {
-            ['~', $suffix] | path join
+    $env.config.keybindings ++= [
+        {
+            name: cwdhist_menu
+            modifier: alt
+            keycode: char_o
+            mode: [emacs, vi_normal, vi_insert]
+            event: [
+                { send: menu name: cwdhist_menu }
+            ]
         }
-        open $env.cwd_history_file
-        | query db $"
-            insert into cwd_history\(cwd\)
-                values \((quote $path)\)
-            on conflict\(cwd\)
-            do update set
-                count = count + 1,
-                recent = datetime\('now', 'localtime');"
-    }
-
-    $env.config = ($env.config
-                  | update hooks.env_change.PWD ($env.config.hooks.env_change.PWD | append $__cwdhist_hook ))
-
-    $env.config = ($env.config
-                  | upsert menus ($env.config.menus | append (__cwdhist_menu))
-                  | upsert keybindings ($env.config.keybindings | append [(__cwdhist_keybinding) (__cwdhist_switching)])
-                  )
+        {
+            name: cwdhist_switching
+            modifier: shift_alt
+            keycode: char_o
+            mode: [emacs, vi_normal, vi_insert]
+            event: [
+                { send: ExecuteHostCommand, cmd: '$env.CWD_HISTORY_FULL = (not $env.CWD_HISTORY_FULL)' }
+            ]
+        }
+    ]
 }
