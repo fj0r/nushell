@@ -14,15 +14,26 @@ export def 'dump nu_scripts' [...mod:string@cmpl-mod --reverse(-r)] {
     lg level 1 'begin'
     for x in $m {
         lg level 0 $"($x.to).nu"
-        let t = $'($env.dest)/($x.to)'
-        if ($t | path exists | not $in) { mkdir $t }
-        let t = [$t $x.to] | path join
+        let t0 = $'($env.dest)/($x.to)'
+        if ($t0 | path exists | not $in) { mkdir $t0 }
+        let t = [$t0 $x.to] | path join
         if $reverse {
             cd $t
             gp
             git-sync $t $'($o)/($x.from)'
         } else {
-            git-sync $'($o)/($x.from)' $t --push --init=$"git@github-fjord:fj0r/($x.to).nu.git"
+            (git-sync
+                $'($o)/($x.from)' $t
+                --push
+                --init=$"git@github-fjord:fj0r/($x.to).nu.git"
+                --post-sync {|src, desc|
+                    cd $desc
+                    let md = ls | get name | path parse | where extension == 'md'
+                    for m in $md {
+                        mv -f $"($m.stem).($m.extension)" ..
+                    }
+                }
+            )
         }
     }
     lg level 1 'end'
