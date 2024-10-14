@@ -65,6 +65,3 @@ power set kube {
 }
 power init
 
-if (which atuin | is-not-empty) {
-    source atuin.nu
-}
