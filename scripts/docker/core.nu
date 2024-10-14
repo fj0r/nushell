@@ -374,6 +374,16 @@ export def volume-restore [
 }
 
 
+def host-path [path] {
+    match ($path | str substring ..<1) {
+        '/' => { $path }
+        '=' => { $path | str substring 1.. }
+        '~' => { [ $env.HOME ($path | str substring 2..) ] | path join }
+        '$' => { $env | get ($path | str substring 1..) }
+        _   => { [ $env.PWD $path ] | path join }
+    }
+}
+
 # run
 export def container-create [
     --name: string

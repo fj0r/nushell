@@ -62,5 +62,5 @@
 - [x] Project #289
     - [ ] Redundant `cd` ($env.OLDPWD) #290
     - [x] Load in batch mode #294
-- [ ] Docker #296
-    - [ ] Configurable development environment #297
+- [x] Docker #296
+    - [x] Configurable development environment #297

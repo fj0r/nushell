@@ -108,12 +108,3 @@ export def cmpl-docker-run-proxy [] {
     [ $"http://($hostaddr):7890" $"http://($hostaddr):" ]
 }
 
-def host-path [path] {
-    match ($path | str substring ..<1) {
-        '/' => { $path }
-        '=' => { $path | str substring 1.. }
-        '~' => { [ $env.HOME ($path | str substring 2..) ] | path join }
-        '$' => { $env | get ($path | str substring 1..) }
-        _   => { [ $env.PWD $path ] | path join }
-    }
-}

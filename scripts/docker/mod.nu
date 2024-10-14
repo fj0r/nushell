@@ -11,8 +11,8 @@ export-env {
     if not ($env.CONTCONFIG | path exists) {
         {
             preset: [
-                [name, image, env, volum, port, cmd];
-                [rust, 'rust', {}, {}, {}, []]
+                [name, image, env, volumn, port, cmd];
+                [rust, 'rust', {CARGO_HOME: /opt/cargo}, {.: /world, ~/.cargo:/opt/cargo}, {8000: 80}, []]
             ]
 
         } | to toml | save -f $env.CONTCONFIG
@@ -21,5 +21,6 @@ export-env {
 
 
 export use core.nu *
+export use utils.nu *
 export use registry.nu *
 export use buildah.nu *
