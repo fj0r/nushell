@@ -4,10 +4,6 @@ def --wrapped container [...flag] {
     ^$env.CONTCTL ...$flag
 }
 
-def --wrapped with-flag [...flag] {
-    if ($in | is-empty) { [] } else { [...$flag $in] }
-}
-
 # network
 export def containers-network-list [
     name?: string@cmpl-docker-network
@@ -68,11 +64,12 @@ export def container-list [
                 $r | upsert created $t
             }
     } else {
-        let r = ^$cli ...($n | with-flag -n) inspect $container
+        let ns = if ($n | is-empty) {[]} else {[-n $n]}
+        let r = ^$cli ...$ns inspect $container
             | from json
             | get 0
         let image = $r.Image
-        let img = ^$cli ...($n | with-flag -n) inspect $image
+        let img = ^$cli ...$ns inspect $image
             | from json
             | get 0
         let imgCmd = $img.Config.Cmd?
@@ -115,30 +112,15 @@ def parse-img [] {
     {image: $image, tag: $tag, repo: $repo}
 }
 
-# select image
-export def image-select [name] {
-    let n = $name | parse-img
-    let imgs = (image-list)
-    let fs = [image tag repo]
-    for i in 2..0 {
-        let r = $imgs | filter {|x|
-            $fs | range 0..$i | all {|y| ($n | get $y) == ($x | get $y) }
-        }
-        if ($r | is-not-empty) {
-            return ($r | sort-by -r created | first | get name)
-        }
-    }
-    $name
-}
-
 # list images
 export def image-list [
     -n: string@cmpl-docker-ns
     image?: string@cmpl-docker-images
 ] {
+    let ns = if ($n | is-empty) {[]} else {[-n $n]}
     if ($image | is-empty) {
         let fmt = '{"id":"{{.ID}}", "repo": "{{.Repository}}", "tag":"{{.Tag}}", "size":"{{.Size}}" "created":"{{.CreatedAt}}"}'
-        ^$env.CONTCTL ...($n | with-flag -n) images --format $fmt
+        ^$env.CONTCTL ...$ns images --format $fmt
             | lines
             | each {|x|
                 let x = $x | from json
@@ -154,7 +136,7 @@ export def image-list [
                 }
             }
     } else {
-        let r = ^$env.CONTCTL ...($n | with-flag -n) inspect $image
+        let r = ^$env.CONTCTL ...$ns inspect $image
             | from json
             | get 0
         let e = $r.Config.Env?
@@ -187,7 +169,8 @@ export def image-layer [
     -n: string@cmpl-docker-ns
     image: string@cmpl-docker-images
 ] {
-    ^$env.CONTCTL ...($n | with-flag -n) inspect $image
+    let ns = if ($n | is-empty) {[]} else {[-n $n]}
+    ^$env.CONTCTL ...$ns inspect $image
     | from json
     | get 0.RootFS.Layers
 }
@@ -200,7 +183,8 @@ export def container-log [
     -n: string@cmpl-docker-ns # namespace
 ] {
     let l = if $l == 0 { [] } else { [--tail $l] }
-    ^$env.CONTCTL ...($n | with-flag -n) logs -f ...$l $container
+    let ns = if ($n | is-empty) {[]} else {[-n $n]}
+    ^$env.CONTCTL ...$ns logs -f ...$l $container
 }
 
 export def container-log-trunc [
@@ -210,7 +194,8 @@ export def container-log-trunc [
     if $env.CONTCTL == 'podman' {
         print -e $'(ansi yellow)podman(ansi dark_gray) isn’t supported(ansi reset)'
     } else {
-        let f = ^$env.CONTCTL ...($n | with-flag -n) inspect --format='{{.LogPath}}' $container
+        let ns = if ($n | is-empty) {[]} else {[-n $n]}
+        let f = ^$env.CONTCTL ...$ns inspect --format='{{.LogPath}}' $container
         truncate -s 0 $f
     }
 }
@@ -221,7 +206,7 @@ export def --wrapped container-attach [
     -n: string@cmpl-docker-ns
     ...args
 ] {
-    let ns = $n | with-flag -n
+    let ns = if ($n | is-empty) {[]} else {[-n $n]}
     if ($args | is-empty) {
         let cmd = [
             '/usr/local/bin/nu'
@@ -250,9 +235,10 @@ export def container-remove [
     container: string@cmpl-docker-containers
     -n: string@cmpl-docker-ns
 ] {
-    let cs = ^$env.CONTCTL ...($n | with-flag -n) ps -a | from ssv -a | get NAMES
+    let ns = if ($n | is-empty) {[]} else {[-n $n]}
+    let cs = ^$env.CONTCTL ...$ns ps -a | from ssv -a | get NAMES
     if $container in $cs {
-        ^$env.CONTCTL ...($n | with-flag -n) container rm -f $container
+        ^$env.CONTCTL ...$ns container rm -f $container
     } else {
         print -e $"(ansi grey)container (ansi yellow)($container)(ansi grey) not exist(ansi reset)"
     }
@@ -261,38 +247,45 @@ export def container-remove [
 
 # history
 export def container-history [image: string@cmpl-docker-images -n: string@cmpl-docker-ns] {
-    ^$env.CONTCTL ...($n | with-flag -n) history --no-trunc $image | from ssv -a
+    let ns = if ($n | is-empty) {[]} else {[-n $n]}
+    ^$env.CONTCTL ...$ns history --no-trunc $image | from ssv -a
 }
 
 
 # save images
 export def image-save [-n: string@cmpl-docker-ns ...image: string@cmpl-docker-images] {
-    ^$env.CONTCTL ...($n | with-flag -n) save ...$image
+    let ns = if ($n | is-empty) {[]} else {[-n $n]}
+    ^$env.CONTCTL ...$ns save ...$image
 }
 
 # load images
 export def image-load [-n: string@cmpl-docker-ns] {
-    ^$env.CONTCTL ...($n | with-flag -n) load
+    let ns = if ($n | is-empty) {[]} else {[-n $n]}
+    ^$env.CONTCTL ...$ns load
 }
 
 # system prune
 export def system-prune [-n: string@cmpl-docker-ns] {
-    ^$env.CONTCTL ...($n | with-flag -n) system prune -f
+    let ns = if ($n | is-empty) {[]} else {[-n $n]}
+    ^$env.CONTCTL ...$ns system prune -f
 }
 
 # system prune all
 export def system-prune-all [-n: string@cmpl-docker-ns] {
-    ^$env.CONTCTL ...($n | with-flag -n) system prune --all --force --volumes
+    let ns = if ($n | is-empty) {[]} else {[-n $n]}
+    ^$env.CONTCTL ...$ns system prune --all --force --volumes
 }
 
 # remove image
 export def image-remove [image: string@cmpl-docker-images -n: string@cmpl-docker-ns] {
-    ^$env.CONTCTL ...($n | with-flag -n) rmi $image
+    let ns = if ($n | is-empty) {[]} else {[-n $n]}
+    ^$env.CONTCTL ...$ns rmi $image
 }
 
 # add new tag
 export def image-tag [from: string@cmpl-docker-images  to: string -n: string@cmpl-docker-ns] {
-    ^$env.CONTCTL ...($n | with-flag -n) tag $from $to
+    let ns = if ($n | is-empty) {[]} else {[-n $n]}
+    ^$env.CONTCTL ...$ns tag $from $to
 }
 
 # push image
@@ -302,41 +295,47 @@ export def image-push [
     -n: string@cmpl-docker-ns -i
 ] {
     let $insecure = if $i {[--insecure-registry]} else {[]}
+    let ns = if ($n | is-empty) {[]} else {[-n $n]}
     if ($tag | is-empty) {
-        ^$env.CONTCTL ...($n | with-flag -n) ...$insecure push $image
+        ^$env.CONTCTL ...$ns ...$insecure push $image
     } else {
-        ^$env.CONTCTL ...($n | with-flag -n) tag $image $tag
+        ^$env.CONTCTL ...$ns tag $image $tag
         do -i {
-            ^$env.CONTCTL ...($n | with-flag -n) ...$insecure push $tag
+            ^$env.CONTCTL ...$ns ...$insecure push $tag
         }
-        ^$env.CONTCTL ...($n | with-flag -n) rmi $tag
+        ^$env.CONTCTL ...$ns rmi $tag
     }
 }
 
 # pull image
 export def image-pull [image -n: string@cmpl-docker-ns -i] {
     let $insecure = if $i {[--insecure-registry]} else {[]}
-    ^$env.CONTCTL ...($n | with-flag -n) ...$insecure pull $image
+    let ns = if ($n | is-empty) {[]} else {[-n $n]}
+    ^$env.CONTCTL ...$ns ...$insecure pull $image
 }
 
 ### list volume
 export def volume-list [-n: string@cmpl-docker-ns] {
-    ^$env.CONTCTL ...($n | with-flag -n) volume ls | from ssv -a
+    let ns = if ($n | is-empty) {[]} else {[-n $n]}
+    ^$env.CONTCTL ...$ns volume ls | from ssv -a
 }
 
 # create volume
 export def volume-create [name: string -n: string@cmpl-docker-ns] {
-    ^$env.CONTCTL ...($n | with-flag -n) volume create $name
+    let ns = if ($n | is-empty) {[]} else {[-n $n]}
+    ^$env.CONTCTL ...$ns volume create $name
 }
 
 # inspect volume
 export def volume-inspect [name: string@cmpl-docker-volume -n: string@cmpl-docker-ns] {
-    ^$env.CONTCTL ...($n | with-flag -n) volume inspect $name
+    let ns = if ($n | is-empty) {[]} else {[-n $n]}
+    ^$env.CONTCTL ...$ns volume inspect $name
 }
 
 # remove volume
 export def volume-remove [...name: string@cmpl-docker-volume -n: string@cmpl-docker-ns] {
-    ^$env.CONTCTL ...($n | with-flag -n) volume rm ...$name
+    let ns = if ($n | is-empty) {[]} else {[-n $n]}
+    ^$env.CONTCTL ...$ns volume rm ...$name
 }
 
 # dump volume
@@ -346,7 +345,8 @@ export def volume-dump [
     -n: string@cmpl-docker-ns
 ] {
     let id = random chars -l 6
-    ^$env.CONTCTL ...($n | with-flag -n) ...[
+    let ns = if ($n | is-empty) {[]} else {[-n $n]}
+    ^$env.CONTCTL ...$ns ...[
         run --rm
         -v $"($name):/tmp/($id)"
         $image
@@ -363,7 +363,8 @@ export def volume-restore [
 ] {
     let id = random chars -l 6
     let src = random chars -l 6
-    ^$env.CONTCTL ...($n | with-flag -n) ...[
+    let ns = if ($n | is-empty) {[]} else {[-n $n]}
+    ^$env.CONTCTL ...$ns ...[
         run --rm
         -v $"($name):/tmp/($id)"
         -v $"(host-path $from):/tmp/($src)"
@@ -382,7 +383,6 @@ export def container-create [
     --proxy: string@cmpl-docker-run-proxy      # proxy
     --ssh(-s): string@cmpl-docker-run-sshkey   # specify ssh key
     --sshuser: string=root                              # default root
-    --cache(-c): string                                 # cache
     --mnt(-m): string@cmpl-docker-run-vol      # mnt
     --vols(-v): any                                     # { host: container }
     --ports(-p): any                                    # { 8080: 80 }
@@ -401,33 +401,58 @@ export def container-create [
 ] {
     mut args = []
 
-    $args ++= ($namespace | with-flag -n)
-    $args ++= ($entrypoint | with-flag --entrypoint)
-    if $daemon { $args ++= [-d] } else { $args ++= [--rm -it] }
-    $args ++= ($mnt | with-flag -v)
-    if ($workdir | is-not-empty) {
-        $args ++= [-w $workdir -v $"($env.PWD):($workdir)"]
+    for b in [
+        [$daemon
+            [-d]
+            [--rm -it]]
+        [$debug
+            [--cap-add=SYS_ADMIN --cap-add=SYS_PTRACE --security-opt seccomp=unconfined]]
+        [$appimage
+            [--device /dev/fuse --security-opt apparmor:unconfined]]
+        [$privileged
+            [--privileged]]
+        [$netadmin
+            [--cap-add=NET_ADMIN --device /dev/net/tun]]
+        [$with_x
+            [ -e $"DISPLAY=($env.DISPLAY)" -v /tmp/.X11-unix:/tmp/.X11-unix ]]
+    ] {
+        if ($b.0) {
+            $args ++= $b.1
+        } else {
+            if ($b.2? | is-not-empty) {
+                $args ++= $b.2
+            }
+        }
     }
-    $args ++= if ($vols | is-empty) { [] } else { $vols | transpose k v | each {|x| [-v $"(host-path $x.k):($x.v)"]} | flatten }
-    $args ++= if ($envs | is-empty) { [] } else { $envs | transpose k v | each {|x| [-e $"($x.k)=($x.v)"]} | flatten }
-    $args ++= if ($ports | is-empty) { [] } else { $ports | transpose k v | each {|x| [-p $"($x.k):($x.v)"] } | flatten }
-    if $debug {
-        $args ++= [--cap-add=SYS_ADMIN --cap-add=SYS_PTRACE --security-opt seccomp=unconfined]
+
+    for i in [
+        [$namespace
+            [--namespace $namespace]]
+        [$entrypoint
+            [--entrypoint $entrypoint]]
+        [$mnt
+            [-v $mnt]]
+        [$workdir
+            [-w $workdir -v $"($env.PWD):($workdir)"]]
+        [$vols
+            ($vols | transpose k v | each {|x| [-v $"(host-path $x.k):($x.v)"]} | flatten)]
+        [$envs
+            ($envs | transpose k v | each {|x| [-e $"($x.k)=($x.v)"]} | flatten)]
+        [$ports
+            ($ports | transpose k v | each {|x| [-p $"($x.k):($x.v)"] } | flatten)]
+        [$proxy
+            [-e $"http_proxy=($proxy)" -e $"https_proxy=($proxy)"]]
+    ] {
+        if ($i.0 | is-not-empty) {
+            $args ++= $i.1
+        }
     }
-    if $appimage { $args ++= [--device /dev/fuse --security-opt apparmor:unconfined] }
-    if $privileged { $args ++= [--privileged] }
-    if $appimage { $args ++= [--device /dev/fuse] }
-    if $netadmin { $args ++= [--cap-add=NET_ADMIN --device /dev/net/tun] }
-    if $with_x {
-        $args ++= [ -e $"DISPLAY=($env.DISPLAY)" -v /tmp/.X11-unix:/tmp/.X11-unix ]
-    }
+
     if ($ssh | is-not-empty) {
         let sshkey = cat ([$env.HOME .ssh $ssh] | path join) | split row ' ' | get 1
         $args ++= [-e $"ed25519_($sshuser)=($sshkey)"]
     }
-    if ($proxy | is-not-empty) {
-        $args ++= [-e $"http_proxy=($proxy)" -e $"https_proxy=($proxy)"]
-    }
+
     if ($join | is-not-empty) {
         let c = $"container:($join)"
         $args ++= [--pid $c --network $c]
@@ -436,7 +461,6 @@ export def container-create [
     if ($network | is-not-empty) and ($join | is-empty) {
         $args ++= [--network $network]
     }
-    $args ++= ($cache | with-flag -v)
 
     let name = if ($name | is-empty) {
         let img = $image | split row '/' | last | str replace ':' '-'
