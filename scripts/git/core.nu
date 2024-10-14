@@ -496,3 +496,14 @@ export def git-garbage-collect [] {
     git gc --aggressive --prune=now
 }
 
+export def git-truncate-history [
+    retain:int=10
+    --message:string="Truncate history"
+] {
+    let h = git log --pretty=%H --reverse -n $retain | lines | first
+    git checkout --orphan temp $h
+    git add .
+    git commit -m $message
+    git rebase --onto temp $h main
+}
+
