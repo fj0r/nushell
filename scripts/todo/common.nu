@@ -71,7 +71,7 @@ export def cat-to-cond [a b --empty-as-all] {
             ''
         } else {
             $v | each {Q $in} | str join ',' | $" and ($b) in \(($in)\)"
-        } 
+        }
         $"\(($a) = (Q $k)($t)\)"
     }
     | filter {|x| $x | is-not-empty }
@@ -84,6 +84,7 @@ export def cat-to-tag-id [
     --and
 ] {
     let cond = $in | cat-to-cond --empty-as-all=$empty_as_all 'c.name' 't.name'
+    let cond = if ($cond | is-empty) { 'true' } else { $cond }
     let s = [...$c, 't.id'] | str join ', '
     $"select ($s) from tag as t join category as c on t.category_id = c.id where ($cond)"
 }

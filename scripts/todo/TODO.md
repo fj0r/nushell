@@ -7,6 +7,7 @@
             - [x] filter `todo list` #188
         - [x] Fix the exception when todo list is called without parameters #196
         - [x] Refactor conditional logic in todo-list filter #231
+        - [x] Tag with predicate can be used independently #299
     - [x] Automatically filter out `trash` tag #18
         - [x] Test re-adding :trash after deleting it. #73
     - [x] Filter finished #81
