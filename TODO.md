@@ -60,5 +60,5 @@
     - [x] project use direnv #287
     - [x] Move direnv into Project.nu #293
 - [x] Project #289
-    - [ ] Redundant `cd` ($env.OLD_PWD) #290
+    - [ ] Redundant `cd` ($env.OLDPWD) #290
     - [x] Load in batch mode #294

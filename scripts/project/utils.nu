@@ -16,8 +16,8 @@ def 'cmd exists' [] {
 export def --wrapped 'watch __' [...cmd:string@cmpl-cmd] {
     watch-modify -c -g '__.nu' {
         [
-            'use direnv'
-            'direnv __'
+            'use project'
+            'project direnv __'
             'overlay use -r __.nu as __ -p'
             $'__ ($cmd |str join " ")'
         ]
