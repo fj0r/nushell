@@ -32,6 +32,8 @@ export def 'dump nu_scripts' [...mod:string@cmpl-mod --reverse(-r)] {
                     for m in $md {
                         mv -f $"($m.stem).($m.extension)" ..
                     }
+                    cd ..
+                    ga
                 }
             )
         }
