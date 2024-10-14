@@ -238,16 +238,15 @@ export def --env init [] {
         }
     }
 
-    $env.config = ( $env.config | update menus ($env.config.menus
-        | each {|x|
-            if ($x.marker in $env.NU_POWER_MENU_MARKER) {
-                let c = ($env.NU_POWER_MENU_MARKER | get $x.marker)
-                $x | upsert marker $'(ansi -e {fg: $c})(char nf_left_segment_thin) '
-            } else {
-                $x
-            }
+    $env.config.menus = $env.config.menus
+    | each {|x|
+        if ($x.marker in $env.NU_POWER_MENU_MARKER) {
+            let c = ($env.NU_POWER_MENU_MARKER | get $x.marker)
+            $x | upsert marker $'(ansi -e {fg: $c})(char nf_left_segment_thin) '
+        } else {
+            $x
         }
-        ))
+    }
 
     hook
 }
