@@ -18,6 +18,8 @@
         - [x] Add column `hidden` #280
         - [x] Filter category where `hidden` is true when querying. #281
         - [x] Toggle hidden of category #282
+    - [ ] List today #291
+    - [ ] Add `--parent` into `todo-list` #292
 - [ ] Actions #22
     - [x] Category #11
         - [x] Allow creation of multiple tags under one category at once #13
@@ -90,7 +92,7 @@
         - [ ] Import #243
             - [x] id collision #245
                 - [x] switch $env.TODO_DB #284
-                    - [x] Allow setting .TODO_DB #285
+                    - [x] Allow setting $env.TODO_DB #285
             - [ ] Restore tag #246
             - [ ] Mounting Node (Parent) #247
             - [ ] Maintain the tree structure #248

@@ -13,6 +13,7 @@ use llm *
 use llm/shortcut.nu *
 use todo *
 use todo/shortcut.nu *
+use todo/integration.nu *
 use project *
 use ssh *
 use cwdhist *
