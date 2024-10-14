@@ -39,10 +39,6 @@ export def tclean [] {
 export def todo-today [
     ...tags: any@cmpl-category
     --all(-a)
-    --important(-i): int@cmpl-level
-    --urgent(-u): int@cmpl-level
-    --challenge(-c): int@cmpl-level
-    --finished
     --md
     --md-list
     --raw
@@ -51,11 +47,14 @@ export def todo-today [
     --untagged(-U)
 ] {
     let d = (date now) - (date now | format date '%FT00:00:00' | into datetime)
-    (todo-list --updated $d --created $d --work-in-process=$work_in_process --finished=$finished
-     --all=$all --important=$important --urgent=$urgent --challenge=$challenge
-     --md-list=$md_list --md=$md --raw=$raw
-     --untagged=$untagged
-     ...$tags)
+    (todo-list
+        ...$tags
+        --updated $d --all=$all
+        --md-list=$md_list --md=$md --raw=$raw
+        --finished=$finished
+        --work-in-process=$work_in_process
+        --untagged=$untagged
+        )
 }
 
 export alias tc = todo-commit

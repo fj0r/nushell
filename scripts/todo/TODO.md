@@ -18,7 +18,7 @@
         - [x] Add column `hidden` #280
         - [x] Filter category where `hidden` is true when querying. #281
         - [x] Toggle hidden of category #282
-    - [ ] List today #291
+    - [x] `todo-today` #291
     - [ ] Add `--parent` into `todo-list` #292
 - [ ] Actions #22
     - [x] Category #11
