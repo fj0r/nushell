@@ -3,6 +3,7 @@ dest = "~/world/nu_scripts"
 [[manifest]]
 from = "direnv"
 to = "direnv"
+disable = true
 
 [[manifest]]
 from = "argx"

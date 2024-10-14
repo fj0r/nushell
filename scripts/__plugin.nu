@@ -1,7 +1,6 @@
 # config
 use argx
 use lg
-use direnv
 use perform-or-print *
 use git *
 use git/shortcut.nu *

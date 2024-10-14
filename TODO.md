@@ -55,8 +55,9 @@
     - [x] git-sync #216
         - [x] An option to control whether to execute rsync. #222
         - [x] Simplify git-sync function by merging conditions #228
-- [ ] direnv #286
+- [x] direnv #286
     - [x] project use direnv #287
-    - [ ] Move direnv into Project.nu #293
-- [ ] Project #289
+    - [x] Move direnv into Project.nu #293
+- [x] Project #289
     - [ ] Redundant `cd` ($env.OLD_PWD) #290
+    - [x] Load in batch mode #294
