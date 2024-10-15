@@ -1,7 +1,3 @@
-export def 'past unixepoch' [d: duration] {
-    ((date now) - $d | into int) / 1000_000 | math floor
-}
-
 export def 'precent' [] {
     ($in * 10000 | math round) / 100
 }

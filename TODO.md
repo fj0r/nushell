@@ -67,4 +67,5 @@
     - [x] Configurable development environment #297
 - [x] history-utils #302
     - [x] histogram-column #303
+        - [x] histogram column fixed width #308
     - [x] history activities #304

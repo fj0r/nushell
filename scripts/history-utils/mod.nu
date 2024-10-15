@@ -114,7 +114,7 @@ def cmpl-interval [] {
 }
 
 export def 'history activities' [
-    --limit(-l):int=90
+    --limit(-l):int=21
     --interval(-i): string@cmpl-interval
 ] {
     let dfs = match $interval {
@@ -132,7 +132,8 @@ export def 'history activities' [
         ]
         limit: $limit
         groupBy: ['date']
-        orderBy: ['date']
+        orderBy: [['date', desc]]
     })
+    | reverse
     | histogram-column count
 }
