@@ -1,7 +1,7 @@
 use common.nu *
 
 def cmpl-scratch-id [] {
-    run $"select id as value, title || ' <' || type || '>' as description
+    run $"select id as value, updated || '│' || type || '│' ||  title as description
         from scratch order by updated desc limit 10;"
 }
 
