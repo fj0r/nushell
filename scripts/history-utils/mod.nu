@@ -1,3 +1,5 @@
+use utils.nu *
+
 def quote [...t] {
     let s = $t | str join '' | str replace -a "'" "''"
     $"'($s)'"
@@ -105,4 +107,32 @@ export def 'history top' [
         orderBy: [[count desc]]
         limit: $num
     })
+}
+
+def cmpl-interval [] {
+    [hour day month year]
+}
+
+export def 'history activities' [
+    --limit(-l):int=90
+    --interval(-i): string@cmpl-interval
+] {
+    let dfs = match $interval {
+        'hour' => '%Y-%m-%d %H'
+        'day' => '%Y-%m-%d'
+        'month' => '%Y-%m'
+        'year' => '%Y'
+        _ => '%Y-%m-%d'
+    }
+    open $nu.history-path | query db (sql {
+        from: history
+        select: [
+            [$"strftime\('($dfs)', DATETIME\(ROUND\(start_timestamp / 1000\), 'unixepoch'\)\)" 'date']
+            ['count(1)' count]
+        ]
+        limit: $limit
+        groupBy: ['date']
+        orderBy: ['date']
+    })
+    | histogram-column count
 }
