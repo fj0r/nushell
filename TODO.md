@@ -56,6 +56,7 @@
     - [x] git-sync #216
         - [x] An option to control whether to execute rsync. #222
         - [x] Simplify git-sync function by merging conditions #228
+        - [x] git-sync hooks #298
 - [x] direnv #286
     - [x] project use direnv #287
     - [x] Move direnv into Project.nu #293
@@ -64,3 +65,6 @@
     - [x] Load in batch mode #294
 - [x] Docker #296
     - [x] Configurable development environment #297
+- [x] history-utils #302
+    - [x] histogram-column #303
+    - [x] history activities #304

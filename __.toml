@@ -58,7 +58,7 @@ to = "cwdhist"
 [[manifest]]
 from = "history-utils"
 to = "history-utils"
-disable = true
+disable = false
 
 [[manifest]]
 from = "resolvenv"

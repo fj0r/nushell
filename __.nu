@@ -109,3 +109,4 @@ export def rename-cmpl-func [file --dry-run] {
 export def file-pwd [] {
     print $env.FILE_PWD
 }
+
