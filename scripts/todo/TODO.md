@@ -1,0 +1,76 @@
+- [ ] Filter #10
+    - [x] Enable filtering by category #15
+    - [ ] Enable `AND` relationship between tags (--and) #17
+    - [x] Automatically filter out `trash` tag #18
+        - [x] Test re-adding :trash after deleting it. #73
+    - [x] Filter finished #81
+    - [x] Category without tag is equivalent to all tags #87
+- [ ] Actions #22
+    - [x] Category #11
+        - [x] Allow creation of multiple tags under one category at once #13
+            - [x] Deduplication #86
+        - [x] Multiple tags under the same category #38
+    - [x] Messaging on deletion #23
+    - [x] Batch operations #31
+        - [x] Batch Done #32
+        - [x] Batch addition #39
+        - [x] Batch attr #51
+    - [ ] Check parent node when operating on `done` status #34
+        - [x] Detection of nodes under other paths #44
+        - [x] Detection on adding nodes #45
+        - [x] Display message abnormalities #46
+        - [ ] Recursive CTE #53
+        - [ ] Return the data structure for easy reuse by other UIs #74
+        - [ ] Detection on removing nodes #144
+    - [x] Set `updated` on Done #35
+    - [x] todo attrs (tt) #48
+        - [x] Special handling for `-x` #112
+        - [x] Merge `todo tag` into `todo attrs` #113
+        - [x] Merge `todo done` into `todo attrs` #114
+    - [x] Inheriting tags when child nodes are added (by default) #54
+    - [ ] When `todo cat clean`, if there are additional tags, only the tags will be cleared. #123
+    - [ ] Discussion #146
+    - [x] Noninteraction mode as default in `Todo add` #147
+- [ ] Display #24
+    - [x] Convert to tree #25
+        - [x] Multi-level tree test #33
+        - [x] Display issue when data is empty #37
+    - [x] Format branches #26
+    - [x] Format nodes #27
+    - [x] Output in Markdown format #28
+        - [x] remove tail space #61
+    - [x] Policy for displaying dangling nodes #40
+    - [x] Display issue when tags is empty #41
+    - [x] Details should be more prominent than metadata #47
+    - [x] View `:trash` #50
+    - [x] Configurable theme colors #52
+        - [x] $env.TODO_THEME #78
+        - [x] Refactor 'fmt leaves' #79
+        - [x] Use variable substitution for actual values #80
+        - [x] $env.TODO_THEME.symbol.box #100
+    - [x] Eye-pleasing default theme #82
+    - [x] Deadline #83
+        - [x] Done Todo do not show deadline #84
+        - [x] Different styles for timeout and no deadline #85
+    - [ ] Change `print message` to return the `message` data structure #101
+    - [ ] Mind Map #145
+- [x] Data #29
+    - [x] Challenge #30
+        - [x] Data structure #36
+        - [x] Formatting #42
+        - [x] Filtering #43
+    - [x] todo list --untagged #55
+        - [x] sql insertion #58
+        - [x] When no tag is specified, `:untagged` is added by default. #59
+        - [x] remove/add `:untagged` when todo tag #60
+- [ ] Integration #63
+    - [ ] More convenient interaction modes #68
+    - [ ] Import/Export(TODO.md) #69
+    - [x] Shortcut #70
+    - [x] Todo Commit #76
+        - [x] Fill in the #todo in the README.md file #64
+            - [x] Return the todo list as a string (instead of printing) #67
+        - [x] Specify the title with the given id as the commit message #65
+        - [x] Done the relevant todo #66
+        - [x] alias: tc #77
+        - [x] Edit #151

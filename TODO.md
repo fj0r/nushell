@@ -1,0 +1,35 @@
+- [ ] $env.MYVIMRC #49
+- [ ] migrate from comma to project-overlay #56
+    - [x] watch updating (for dev) #57
+        - [x] watch __ #106
+    - [x] scope project #99
+    - [x] Application Migration #102
+        - [x] docker.io #103
+        - [x] config/nushell #109
+        - [x] typst #124
+        - [x] deployment #126
+        - [ ] risingwave #127
+        - [ ] meilisearch #128
+        - [x] ansible #134
+    - [x] Find __.nu in all parent directories. #104
+        - [x] replace-cmpl <file> #107
+    - [ ] test framework #108
+    - [ ] FILE_PWD #110
+    - [x] Update links in README.md #111
+    - [x] perform-or-print #115
+    - [x] update Comma's README.md #125
+- [x] Change the complete function's prefix to `cmpl` #105
+- [x] Refactor argx #130
+    - [x] Support command names containing spaces. #129
+    - [x] Add a `argx new` interface #131
+        - [x] migrage new api #135
+        - [x] `argx parse` support aliases #153
+    - [x] get-sign to obtain the most matching (longest(sorted last)) option #132
+    - [x] kubectl complete update _args index #133
+- [ ] Modularize #136
+- [x] Shortcut.nu #148
+    - [x] kubernetes #149
+    - [x] git #150
+    - [x] llm #152
+- [x] Container #154
+    - [x] container-layer #155

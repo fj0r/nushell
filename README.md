@@ -1,0 +1,10 @@
+- [OpenAI and Ollama clients](scripts/llm/README.md)
+- [TODO](scripts/todo/README.md)
+- [Kubernetes](scripts/kubernetes/)
+- [Docker](scripts/docker/)
+- [git](scripts/git/README.md)
+- [powerline prompt](scripts/power/README.md)
+- [ssh](scripts/ssh/)
+- [project](scripts/project/README.md)
+- [dev-container](scripts/devcontainer/) work with ci
+- [nvim](scripts/nvim/)
