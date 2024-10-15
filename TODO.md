@@ -57,6 +57,9 @@
         - [x] An option to control whether to execute rsync. #222
         - [x] Simplify git-sync function by merging conditions #228
         - [x] git-sync hooks #298
+    - [x] Histogram #309
+        - [x] git-histogram-merger #310
+        - [x] git-histogram-activities #311
 - [x] direnv #286
     - [x] project use direnv #287
     - [x] Move direnv into Project.nu #293
