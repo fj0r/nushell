@@ -486,3 +486,41 @@ export def container-create [
         ^$env.CONTCTL run --name $name ...$args $image ...($cmd | flatten)
     }
 }
+
+
+export def container-preset [
+    preset:string@cmpl-preset
+    ...cmd
+    --vols(-v): any = {}
+    --ports(-p): any = {}
+    --envs(-e): any = {}
+    --proxy: string@cmpl-docker-run-proxy
+    --ssh(-s): string@cmpl-docker-run-sshkey
+    --debug(-d)
+    --privileged(-P)
+    --netadmin
+    --with-x
+    --dry-run
+] {
+    let c = open $env.CONTCONFIG | get preset | where name == $preset
+    if ($c | is-empty) {
+        print $"(ansi grey)Oops!(ansi reset)"
+    } else {
+        let c = $c.0
+        let image = $c.image
+        let cmd = if ($cmd | is-empty) { $c.cmd } else { $cmd }
+        (container-create
+            --daemon=$c.daemon
+            --envs {...$c.env, ...$envs}
+            --vols {...$c.volumn, ...$vols}
+            --ports {...$c.port, ...$ports}
+            --debug=$debug
+            --privileged=$privileged
+            --netadmin=$netadmin
+            --with-x=$with_x
+            --proxy=$proxy
+            --ssh=$ssh
+            --dry-run=$dry_run
+            $image ...$cmd)
+    }
+}

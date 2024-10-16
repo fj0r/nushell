@@ -6,16 +6,18 @@ export-env {
         }
     }
     if 'CONTCONFIG' not-in $env {
-        $env.CONTCONFIG = [$nu.data-dir 'container.toml'] | path join
+        $env.CONTCONFIG = [$nu.data-dir 'container-preset.yml'] | path join
     }
     if not ($env.CONTCONFIG | path exists) {
         {
             preset: [
-                [name, image, env, volumn, port, cmd];
-                [rust, 'rust', {CARGO_HOME: /opt/cargo}, {.: /world, ~/.cargo:/opt/cargo}, {8000: 80}, []]
+                [name, image, daemon, env, volumn, port, cmd];
+                [rust, 'rust', false, {CARGO_HOME: /opt/cargo}, {.: /world, ~/.cargo:/opt/cargo}, {8000: 80}, []]
+                [postgres, 'postgres', true, {}, {}, {5432: 5432}, []]
+                [surreal, 'surreal', true, {}, {}, {8000: 8000}, []]
             ]
 
-        } | to toml | save -f $env.CONTCONFIG
+        } | to yaml | save -f $env.CONTCONFIG
     }
 }
 

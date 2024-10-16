@@ -108,3 +108,6 @@ export def cmpl-docker-run-proxy [] {
     [ $"http://($hostaddr):7890" $"http://($hostaddr):" ]
 }
 
+export def cmpl-preset [] {
+    open $env.CONTCONFIG | get preset.name
+}
