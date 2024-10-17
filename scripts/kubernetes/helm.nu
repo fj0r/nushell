@@ -10,7 +10,7 @@ export def record-to-set-json [value] {
 
 def cmpl-helm-list [context: string, offset: int] {
     let ctx = $context | argx parse
-    kgh -n $ctx.opt.namespace? | each {|x| {value: $x.name  description: $x.updated} }
+    kube-get-helm -n $ctx.opt.namespace? | each {|x| {value: $x.name  description: $x.updated} }
 }
 
 def cmpl-helm-charts [context: string, offset: int] {
