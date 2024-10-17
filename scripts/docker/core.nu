@@ -441,9 +441,7 @@ export def container-create [
     | reduce -f {} {|i,a|
         let p = $i.k | into int
         let k = port $p
-        if $k != $p {
-            print $"(ansi grey)port ($p) is already in use, using ($k)."
-        }
+        print $"(ansi grey)port: ($k) (if $k == $p {'->'} else {'=>'}) ($i.v)"
         $a | merge {$k: $i.v}
     }
 
