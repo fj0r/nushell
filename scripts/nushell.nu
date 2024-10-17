@@ -35,3 +35,15 @@ export def nonstdout [--view(-v) --append(-a)] {
     }
 }
 
+export-env {
+    $env.config.keybindings ++= [
+        {
+            modifier: control_alt
+            keycode: char_r
+            mode: [emacs, vi_normal, vi_insert]
+            event: [
+                { send: ExecuteHostCommand, cmd: 'exec nu' }
+            ]
+        }
+    ]
+}

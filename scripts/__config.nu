@@ -35,4 +35,4 @@ const __dyn_load = if ('~/.nu' | path exists) { '~/.nu' } else { 'dummy.nu' }
 source $__dyn_load
 
 use __prefer_alt.nu prefer_alt_env
-prefer_alt_env $env.PREFER_ALT?
+prefer_alt_env
