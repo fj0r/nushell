@@ -79,7 +79,7 @@ export-env {
     $env.config.keybindings ++= [
         {
             name: cwdhist_menu
-            modifier: control
+            modifier: alt
             keycode: char_o
             mode: [emacs, vi_normal, vi_insert]
             event: [

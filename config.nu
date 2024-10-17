@@ -898,4 +898,4 @@ $env.config = {
 }
 
 ### gen with `config reset`
-source ($nu.default-config-dir | path join 'scripts/__config.nu')
+source ($nu.default-config-dir | path join 'scripts/main/mod.nu')

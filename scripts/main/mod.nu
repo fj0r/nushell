@@ -1,6 +1,6 @@
 const __dyn_load = if ('~/.env.nu' | path exists) { '~/.env.nu' } else { 'dummy.nu' }
 source $__dyn_load
-source __env.nu
+source env.nu
 
 # settings
 $env.config.show_banner = false
@@ -18,7 +18,7 @@ $env.config.table.padding = 0
 if not ($nu.data-dir | path exists) { mkdir $nu.data-dir }
 if not ($nu.cache-dir | path exists) { mkdir $nu.cache-dir }
 
-source __plugin.nu
+source plugin.nu
 
 # const plugin_msgpackz = (
 #     [($nu.config-path | path dirname), 'plugin.msgpackz'] | path join
@@ -34,5 +34,5 @@ source __plugin.nu
 const __dyn_load = if ('~/.nu' | path exists) { '~/.nu' } else { 'dummy.nu' }
 source $__dyn_load
 
-use __prefer_alt.nu prefer_alt_env
-prefer_alt_env
+source keymaps.nu
+
