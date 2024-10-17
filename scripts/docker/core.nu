@@ -406,6 +406,7 @@ export def container-create [
     --with-x
     --privileged(-P)
     --namespace(-n): string@cmpl-docker-ns
+    --xargs: list<string>
     image: string@cmpl-docker-images           # image
     ...cmd                                              # command args
 ] {
@@ -491,10 +492,12 @@ export def container-create [
         $name
     }
 
+    let xargs = if ($xargs | is-empty) { [] } else { $xargs }
+
     if $dry_run {
-        echo ([docker run --name $name $args $image $cmd] | flatten | str join ' ')
+        echo ([docker run --name $name $xargs $args $image $cmd] | flatten | str join ' ')
     } else {
-        ^$env.CONTCTL run --name $name ...$args $image ...($cmd | flatten)
+        ^$env.CONTCTL run --name $name ...$xargs ...$args $image ...($cmd | flatten)
     }
 }
 
@@ -525,6 +528,7 @@ export def container-preset [
             --envs {...$c.env, ...$envs}
             --vols {...$c.volumn, ...$vols}
             --ports {...$c.port, ...$ports}
+            --workdir=$c.workdir?
             --debug=$debug
             --privileged=$privileged
             --netadmin=$netadmin
@@ -532,6 +536,8 @@ export def container-preset [
             --proxy=$proxy
             --ssh=$ssh
             --dry-run=$dry_run
+            --entrypoint=$c.entrypoint?
+            --xargs=$c.args?
             $image ...$cmd)
     }
 }

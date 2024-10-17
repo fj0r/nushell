@@ -72,6 +72,7 @@
         - [ ] surrealdb #325
         - [ ] redis #326
         - [x] `daemon` field #327
+        - [x] Added `--workdir`, `--entrypoint`, and `--xargs` options to the `container-preset` function. #328
 - [x] history-utils #302
     - [x] histogram-column #303
         - [x] histogram column fixed width #308
