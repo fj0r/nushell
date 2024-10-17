@@ -447,7 +447,7 @@ export def kube-clean-evicted [] {
     kubectl get pods -A
     | from ssv -a
     | where STATUS == Evicted
-    | each { |x| kdel pod -n $x.NAMESPACE $x.NAME }
+    | each { |x| kube-delete pod -n $x.NAMESPACE $x.NAME }
 }
 
 ### FIXME:
