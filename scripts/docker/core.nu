@@ -435,6 +435,17 @@ export def container-create [
         }
     }
 
+    let ports = $ports
+    | transpose k v
+    | reduce -f {} {|i,a|
+        let p = $i.k | into int
+        let k = port $p
+        if $k != $p {
+            print $"(ansi grey)port ($p) is already in use, using ($k)."
+        }
+        $a | merge {$k: $i.v}
+    }
+
     for i in [
         [$namespace
             [--namespace $namespace]]
