@@ -324,7 +324,7 @@ export def kube-scale-deployment [
 ] {
     if $num > 9 {
         "too large"
-    } else if $num <= 0 {
+    } else if $num < 0 {
         "too small"
     } else {
         let ns = $namespace | with-flag -n
