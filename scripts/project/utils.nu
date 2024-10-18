@@ -42,12 +42,19 @@ export def 'watch-modify' [
     }
 }
 
-export def --env direnv [mod?:string="__"] {
-    let _ = if ('.env' | path exists) {
-        open .env
-        | lines
-        | parse -r '(?<k>.+?)\\s*=\\s*(?<v>.+)'
-        | reduce -f {} {|x, acc| $acc | upsert $x.k $x.v}
+export def parse-env [] {
+    $in
+    | lines
+    | parse -r '\s*(?<k>.+?)\s*=\s*(?<v>.+)'
+    | reduce -f {} {|x, acc| $acc | upsert $x.k $x.v}
+}
+
+export def --env direnv [
+    mod?:string="__"
+    --env-file(-e):string='.env'
+] {
+    let _ = if ($env_file | path exists) {
+        open $env_file | parse-env
     }
     | default {}
 
