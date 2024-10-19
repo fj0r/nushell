@@ -75,6 +75,7 @@
     - [ ] Change `print message` to return the `message` data structure #101
     - [ ] Mind Map #145
     - [ ] Optimize `fmt leaves` #183
+    - [x] Show all parent node #337
 - [x] Data #29
     - [x] Challenge #30
         - [x] Data structure #36

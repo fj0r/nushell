@@ -212,6 +212,7 @@ export def todo-list [
     --work-in-process(-W)
     --finished(-F)
     --untagged(-U)
+    --no-parent(-N)
     --md(-m)
     --md-list(-l)
     --raw
@@ -291,6 +292,19 @@ export def todo-list [
         $r
     }
 
+    let r = if $no_parent {
+        $r
+    } else {
+        let ids = $r | get id | str join ', '
+        let fp = [id, parent_id, title, done]
+        let ft = $fp | each { $"t.($in)" } | str join ', '
+        let x = run $"with recursive p as \(
+            select ($fp | str join ', ') from todo where id in \(($ids)\)
+            union all
+            select ($ft) from todo as t join p on p.parent_id = t.id
+            \) select * from p;"
+        $r | append $x | uniq-by id
+    }
 
     if $raw { $r } else { $r | todo-format --md=$md --md-list=$md_list }
 }

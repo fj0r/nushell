@@ -89,7 +89,7 @@ def 'fmt leaves' [
     | str join ' '
     |  if $verbose { $"($in)(ansi reset)" } else { $in }
 
-    let body = if $verbose {
+    let body = if $verbose and ($o.description? | is-not-empty) {
         $o.description
         | lines
         | each {$"($endent)(ansi $color.description)($in)(ansi reset)"}
