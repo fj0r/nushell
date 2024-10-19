@@ -21,16 +21,16 @@ export def inspect-file [file:path='~/.cache/nonstdout'] {
     $x
 }
 
-export def nonstdout [--view(-v) --append(-a)] {
+export def nonstdout [--view(-v) --flush(-f)] {
     let o = $in
     let f = '~/.cache/nonstdout'
     if $view {
         tail -f ($f | path expand)
     } else {
-        if $append {
-            $o | save -a -f $f
-        } else {
+        if $flush {
             $o | save -f $f
+        } else {
+            $"\n($o)" | save -a -f $f
         }
     }
 }
