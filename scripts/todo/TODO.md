@@ -21,6 +21,7 @@
         - [x] Toggle hidden of category #282
     - [x] `todo-today` #291
     - [ ] Add `--parent` into `todo-list` #292
+    - [x] Search #336
 - [ ] Actions #22
     - [x] Category #11
         - [x] Allow creation of multiple tags under one category at once #13

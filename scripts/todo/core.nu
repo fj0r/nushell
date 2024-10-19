@@ -200,6 +200,7 @@ export def todo-move [
 # todo list
 export def todo-list [
     ...tags: any@cmpl-category
+    --search(-s): string
     --all(-a)
     --important(-i): int@cmpl-level
     --urgent(-u): int@cmpl-level
@@ -255,6 +256,7 @@ export def todo-list [
         }
     }
     let now = date now
+    if ($search | is-not-empty) { $cond ++= $"title like '%($search)%'" }
     if ($challenge | is-not-empty) { $cond ++= $"challenge >= ($challenge)"}
     if ($important | is-not-empty) { $cond ++= $"important >= ($important)"}
     if ($urgent | is-not-empty) { $cond ++= $"urgent >= ($urgent)"}
