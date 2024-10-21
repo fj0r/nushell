@@ -404,6 +404,7 @@ export def container-create [
     --entrypoint: string                                # entrypoint
     --dry-run
     --with-x
+    --nvidia:int
     --privileged(-P)
     --namespace(-n): string@cmpl-docker-ns
     --xargs: list<string>
@@ -471,6 +472,18 @@ export def container-create [
     if ($ssh | is-not-empty) {
         let sshkey = cat ([$env.HOME .ssh $ssh] | path join) | split row ' ' | get 1
         $args ++= [-e $"ed25519_($sshuser)=($sshkey)"]
+    }
+
+    if ($nvidia | is-not-empty) {
+        $args ++= if $env.CONTCTL in ['podman'] {
+            if $nvidia == 0 {
+                [--device nvidia.com/gpu=all --ipc=host]
+            } else {
+                [--gpus $nvidia]
+            }
+        } else {
+            [--runtime nvidia --gpus (if $nvidia == 0 { 'all' } else { $nvidia }) --ipc=host]
+        }
     }
 
     if ($join | is-not-empty) {
