@@ -234,13 +234,6 @@ export def todo-list [
 
     mut cond = []
     mut flt = {and: [], not: []}
-    if not $all {
-        let tidq = "select todo_tag.todo_id from category
-            join tag on category.id = tag.category_id
-            join todo_tag on todo_tag.tag_id = tag.id
-            where category.hidden"
-        $cond ++= $"todo.id not in \(($tidq)\)"
-    }
     if ($tags | is-not-empty) {
         let sc = $tags | split-cat
         let tag_cond = $sc | cat-to-tag-id --empty-as-all --and=(not $all)
@@ -252,6 +245,13 @@ export def todo-list [
         #$cond ++= $"todo_tag.tag_id not in \(1\)"
         $cond ++= $"todo.id in \(select todo_id from todo_tag where tag_id in \(($tag_id)\)\)"
     } else {
+        if not $all {
+            let tidq = "select todo_tag.todo_id from category
+                join tag on category.id = tag.category_id
+                join todo_tag on todo_tag.tag_id = tag.id
+                where category.hidden"
+            $cond ++= $"todo.id not in \(($tidq)\)"
+        }
         if $untagged {
             $cond ++= $"todo_tag.tag_id is null"
         }
