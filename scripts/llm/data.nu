@@ -48,6 +48,13 @@ export def --env init [] {
             tag TEXT
         );"
         "CREATE INDEX idx_messages ON messages (session_id);"
+        "CREATE TABLE IF NOT EXISTS function (
+            name TEXT,
+            description TEXT,
+            parameters TEXT,
+            tag TEXT
+        );"
+        "CREATE INDEX idx_function ON function (name);"
 
         "INSERT INTO provider (name, baseurl, model_default, temp_max, active) VALUES ('ollama', 'http://localhost:11434/v1', 'llama3.2:latest', 1, 1);"
 
