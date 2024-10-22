@@ -62,7 +62,7 @@ export def --env start [] {
             PRIMARY KEY (scratch_id, tag_id)
         );"
     ] {
-        open $env.TODO_DB | query db $s
+        run $s
     }
 }
 

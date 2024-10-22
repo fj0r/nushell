@@ -185,7 +185,7 @@ export def todo-edit [
     | block-edit $"todo.XXX.yml"
     | from yaml
     | update updated (date now | fmt-date)
-    | db-upsert $env.TODO_DB todo id
+    | db-upsert todo id
 
 }
 
