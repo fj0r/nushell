@@ -4,7 +4,9 @@
     - [x] ai-do follows the `system` in the configuration #322
     - [x] Adjust `--system` of ai-chat #323
 - [ ] LLM #329
-    - [x] Function call #332
+    - [ ] Function call #332
         - [x] Add function table #339
+        - [ ] Maintain function data #340
+        - [ ] ai-do add --function flag #341
     - [ ] vllm #334
         - [ ] Pull #335
