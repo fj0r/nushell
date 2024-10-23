@@ -425,7 +425,7 @@ export def container-create [
         [$netadmin
             [--cap-add=NET_ADMIN --device /dev/net/tun]]
         [$with_x
-            [ -e $"DISPLAY=($env.DISPLAY)" -v /tmp/.X11-unix:/tmp/.X11-unix ]]
+            [ -e $"DISPLAY=($env.DISPLAY?)" -v /tmp/.X11-unix:/tmp/.X11-unix ]]
     ] {
         if ($b.0) {
             $args ++= $b.1
