@@ -234,6 +234,18 @@ export def todo-list [
 
     mut cond = []
     mut flt = {and: [], not: []}
+
+    let tidq = "select todo_tag.todo_id from category
+        join tag on category.id = tag.category_id
+        join todo_tag on todo_tag.tag_id = tag.id"
+    let tidq_filter_trash = "category.name = '' and tag.name = 'trash'"
+    $cond ++= match [$all ($tags | is-empty)] {
+        [true false] => $"true"
+        [true true] => $"todo.id not in \(($tidq) where category.hidden\)"
+        [false false] => $"todo.id not in \(($tidq) where ($tidq_filter_trash)\)"
+        [false true] => $"todo.id not in \(($tidq) where \(($tidq_filter_trash)\) or category.hidden\)"
+    }
+
     if ($tags | is-not-empty) {
         let sc = $tags | split-cat
         let tag_cond = $sc | cat-to-tag-id --empty-as-all --and=(not $all)
@@ -245,13 +257,6 @@ export def todo-list [
         #$cond ++= $"todo_tag.tag_id not in \(1\)"
         $cond ++= $"todo.id in \(select todo_id from todo_tag where tag_id in \(($tag_id)\)\)"
     } else {
-        if not $all {
-            let tidq = "select todo_tag.todo_id from category
-                join tag on category.id = tag.category_id
-                join todo_tag on todo_tag.tag_id = tag.id
-                where category.hidden"
-            $cond ++= $"todo.id not in \(($tidq)\)"
-        }
         if $untagged {
             $cond ++= $"todo_tag.tag_id is null"
         }
@@ -266,6 +271,7 @@ export def todo-list [
     if ($deadline | is-not-empty) { $cond ++= $"deadline >= ($now - $deadline | fmt-date | Q $in)"}
     if ($work_in_process) { $cond ++= $"done = 0" }
     if ($finished) { $cond ++= $"done = 1" }
+
     let $cond = if ($cond | is-empty) { '' } else { $cond | str join ' and ' | $"where ($in)" }
 
     dbg $debug $cond -t cond

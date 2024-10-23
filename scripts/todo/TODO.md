@@ -20,6 +20,7 @@
         - [x] Filter category where `hidden` is true when querying. #281
         - [x] Toggle hidden of category #282
         - [x] todo-list: change to filter hidden when there is no tag #338
+            - [x] Adjust the query conditions when using --all and ...$tag together #346
     - [x] `todo-today` #291
     - [ ] Add `--parent` into `todo-list` #292
     - [x] Search #336
@@ -130,3 +131,7 @@
     - [ ] Only count leaf node #256
     - [x] New column named `value` with type `REAL` #257
     - [ ] How to calculate when both child nodes and parent nodes have values #258
+- [ ] Financial.nu #342
+    - [ ] Payee/Payer #343
+    - [ ] Accounting subject #344
+    - [ ] Category #345

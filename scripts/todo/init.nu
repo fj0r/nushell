@@ -22,7 +22,7 @@ export def --env start [] {
             name TEXT NOT NULL,
             UNIQUE (category_id, name) ON CONFLICT REPLACE
         );"
-        "INSERT INTO category (id, name, hidden) VALUES (1, '', 1);"
+        "INSERT INTO category (id, name, hidden) VALUES (1, '', 0);"
         "INSERT INTO tag (category_id, name) VALUES (1, 'trash');"
         "CREATE TABLE IF NOT EXISTS todo (
             id INTEGER PRIMARY KEY,
