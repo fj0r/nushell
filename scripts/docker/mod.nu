@@ -9,16 +9,74 @@ export-env {
         $env.CONTCONFIG = [$nu.data-dir 'container-preset.yml'] | path join
     }
     if not ($env.CONTCONFIG | path exists) {
-        {
-            preset: [
-                [name, image, daemon, env, volumn, port, cmd, args];
-                [rust, 'rust', false, {CARGO_HOME: /opt/cargo}, {.: /world, ~/.cargo:/opt/cargo}, {8000: 80}, [], [--cap-add=SYS_ADMIN --cap-add=SYS_PTRACE --security-opt seccomp=unconfined]]
-                [ollama, 'ollama', true, {}, {~/.ollama: /root/.ollama}, {11434: 11434}, [], [--runtime nvidia --gpus all --ipc=host]]
-                [postgres, 'postgres', true, {}, {}, {5432: 5432}, [], []]
-                [surreal, 'surreal', true, {}, {}, {8000: 8000}, [], []]
-            ]
-
-        } | to yaml | save -f $env.CONTCONFIG
+        "
+        preset:
+        - name: rust
+          image: rust
+          daemon: false
+          env:
+            CARGO_HOME: /opt/cargo
+          volumn:
+            .: /world
+            ~/.cargo: /opt/cargo
+          port:
+            '8000': 80
+          cmd: []
+          args:
+          - --cap-add=SYS_ADMIN
+          - --cap-add=SYS_PTRACE
+          - --security-opt
+          - seccomp=unconfined
+        - name: ollama-gpu
+          image: ollama
+          daemon: true
+          env: {}
+          volumn:
+            ~/.ollama: /root/.ollama
+            ~/pub/Platform/llm: /world
+          port:
+            '11434': 11434
+          cmd: []
+          args:
+          - --gpus
+          - all
+          - --ipc=host
+        - name: ollama
+          image: ollama
+          daemon: true
+          env: {}
+          volumn:
+            ~/.ollama: /root/.ollama
+            ~/pub/Platform/llm: /world
+          port:
+            '11434': 11434
+          cmd: []
+          args:
+          - --ipc=host
+        - name: postgres
+          image: postgres
+          daemon: true
+          env: {}
+          volumn: {}
+          port:
+            '5432': 5432
+          cmd: []
+          args: []
+        - name: surreal
+          image: surreal
+          daemon: true
+          env: {}
+          volumn: {}
+          port:
+            '8000': 8000
+          cmd: []
+          args: []
+        "
+        | lines
+        | range 1..-1
+        | str substring 8..
+        | str join (char newline)
+        | save -f $env.CONTCONFIG
     }
 }
 
