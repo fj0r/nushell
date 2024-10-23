@@ -260,8 +260,7 @@ export def image-save [-n: string@cmpl-docker-ns ...image: string@cmpl-docker-im
 
 # load images
 export def image-load [-n: string@cmpl-docker-ns] {
-    let ns = if ($n | is-empty) {[]} else {[-n $n]}
-    ^$env.CONTCTL ...$ns load
+    $in | ^$env.CONTCTL ...(if ($n | is-empty) {[]} else {[-n $n]}) load
 }
 
 # system prune
