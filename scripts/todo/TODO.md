@@ -22,7 +22,7 @@
         - [x] todo-list: change to filter hidden when there is no tag #338
             - [x] Adjust the query conditions when using --all and ...$tag together #346
     - [x] `todo-today` #291
-    - [ ] Add `--parent` into `todo-list` #292
+    - [x] Add `--parent` into `todo-list` #292
     - [x] Search #336
 - [ ] Actions #22
     - [x] Category #11

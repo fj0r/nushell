@@ -200,6 +200,7 @@ export def todo-move [
 # todo list
 export def todo-list [
     ...tags: any@cmpl-category
+    --parent(-p): int@cmpl-todo-id
     --search(-s): string
     --all(-a)
     --important(-i): int@cmpl-level
@@ -212,7 +213,7 @@ export def todo-list [
     --work-in-process(-W)
     --finished(-F)
     --untagged(-U)
-    --no-parent(-N)
+    --no-branch(-N)
     --md(-m)
     --md-list(-l)
     --raw
@@ -261,6 +262,15 @@ export def todo-list [
             $cond ++= $"todo_tag.tag_id is null"
         }
     }
+
+    if ($parent | is-not-empty) {
+        let children = $"with recursive s as \(
+        select id, parent_id from todo where id = ($parent)
+        union select t.id, t.parent_id from todo as t join s on t.parent_id = s.id
+        \) select id from s"
+        $cond ++= $"todo.id in \(($children)\)"
+    }
+
     let now = date now
     if ($search | is-not-empty) { $cond ++= $"title like '%($search)%'" }
     if ($challenge | is-not-empty) { $cond ++= $"challenge >= ($challenge)"}
@@ -298,7 +308,7 @@ export def todo-list [
         $r
     }
 
-    let r = if $no_parent {
+    let r = if $no_branch {
         $r
     } else {
         let ids = $r | get id | str join ', '

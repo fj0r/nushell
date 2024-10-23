@@ -42,7 +42,7 @@ export def todo-today [
     --md
     --md-list
     --raw
-    --no-parent(-N)
+    --no-branch(-N)
     --work-in-process(-W)
     --finished(-F)
     --untagged(-U)
@@ -55,7 +55,7 @@ export def todo-today [
         --finished=$finished
         --work-in-process=$work_in_process
         --untagged=$untagged
-        --no-parent=$no_parent
+        --no-branch=$no_branch
         )
 }
 
