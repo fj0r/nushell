@@ -102,6 +102,7 @@
             - [ ] Mounting Node (Parent) #247
             - [ ] Maintain the tree structure #248
     - [x] Shortcut #70
+        - [x] Change the `parent` parameter to flag to be consistent with others #347
     - [x] Todo Commit #76
         - [x] Fill in the #todo in the README.md file #64
             - [x] Return the todo list as a string (instead of printing) #67
