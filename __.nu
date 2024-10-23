@@ -41,6 +41,29 @@ export def 'dump nu_scripts' [...mod:string@cmpl-mod --reverse(-r)] {
     lg level 1 'end'
 }
 
+export def git-hooks [act ctx] {
+    if $act == 'pre-push' {
+        if $ctx.repo == 'git@github-fjord:fj0r/nushell.git' {
+            dump nu_scripts
+        }
+    }
+    if $act == 'fsmonitor-watchman' {
+        print $act
+    }
+    if false {
+        use lg
+        lg msg {act: $act, workdir: $ctx.workdir}
+    }
+}
+
+export def 'test in container' [] {
+    ^$env.CONTCTL run ...[
+        --name test-nu
+        --rm -it
+        -v $"($env.PWD):/etc/nushell"
+    ] io
+}
+
 export def 'add nupm.nuon' [] {
     for d in $env.manifest {
         cd $env.dest
@@ -68,21 +91,6 @@ export def 'add nupm.nuon' [] {
         ga
         gc 'Package for nupm'
         gp
-    }
-}
-
-export def git-hooks [act ctx] {
-    if $act == 'pre-push' {
-        if $ctx.repo == 'git@github-fjord:fj0r/nushell.git' {
-            dump nu_scripts
-        }
-    }
-    if $act == 'fsmonitor-watchman' {
-        print $act
-    }
-    if false {
-        use lg
-        lg msg {act: $act, workdir: $ctx.workdir}
     }
 }
 
