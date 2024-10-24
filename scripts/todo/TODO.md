@@ -79,7 +79,7 @@
     - [x] Optimize `fmt leaves` #183
         - [x] Reduce string concatenation (SQLite) and splitting. #351
     - [x] Show all parent node #337
-- [x] Data #29
+- [ ] Data #29
     - [x] Challenge #30
         - [x] Data structure #36
         - [x] Formatting #42
@@ -89,6 +89,7 @@
         - [x] When no tag is specified, `:untagged` is added by default. #59
         - [x] remove/add `:untagged` when todo tag #60
     - [x] Tips about initializing the database #239
+    - [x] todo-add return $ids #352
 - [ ] Integration #63
     - [x] More convenient interaction modes #68
         - [x] kebab-case #201

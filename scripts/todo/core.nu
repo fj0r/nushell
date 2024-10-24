@@ -108,6 +108,8 @@ export def todo-add [
     for id in $ids {
         todo-done $id --reverse=(not $done)
     }
+
+    return $ids
 }
 
 # todo set
