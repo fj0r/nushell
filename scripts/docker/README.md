@@ -16,4 +16,11 @@ preset:
     ~/.cargo: /opt/cargo
   port:
     '8000': 80
+  cmd: []
+  args:
+  - --cap-add=SYS_ADMIN
+  - --cap-add=SYS_PTRACE
+  - --security-opt
+  - seccomp=unconfined
 ```
+- specify the `container_name` field, delete the existing container if it exists and then run.

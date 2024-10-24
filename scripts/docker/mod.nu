@@ -29,6 +29,7 @@ export-env {
           - seccomp=unconfined
         - name: ollama-gpu
           image: ollama
+          container_name: ollama
           daemon: true
           env: {}
           volumn:
@@ -43,6 +44,7 @@ export-env {
           - --ipc=host
         - name: ollama
           image: ollama
+          container_name: ollama
           daemon: true
           env: {}
           volumn:
@@ -55,6 +57,7 @@ export-env {
           - --ipc=host
         - name: postgres
           image: postgres
+          container_name: postgres
           daemon: true
           env: {}
           volumn: {}
@@ -64,6 +67,7 @@ export-env {
           args: []
         - name: surreal
           image: surreal
+          container_name: surrealdb
           daemon: true
           env: {}
           volumn: {}

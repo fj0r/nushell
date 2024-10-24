@@ -47,7 +47,7 @@ export def containers-network-remove [
 
 # list containers
 export def container-list [
-    -n: string@cmpl-docker-ns
+    --namespace(-n): string@cmpl-docker-ns
     container?: string@cmpl-docker-containers
     --all(-a)
 ] {
@@ -64,7 +64,7 @@ export def container-list [
                 $r | upsert created $t
             }
     } else {
-        let ns = if ($n | is-empty) {[]} else {[-n $n]}
+        let ns = if ($namespace | is-empty) {[]} else {[-n $namespace]}
         let r = ^$cli ...$ns inspect $container
             | from json
             | get 0
@@ -233,9 +233,9 @@ export def container-copy-file [
 # remove container
 export def container-remove [
     container: string@cmpl-docker-containers
-    -n: string@cmpl-docker-ns
+    --namespace(-n): string@cmpl-docker-ns
 ] {
-    let ns = if ($n | is-empty) {[]} else {[-n $n]}
+    let ns = if ($namespace | is-empty) {[]} else {[-n $namespace]}
     let cs = ^$env.CONTCTL ...$ns ps -a | from ssv -a | get NAMES
     if $container in $cs {
         ^$env.CONTCTL ...$ns container rm -f $container
@@ -499,6 +499,10 @@ export def container-create [
         let now = date now | format date %m%d%H%M
         $"($img)_($now)"
     } else {
+        let c = container-list --namespace=$namespace | where name == $name
+        if ($c | is-not-empty) {
+            container-remove --namespace=$namespace $name
+        }
         $name
     }
 
@@ -515,6 +519,7 @@ export def container-create [
 export def container-preset [
     preset:string@cmpl-preset
     ...cmd
+    --namespace(-n): string@cmpl-docker-ns
     --vols(-v): any = {}
     --ports(-p): any = {}
     --envs(-e): any = {}
@@ -533,7 +538,8 @@ export def container-preset [
         let c = $c.0
         let image = $c.image
         let cmd = if ($cmd | is-empty) { $c.cmd } else { $cmd }
-        (container-create
+        (container-create --namespace=$namespace
+            --name=$c.container_name?
             --daemon=$c.daemon
             --envs {...$c.env, ...$envs}
             --vols {...$c.volumn, ...$vols}

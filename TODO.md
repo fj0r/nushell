@@ -68,11 +68,11 @@
     - [x] Load in batch mode #294
 - [ ] Docker #296
     - [ ] Configurable development environment #297
-        - [ ] postgresql #324
-        - [ ] surrealdb #325
-        - [ ] redis #326
+        - [x] postgresql #324
+        - [x] surrealdb #325
         - [x] `daemon` field #327
         - [x] Added `--workdir`, `--entrypoint`, and `--xargs` options to the `container-preset` function. #328
+        - [x] Specify the `container_name` field, delete the existing container if it exists and then run. #356
 - [x] history-utils #302
     - [x] histogram-column #303
         - [x] histogram column fixed width #308
