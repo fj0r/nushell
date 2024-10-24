@@ -226,7 +226,7 @@ export def todo-list [
     let fields = [
         "todo.id as id", parent_id,
         title, description, ...$sortable , delegate,
-        "category.name || ':' || tag.name as tag"
+        "category.name as cat", "tag.name as tag"
     ] | str join ', '
 
     let sort = if ($sort | is-empty) { ['created'] } else { $sort }
@@ -293,7 +293,7 @@ export def todo-list [
     dbg $debug $stmt -t stmt
     let r = run $stmt
     | group-by id
-    | items {|k, x| $x | first | insert tags ($x | get tag) | reject tag }
+    | items {|k, x| $x | first | insert tags ($x | select cat tag) | reject tag }
 
 
     let flt = $flt
@@ -332,7 +332,7 @@ export def todo-cat-clean [
     ...tags: string@cmpl-category
 ] {
     let ns = $tags | split-cat
-    let tag_id = run ($tags | split-cat | cat-to-tag-id) | get id
+    let tag_id = run ($ns | cat-to-tag-id) | get id
     let id = run $"delete from todo where id in \(
         select todo_id from todo_tag where tag_id in \(($tag_id | str join ', ')\)
         \) returning id" | get id

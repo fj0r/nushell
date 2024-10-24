@@ -65,9 +65,8 @@ def 'fmt leaves' [
 
     let tags = if $verbose and ($o.tags? | is-not-empty) {
         $o.tags
-        | filter { $in | is-not-empty }
-        | split-cat
-        | items {|k,v| $"(ansi $color.cat)($k):(ansi $color.tag)($v | str join '/')"}
+        | group-by cat
+        | items {|k,v| $"(ansi $color.cat)($k):(ansi $color.tag)($v.tag | str join '/')"}
     } else { [] }
 
     let meta = [important urgent challenge created updated]
