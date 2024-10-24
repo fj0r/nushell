@@ -29,6 +29,7 @@ use history-utils/backup.nu *
 use resolvenv
 use git-cmp.nu *
 use rustic *
+use surrealdb
 #use just.nu *
 #use completion-generator.nu *
 
