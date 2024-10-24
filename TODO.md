@@ -63,7 +63,7 @@
 - [x] direnv #286
     - [x] project use direnv #287
     - [x] Move direnv into Project.nu #293
-- [x] Project #289
+- [ ] Project #289
     - [ ] Redundant `cd` ($env.OLDPWD) #290
     - [x] Load in batch mode #294
 - [ ] Docker #296
@@ -80,3 +80,4 @@
 - [ ] Issues #315
     - [ ] Sortable completion menu #316
     - [ ] Allow searching in completion's description #317
+    - [ ] Completion of list's elements #333
