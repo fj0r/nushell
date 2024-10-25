@@ -6,7 +6,7 @@ export-env {
 
         $env.config.hooks.env_change.PWD ++= [
             {
-                condition: {|_, after| '__' in (overlay list) and (find-project $after | is-empty) }
+                condition: {|_, after| '__' in (overlay list) }
                 code: ([
                     $"overlay hide __ --keep-env [ PWD OLDPWD ]"
                     $"print '(ansi default_italic)(ansi grey)unload overlay (ansi default_bold)__(ansi reset)'"
