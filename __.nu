@@ -52,7 +52,7 @@ export def git-hooks [act ctx] {
     }
     if false {
         use lg
-        lg msg {act: $act, workdir: $ctx.workdir}
+        lg msg {act: $act, ...$ctx}
     }
 }
 

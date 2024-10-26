@@ -83,6 +83,24 @@ export def git-hooks-dir [] {
     | path join
 }
 
+export def git-hooks-context [] {
+    let argv = $in
+    {
+        workdir: $env.PWD
+        ...(git-commit)
+        remote: $argv.0?
+        repo: $argv.1?
+    }
+}
+
+def outdent [indent] {
+    $in
+    | lines
+    | range 1..
+    | str substring $indent..
+    | str join (char newline)
+}
+
 export def git-install-hooks [
     ...hooks:string@cmpl-hooks
     --mod(-m)="__"
@@ -90,39 +108,29 @@ export def git-install-hooks [
 ] {
     let c = git-cdup
     if ($c | describe) == nothing { return }
-    let hp = [$c .git hooks] | path join
-    let rp = [$env.PWD $c] | path join | path expand
+    let hook_path = [$c .git hooks] | path join
+    #let workdir = [$env.PWD $c] | path join | path expand
     let hs = $env.GIT_HOOKS | transpose k v
     let hs = if ($hooks | is-empty) { $hs | filter {$in.v.default?} } else { $hs | where k in $hooks }
     for h in $hs {
-        let p = [$hp $h.k] | path join
+        let p = [$hook_path $h.k] | path join
         $"
         #!/bin/env nu
         use project
         use ../../($mod).nu
 
-        export def main [...argv:string] {
+        export def main [...argv: string] {
             if \(project has-git-hooks ($mod) ($fun)\) {
                 let wd = project git-hooks-dir
-
                 cd $wd
                 project direnv ($mod)
-
-                ($mod) ($fun) '($h.k)' {
-                    workdir: $env.PWD
-                    ...\(project git-commit\)
-                    remote: $argv.0?
-                    repo: $argv.1?
-                }
+                ($mod) ($fun) '($h.k)' \($argv | project git-hooks-context\)
             } else {
                 print $'\(ansi grey\)($h.k): `($fun)` function is undefined.\(ansi reset\)'
             }
         }
         "
-        | lines
-        | range 1..<-1
-        | str substring 8..
-        | str join (char newline)
+        | outdent 8
         | save -f $p
         chmod +x $p
     }
