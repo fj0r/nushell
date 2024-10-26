@@ -40,7 +40,9 @@
         - [x] Display message abnormalities #46
         - [ ] Recursive CTE #53
         - [ ] Return the data structure for easy reuse by other UIs #74
-        - [ ] Detection on removing nodes #144
+        - [x] Detection on moving nodes #361
+        - [x] `uplevel done` ignore :trash #362
+            - [ ] Detection on removing nodes #144
     - [x] Set `updated` on Done #35
     - [x] todo attrs (tt) #48
         - [x] Special handling for `-x` #112

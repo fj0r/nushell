@@ -2,28 +2,6 @@ use completion.nu *
 use common.nu *
 use format.nu *
 
-def 'uplevel done' [pid now done:bool] {
-    mut p = $pid
-    loop {
-        if $done {
-            # Check if all nodes at the current level are Done
-            let all_done = (run $"select count\(1\) as c from todo where parent_id = ($p) and done = 0" | get 0.c) == 0
-            if $all_done {
-                $p = (run $"update todo set done = 1, updated = ($now) where id = ($p) returning parent_id;" | get 0.parent_id)
-            } else {
-                break
-            }
-        } else {
-            let x = run $"update todo set done = 0, updated = ($now) where id = ($p) and done = 1 returning parent_id;"
-            if ($x | is-empty) {
-                break
-            } else {
-                $p = $x | get 0.parent_id
-            }
-        }
-    }
-}
-
 # add todo
 export def todo-add [
     --important(-i): int@cmpl-level
@@ -161,6 +139,42 @@ export def todo-attrs [
     }
 }
 
+def 'uplevel done' [pid now done:bool] {
+    mut p = $pid
+    loop {
+        if $done {
+            # Check if all nodes at the current level are Done
+            let all_done = (run $"
+                with p as \(
+                    select tag.id as id from category
+                    join tag on category.id = tag.category_id
+                    where category.name = '' and tag.name = 'trash'
+                \), x as \(
+                    select d.parent_id, d.id,
+                    case t.tag_id in \(p.id\) when true then 0 else 1 end as c
+                    from p, todo as d
+                    join todo_tag as t on d.id = t.todo_id
+                    where d.parent_id = ($p) and d.done = 0
+                    group by d.id, d.done
+                \) select sum\(c\) as c from x;
+                " | get 0.c | default 0) == 0
+            if $all_done {
+                $p = (run $"update todo set done = 1, updated = ($now) where id = ($p) returning parent_id;" | get 0.parent_id)
+            } else {
+                run $"update todo set done = 0, updated = ($now) where id = ($p)"
+                break
+            }
+        } else {
+            let x = run $"update todo set done = 0, updated = ($now) where id = ($p) and done = 1 returning parent_id;"
+            if ($x | is-empty) {
+                break
+            } else {
+                $p = $x | get 0.parent_id
+            }
+        }
+    }
+}
+
 # done todo
 export def todo-done [
     ...id: int@cmpl-todo-id
@@ -196,7 +210,11 @@ export def todo-move [
     id: int@cmpl-todo-id
     to: int@cmpl-todo-id
 ] {
+    let now = date now | fmt-date | Q $in
+    let pid = run $"select parent_id from todo where id = ($id);" | get 0.parent_id
     run $"update todo set parent_id = ($to) where id = ($id);"
+    uplevel done $pid $now true
+    uplevel done $to $now true
 }
 
 # todo list
