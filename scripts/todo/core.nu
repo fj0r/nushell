@@ -398,6 +398,11 @@ export def todo-title [id: int@cmpl-todo-id] {
     | get 0.title
 }
 
+export def todo-body [id: int@cmpl-todo-id] {
+    run $'select description from todo where id = ($id);'
+    | get 0.description
+}
+
 export def todo-export [
     ...tags: any@cmpl-category
 ] {
