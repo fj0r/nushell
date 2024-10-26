@@ -1,6 +1,8 @@
 export use utils.nu *
+export use git-hooks.nu *
 
 export-env {
+    use git-hooks.nu *
     if 'config' in $env {
         let load_msg = $"print '(ansi default_italic)(ansi grey)`__.nu` as overlay (ansi default_bold)__(ansi reset)'"
 
@@ -45,17 +47,3 @@ export-env {
     }
 }
 
-export def find-project [dir] {
-    for d in (
-        $dir
-        | path expand
-        | path split
-        | range 1..
-        | reduce -f ['/'] {|i, a| $a | append ([($a | last) $i] | path join) }
-        | each { [$in '__.nu'] | path join }
-        | reverse
-    ) {
-        if ($d | path exists) { return $d }
-    }
-    ''
-}

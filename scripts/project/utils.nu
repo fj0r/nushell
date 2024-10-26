@@ -67,3 +67,17 @@ export def --env direnv [
     | load-env
 }
 
+export def find-project [dir] {
+    for d in (
+        $dir
+        | path expand
+        | path split
+        | range 1..
+        | reduce -f ['/'] {|i, a| $a | append ([($a | last) $i] | path join) }
+        | each { [$in '__.nu'] | path join }
+        | reverse
+    ) {
+        if ($d | path exists) { return $d }
+    }
+    ''
+}

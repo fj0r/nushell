@@ -1,5 +1,3 @@
-use utils.nu *
-
 export-env {
     $env.GIT_HOOKS = {
         # commit
@@ -31,6 +29,22 @@ export-env {
     }
 }
 
+def git-cdup [] {
+    let r = git rev-parse --show-cdup | complete
+    if $r.exit_code == 0 {
+        $r.stdout | str trim
+    }
+}
+
+export def git-commit [] {
+    let c = git log --reverse -n 1 --pretty=%h»¦«%s
+    | split row '»¦«'
+    {
+        hash: $c.0
+        message: $c.1
+    }
+}
+
 export def git-list-hooks [] {
     let c = git-cdup
     if ($c | describe) == nothing { return }
@@ -44,14 +58,6 @@ def cmpl-hooks [] {
     $env.GIT_HOOKS | columns
 }
 
-def outdent [] {
-    let txt = $in | lines | range 1..
-    let indent = $txt.0 | parse --regex '^(?P<indent>\s*)' | get indent.0 | str length
-    $txt
-    | each {|s| $s | str substring $indent.. }
-    | str join (char newline)
-}
-
 export def git-uninstall-hooks [...hooks:string@git-list-hooks] {
     let c = git-cdup
     if ($c | describe) == nothing { return }
@@ -62,11 +68,19 @@ export def git-uninstall-hooks [...hooks:string@git-list-hooks] {
     }
 }
 
+export def git-hooks-dir [] {
+    $env.CURRENT_FILE
+    | path split
+    | split list '.git'
+    | range ..<-1
+    | flatten
+    | path join
+}
+
 export def git-install-hooks [
     ...hooks:string@cmpl-hooks
     --mod(-m)="__"
     --fun(-f)="git-hooks"
-    --direnv
 ] {
     let c = git-cdup
     if ($c | describe) == nothing { return }
@@ -84,30 +98,28 @@ export def git-install-hooks [
             if \(scope commands | where name == '($mod) ($fun)' | is-empty\) {
                 print $'\(ansi grey\)The `($fun)` function is undefined.\(ansi reset\)'
             } else {
-                let wd = $env.CURRENT_FILE
-                | path split
-                | split list '.git'
-                | range ..<-1
-                | flatten
-                | path join
+                use project
+
+                let wd = project git-hooks-dir
 
                 cd $wd
-
-                (if $direnv { $'use project; project direnv ($mod)' })
+                project direnv ($mod)
 
                 let cm = git log --reverse -n 1 --pretty=%h»¦«%s | split row '»¦«'
 
                 ($mod) ($fun) '($h.k)' {
                     workdir: $env.PWD
-                    hash: $cm.0
-                    message: $cm.1
+                    ...\(project git-commit\)
                     remote: $argv.0?
                     repo: $argv.1?
                 }
             }
         }
         "
-        | outdent
+        | lines
+        | range 1..<-1
+        | str substring 8..
+        | str join (char newline)
         | save -f $p
         chmod +x $p
     }
