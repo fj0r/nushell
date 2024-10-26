@@ -48,7 +48,7 @@ export def scratch-edit [id?:int@cmpl-scratch-id --type(-t):string='md'] {
     let type = if ($type | is-empty) { $old.type | first } else { $type }
     let input = [...$old.title ...$old.content]
     | str join (char newline)
-    | block-edit $"scratch-XXX.($type)"
+    | block-edit $"scratch-XXX.($type)" --line 2
     | lines
     let content = $input | range 1.. | skip-empty-lines | str join (char newline)
     let d = {
@@ -66,8 +66,12 @@ export def scratch-edit [id?:int@cmpl-scratch-id --type(-t):string='md'] {
 }
 
 export def scratch-in [id?:int@cmpl-scratch-id] {
-    $in | scratch-add
-    scratch-edit
+    let o = $in
+    if ($id | is-empty) {
+        $o | scratch-add
+    } else {
+        scratch-edit $id
+    }
 }
 
 export def scratch-out [id?:int@cmpl-scratch-id] {
