@@ -44,23 +44,6 @@ export def --env start [] {
             tag_id INTEGER NOT NULL,
             PRIMARY KEY (todo_id, tag_id)
         );"
-        "CREATE TABLE IF NOT EXISTS scratch (
-            id INTEGER PRIMARY KEY,
-            parent_id INTEGER DEFAULT -1,
-            title TEXT NOT NULL,
-            type TEXT DEFAULT '',
-            content TEXT DEFAULT '',
-            created TEXT DEFAULT (strftime('%Y-%m-%dT%H:%M:%S','now')),
-            updated TEXT DEFAULT (strftime('%Y-%m-%dT%H:%M:%S','now')),
-            important INTEGER DEFAULT -1,
-            urgent INTEGER DEFAULT -1,
-            challenge INTEGER DEFAULT -1
-        );"
-        "CREATE TABLE IF NOT EXISTS scratch_tag (
-            scratch_id INTEGER NOT NULL,
-            tag_id INTEGER NOT NULL,
-            PRIMARY KEY (scratch_id, tag_id)
-        );"
     ] {
         run $s
     }

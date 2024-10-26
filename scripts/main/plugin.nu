@@ -8,6 +8,8 @@ use kubernetes *
 use kubernetes/shortcut.nu *
 use docker *
 use docker/shortcut.nu *
+use scratch *
+use scratch/shortcut.nu *
 use llm *
 use llm/shortcut.nu *
 use todo *

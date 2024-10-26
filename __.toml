@@ -34,6 +34,10 @@ from = "todo"
 to = "todo"
 
 [[manifest]]
+from = "scratch"
+to = "scratch"
+
+[[manifest]]
 from = "git"
 to = "git"
 

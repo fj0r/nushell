@@ -1,6 +1,5 @@
 use completion.nu *
 use core.nu *
-use scratch.nu *
 
 export def todo-commit [
     tag: string@cmpl-category
@@ -69,6 +68,3 @@ export alias tm = todo-move
 export alias tca = todo-cat-add
 export alias tcc = todo-cat-clean
 export alias tcr = todo-cat-rename
-export alias sa = scratch-add
-export alias se = scratch-edit
-export alias so = scratch-out

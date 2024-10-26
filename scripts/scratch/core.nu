@@ -65,6 +65,11 @@ export def scratch-edit [id?:int@cmpl-scratch-id --type(-t):string='md'] {
     $content
 }
 
+export def scratch-in [id?:int@cmpl-scratch-id] {
+    $in | scratch-add
+    scratch-edit
+}
+
 export def scratch-out [id?:int@cmpl-scratch-id] {
     let id = if ($id | is-empty) {
         run $"select id from scratch order by updated desc limit 1;"
