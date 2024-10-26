@@ -26,7 +26,7 @@ export def --wrapped 'watch __' [...cmd:string@cmpl-cmd] {
     }
 }
 
-export def 'watch-modify' [
+export def 'run-and-watch' [
     --clear(-c)
     --path(-p):string='.'
     --glob(-g):string='*'
