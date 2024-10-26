@@ -39,8 +39,8 @@ export def "pwd_abbr" [] {
             let first = $dir_comp | first
             let last = $dir_comp | last
             let body = $dir_comp
-                |range 1..-2
-                |each {|x| $x | str substring ..<2 }
+            | range 1..-2
+            | each {|x| $x | str substring ..<2 }
             $dir_comp = ([$first $body $last] | flatten)
         }
         let dir_comp = $dir_comp | path join
