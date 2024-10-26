@@ -1,0 +1,16 @@
+- [x] Scratch.nu #190
+    - [x] Edit or Output #192
+    - [x] If no id is provided, get the latest #195
+    - [x] New table `scratch`, `scratch_tag` #199
+        - [x] Meta tag `:scratch` #197
+        - [x] Add column `type` into table `todo` #198
+    - [x] Scratch new/edit/out #200
+    - [x] The default type is `md` #208
+    - [x] Adjust return value of sa/se #209
+        - [x] Return `content` #218
+    - [x] Content ignore leading empty lines #221
+    - [x] Set Default Title #225
+        - [x] Open the editor and location to the second line. #226
+        - [x] Variants-edit #238
+    - [x] `scratch-add` can read content from stdin. #229
+    - [x] scratch.nu as an independent project #364

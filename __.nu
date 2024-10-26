@@ -118,3 +118,10 @@ export def file-pwd [] {
     print $env.FILE_PWD
 }
 
+export def 'update todo' [] {
+    let m = [todo llm scratch]
+    for i in ($env.manifest | where from in $m)  {
+        let f = [scripts $i.from TODO.md] | path join
+        tl $"proj:($i.to)" -m | save -f $f
+    }
+}
