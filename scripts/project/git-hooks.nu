@@ -68,6 +68,12 @@ export def git-uninstall-hooks [...hooks:string@git-list-hooks] {
     }
 }
 
+export def has-git-hooks [mod fun] {
+    scope commands
+    | where name == $'($mod) ($fun)'
+    | is-not-empty
+}
+
 export def git-hooks-dir [] {
     $env.CURRENT_FILE
     | path split
@@ -92,20 +98,15 @@ export def git-install-hooks [
         let p = [$hp $h.k] | path join
         $"
         #!/bin/env nu
+        use project
         use ../../($mod).nu
 
         export def main [...argv:string] {
-            if \(scope commands | where name == '($mod) ($fun)' | is-empty\) {
-                print $'\(ansi grey\)The `($fun)` function is undefined.\(ansi reset\)'
-            } else {
-                use project
-
+            if \(project has-git-hooks ($mod) ($fun)\) {
                 let wd = project git-hooks-dir
 
                 cd $wd
                 project direnv ($mod)
-
-                let cm = git log --reverse -n 1 --pretty=%h»¦«%s | split row '»¦«'
 
                 ($mod) ($fun) '($h.k)' {
                     workdir: $env.PWD
@@ -113,6 +114,8 @@ export def git-install-hooks [
                     remote: $argv.0?
                     repo: $argv.1?
                 }
+            } else {
+                print $'\(ansi grey\)($h.k): `($fun)` function is undefined.\(ansi reset\)'
             }
         }
         "
