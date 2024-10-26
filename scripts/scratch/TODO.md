@@ -14,3 +14,4 @@
         - [x] Variants-edit #238
     - [x] `scratch-add` can read content from stdin. #229
     - [x] scratch.nu as an independent project #364
+    - [x] Filter empty #366

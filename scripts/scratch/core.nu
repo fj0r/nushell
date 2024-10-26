@@ -24,6 +24,7 @@ export def scratch-add [--type(-t): string='md'] {
     let content = if ($o | is-empty) { char newline } else { $o }
     let input = $"(char newline)($content)" | block-edit $"scratch-XXX.($type)" --line 2 | lines
     let content = $input | range 1.. | skip-empty-lines | str join (char newline)
+    if ($content | is-empty) { return }
     let d = {
         title: ($input | first)
         type: $type
