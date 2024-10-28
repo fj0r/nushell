@@ -18,12 +18,17 @@ export def --env start [] {
         );"
         "CREATE TABLE IF NOT EXISTS tag (
             id INTEGER PRIMARY KEY,
-            category_id INTEGER NOT NULL,
+            category_id INTEGER NOT NULL REFERENCES category(id),
             name TEXT NOT NULL,
             UNIQUE (category_id, name) ON CONFLICT REPLACE
         );"
         "INSERT INTO category (id, name, hidden) VALUES (1, '', 0);"
         "INSERT INTO tag (category_id, name) VALUES (1, 'trash');"
+        "CREATE TABLE IF NOT EXISTS person (
+            id INTEGER PRIMARY KEY,
+            name TEXT NOT NULL UNIQUE,
+            info TEXT default ''
+        );"
         "CREATE TABLE IF NOT EXISTS todo (
             id INTEGER PRIMARY KEY,
             parent_id INTEGER DEFAULT -1,
@@ -37,7 +42,7 @@ export def --env start [] {
             challenge INTEGER DEFAULT -1,
             value REAL DEFAULT 0,
             done BOOLEAN DEFAULT -1,
-            relevant TEXT DEFAULT ''
+            relevant INTEGER REFERENCES person(id)
         );"
         "CREATE TABLE IF NOT EXISTS todo_tag (
             todo_id INTEGER NOT NULL,

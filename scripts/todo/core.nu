@@ -12,6 +12,7 @@ export def todo-add [
     --deadline(-d): duration
     --done(-x)
     --desc: string=''
+    --relevant(-r): int@cmpl-relevant-id
     --edit(-e)
     title?: string
 ] {
@@ -48,6 +49,7 @@ export def todo-add [
         urgent: $urgent
         challenge: $challenge
         parent_id: $parent
+        relevant: $relevant
         deadline: (if ($deadline | is-not-empty) {(date now) + $deadline | fmt-date})
         done: (if $done { 1 } else { 0 })
     } | filter-empty
@@ -229,6 +231,7 @@ export def todo-list [
     --updated: duration
     --created: duration
     --deadline: duration
+    --relevant(-r): int@cmpl-relevant-id
     --sort(-s): list<string@cmpl-sort>
     --work-in-process(-W)
     --finished(-F)
@@ -299,6 +302,7 @@ export def todo-list [
     if ($updated | is-not-empty) { $cond ++= $"updated >= ($now - $updated | fmt-date | Q $in)"}
     if ($created | is-not-empty) { $cond ++= $"created >= ($now - $created | fmt-date | Q $in)"}
     if ($deadline | is-not-empty) { $cond ++= $"deadline >= ($now - $deadline | fmt-date | Q $in)"}
+    if ($relevant | is-not-empty) { $cond ++= $"relevant = ($relevant)"}
     if ($work_in_process) { $cond ++= $"done = 0" }
     if ($finished) { $cond ++= $"done = 1" }
 
