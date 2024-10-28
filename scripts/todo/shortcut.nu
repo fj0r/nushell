@@ -2,7 +2,7 @@ use completion.nu *
 use core.nu *
 
 export def todo-commit [
-    tag: string@cmpl-category
+    tag: string@cmpl-tag-id
     --todo(-t): int@cmpl-todo-id
     --file(-f): string@cmpl-todo-md
     --amend(-a)
@@ -36,7 +36,7 @@ export def tclean [] {
 }
 
 export def todo-today [
-    ...tags: any@cmpl-category
+    ...tags: any@cmpl-tag-id
     --all(-a)
     --md
     --md-list

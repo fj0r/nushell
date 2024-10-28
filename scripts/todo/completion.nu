@@ -9,7 +9,7 @@ export def cmpl-level [] {
 }
 
 export def cmpl-del-level [] {
-    [tag category]
+    [tag]
 }
 
 export def cmpl-sort [] {
@@ -34,17 +34,6 @@ export def cmpl-tag-id [] {
 export def cmpl-tag [] {
     run 'select name from tag;'
     | get name
-}
-
-export def cmpl-cat [] {
-    run $"select id as value, name || '(char tab)' || hidden as description from category"
-}
-
-export def cmpl-category [] {
-    run 'select c.name as category, t.name as tag
-        from category as c
-        join tag as t on t.category_id = c.id'
-    | each { $"($in.category):($in.tag)" }
 }
 
 export def cmpl-todo-md [] {

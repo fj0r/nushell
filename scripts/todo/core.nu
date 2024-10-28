@@ -8,7 +8,7 @@ export def todo-add [
     --urgent(-u): int@cmpl-level
     --challenge(-c): int@cmpl-level
     --parent(-p): int@cmpl-todo-id
-    --tag(-t): list<string@cmpl-category>
+    --tag(-t): list<string@cmpl-tag-id>
     --deadline(-d): duration
     --done(-x)
     --desc: string=''
@@ -101,7 +101,7 @@ export def todo-attrs [
     --parent(-p): int@cmpl-todo-id
     --deadline(-d): duration
     --done(-x): int
-    --tag(-t): list<string@cmpl-category>
+    --tag(-t): list<string@cmpl-tag-id>
     --remove(-r)
 ] {
     let args = {
@@ -221,7 +221,7 @@ export def todo-move [
 
 # todo list
 export def todo-list [
-    ...tags: any@cmpl-category
+    ...tags: any@cmpl-tag-id
     --parent(-p): int@cmpl-todo-id
     --search(-s): string
     --all(-a)
@@ -249,7 +249,7 @@ export def todo-list [
     let fields = [
         "todo.id as id", "todo.parent_id as parent_id",
         title, description, ...$sortable, relevant,
-        "category.name as cat", "tag.name as tag"
+        "tag.name as tag"
     ] | str join ', '
 
     let sort = if ($sort | is-empty) { ['created'] } else { $sort }
@@ -259,15 +259,13 @@ export def todo-list [
     mut cond = []
     mut flt = {and: [], not: []}
 
-    let tidq = "select todo_tag.todo_id from category
-        join tag on category.id = tag.category_id
-        join todo_tag on todo_tag.tag_id = tag.id"
-    let tidq_filter_trash = "category.name = '' and tag.name = 'trash'"
+    let tidq = "select t1.id from tag as t0 join tag as t1 on t1.parent_id = t0.id"
+    let tidq_filter_trash = "t0.name = '' and t1.name = 'trash'"
     $cond ++= match [$all ($tags | is-empty)] {
         [true false] => $"true"
-        [true true] => $"todo.id not in \(($tidq) where category.hidden\)"
+        [true true] => $"todo.id not in \(($tidq) where t0.hidden\)"
         [false false] => $"todo.id not in \(($tidq) where ($tidq_filter_trash)\)"
-        [false true] => $"todo.id not in \(($tidq) where \(($tidq_filter_trash)\) or category.hidden\)"
+        [false true] => $"todo.id not in \(($tidq) where \(($tidq_filter_trash)\) or t0.hidden\)"
     }
 
     if ($tags | is-not-empty) {
@@ -312,13 +310,14 @@ export def todo-list [
     let stmt = $"select ($fields) from todo
         left outer join todo_tag on todo.id = todo_tag.todo_id
         left outer join tag on todo_tag.tag_id = tag.id
-        left outer join category on tag.category_id = category.id
         ($cond) order by ($sort);"
     dbg $debug $stmt -t stmt
     let r = run $stmt
     | group-by id
-    | items {|k, x| $x | first | insert tags ($x | select cat tag) | reject tag }
+    | items {|k, x| $x | first | insert tags ($x | select tag) | reject tag }
 
+    print ($r | select tags | table -e)
+    return
 
     let flt = $flt
     let r = if ($flt.and | is-not-empty) or ($flt.not | is-not-empty) {
@@ -353,7 +352,7 @@ export def todo-list [
 # delete todo in categories
 export def todo-cat-clean [
     --level(-L): string@cmpl-del-level
-    ...tags: string@cmpl-category
+    ...tags: string@cmpl-tag-id
 ] {
     let ns = $tags | split-cat
     let tag_id = run ($ns | cat-to-tag-id) | get id
@@ -389,11 +388,11 @@ export def todo-cat-add [...categories] {
     }
 }
 
-export def todo-cat-rename [from:string@cmpl-category to] {
+export def todo-cat-rename [from:string@cmpl-tag-id to] {
     run $"update tag set name = (Q $to) where name = (Q $from)"
 }
 
-export def todo-cat-hidden [cat:string@cmpl-cat] {
+export def todo-cat-hidden [cat:string@cmpl-tag-id] {
     run $"update category set hidden = not hidden where id = ($cat)"
 }
 
@@ -408,7 +407,7 @@ export def todo-body [id: int@cmpl-todo-id] {
 }
 
 export def todo-export [
-    ...tags: any@cmpl-category
+    ...tags: any@cmpl-tag-id
 ] {
     todo-list ...$tags --raw | todo-tree | to json
 }

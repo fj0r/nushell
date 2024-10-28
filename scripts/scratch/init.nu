@@ -12,8 +12,8 @@ export def --env start [] {
         "CREATE TABLE IF NOT EXISTS tag (
             id INTEGER PRIMARY KEY,
             parent_id INTEGER DEFAULT -1,
-            hidden BOOLEAN DEFAULT 0,
-            name TEXT NOT NULL
+            name TEXT NOT NULL,
+            hidden BOOLEAN DEFAULT 0
         );"
         "INSERT INTO tag (id, name) VALUES (1, '');"
         "INSERT INTO tag (parent_id, name) VALUES (1, 'trash');"
