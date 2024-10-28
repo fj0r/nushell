@@ -343,11 +343,12 @@ export def todo-list [
 
 # delete todo in tag
 export def todo-tag-clean [
-    --level(-L): string@cmpl-del-level
-    ...tags: string@cmpl-tag-id
+    ...tags: string@cmpl-tag
+    --with-tag(-T)
 ] {
-    let ns = $tags | split-cat
-    let tag_id = run ($ns | cat-to-tag-id) | get id
+    let tag_id = run $"(tag-tree) select id from tags
+        where name in \(($tags | each {Q $in} | str join ', ')\)"
+    | get id
     let id = run $"delete from todo where id in \(
         select todo_id from todo_tag where tag_id in \(($tag_id | str join ', ')\)
         \) returning id" | get id
@@ -355,13 +356,9 @@ export def todo-tag-clean [
     let tid = run $"delete from todo_tag where todo_id in \(($id | str join ', ')\)
         returning todo_id, tag_id"
     dbg true -t 'delete todo_tag' $tid
-    if $level in [tag category] {
+    if $with_tag {
         run $"delete from tag where id in \(($tag_id | str join ', ')\)"
         dbg true -t 'delete tag' $tag_id
-    }
-    if $level in [category] {
-        run $"delete from category where name in \(($ns | columns | each {Q $in} | str join ', ')\);"
-        dbg true -t 'delete category' ($ns | columns)
     }
 }
 

@@ -100,13 +100,16 @@
             - [x] hide trash #377
             - [ ] hide tag #385
         - [x] todo-add #373
-        - [x] todo-attrs #378
+        - [ ] todo-attrs #378
+            - [ ] Add only the last level tag #388
         - [ ] uplevel done #379
-        - [ ] tag-data #380
-            - [ ] tag-clean #381
+        - [x] tag-data #380
+            - [x] tag-clean #381
             - [x] tag-add #382
             - [x] tag-rename #383
             - [x] tag-hidden #384
+        - [x] remove split-cat #386
+        - [ ] Segmented completion cmpl-tag #387
 - [ ] Integration #63
     - [x] More convenient interaction modes #68
         - [x] kebab-case #201

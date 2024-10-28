@@ -17,7 +17,7 @@ export def todo-commit [
 }
 
 export def todo-clean [] {
-    todo-cat-clean ':trash'
+    todo-tag-clean ':trash'
 }
 
 export def todo-trash [] {
@@ -31,7 +31,7 @@ export def tclean [] {
     let p = $'(ansi grey)------(char newline)Perform cleanup?(ansi reset)'
     let c = [yes no] | input list $p | str starts-with 'y'
     if $c {
-        todo-cat-clean ':trash'
+        todo-tag-clean ':trash'
     }
 }
 

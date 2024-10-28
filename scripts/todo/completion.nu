@@ -8,10 +8,6 @@ export def cmpl-level [] {
     0..<5
 }
 
-export def cmpl-del-level [] {
-    [tag]
-}
-
 export def cmpl-sort [] {
     [created, updated, deadline, done, important, urgent]
 }
