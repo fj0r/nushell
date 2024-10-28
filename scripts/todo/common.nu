@@ -29,17 +29,18 @@ export def Q [...t] {
     $"'($s)'"
 }
 
-export def tag-tree [name?: string='tags'] {
+export def tag-tree [name?: string='tags' --parent-id: int=-1] {
     let n = $"_(random chars -l 3)"
+    let pid = $parent_id | into string | str join ', '
     $"with recursive ($n)_0 as \(
-        select id, parent_id, hidden, name from tag where parent_id = -1
+        select id, parent_id, hidden, name from tag where parent_id in \(($pid)\)
         union all
         select ($n).id, ($n).parent_id, ($n).hidden, ($n)_0.name || ':' || ($n).name as name from tag as ($n)
         join ($n)_0 on ($n).parent_id= ($n)_0.id
     \), ($n)_1 as \(
         select id, parent_id, hidden, name from ($n)_0 order by length\(name\) desc
     \), ($name) as \(
-        select id, hidden, name from ($n)_1 where parent_id != -1 group by id
+        select id, hidden, name from ($n)_1 where parent_id not in \(($pid)\) group by id
     \)
     "
 }

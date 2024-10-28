@@ -42,16 +42,3 @@ with recursive p as (
 ) select * from p;
 
 
----
-with p as \(
-    select tag.id as id from category
-    join tag on category.id = tag.category_id
-    where category.name = '' and tag.name = 'trash'
-\), x as \(
-    select d.parent_id, d.id,
-    case t.tag_id in \(p.id\) when true then 0 else 1 end as c
-    from p, todo as d
-    join todo_tag as t on d.id = t.todo_id
-    where d.parent_id = ($p) and d.done = 0
-    group by d.id, d.done
-\) select sum\(c\) as c from x;
