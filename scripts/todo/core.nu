@@ -105,7 +105,7 @@ export def todo-attrs [
     --parent(-p): int@cmpl-todo-id
     --deadline(-d): duration
     --done(-x): int
-    --tag(-t): list<string@cmpl-tag-id>
+    --tag(-t): list<string@cmpl-tag>
     --remove(-r)
 ] {
     let args = {
@@ -132,12 +132,12 @@ export def todo-attrs [
 
     if ($tag | is-not-empty) {
         if $remove {
-            let children = $tag | split-cat | cat-to-tag-id
-            run $"delete from todo_tag where todo_id in \(($ids | str join ',')\) and tag_id in \(($children)\);"
+            let children = run $"(tag-tree) select tags.id from tags where name in \(($tag | each {Q $in} | str join ',')\)" | get id
+            run $"delete from todo_tag where todo_id in \(($ids | str join ',')\) and tag_id in \(($children | str join ',')\);"
         } else {
             for id in $ids {
-                let children = $tag | split-cat | cat-to-tag-id $id
-                run $"insert into todo_tag ($children)
+                let children = $"select ($id), tags.id from tags where name in \(($tag | each {Q $in} | str join ',')\)"
+                run $"(tag-tree) insert into todo_tag ($children)
                   on conflict \(todo_id, tag_id\) do nothing
                 ;"
             }

@@ -99,6 +99,7 @@
         - [x] todo-list #372
             - [x] hide trash #377
         - [x] todo-add #373
+        - [x] todo-attrs #378
 - [ ] Integration #63
     - [x] More convenient interaction modes #68
         - [x] kebab-case #201
