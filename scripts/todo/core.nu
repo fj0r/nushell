@@ -341,8 +341,8 @@ export def todo-list [
 }
 
 
-# delete todo in categories
-export def todo-cat-clean [
+# delete todo in tag
+export def todo-tag-clean [
     --level(-L): string@cmpl-del-level
     ...tags: string@cmpl-tag-id
 ] {
@@ -365,26 +365,29 @@ export def todo-cat-clean [
     }
 }
 
-# add categories
-export def todo-cat-add [...categories] {
-    let ns = $categories | split-cat
-    let c = $ns | columns | each { $"\((Q $in)\)" } | str join ','
-    let c = run $"insert into category \(name\) values ($c)
-        on conflict \(name\) do update set name = EXCLUDED.name
-        returning id, name;"
-    for i in $c {
-        let t = $ns | get $i.name -s
-        let t = $t | each { $"\(($i.id), (Q $in)\)" } | str join ','
-        run $"insert into tag \(category_id, name\) values ($t)
-            on conflict \(category_id, name\) do nothing;"
+# add tag
+export def todo-tag-add [...tags] {
+    for tag in $tags {
+        let ts = $tag | split row ':'
+        mut pid = run $"insert into tag \(parent_id, name\) values \(-1, (Q $ts.0)\)
+            on conflict \(parent_id, name\) do update set id = EXCLUDED.id
+            returning id, name;"
+            | get 0.id
+        for t in ($ts | range 1..) {
+            $pid = run $"insert into tag \(parent_id, name\) values
+            \(($pid), (Q $t)\)
+            on conflict \(parent_id, name\) do update set id = EXCLUDED.id
+            returning id, name;"
+            | get 0.id
+        }
     }
 }
 
-export def todo-cat-rename [from:string@cmpl-tag-id to] {
+export def todo-tag-rename [from:string@cmpl-tag-id to] {
     run $"update tag set name = (Q $to) where name = (Q $from)"
 }
 
-export def todo-cat-hidden [cat:string@cmpl-tag-id] {
+export def todo-tag-hidden [cat:string@cmpl-tag-id] {
     run $"update category set hidden = not hidden where id = ($cat)"
 }
 
@@ -399,7 +402,7 @@ export def todo-body [id: int@cmpl-todo-id] {
 }
 
 export def todo-export [
-    ...tags: any@cmpl-tag-id
+    ...tags: any@cmpl-tag
 ] {
     todo-list ...$tags --raw | todo-tree | to json
 }

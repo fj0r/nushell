@@ -94,12 +94,18 @@
     - [x] Tips about initializing the database #239
     - [x] todo-add return $ids #352
     - [ ] Tag tree #369
-        - [ ] parent_id #370
-        - [ ] Drop category #371
+        - [x] parent_id #370
+        - [x] Drop category #371
         - [x] todo-list #372
             - [x] hide trash #377
         - [x] todo-add #373
         - [x] todo-attrs #378
+        - [ ] uplevel done #379
+        - [ ] tag-data #380
+            - [ ] tag-clean #381
+            - [x] tag-add #382
+            - [ ] tag-rename #383
+            - [ ] tag-hidden #384
 - [ ] Integration #63
     - [x] More convenient interaction modes #68
         - [x] kebab-case #201

@@ -15,7 +15,8 @@ export def --env start [] {
             id INTEGER PRIMARY KEY,
             parent_id INTEGER DEFAULT -1,
             name TEXT NOT NULL,
-            hidden BOOLEAN DEFAULT 0
+            hidden BOOLEAN DEFAULT 0,
+            UNIQUE(parent_id, name)
         );"
         "INSERT INTO tag (id, name) VALUES (1, '');"
         "INSERT INTO tag (parent_id, name) VALUES (1, 'trash');"
