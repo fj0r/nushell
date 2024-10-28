@@ -82,7 +82,7 @@
         - [x] Reduce string concatenation (SQLite) and splitting. #351
     - [x] Show all parent node #337
     - [x] todo-body #367
-- [ ] Data #29
+- [x] Data #29
     - [x] Challenge #30
         - [x] Data structure #36
         - [x] Formatting #42
@@ -140,6 +140,6 @@
     - [x] New column named `value` with type `REAL` #257
     - [ ] How to calculate when both child nodes and parent nodes have values #258
 - [ ] Financial.nu #342
-    - [ ] Payee/Payer #343
+    - [x] Relevant: Payee/Payer #343
     - [ ] Accounting subject #344
-    - [ ] Category #345
+    - [x] Category #345
