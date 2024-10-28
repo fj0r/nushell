@@ -82,7 +82,7 @@
         - [x] Reduce string concatenation (SQLite) and splitting. #351
     - [x] Show all parent node #337
     - [x] todo-body #367
-- [x] Data #29
+- [ ] Data #29
     - [x] Challenge #30
         - [x] Data structure #36
         - [x] Formatting #42
@@ -93,6 +93,9 @@
         - [x] remove/add `:untagged` when todo tag #60
     - [x] Tips about initializing the database #239
     - [x] todo-add return $ids #352
+    - [ ] Tag tree #369
+        - [ ] parent_id #370
+        - [ ] Drop category #371
 - [ ] Integration #63
     - [x] More convenient interaction modes #68
         - [x] kebab-case #201
@@ -139,7 +142,7 @@
     - [ ] Only count leaf node #256
     - [x] New column named `value` with type `REAL` #257
     - [ ] How to calculate when both child nodes and parent nodes have values #258
-- [ ] Financial.nu #342
+- [x] Financial.nu #342
     - [x] Relevant: Payee/Payer #343
-    - [ ] Accounting subject #344
+    - [x] Accounting subject #344
     - [x] Category #345

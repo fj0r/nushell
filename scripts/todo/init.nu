@@ -18,8 +18,10 @@ export def --env start [] {
         );"
         "CREATE TABLE IF NOT EXISTS tag (
             id INTEGER PRIMARY KEY,
-            category_id INTEGER NOT NULL REFERENCES category(id),
+            parent_id INTEGER DEFAULT -1,
+            hidden BOOLEAN DEFAULT 0,
             name TEXT NOT NULL,
+            category_id INTEGER NOT NULL,
             UNIQUE (category_id, name) ON CONFLICT REPLACE
         );"
         "INSERT INTO category (id, name, hidden) VALUES (1, '', 0);"

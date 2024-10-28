@@ -9,19 +9,14 @@ export def --env start [] {
     print $"(ansi grey)created database: $env.SCRATCH_DB(ansi reset)"
     for s in [
         "DROP TABLE _;"
-        "CREATE TABLE IF NOT EXISTS category (
-            id INTEGER PRIMARY KEY,
-            name TEXT NOT NULL UNIQUE,
-            hidden BOOLEAN DEFAULT 0
-        );"
         "CREATE TABLE IF NOT EXISTS tag (
             id INTEGER PRIMARY KEY,
-            category_id INTEGER NOT NULL,
-            name TEXT NOT NULL,
-            UNIQUE (category_id, name) ON CONFLICT REPLACE
+            parent_id INTEGER DEFAULT -1,
+            hidden BOOLEAN DEFAULT 0,
+            name TEXT NOT NULL
         );"
-        "INSERT INTO category (id, name, hidden) VALUES (1, '', 0);"
-        "INSERT INTO tag (category_id, name) VALUES (1, 'trash');"
+        "INSERT INTO tag (id, name) VALUES (1, '');"
+        "INSERT INTO tag (parent_id, name) VALUES (1, 'trash');"
         "CREATE TABLE IF NOT EXISTS scratch (
             id INTEGER PRIMARY KEY,
             parent_id INTEGER DEFAULT -1,
