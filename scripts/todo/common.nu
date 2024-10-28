@@ -31,14 +31,14 @@ export def Q [...t] {
 
 export def tag-tree [] {
     $"with recursive t as \(
-        select parent_id, id, name from tag where parent_id = -1
+        select id, parent_id, hidden, name from tag where parent_id = -1
         union all
-        select t1.parent_id, t1.id, t.name || ':' || t1.name as name from tag as t1
+        select t1.id, t1.parent_id, t1.hidden, t.name || ':' || t1.name as name from tag as t1
         join t on t1.parent_id= t.id
     \), ts as \(
-        select id, parent_id, name from t order by length\(name\) desc
+        select id, parent_id, hidden, name from t order by length\(name\) desc
     \), tags as \(
-        select id, name from ts where parent_id != -1 group by id
+        select id, hidden, name from ts where parent_id != -1 group by id
     \)
     "
 }

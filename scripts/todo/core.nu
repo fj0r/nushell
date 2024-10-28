@@ -263,13 +263,13 @@ export def todo-list [
     mut cond = []
     mut flt = {and: [], not: []}
 
-    let tidq = "select t1.id from tag as t0 join tag as t1 on t1.parent_id = t0.id"
-    let tidq_filter_trash = "t0.name = '' and t1.name = 'trash'"
+    let tidq = "select todo_tag.todo_id from todo_tag join tags on tags.id = todo_tag.tag_id"
+    let tidq_filter_trash = "tags.name = ':trash'"
     $cond ++= match [$all ($tags | is-empty)] {
         [true false] => $"true"
-        [true true] => $"todo.id not in \(($tidq) where t0.hidden\)"
+        [true true] => $"todo.id not in \(($tidq) where tags.hidden\)"
         [false false] => $"todo.id not in \(($tidq) where ($tidq_filter_trash)\)"
-        [false true] => $"todo.id not in \(($tidq) where \(($tidq_filter_trash)\) or t0.hidden\)"
+        [false true] => $"todo.id not in \(($tidq) where \(($tidq_filter_trash)\) or tags.hidden\)"
     }
 
     if ($tags | is-not-empty) {
