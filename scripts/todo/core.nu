@@ -151,10 +151,8 @@ def 'uplevel done' [pid now done:bool] {
         if $done {
             # Check if all nodes at the current level are Done
             let all_done = (run $"
-                with p as \(
-                    select tag.id as id from category
-                    join tag on category.id = tag.category_id
-                    where category.name = '' and tag.name = 'trash'
+                (tag-tree), p as \(
+                    select tags.id from tags where name = ':trash'
                 \), x as \(
                     select d.parent_id, d.id,
                     case t.tag_id in \(p.id\) when true then 0 else 1 end as c
