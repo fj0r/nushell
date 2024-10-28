@@ -384,11 +384,11 @@ export def todo-tag-add [...tags] {
 }
 
 export def todo-tag-rename [from:string@cmpl-tag-id to] {
-    run $"update tag set name = (Q $to) where name = (Q $from)"
+    run $"update tag set name = (Q $to) where id = ($from)"
 }
 
-export def todo-tag-hidden [cat:string@cmpl-tag-id] {
-    run $"update category set hidden = not hidden where id = ($cat)"
+export def todo-tag-hidden [tag:string@cmpl-tag-id] {
+    run $"update tag set hidden = not hidden where id = ($tag)"
 }
 
 export def todo-title [id: int@cmpl-todo-id] {
