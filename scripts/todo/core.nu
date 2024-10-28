@@ -269,15 +269,8 @@ export def todo-list [
     }
 
     if ($tags | is-not-empty) {
-        let sc = $tags | split-cat
-        let tag_cond = $sc | cat-to-tag-id --empty-as-all --and=(not $all)
-        $flt = $sc | cat-filter
-        dbg -t tag-cond $debug $tag_cond
-        let tag_id = run $tag_cond
-        | get id
-        | str join ', '
-        #$cond ++= $"todo_tag.tag_id not in \(1\)"
-        $cond ++= $"todo.id in \(select todo_id from todo_tag where tag_id in \(($tag_id)\)\)"
+        let ts = $tags | each { Q $in } | str join ', '
+        $cond ++= $"todo.id in \(select todo_id from todo_tag join tags on tag_id = tags.id where tags.name in \(($ts)\)\)"
     } else {
         if $untagged {
             $cond ++= $"todo_tag.tag_id is null"

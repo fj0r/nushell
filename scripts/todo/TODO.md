@@ -28,7 +28,6 @@
     - [x] Category #11
         - [x] Allow creation of multiple tags under one category at once #13
             - [x] Deduplication #86
-        - [x] Multiple tags under the same category #38
     - [x] Messaging on deletion #23
     - [x] Batch operations #31
         - [x] Batch Done #32
@@ -96,6 +95,7 @@
     - [ ] Tag tree #369
         - [ ] parent_id #370
         - [ ] Drop category #371
+        - [x] todo-list #372
 - [ ] Integration #63
     - [x] More convenient interaction modes #68
         - [x] kebab-case #201
