@@ -247,7 +247,7 @@ export def todo-list [
         done, important, urgent, challenge
     ]
     let fields = [
-        "todo.id as id", parent_id,
+        "todo.id as id", "todo.parent_id as parent_id",
         title, description, ...$sortable, relevant,
         "category.name as cat", "tag.name as tag"
     ] | str join ', '
