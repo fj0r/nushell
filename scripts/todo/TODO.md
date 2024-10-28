@@ -97,11 +97,12 @@
         - [x] parent_id #370
         - [x] Drop category #371
         - [ ] todo-list #372
-            - [x] hide trash #377
+            - [ ] hide trash #377
+                - [ ] include children #392
             - [ ] hide tag #385
         - [x] todo-add #373
-        - [ ] todo-attrs #378
-            - [ ] Add only the last level tag #388
+        - [x] todo-attrs #378
+            - [x] Add only the last level tag #388
         - [ ] uplevel done #379
         - [x] tag-data #380
             - [x] tag-clean #381
