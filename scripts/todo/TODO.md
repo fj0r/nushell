@@ -95,7 +95,12 @@
     - [ ] Tag tree #369
         - [ ] parent_id #370
         - [ ] Drop category #371
-        - [x] todo-list #372
+        - [ ] todo-list #372
+            - [ ] hide trash #377
+        - [x] todo-add #373
+        - [ ] todo-addsss #374
+        - [ ] todo-addsssxxx #375
+        - [ ] todo-addsssxxxxxx #376
 - [ ] Integration #63
     - [x] More convenient interaction modes #68
         - [x] kebab-case #201

@@ -74,14 +74,18 @@ export def todo-add [
     mut tag = $tag | default []
     # Inheriting tags when child nodes are added
     if ($parent | is-not-empty) {
-        let t = run $"select category.name || ':' || tag.name as tag from todo join todo_tag on todo.id = todo_tag.todo_id join tag on todo_tag.tag_id = tag.id join category on tag.category_id = category.id where todo.id = ($parent)"
-        | get tag
+        let t = run $"(tag-tree) select tags.name
+        from todo join todo_tag on todo.id = todo_tag.todo_id
+        join tags on todo_tag.tag_id = tags.id
+        where todo.id = ($parent)"
+        | get name
         $tag ++= $t
     }
     if ($tag | is-not-empty) {
         for id in $ids {
-            let children = $tag | split-cat | cat-to-tag-id $id
-            run $"insert into todo_tag ($children);"
+            run $"(tag-tree) insert into todo_tag
+            select ($id) as todo_id, tags.id as tag_id
+            from tags where tags.name in \(($tag | each { Q $in } | str join ', ')\);"
         }
     }
 
