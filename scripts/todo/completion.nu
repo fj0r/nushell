@@ -26,14 +26,13 @@ export def cmpl-todo-id [] {
     | each { $"($in.id) # ($in.title)" }
 }
 
-export def cmpl-tag-id [] {
-    run 'select id, name from tag;'
-    | each { $"($in.id) # ($in.name)" }
+export def cmpl-tag [] {
+    run $"(tag-tree) select * from tags" | get name
+
 }
 
-export def cmpl-tag [] {
-    run 'select name from tag;'
-    | get name
+export def cmpl-tag-id [] {
+   run $"(tag-tree) select * from tags" | each { $"($in.id) # ($in.name)" }
 }
 
 export def cmpl-todo-md [] {

@@ -221,7 +221,7 @@ export def todo-move [
 
 # todo list
 export def todo-list [
-    ...tags: any@cmpl-tag-id
+    ...tags: any@cmpl-tag
     --parent(-p): int@cmpl-todo-id
     --search(-s): string
     --all(-a)
@@ -249,7 +249,7 @@ export def todo-list [
     let fields = [
         "todo.id as id", "todo.parent_id as parent_id",
         title, description, ...$sortable, relevant,
-        "tag.name as tag"
+        "tags.name as tag"
     ] | str join ', '
 
     let sort = if ($sort | is-empty) { ['created'] } else { $sort }
@@ -307,17 +307,14 @@ export def todo-list [
     let $cond = if ($cond | is-empty) { '' } else { $cond | str join ' and ' | $"where ($in)" }
 
     dbg $debug $cond -t cond
-    let stmt = $"select ($fields) from todo
+    let stmt = $"(tag-tree) select ($fields) from todo
         left outer join todo_tag on todo.id = todo_tag.todo_id
-        left outer join tag on todo_tag.tag_id = tag.id
+        left outer join tags on todo_tag.tag_id = tags.id
         ($cond) order by ($sort);"
     dbg $debug $stmt -t stmt
     let r = run $stmt
     | group-by id
     | items {|k, x| $x | first | insert tags ($x | select tag) | reject tag }
-
-    print ($r | select tags | table -e)
-    return
 
     let flt = $flt
     let r = if ($flt.and | is-not-empty) or ($flt.not | is-not-empty) {

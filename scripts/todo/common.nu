@@ -29,6 +29,22 @@ export def Q [...t] {
     $"'($s)'"
 }
 
+export def tag-tree [] {
+    $"with recursive t as \(
+        select parent_id, id, name from tag where parent_id = -1
+        union all
+        select t1.parent_id, t1.id, t.name || ':' || t1.name as name from tag as t1
+        join t on t1.parent_id= t.id
+    \), ts as \(
+        select id, parent_id, name from t order by length\(name\) desc
+    \), tags as \(
+        select id, name from ts where parent_id != -1 group by id
+    \)
+    "
+}
+
+
+# TODO: rm
 export def split-cat [] {
     $in
     | each { split column ':' c tag  }
@@ -39,6 +55,7 @@ export def split-cat [] {
     | reduce -f {} {|i,a| $a | insert $i.cat $i.tag }
 }
 
+# TODO: rm
 export def cat-filter [] {
     let x = $in
     mut r = {
@@ -62,6 +79,7 @@ export def cat-filter [] {
     $r
 }
 
+# TODO: rm
 export def cat-to-cond [a b --empty-as-all] {
     $in
     | items {|k, v|
@@ -78,6 +96,7 @@ export def cat-to-cond [a b --empty-as-all] {
     | str join ' or '
 }
 
+# TODO: rm
 export def cat-to-tag-id [
     ...c
     --empty-as-all

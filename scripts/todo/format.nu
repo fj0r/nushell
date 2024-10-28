@@ -64,9 +64,10 @@ def 'fmt leaves' [
     let verbose = not $md and not $md_list
 
     let tags = if $verbose and ($o.tags? | is-not-empty) {
-        $o.tags
-        | group-by cat
-        | items {|k,v| $"(ansi $color.cat)($k):(ansi $color.tag)($v.tag | str join '/')"}
+        # :TODO:
+        $o.tags | get tag | each {$"(ansi $color.tag)($in)"}
+        #| group-by cat
+        #| items {|k,v| $"(ansi $color.cat)($k):(ansi $color.tag)($v.tag | str join '/')"}
     } else { [] }
 
     let meta = [important urgent challenge created updated]
