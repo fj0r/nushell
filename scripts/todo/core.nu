@@ -261,8 +261,13 @@ export def todo-list [
     mut cond = []
     mut flt = {and: [], not: []}
 
+    let trash_id = run $"select tag.id from tag join tag as t on tag.id = t.parent_id where tag.name = '' and t.name = 'trash'" | get 0.id
+    let trash_sid = run $"(tag-tree --parent-id $trash_id) select id from tags" | get id
+    let trash_ids = [$trash_id, ...$trash_sid]
     let tidq = "select todo_tag.todo_id from todo_tag join tags on tags.id = todo_tag.tag_id"
     let tidq_filter_trash = "tags.name = ':trash'"
+    # TODO:
+    #let tidq_filter_trash = $"todo_tag.id in \(($trash_ids | into string | str join ',')\)"
     $cond ++= match [$all ($tags | is-empty)] {
         [true false] => $"true"
         [true true] => $"todo.id not in \(($tidq) where tags.hidden\)"
@@ -367,13 +372,13 @@ export def todo-tag-add [...tags] {
     for tag in $tags {
         let ts = $tag | split row ':'
         mut pid = run $"insert into tag \(parent_id, name\) values \(-1, (Q $ts.0)\)
-            on conflict \(parent_id, name\) do update set id = EXCLUDED.id
+            on conflict \(parent_id, name\) do update set parent_id = EXCLUDED.parent_id
             returning id, name;"
             | get 0.id
         for t in ($ts | range 1..) {
             $pid = run $"insert into tag \(parent_id, name\) values
             \(($pid), (Q $t)\)
-            on conflict \(parent_id, name\) do update set id = EXCLUDED.id
+            on conflict \(parent_id, name\) do update set parent_id = EXCLUDED.parent_id
             returning id, name;"
             | get 0.id
         }

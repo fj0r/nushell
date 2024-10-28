@@ -40,7 +40,7 @@ export def tag-tree [name?: string='tags' --parent-id: int=-1] {
     \), ($n)_1 as \(
         select id, parent_id, hidden, name from ($n)_0 order by length\(name\) desc
     \), ($name) as \(
-        select id, hidden, name from ($n)_1 where parent_id not in \(($pid)\) group by id
+        select id, hidden, name from ($n)_1 where parent_id != -1 group by id
     \)
     "
 }
