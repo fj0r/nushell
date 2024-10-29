@@ -236,7 +236,7 @@ export def todo-list [
     ...tags: any@cmpl-tag
     --parent(-p): int@cmpl-todo-id
     --search(-s): string
-    --all(-a) # show trash
+    --trash(-T) # show trash
     --important(-i): int@cmpl-level
     --urgent(-u): int@cmpl-level
     --challenge(-c): int@cmpl-level
@@ -272,14 +272,14 @@ export def todo-list [
 
     ## A todo may have multiple associated tags
     ## so instead of filtering by tag_id, we need to filter by todo_id
-    # (not $all) show deleted
+    # (not $trash) show deleted
     let exclude_deleted = $"todo.deleted is null"
     # ($tags | is-empty) tags.hidden = 0
     let exclude_tags_hidden = "tags.hidden = 0"
     # ($untagged)
     let include_untagged = "tags.name is null"
-    dbg $debug {all: $all, notags: ($tags | is-empty), untagged: $untagged} -t cond
-    $cond ++= match [$all ($tags | is-empty) $untagged] {
+    dbg $debug {trash: $trash, notags: ($tags | is-empty), untagged: $untagged} -t cond
+    $cond ++= match [$trash ($tags | is-empty) $untagged] {
         # --untagged
         [false true true] => $"($exclude_deleted) and ($include_untagged)"
         #
@@ -288,13 +288,13 @@ export def todo-list [
         [false false true] => $"($exclude_deleted) and ($include_untagged)"
         # tag
         [false false false] => $"($exclude_deleted)"
-        # --all --untagged
+        # --trash --untagged
         [true true true] => $"\(($exclude_tags_hidden) or ($include_untagged)\)"
-        # --all
+        # --trash
         [true true false] => $exclude_tags_hidden
-        # --all [ --untagged tag ]
+        # --trash [ --untagged tag ]
         [true false true] => $include_untagged
-        # --all tag
+        # --trash tag
         [true false false] => "true"
     }
 

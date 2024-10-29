@@ -1,11 +1,11 @@
 tga tag:a:b
 let th = tga hidden
 let h = ta -t [tag:a:b] hastag
-let h1 = ta -p $h.0 hastag1
-let h2 = ta -p $h1.0 hastag2
+let h1 = ta -t [tag:a] hastag1
+let h2 = ta -t [tag] hastag2
 let n = ta notag
-let n1 = ta -p $n.0 notag1
-let n2 = ta -p $n1.0 notag2
+let n1 = ta notag1
+let n2 = ta  notag2
 tt -t [hidden] $h1.0
 tt -t [hidden] $n1.0
 todo-delete $h2.0

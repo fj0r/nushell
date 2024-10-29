@@ -117,6 +117,7 @@
         - [ ] Group tags #397
         - [x] Deleted #404
             - [x] Remove :trash #406
+            - [x] todo-list: --all -> --trash #411
 - [ ] Integration #63
     - [x] More convenient interaction modes #68
         - [x] kebab-case #201

@@ -23,12 +23,12 @@ export def todo-clean [] {
 
 # TODO:
 export def todo-trash [] {
-    todo-list ':trash' --all
+    todo-list --trash
 }
 
 # TODO:
 export def tclean [] {
-    let a = todo-list ':trash' --all
+    let a = todo-list --trash
     print $a
     if ($a | is-empty) { return }
     let p = $'(ansi grey)------(char newline)Perform cleanup?(ansi reset)'
@@ -40,7 +40,7 @@ export def tclean [] {
 
 export def todo-today [
     ...tags: any@cmpl-tag-id
-    --all(-a)
+    --trash(-T)
     --md
     --md-list
     --raw
@@ -52,7 +52,7 @@ export def todo-today [
     let d = (date now) - (date now | format date '%FT00:00:00' | into datetime)
     (todo-list
         ...$tags
-        --updated $d --all=$all
+        --updated $d --trash=$trash
         --md-list=$md_list --md=$md --raw=$raw
         --finished=$finished
         --work-in-process=$work_in_process
