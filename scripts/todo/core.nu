@@ -231,7 +231,7 @@ export def todo-list [
     ...tags: any@cmpl-tag
     --parent(-p): int@cmpl-todo-id
     --search(-s): string
-    --all(-a)
+    --all(-a) # show trash
     --important(-i): int@cmpl-level
     --urgent(-u): int@cmpl-level
     --challenge(-c): int@cmpl-level
@@ -265,14 +265,30 @@ export def todo-list [
 
     mut cond = []
 
-    # A todo may have multiple associated tags
-    # so instead of filtering by tag_id, we need to filter by todo_id
+    ## A todo may have multiple associated tags
+    ## so instead of filtering by tag_id, we need to filter by todo_id
+    # (not $all) show :trash
     let exclude_trash_todo_id = $"todo.id not in \(select todo_id from todo_tag where tag_id in \((tag-trash)\)\)"
-    $cond ++= match [$all ($tags | is-empty)] {
-        [true false] => $"true"
-        [true true] => $"not tags.hidden"
-        [false false] => $exclude_trash_todo_id
-        [false true] => $"($exclude_trash_todo_id) and not tags.hidden"
+    # ($tags | is-empty) tags.hidden = 0
+    let exclude_tags_hidden = "tags.hidden = 0"
+    # ($untagged)
+    let include_untagged = "tags.hidden is null"
+    dbg $debug [$all ($tags | is-empty) $untagged] -t cond
+    $cond ++= match [$all ($tags | is-empty) $untagged] {
+        # --untagged
+        [false true true] => $"($exclude_trash_todo_id) and ($include_untagged)"
+        [false true false] => $"($exclude_trash_todo_id) and ($exclude_tags_hidden)"
+        [false false true] => $"($exclude_trash_todo_id) and ($include_untagged)"
+        # tag
+        [false false false] => $"($exclude_trash_todo_id)"
+        # --all --untagged
+        [true true true] => $"\(($exclude_tags_hidden) or ($include_untagged)\)"
+        # --all
+        [true true false] => $exclude_tags_hidden
+        # --all [ --untagged tag ]
+        [true false true] => $include_untagged
+        # --all tag
+        [true false false] => "true"
     }
 
     mut flt = {and:[], not:[]}
@@ -285,10 +301,6 @@ export def todo-list [
         select id from ids"
         | get id | each { $in | into string } | str join ', '
         $cond ++= $"todo.id in \(select todo_id from todo_tag where tag_id in \(($tags_id)\)\)"
-    } else {
-        if $untagged {
-            $cond ++= $"todo_tag.tag_id is null"
-        }
     }
 
     if ($parent | is-not-empty) {
@@ -313,7 +325,6 @@ export def todo-list [
 
     let $cond = if ($cond | is-empty) { '' } else { $cond | str join ' and ' | $"where ($in)" }
 
-    dbg $debug $cond -t cond
     let stmt = $"with (tag-tree) select ($fields) from todo
         left outer join todo_tag on todo.id = todo_tag.todo_id
         left outer join tags on todo_tag.tag_id = tags.id
