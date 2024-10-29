@@ -90,10 +90,10 @@ def 'fmt leaves' [
     | str join ' '
     |  if $verbose { $"($in)(ansi reset)" } else { $in }
 
-    let body = if $verbose and ($o.description? | is-not-empty) {
-        $o.description
+    let body = if $verbose and ($o.content? | is-not-empty) {
+        $o.content
         | lines
-        | each {$"($endent)(ansi $color.description)($in)(ansi reset)"}
+        | each {$"($endent)(ansi $color.content)($in)(ansi reset)"}
     } else { [] }
 
     [$header ...$body]

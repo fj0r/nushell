@@ -54,7 +54,7 @@ export def todo-add [
         done: (if $done { 1 } else { 0 })
     } | filter-empty
 
-    let keys = [created, updated, title, description, ...($attrs | columns)]
+    let keys = [created, updated, title, content, ...($attrs | columns)]
     | str join ','
 
     let now = date now | fmt-date
@@ -255,7 +255,7 @@ export def todo-list [
     ]
     let fields = [
         "todo.id as id", "todo.parent_id as parent_id",
-        title, description, ...$sortable, relevant,
+        title, content, ...$sortable, relevant,
         "tags.name as tag"
     ] | str join ', '
 
@@ -408,8 +408,8 @@ export def todo-title [id: int@cmpl-todo-id] {
 }
 
 export def todo-body [id: int@cmpl-todo-id] {
-    run $'select description from todo where id = ($id);'
-    | get 0.description
+    run $'select content from todo where id = ($id);'
+    | get 0.content
 }
 
 export def todo-export [

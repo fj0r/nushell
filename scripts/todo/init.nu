@@ -29,7 +29,7 @@ export def --env start [] {
             id INTEGER PRIMARY KEY,
             parent_id INTEGER DEFAULT -1,
             title TEXT NOT NULL,
-            description TEXT DEFAULT '',
+            content TEXT DEFAULT '',
             created TEXT DEFAULT (strftime('%Y-%m-%dT%H:%M:%S','now')),
             updated TEXT DEFAULT (strftime('%Y-%m-%dT%H:%M:%S','now')),
             deadline TEXT,
@@ -63,7 +63,7 @@ export def --env theme [] {
             deadline: xterm_rosybrown
             created: xterm_paleturquoise4
             updated: xterm_lightsalmon3a
-            description: grey
+            content: grey
         }
         symbol: {
             box: [['☐' '🗹' '*'],['[ ]' '[x]' '']]
