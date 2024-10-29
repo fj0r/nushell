@@ -276,8 +276,14 @@ export def todo-list [
     }
 
     if ($tags | is-not-empty) {
-        let ts = $tags | each { Q $in } | str join ', '
-        $cond ++= $"todo.id in \(select todo_id from todo_tag join tags on tag_id = tags.id where tags.name in \(($ts)\)\)"
+        let tags_name = $tags | each { Q $in } | str join ', '
+        let tb = $"id in \(select id from tid\)"
+        let tags_id = $"with (tag-tree), tid as \(
+            select id from tags where name in \(($tags_name)\)
+        \), (tag-branch ids --where $tb) select id from ids"
+        | each { $in | into string }
+        | str join ', '
+        $cond ++= $"todo.id in \(select todo_id from todo_tag join tags on tag_id = tags.id where tags.id in \(($tags_id)\)\)"
     } else {
         if $untagged {
             $cond ++= $"todo_tag.tag_id is null"

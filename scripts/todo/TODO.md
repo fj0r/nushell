@@ -97,8 +97,8 @@
         - [x] parent_id #370
         - [x] Drop category #371
         - [ ] todo-list #372
-            - [ ] hide trash #377
-                - [ ] include children #392
+            - [x] hide trash #377
+                - [x] include children #392
             - [ ] hide tag #385
         - [x] todo-add #373
         - [x] todo-attrs #378
