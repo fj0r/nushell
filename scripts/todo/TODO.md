@@ -96,10 +96,10 @@
     - [ ] Tag tree #369
         - [x] parent_id #370
         - [x] Drop category #371
-        - [ ] todo-list #372
+        - [x] todo-list #372
             - [x] hide trash #377
                 - [x] include children #392
-            - [ ] hide tag #385
+            - [x] hide tag #385
         - [x] todo-add #373
         - [x] todo-attrs #378
             - [x] Add only the last level tag #388

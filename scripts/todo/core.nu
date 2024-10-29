@@ -266,13 +266,11 @@ export def todo-list [
     mut cond = []
     mut flt = {and: [], not: []}
 
-    let tidq = "select todo_tag.todo_id from todo_tag join tags on tags.id = todo_tag.tag_id"
-    let tidq_filter_trash = $"todo_tag.tag_id in \((tag-trash)\)"
     $cond ++= match [$all ($tags | is-empty)] {
         [true false] => $"true"
-        [true true] => $"todo.id not in \(($tidq) where tags.hidden\)"
-        [false false] => $"todo.id not in \(($tidq) where ($tidq_filter_trash)\)"
-        [false true] => $"todo.id not in \(($tidq) where \(($tidq_filter_trash)\) or tags.hidden\)"
+        [true true] => $"not tags.hidden"
+        [false false] => $"todo_tag.tag_id not in \((tag-trash)\)"
+        [false true] => $"todo_tag.tag_id not in \((tag-trash)\) and not tags.hidden"
     }
 
     if ($tags | is-not-empty) {
@@ -396,7 +394,7 @@ export def todo-tag-rename [from:string@cmpl-tag-id to] {
 }
 
 export def todo-tag-hidden [tag:string@cmpl-tag-id] {
-    run $"update tag set hidden = not hidden where id = ($tag)"
+    run $"update tag set hidden = not hidden where id = ($tag) returning hidden"
 }
 
 export def todo-title [id: int@cmpl-todo-id] {
