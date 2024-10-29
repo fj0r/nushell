@@ -265,11 +265,14 @@ export def todo-list [
 
     mut cond = []
 
+    # A todo may have multiple associated tags
+    # so instead of filtering by tag_id, we need to filter by todo_id
+    let exclude_trash_todo_id = $"todo.id not in \(select todo_id from todo_tag where tag_id in \((tag-trash)\)\)"
     $cond ++= match [$all ($tags | is-empty)] {
         [true false] => $"true"
         [true true] => $"not tags.hidden"
-        [false false] => $"todo_tag.tag_id not in \((tag-trash)\)"
-        [false true] => $"todo_tag.tag_id not in \((tag-trash)\) and not tags.hidden"
+        [false false] => $exclude_trash_todo_id
+        [false true] => $"($exclude_trash_todo_id) and not tags.hidden"
     }
 
     mut flt = {and:[], not:[]}
