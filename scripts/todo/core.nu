@@ -284,7 +284,7 @@ export def todo-list [
         \), (tag-branch ids --where 'id in (select id from tid)')
         select id from ids"
         | get id | each { $in | into string } | str join ', '
-        $cond ++= $"todo.id in \(select todo_id from todo_tag join tags on tag_id = tags.id where tags.id in \(($tags_id)\)\)"
+        $cond ++= $"todo.id in \(select todo_id from todo_tag where tag_id in \(($tags_id)\)\)"
     } else {
         if $untagged {
             $cond ++= $"todo_tag.tag_id is null"
