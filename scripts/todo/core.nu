@@ -151,7 +151,7 @@ def 'uplevel done' [pid now done:bool] {
         if $done {
             # Check if all nodes at the current level are Done
             let all_done = (run $"select count\(1\) as c from todo
-                where parent_id = ($p) and deleted is null and done = 0"
+                where parent_id = ($p) and deleted = '' and done = 0"
             | get 0.c | default 0) == 0
             if $all_done {
                 let r = run $"update todo set done = 1, updated = ($now) where id = ($p) returning parent_id;"
@@ -196,7 +196,7 @@ export def todo-delete [
     --reverse(-r)
 ] {
     let now = date now | fmt-date | Q $in
-    let d = if $reverse { null } else { $now }
+    let d = if $reverse { '' } else { $now }
     let ids = $id | str join ','
     let pid = run $"update todo set deleted = ($d) where id in \(($ids)\) returning parent_id;" | get parent_id
     # update parents status
@@ -273,7 +273,7 @@ export def todo-list [
     ## A todo may have multiple associated tags
     ## so instead of filtering by tag_id, we need to filter by todo_id
     # (not $trash) show deleted
-    let exclude_deleted = $"todo.deleted is null"
+    let exclude_deleted = $"todo.deleted = ''"
     # ($tags | is-empty) tags.hidden = 0
     let exclude_tags_hidden = "tags.hidden = 0"
     # ($untagged)
