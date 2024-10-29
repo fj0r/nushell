@@ -29,6 +29,19 @@ export def Q [...t] {
     $"'($s)'"
 }
 
+export def tag-group [] {
+    let x = $in
+    mut $r = { not: [], and: [], normal: [] }
+    for i in $x {
+        match ($i | str substring ..<1) {
+            '!' => { $r.not ++= $i | str substring 1.. }
+            '&' => { $r.and ++= $i | str substring 1.. }
+            _ => { $r.normal ++= $i}
+        }
+    }
+    $r
+}
+
 export def tag-branch [table: string, --where: string] {
     let n = $"($table)_(random chars -l 3)"
     $"($table) as \(

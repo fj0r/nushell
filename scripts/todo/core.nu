@@ -264,7 +264,6 @@ export def todo-list [
     | str join ', '
 
     mut cond = []
-    mut flt = {and: [], not: []}
 
     $cond ++= match [$all ($tags | is-empty)] {
         [true false] => $"true"
@@ -273,7 +272,10 @@ export def todo-list [
         [false true] => $"todo_tag.tag_id not in \((tag-trash)\) and not tags.hidden"
     }
 
+    mut flt = {and:[], not:[]}
     if ($tags | is-not-empty) {
+        $flt = $tags | tag-group
+        let tags = $flt.normal
         let tags_id = run $"with (tag-tree), tid as \(
             select id from tags where name in \(($tags | each {Q $in} | str join ', ')\)
         \), (tag-branch ids --where 'id in (select id from tid)')
@@ -316,7 +318,7 @@ export def todo-list [
     dbg $debug $stmt -t stmt
     let r = run $stmt
     | group-by id
-    | items {|k, x| $x | first | insert tags ($x | select tag) | reject tag }
+    | items {|k, x| $x | first | insert tags ($x | get tag) | reject tag }
 
     let flt = $flt
     let r = if ($flt.and | is-not-empty) or ($flt.not | is-not-empty) {
