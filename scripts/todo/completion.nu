@@ -23,8 +23,7 @@ export def cmpl-todo-id [] {
 }
 
 export def cmpl-tag [] {
-    run $"with (tag-tree) select * from tags" | get name
-
+    run $"with (tag-tree) select * from tags" | get name | filter { $in | is-not-empty }
 }
 
 export def cmpl-tag-id [] {
