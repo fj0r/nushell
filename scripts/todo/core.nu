@@ -276,13 +276,11 @@ export def todo-list [
     }
 
     if ($tags | is-not-empty) {
-        let tags_name = $tags | each { Q $in } | str join ', '
-        let tb = $"id in \(select id from tid\)"
-        let tags_id = $"with (tag-tree), tid as \(
-            select id from tags where name in \(($tags_name)\)
-        \), (tag-branch ids --where $tb) select id from ids"
-        | each { $in | into string }
-        | str join ', '
+        let tags_id = run $"with (tag-tree), tid as \(
+            select id from tags where name in \(($tags | each {Q $in} | str join ', ')\)
+        \), (tag-branch ids --where 'id in (select id from tid)')
+        select id from ids"
+        | get id | each { $in | into string } | str join ', '
         $cond ++= $"todo.id in \(select todo_id from todo_tag join tags on tag_id = tags.id where tags.id in \(($tags_id)\)\)"
     } else {
         if $untagged {
@@ -357,19 +355,21 @@ export def todo-tag-clean [
     ...tags: string@cmpl-tag
     --with-tag(-T)
 ] {
-    let tag_id = run $"with (tag-tree) select id from tags
-        where name in \(($tags | each {Q $in} | str join ', ')\)"
-    | get id
+    let tags_id = run $"with (tag-tree), tid as \(
+        select id from tags where name in \(($tags | each {Q $in} | str join ', ')\)
+    \), (tag-branch ids --where 'id in (select id from tid)')
+    select id from ids"
+    | get id | each { $in | into string } | str join ', '
     let id = run $"delete from todo where id in \(
-        select todo_id from todo_tag where tag_id in \(($tag_id | str join ', ')\)
+        select todo_id from todo_tag where tag_id in \(($tags_id)\)
         \) returning id" | get id
     dbg true -t 'delete todo' $id
     let tid = run $"delete from todo_tag where todo_id in \(($id | str join ', ')\)
         returning todo_id, tag_id"
     dbg true -t 'delete todo_tag' $tid
     if $with_tag {
-        run $"delete from tag where id in \(($tag_id | str join ', ')\)"
-        dbg true -t 'delete tag' $tag_id
+        run $"delete from tag where id in \(($tags_id)\)"
+        dbg true -t 'delete tag' $tags_id
     }
 }
 

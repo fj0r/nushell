@@ -112,6 +112,7 @@
         - [x] remove split-cat #386
         - [ ] Segmented completion cmpl-tag #387
         - [ ] Format tags #394
+        - [x] todo-tag-clean #395
 - [ ] Integration #63
     - [x] More convenient interaction modes #68
         - [x] kebab-case #201
