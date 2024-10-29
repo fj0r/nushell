@@ -152,7 +152,7 @@ def 'uplevel done' [pid now done:bool] {
             # Check if all nodes at the current level are Done
             let all_done = (run $"
                 with (tag-tree), p as \(
-                    select tags.id from tags where name = ':trash'
+                    select tags.id from tags where id in \((tag-trash)\)
                 \), x as \(
                     select d.parent_id, d.id,
                     case t.tag_id in \(p.id\) when true then 0 else 1 end as c
@@ -163,7 +163,12 @@ def 'uplevel done' [pid now done:bool] {
                 \) select sum\(c\) as c from x;
                 " | get 0.c | default 0) == 0
             if $all_done {
-                $p = (run $"update todo set done = 1, updated = ($now) where id = ($p) returning parent_id;" | get 0.parent_id)
+                let r = run $"update todo set done = 1, updated = ($now) where id = ($p) returning parent_id;"
+                if ($r | is-empty) {
+                    break
+                } else {
+                    $p = $r | get 0.parent_id
+                }
             } else {
                 run $"update todo set done = 0, updated = ($now) where id = ($p)"
                 break
@@ -261,13 +266,8 @@ export def todo-list [
     mut cond = []
     mut flt = {and: [], not: []}
 
-    let trash_id = run $"select tag.id from tag join tag as t on tag.id = t.parent_id where tag.name = '' and t.name = 'trash'" | get 0.id
-    let trash_sid = run $"with (tag-tree --parent-id $trash_id) select id from tags" | get id
-    let trash_ids = [$trash_id, ...$trash_sid]
     let tidq = "select todo_tag.todo_id from todo_tag join tags on tags.id = todo_tag.tag_id"
-    let tidq_filter_trash = "tags.name = ':trash'"
-    # TODO:
-    #let tidq_filter_trash = $"todo_tag.id in \(($trash_ids | into string | str join ',')\)"
+    let tidq_filter_trash = $"todo_tag.tag_id in \((tag-trash)\)"
     $cond ++= match [$all ($tags | is-empty)] {
         [true false] => $"true"
         [true true] => $"todo.id not in \(($tidq) where tags.hidden\)"
