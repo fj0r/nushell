@@ -64,8 +64,9 @@ def 'fmt leaves' [
     let verbose = not $md and not $md_list
 
     let tags = if $verbose and ($o.tags? | is-not-empty) {
+        let ct = ansi $color.tag
+        $o.tags | each {|x| $"($ct)($x)" }
         # :TODO:
-        $o.tags | each {|x| $"(ansi $color.tag)($x)" }
         #| group-by cat
         #| items {|k,v| $"(ansi $color.cat)($k):(ansi $color.tag)($v.tag | str join '/')"}
     } else { [] }

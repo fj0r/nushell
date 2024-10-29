@@ -38,7 +38,7 @@
         - [x] Detection of nodes under other paths #44
         - [x] Detection on adding nodes #45
         - [x] Display message abnormalities #46
-        - [ ] Recursive CTE #53
+        - [x] Recursive CTE #53
         - [ ] Return the data structure for easy reuse by other UIs #74
         - [x] Detection on moving nodes #361
         - [x] `uplevel done` ignore :trash #362
@@ -63,6 +63,7 @@
         - [x] remove tail space #61
         - [x] List format (no checkbox) #237
     - [x] Policy for displaying dangling nodes #40
+        - [x] distinct dangling nodes #398
     - [x] Display issue when tags is empty #41
     - [x] Details should be more prominent than metadata #47
     - [x] View `:trash` #50
@@ -113,6 +114,7 @@
         - [ ] Segmented completion cmpl-tag #387
         - [x] Format tags #394
         - [x] todo-tag-clean #395
+        - [ ] Group tags #397
 - [ ] Integration #63
     - [x] More convenient interaction modes #68
         - [x] kebab-case #201

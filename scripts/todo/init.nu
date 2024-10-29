@@ -66,7 +66,7 @@ export def --env theme [] {
             description: grey
         }
         symbol: {
-            box: [['☐' '🗹'],['[ ]' '[x]']]
+            box: [['☐' '🗹' '*'],['[ ]' '[x]' '']]
             md_list: '-'
         }
         formatter: {

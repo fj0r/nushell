@@ -336,12 +336,12 @@ export def todo-list [
         $r
     } else {
         let ids = $r | get id | str join ', '
-        let fp = [id, parent_id, title, done]
+        let fp = [id, parent_id, title]
         let ft = $fp | each { $"t.($in)" } | str join ', '
         let x = run $"with recursive p as \(
-            select ($fp | str join ', ') from todo where id in \(($ids)\)
+            select ($fp | str join ', '), 2 as done from todo where id in \(($ids)\)
             union all
-            select ($ft) from todo as t join p on p.parent_id = t.id
+            select ($ft), 2 as done from todo as t join p on p.parent_id = t.id
             \) select * from p;"
         $r | append $x | uniq-by id
     }
