@@ -396,6 +396,7 @@ export def todo-tag-clean [
 
 # add tag
 export def todo-tag-add [...tags] {
+    mut ids = []
     for tag in $tags {
         let ts = $tag | split row ':'
         mut pid = run $"insert into tag \(parent_id, name\) values \(-1, (Q $ts.0)\)
@@ -409,14 +410,16 @@ export def todo-tag-add [...tags] {
             returning id, name;"
             | get 0.id
         }
+        $ids ++= $pid
     }
+    return $ids
 }
 
 export def todo-tag-rename [from:string@cmpl-tag-id to] {
     run $"update tag set name = (Q $to) where id = ($from)"
 }
 
-export def todo-tag-hidden [tag:string@cmpl-tag-id] {
+export def todo-tag-hidden [tag:int@cmpl-tag-id] {
     run $"update tag set hidden = not hidden where id = ($tag) returning hidden"
 }
 

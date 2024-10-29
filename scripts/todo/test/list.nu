@@ -1,14 +1,20 @@
 tga tag:a:b
+let th = tga hidden
 let h = ta -t [tag:a:b] hastag
 let h1 = ta -p $h.0 hastag1
 let h2 = ta -p $h1.0 hastag2
 let n = ta notag
 let n1 = ta -p $n.0 notag1
 let n2 = ta -p $n1.0 notag2
-tt -t [:trash] $h2.0
-tt -t [:trash] $n2.0
+tt -t [hidden] $h1.0
+tt -t [hidden] $n1.0
+todo-delete $h2.0
+todo-delete $n2.0
 alias tx = tl #--debug
 for c in [[cond, name, act];
+    ['', 'tl' { tx }]
+    ['', 'toggle hidden', { todo-tag-hidden $th.0 }]
+    ['', 'tl hidden' { tx }]
     ['FTT', 'tl --untagged', { tx --untagged }]
     ['FTF', tl, { tx }]
     ['FFT', 'tl tag --untagged', { tx --untagged  tag}]
