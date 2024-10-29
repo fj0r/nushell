@@ -42,7 +42,7 @@
         - [ ] Return the data structure for easy reuse by other UIs #74
         - [x] Detection on moving nodes #361
         - [x] `uplevel done` ignore :trash #362
-            - [ ] Detection on removing nodes #144
+            - [x] Detection on removing nodes #144
     - [x] Set `updated` on Done #35
     - [x] todo attrs (tt) #48
         - [x] Special handling for `-x` #112
@@ -115,6 +115,7 @@
         - [x] Format tags #394
         - [x] todo-tag-clean #395
         - [ ] Group tags #397
+        - [x] Deleted #404
 - [ ] Integration #63
     - [x] More convenient interaction modes #68
         - [x] kebab-case #201

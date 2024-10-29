@@ -15,8 +15,6 @@ export def --env start [] {
             name TEXT NOT NULL,
             hidden BOOLEAN DEFAULT 0
         );"
-        "INSERT INTO tag (id, name) VALUES (1, '');"
-        "INSERT INTO tag (parent_id, name) VALUES (1, 'trash');"
         "CREATE TABLE IF NOT EXISTS scratch (
             id INTEGER PRIMARY KEY,
             parent_id INTEGER DEFAULT -1,
@@ -25,6 +23,7 @@ export def --env start [] {
             content TEXT DEFAULT '',
             created TEXT DEFAULT (strftime('%Y-%m-%dT%H:%M:%S','now')),
             updated TEXT DEFAULT (strftime('%Y-%m-%dT%H:%M:%S','now')),
+            deleted TEXT,
             important INTEGER DEFAULT -1,
             urgent INTEGER DEFAULT -1,
             challenge INTEGER DEFAULT -1

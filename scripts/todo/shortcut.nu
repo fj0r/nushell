@@ -16,14 +16,17 @@ export def todo-commit [
     git commit ...$a -m $"(todo-title $todo) #($todo)"
 }
 
+# TODO:
 export def todo-clean [] {
     todo-tag-clean ':trash'
 }
 
+# TODO:
 export def todo-trash [] {
     todo-list ':trash' --all
 }
 
+# TODO:
 export def tclean [] {
     let a = todo-list ':trash' --all
     print $a

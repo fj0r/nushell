@@ -150,18 +150,9 @@ def 'uplevel done' [pid now done:bool] {
     loop {
         if $done {
             # Check if all nodes at the current level are Done
-            let all_done = (run $"
-                with (tag-tree), p as \(
-                    select tags.id from tags where id in \((tag-trash)\)
-                \), x as \(
-                    select d.parent_id, d.id,
-                    case t.tag_id in \(p.id\) when true then 0 else 1 end as c
-                    from p, todo as d
-                    join todo_tag as t on d.id = t.todo_id
-                    where d.parent_id = ($p) and d.done = 0
-                    group by d.id, d.done
-                \) select sum\(c\) as c from x;
-                " | get 0.c | default 0) == 0
+            let all_done = (run $"select count\(1\) as c from todo
+                where parent_id = ($p) and deleted is null and done = 0"
+            | get 0.c | default 0) == 0
             if $all_done {
                 let r = run $"update todo set done = 1, updated = ($now) where id = ($p) returning parent_id;"
                 if ($r | is-empty) {
@@ -199,6 +190,21 @@ export def todo-done [
     }
 }
 
+# done delete
+export def todo-delete [
+    ...id: int@cmpl-todo-id
+    --reverse(-r)
+] {
+    let now = date now | fmt-date | Q $in
+    let d = if $reverse { null } else { $now }
+    let ids = $id | str join ','
+    let pid = run $"update todo set deleted = ($d) where id in \(($ids)\) returning parent_id;" | get parent_id
+    # update parents status
+    for i in $pid {
+        uplevel done $i $now (not $reverse)
+    }
+}
+
 # todo edit
 export def todo-edit [
     id: int@cmpl-todo-id
@@ -211,7 +217,6 @@ export def todo-edit [
     | from yaml
     | update updated (date now | fmt-date)
     | db-upsert todo id
-
 }
 
 # todo move
@@ -267,20 +272,22 @@ export def todo-list [
 
     ## A todo may have multiple associated tags
     ## so instead of filtering by tag_id, we need to filter by todo_id
-    # (not $all) show :trash
-    let exclude_trash_todo_id = $"todo.id not in \(select todo_id from todo_tag where tag_id in \((tag-trash)\)\)"
+    # (not $all) show deleted
+    let exclude_deleted = $"todo.deleted is null"
     # ($tags | is-empty) tags.hidden = 0
     let exclude_tags_hidden = "tags.hidden = 0"
     # ($untagged)
-    let include_untagged = "tags.hidden is null"
-    dbg $debug [$all ($tags | is-empty) $untagged] -t cond
+    let include_untagged = "tags.name is null"
+    dbg $debug {all: $all, notags: ($tags | is-empty), untagged: $untagged} -t cond
     $cond ++= match [$all ($tags | is-empty) $untagged] {
         # --untagged
-        [false true true] => $"($exclude_trash_todo_id) and ($include_untagged)"
-        [false true false] => $"($exclude_trash_todo_id) and ($exclude_tags_hidden)"
-        [false false true] => $"($exclude_trash_todo_id) and ($include_untagged)"
+        [false true true] => $"($exclude_deleted) and ($include_untagged)"
+        #
+        [false true false] => $"($exclude_deleted) and ($exclude_tags_hidden)"
+        # [ --untagged tag ]
+        [false false true] => $"($exclude_deleted) and ($include_untagged)"
         # tag
-        [false false false] => $"($exclude_trash_todo_id)"
+        [false false false] => $"($exclude_deleted)"
         # --all --untagged
         [true true true] => $"\(($exclude_tags_hidden) or ($include_untagged)\)"
         # --all
