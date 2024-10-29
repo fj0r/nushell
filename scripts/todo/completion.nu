@@ -23,12 +23,12 @@ export def cmpl-todo-id [] {
 }
 
 export def cmpl-tag [] {
-    run $"(tag-tree) select * from tags" | get name
+    run $"with (tag-tree) select * from tags" | get name
 
 }
 
 export def cmpl-tag-id [] {
-   run $"(tag-tree) select * from tags" | each { $"($in.id) # ($in.name)" }
+   run $"with (tag-tree) select * from tags" | each { $"($in.id) # ($in.name)" }
 }
 
 export def cmpl-todo-md [] {

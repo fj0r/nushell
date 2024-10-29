@@ -74,7 +74,7 @@ export def todo-add [
     mut tag = $tag | default []
     # Inheriting tags when child nodes are added
     if ($parent | is-not-empty) {
-        let t = run $"(tag-tree) select tags.name
+        let t = run $"with (tag-tree) select tags.name
         from todo join todo_tag on todo.id = todo_tag.todo_id
         join tags on todo_tag.tag_id = tags.id
         where todo.id = ($parent)"
@@ -83,7 +83,7 @@ export def todo-add [
     }
     if ($tag | is-not-empty) {
         for id in $ids {
-            run $"(tag-tree) insert into todo_tag
+            run $"with (tag-tree) insert into todo_tag
             select ($id) as todo_id, tags.id as tag_id
             from tags where tags.name in \(($tag | each { Q $in } | str join ', ')\);"
         }
@@ -132,12 +132,12 @@ export def todo-attrs [
 
     if ($tag | is-not-empty) {
         if $remove {
-            let children = run $"(tag-tree) select tags.id from tags where name in \(($tag | each {Q $in} | str join ',')\)" | get id
+            let children = run $"with (tag-tree) select tags.id from tags where name in \(($tag | each {Q $in} | str join ',')\)" | get id
             run $"delete from todo_tag where todo_id in \(($ids | str join ',')\) and tag_id in \(($children | str join ',')\);"
         } else {
             for id in $ids {
                 let children = $"select ($id), tags.id from tags where name in \(($tag | each {Q $in} | str join ',')\)"
-                run $"(tag-tree) insert into todo_tag ($children)
+                run $"with (tag-tree) insert into todo_tag ($children)
                   on conflict \(todo_id, tag_id\) do nothing
                 ;"
             }
@@ -151,7 +151,7 @@ def 'uplevel done' [pid now done:bool] {
         if $done {
             # Check if all nodes at the current level are Done
             let all_done = (run $"
-                (tag-tree), p as \(
+                with (tag-tree), p as \(
                     select tags.id from tags where name = ':trash'
                 \), x as \(
                     select d.parent_id, d.id,
@@ -262,7 +262,7 @@ export def todo-list [
     mut flt = {and: [], not: []}
 
     let trash_id = run $"select tag.id from tag join tag as t on tag.id = t.parent_id where tag.name = '' and t.name = 'trash'" | get 0.id
-    let trash_sid = run $"(tag-tree --parent-id $trash_id) select id from tags" | get id
+    let trash_sid = run $"with (tag-tree --parent-id $trash_id) select id from tags" | get id
     let trash_ids = [$trash_id, ...$trash_sid]
     let tidq = "select todo_tag.todo_id from todo_tag join tags on tags.id = todo_tag.tag_id"
     let tidq_filter_trash = "tags.name = ':trash'"
@@ -307,7 +307,7 @@ export def todo-list [
     let $cond = if ($cond | is-empty) { '' } else { $cond | str join ' and ' | $"where ($in)" }
 
     dbg $debug $cond -t cond
-    let stmt = $"(tag-tree) select ($fields) from todo
+    let stmt = $"with (tag-tree) select ($fields) from todo
         left outer join todo_tag on todo.id = todo_tag.todo_id
         left outer join tags on todo_tag.tag_id = tags.id
         ($cond) order by ($sort);"
@@ -351,7 +351,7 @@ export def todo-tag-clean [
     ...tags: string@cmpl-tag
     --with-tag(-T)
 ] {
-    let tag_id = run $"(tag-tree) select id from tags
+    let tag_id = run $"with (tag-tree) select id from tags
         where name in \(($tags | each {Q $in} | str join ', ')\)"
     | get id
     let id = run $"delete from todo where id in \(
