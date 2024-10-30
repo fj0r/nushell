@@ -23,7 +23,7 @@ export def --env start [] {
             content TEXT DEFAULT '',
             created TEXT DEFAULT (strftime('%Y-%m-%dT%H:%M:%S','now')),
             updated TEXT DEFAULT (strftime('%Y-%m-%dT%H:%M:%S','now')),
-            deleted TEXT,
+            deleted TEXT DEFAULT '',
             important INTEGER DEFAULT -1,
             urgent INTEGER DEFAULT -1,
             challenge INTEGER DEFAULT -1
