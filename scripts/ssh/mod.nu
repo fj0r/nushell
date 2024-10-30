@@ -1,5 +1,6 @@
 export use scp.nu *
 export use x.nu *
+export use data.nu
 use parse.nu *
 
 
