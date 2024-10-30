@@ -221,7 +221,7 @@ export def todo-edit [
 ] {
     let d = run $"select * from todo where id = ($id)"
     | first
-    | reject id parent_id deleted deadline created updated
+    | reject id parent_id created updated deleted deadline relevant
     | to yaml
     | $"### Do not change the `id` \n($in)"
     | block-edit $"todo.XXX.yml"
