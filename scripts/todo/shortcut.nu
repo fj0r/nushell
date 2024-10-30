@@ -32,7 +32,7 @@ export def tclean [] {
 }
 
 export def todo-today [
-    ...tags: any@cmpl-tag-id
+    ...tags: any@cmpl-tag
     --trash(-T)
     --md
     --md-list
