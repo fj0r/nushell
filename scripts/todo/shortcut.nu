@@ -29,7 +29,7 @@ export def tclean [] {
     let p = $'(ansi grey)------(char newline)Perform cleanup?(ansi reset)'
     let c = [yes no] | input list $p | str starts-with 'y'
     if $c {
-        todo-tag-clean ':trash'
+        todo-clean
     }
 }
 

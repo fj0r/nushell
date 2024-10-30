@@ -34,12 +34,12 @@
         - [x] Batch Done #32
         - [x] Batch addition #39
         - [x] Batch attr #51
-    - [ ] Check parent node when operating on `done` status #34
+    - [x] Check parent node when operating on `done` status #34
         - [x] Detection of nodes under other paths #44
         - [x] Detection on adding nodes #45
         - [x] Display message abnormalities #46
         - [x] Recursive CTE #53
-        - [ ] Return the data structure for easy reuse by other UIs #74
+        - [x] Return the data structure for easy reuse by other UIs #74
         - [x] Detection on moving nodes #361
         - [x] `uplevel done` ignore :trash #362
             - [x] Detection on removing nodes #144

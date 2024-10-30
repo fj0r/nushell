@@ -19,10 +19,10 @@ for c in [[cond, name, act];
     ['FTF', tl, { tx }]
     ['FFT', 'tl tag --untagged', { tx --untagged  tag}]
     ['FFF', 'tl tag', { tx tag }]
-    ['TTT', 'tl --untagged --all', { tx --all --untagged }]
-    ['TTF', 'tl --all', { tx --all }]
-    ['TFT', 'tl tag --untagged --all', { tx --all --untagged  tag}]
-    ['TFF', 'tl tag --all', { tx --all tag }]
+    ['TTT', 'tl --untagged --trash', { tx --trash --untagged }]
+    ['TTF', 'tl --trash', { tx --trash }]
+    ['TFT', 'tl tag --untagged --trash', { tx --trash --untagged  tag}]
+    ['TFF', 'tl tag --trash', { tx --trash tag }]
 ] {
     lg level 1 {c: $c.cond} $c.name
     do $c.act | print $in

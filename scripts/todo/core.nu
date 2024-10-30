@@ -209,8 +209,8 @@ export def todo-clean [] {
     let tags = run $"delete from todo_tag where todo_id in \(select id from todo where deleted != ''\) returning todo_id, tag_id"
     let todo = run $"delete from todo where deleted != '' returning id"
     {
-        tags: $tags
         todo: $todo
+        todo_tags: $tags
     }
 }
 
@@ -392,13 +392,16 @@ export def todo-tag-clean [
     let id = run $"delete from todo where id in \(
         select todo_id from todo_tag where tag_id in \(($tags_id)\)
         \) returning id" | get id
-    dbg true -t 'delete todo' $id
     let tid = run $"delete from todo_tag where todo_id in \(($id | str join ', ')\)
         returning todo_id, tag_id"
-    dbg true -t 'delete todo_tag' $tid
-    if $with_tag {
+    let tags = if $with_tag {
         run $"delete from tag where id in \(($tags_id)\)"
-        dbg true -t 'delete tag' $tags_id
+        $tags_id
+    }
+    {
+        todo: $id
+        todo_tags: $tid
+        tags: $tags
     }
 }
 
