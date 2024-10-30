@@ -431,7 +431,7 @@ export def kube-top-pod [
 }
 
 # kubectl top node
-export def ktno [] {
+export def kube-top-node [] {
     kubectl top node | from ssv -a | rename name cpu pcpu mem pmem
     | each {|x| {
         name: $x.name
