@@ -24,7 +24,7 @@
     - [x] `todo-today` #291
     - [x] Add `--parent` into `todo-list` #292
     - [x] Search #336
-    - [ ] Complex filter #414
+    - [x] Complex filter #414
 - [ ] Actions #22
     - [x] Category #11
         - [x] Allow creation of multiple tags under one category at once #13

@@ -292,23 +292,20 @@ export def todo-list [
     # ($untagged)
     let include_untagged = "tags.name is null"
     dbg $debug {trash: $trash, notags: ($tags | is-empty), untagged: $untagged} -t cond
-    $cond ++= match [$trash ($tags | is-empty) $untagged] {
+    $cond ++= match [($tags | is-empty) $untagged] {
         # --untagged
-        [false true true] => $"($exclude_deleted.0) and ($include_untagged)"
+        [true true] => $include_untagged
         #
-        [false true false] => $"($exclude_deleted.0) and ($exclude_tags_hidden)"
+        [true false] => $exclude_tags_hidden
         # [ --untagged tag ]
-        [false false true] => $"($exclude_deleted.0) and ($include_untagged)"
+        [false true] => $include_untagged
         # tag
-        [false false false] => $"($exclude_deleted.0)"
-        # --trash --untagged
-        [true true true] => $"\(($exclude_tags_hidden) or ($include_untagged)\)"
-        # --trash
-        [true true false] => $"($exclude_deleted.1) and ($exclude_tags_hidden)"
-        # --trash [ --untagged tag ]
-        [true false true] => $include_untagged
-        # --trash tag
-        [true false false] => "true"
+        [false false] => ""
+    }
+    | do { let x = $in
+        [($exclude_deleted | get ($trash | into int)) $x]
+        | filter { $in | is-not-empty}
+        | str join ' and '
     }
 
     mut flt = {and:[], not:[]}
