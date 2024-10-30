@@ -36,5 +36,4 @@ export def --env start [] {
     ] {
         run $s
     }
-
 }
