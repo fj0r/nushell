@@ -4,11 +4,20 @@ export def --env start [] {
     if 'SSH_DB' not-in $env {
         $env.SSH_DB = [$nu.data-dir 'ssh.db'] | path join
     }
+    if 'SSH_ENV' not-in $env {
+        $env.SSH_ENV = 'default'
+    }
     if ($env.SSH_DB | path exists) { return }
     {_: '.'} | into sqlite -t _ $env.SSH_DB
     print $"(ansi grey)created database: $env.SSH_DB(ansi reset)"
     for s in [
         "DROP TABLE _;"
+        "CREATE TABLE IF NOT EXISTS env (
+            id INTEGER PRIMARY KEY,
+            name TEXT NOT NULL,
+            description TEXT DEFAULT ''
+        );"
+        "INSERT into env (name) values ('default');"
         "CREATE TABLE IF NOT EXISTS tag (
             id INTEGER PRIMARY KEY,
             parent_id INTEGER DEFAULT -1,
@@ -42,14 +51,16 @@ export def --env start [] {
             deleted TEXT DEFAULT ''
         );"
         "CREATE TABLE IF NOT EXISTS ssh_key (
+            env_id INTEGER NOT NULL,
             ssh_name TEXT NOT NULL,
             key_name TEXT NOT NULL,
-            PRIMARY KEY (ssh_name, key_name)
+            PRIMARY KEY (env_id, ssh_name, key_name)
         );"
         "CREATE TABLE IF NOT EXISTS ssh_host (
+            env_id INTEGER NOT NULL,
             ssh_name TEXT NOT NULL,
             host_name TEXT NOT NULL,
-            PRIMARY KEY (ssh_name, host_name)
+            PRIMARY KEY (env_id, ssh_name, host_name)
         );"
         "CREATE TABLE IF NOT EXISTS ssh_tag (
             ssh_name TEXT NOT NULL,
