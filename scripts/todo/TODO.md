@@ -120,6 +120,7 @@
             - [x] Remove :trash #405
             - [x] todo-list: --all -> --trash #407
     - [x] Edit #413
+        - [x] relevant references #422
 - [ ] Integration #63
     - [x] More convenient interaction modes #68
         - [x] kebab-case #201

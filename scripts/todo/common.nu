@@ -72,19 +72,6 @@ export def dbg [switch content -t:string] {
     }
 }
 
-export def db-upsert [table pk --do-nothing] {
-    let r = $in
-    let d = if $do_nothing { 'NOTHING' } else {
-        $"UPDATE SET ($r| items {|k,v | $"($k)=(Q $v)" } | str join ', ')"
-    }
-    let u = $"INSERT INTO ($table)\(($r | columns | str join ', ')\)
-        VALUES\(($r | values | each {Q $in} | str join ', ')\)
-        ON CONFLICT\(($pk)\) DO ($d) returning id"
-    # HACK: It seems to be an issue with nushell
-    # return (run $u)
-    $u | sqlite3 $env.TODO_DB
-}
-
 export def 'str plain' [] {
     $in | str replace -ra '\e\[.*?m' ''
 }

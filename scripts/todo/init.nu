@@ -37,7 +37,7 @@ export def --env start [] {
             challenge INTEGER DEFAULT -1,
             value REAL DEFAULT 0,
             done BOOLEAN DEFAULT -1,
-            relevant INTEGER REFERENCES person(id)
+            relevant INTEGER -- REFERENCES person(id)
         );"
         "CREATE TABLE IF NOT EXISTS todo_tag (
             todo_id INTEGER NOT NULL,

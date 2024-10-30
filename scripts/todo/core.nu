@@ -219,14 +219,19 @@ export def todo-clean [] {
 export def todo-edit [
     id: int@cmpl-todo-id
 ] {
-    run $"select * from todo where id = ($id);"
+    let d = run $"select * from todo where id = ($id)"
     | first
+    | reject id parent_id deleted deadline created updated
     | to yaml
     | $"### Do not change the `id` \n($in)"
     | block-edit $"todo.XXX.yml"
     | from yaml
-    | update updated (date now | fmt-date)
-    | db-upsert todo id
+    | upsert updated (date now | fmt-date)
+    | items {|k, v|
+        $"($k) = (Q $v)"
+    }
+    | str join ', '
+    run $"update todo set ($d) where id = ($id) returning id"
 }
 
 # todo move
