@@ -205,6 +205,16 @@ export def todo-delete [
     }
 }
 
+export def todo-clean [] {
+    let tags = run $"delete from todo_tag where todo_id in \(select id from todo where deleted != ''\) returning todo_id, tag_id"
+    let todo = run $"delete from todo where deleted != '' returning id"
+    {
+        tags: $tags
+        todo: $todo
+    }
+}
+
+
 # todo edit
 export def todo-edit [
     id: int@cmpl-todo-id
@@ -270,10 +280,8 @@ export def todo-list [
 
     mut cond = []
 
-    ## A todo may have multiple associated tags
-    ## so instead of filtering by tag_id, we need to filter by todo_id
-    # (not $trash) show deleted
-    let exclude_deleted = $"todo.deleted = ''"
+    # (not $trash) hide deleted
+    let exclude_deleted = ["todo.deleted = ''", "todo.deleted != ''"]
     # ($tags | is-empty) tags.hidden = 0
     let exclude_tags_hidden = "tags.hidden = 0"
     # ($untagged)
@@ -281,17 +289,17 @@ export def todo-list [
     dbg $debug {trash: $trash, notags: ($tags | is-empty), untagged: $untagged} -t cond
     $cond ++= match [$trash ($tags | is-empty) $untagged] {
         # --untagged
-        [false true true] => $"($exclude_deleted) and ($include_untagged)"
+        [false true true] => $"($exclude_deleted.0) and ($include_untagged)"
         #
-        [false true false] => $"($exclude_deleted) and ($exclude_tags_hidden)"
+        [false true false] => $"($exclude_deleted.0) and ($exclude_tags_hidden)"
         # [ --untagged tag ]
-        [false false true] => $"($exclude_deleted) and ($include_untagged)"
+        [false false true] => $"($exclude_deleted.0) and ($include_untagged)"
         # tag
-        [false false false] => $"($exclude_deleted)"
+        [false false false] => $"($exclude_deleted.0)"
         # --trash --untagged
         [true true true] => $"\(($exclude_tags_hidden) or ($include_untagged)\)"
         # --trash
-        [true true false] => $exclude_tags_hidden
+        [true true false] => $"($exclude_deleted.1) and ($exclude_tags_hidden)"
         # --trash [ --untagged tag ]
         [true false true] => $include_untagged
         # --trash tag

@@ -17,11 +17,6 @@ export def todo-commit [
 }
 
 # TODO:
-export def todo-clean [] {
-    todo-tag-clean ':trash'
-}
-
-# TODO:
 export def todo-trash [] {
     todo-list --trash
 }

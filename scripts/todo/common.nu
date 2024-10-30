@@ -77,6 +77,7 @@ export def db-upsert [table pk --do-nothing] {
         VALUES\(($r | values | each {Q $in} | str join ',')\)
         ON CONFLICT\(($pk)\) DO ($d) returning id;"
         print $u
+    # TODO: xxx
     return (run $u)
 }
 
