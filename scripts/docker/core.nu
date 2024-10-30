@@ -103,13 +103,10 @@ export def container-list [
     }
 }
 
-def parse-img [] {
-    let n = $in | split row ':'
-    let tag = $n.1? | default 'latest'
-    let repo = $n.0 | split row '/'
-    let image = $repo | last
-    let repo = $repo | range 0..-2 | str join '/'
-    {image: $image, tag: $tag, repo: $repo}
+export def parse-img [] {
+    $in
+    | parse --regex '(?<repo>[^/\<\>]*)/?(?<image>.+):(?<tag>.*)$'
+    | get -i 0
 }
 
 # list images
@@ -124,15 +121,16 @@ export def image-list [
             | lines
             | each {|x|
                 let x = $x | from json
-                let img = $x.repo | parse-img
+                let name = $"($x.repo):($x.tag)"
+                let img = $name | parse-img
                 {
-                    name: $"($x.repo):($x.tag)"
+                    name: $name
                     id: $x.id
                     created: ($x.created | into datetime)
                     size: ($x.size | into filesize)
-                    repo: $img.repo
-                    image: $img.image
-                    tag: $x.tag
+                    repo: $img.repo?
+                    image: $img.image?
+                    tag: $x.tag?
                 }
             }
     } else {
