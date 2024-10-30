@@ -35,6 +35,8 @@ export def --env start [] {
         "CREATE TABLE IF NOT EXISTS ssh (
             name TEXT PRIMARY KEY,
             user TEXT NOT NULL DEFAULT 'root',
+            permanent TEXT DEFAULT '', -- 'config.d/git'
+            options TEXT DEFAULT '',
             created TEXT DEFAULT (strftime('%Y-%m-%dT%H:%M:%S','now')),
             updated TEXT DEFAULT (strftime('%Y-%m-%dT%H:%M:%S','now')),
             deleted TEXT DEFAULT ''
