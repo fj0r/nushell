@@ -1,3 +1,7 @@
+export def run [stmt] {
+    open $env.TODO_DB | query db $stmt
+}
+
 export def fmt-date [] {
     $in | format date '%FT%H:%M:%S'
 }
@@ -71,18 +75,14 @@ export def dbg [switch content -t:string] {
 export def db-upsert [table pk --do-nothing] {
     let r = $in
     let d = if $do_nothing { 'NOTHING' } else {
-        $"UPDATE SET ($r| items {|k,v | $"($k)=(Q $v)" } | str join ',')"
+        $"UPDATE SET ($r| items {|k,v | $"($k)=(Q $v)" } | str join ', ')"
     }
-    let u = $"INSERT INTO ($table)\(($r | columns | str join ',')\)
-        VALUES\(($r | values | each {Q $in} | str join ',')\)
-        ON CONFLICT\(($pk)\) DO ($d) returning id;"
-        print $u
-    # TODO: xxx
-    return (run $u)
-}
-
-export def run [stmt] {
-    open $env.TODO_DB | query db $stmt
+    let u = $"INSERT INTO ($table)\(($r | columns | str join ', ')\)
+        VALUES\(($r | values | each {Q $in} | str join ', ')\)
+        ON CONFLICT\(($pk)\) DO ($d) returning id"
+    # HACK: It seems to be an issue with nushell
+    # return (run $u)
+    $u | sqlite3 $env.TODO_DB
 }
 
 export def 'str plain' [] {

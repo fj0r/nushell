@@ -24,6 +24,7 @@
     - [x] `todo-today` #291
     - [x] Add `--parent` into `todo-list` #292
     - [x] Search #336
+    - [ ] Complex filter #414
 - [ ] Actions #22
     - [x] Category #11
         - [x] Allow creation of multiple tags under one category at once #13
@@ -77,7 +78,7 @@
     - [x] Deadline #83
         - [x] Done Todo do not show deadline #84
         - [x] Different styles for timeout and no deadline #85
-    - [ ] Change `print message` to return the `message` data structure #101
+    - [x] Change `print message` to return the `message` data structure #101
     - [ ] Mind Map #145
     - [x] Optimize `fmt leaves` #183
         - [x] Reduce string concatenation (SQLite) and splitting. #351
@@ -118,6 +119,7 @@
         - [x] Deleted #404
             - [x] Remove :trash #405
             - [x] todo-list: --all -> --trash #407
+    - [x] Edit #413
 - [ ] Integration #63
     - [x] More convenient interaction modes #68
         - [x] kebab-case #201
