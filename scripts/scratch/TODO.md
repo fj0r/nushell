@@ -1,4 +1,4 @@
-- [x] Scratch.nu #190
+- [ ] Scratch.nu #190
     - [x] Edit or Output #192
     - [x] If no id is provided, get the latest #195
     - [x] New table `scratch`, `scratch_tag` #199
@@ -15,3 +15,4 @@
     - [x] `scratch-add` can read content from stdin. #229
     - [x] scratch.nu as an independent project #364
     - [x] Filter empty #366
+    - [ ] Code Runner #427
