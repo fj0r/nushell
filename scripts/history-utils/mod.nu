@@ -107,6 +107,7 @@ export def 'history top' [
         orderBy: [[count desc]]
         limit: $num
     })
+    | histogram-column count
 }
 
 def cmpl-interval [] {
