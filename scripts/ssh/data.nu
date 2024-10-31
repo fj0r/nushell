@@ -91,7 +91,7 @@ export def --env start [] {
 export def load [] {
     for s in (ssh-list) {
         print $s
-        let tag = $s | split '/' | last
+        let tag = $s.Group | split row '/' | last
         let tag_id = run $"select id from tag where name = (Q $tag)"
         let tag_id = if ($tag_id | is-empty) {
             run $"insert into tag \(name\) values \((Q $tag)\) returning id"
@@ -102,7 +102,7 @@ export def load [] {
         let user = Q ($s.User? | default 'root')
         let addr = Q $s.HostName
         let port = Q ($s.Port? | default '22')
-        let keyname = $s.IdentityFile | split '/' | last
+        let keyname = $s.IdentityFile | split row '/' | last
         let pubkey = if ($"($s.IdentityFile).pub" | path exists) { open $"($s.IdentityFile).pub" }
         let prikey = open $s.IdentityFile
         run $"insert into key \(name, type, public_key, private_key\) values \((Q $keyname), 'ed25519', ($pubkey), ($prikey)\)"
