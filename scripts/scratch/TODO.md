@@ -22,3 +22,4 @@
         - [x] Shortcut `scratch-find` #436
     - [x] Clean #438
         - [x] --untitled #439
+    - [ ] Logical/strict command combinations #441

@@ -355,21 +355,25 @@ export def todo-list [
         $r
     }
 
-    let r = if $no_branch {
+
+    if $raw {
         $r
     } else {
-        let ids = $r | get id | str join ', '
-        let fp = [id, parent_id, title]
-        let ft = $fp | each { $"t.($in)" } | str join ', '
-        let x = run $"with recursive p as \(
-            select ($fp | str join ', '), 2 as done from todo where id in \(($ids)\)
-            union all
-            select ($ft), 2 as done from todo as t join p on p.parent_id = t.id
-            \) select * from p;"
-        $r | append $x | uniq-by id
+        if $no_branch {
+            $r
+        } else {
+            let ids = $r | get id | str join ', '
+            let fp = [id, parent_id, title]
+            let ft = $fp | each { $"t.($in)" } | str join ', '
+            let x = run $"with recursive p as \(
+                select ($fp | str join ', '), 2 as done from todo where id in \(($ids)\)
+                union all
+                select ($ft), 2 as done from todo as t join p on p.parent_id = t.id
+                \) select * from p;"
+            $r | append $x | uniq-by id
+        }
+        | todo-format --md=$md --md-list=$md_list
     }
-
-    if $raw { $r } else { $r | todo-format --md=$md --md-list=$md_list }
 }
 
 
