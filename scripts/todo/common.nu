@@ -87,3 +87,16 @@ export def 'filter-empty' [] {
         }
     }
 }
+
+export def skip-empty-lines [] {
+    let o = $in
+    mut s = 0
+    for x in $o {
+        if ($x | str replace -ra '\s' '' | is-not-empty) {
+            break
+        } else {
+            $s += 1
+        }
+    }
+    $o | range $s..
+}

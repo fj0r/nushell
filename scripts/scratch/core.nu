@@ -84,3 +84,10 @@ export def scratch-out [id?:int@cmpl-scratch-id] {
     }
     run $"select content from scratch where id = ($id);" | get 0.content
 }
+
+export def scratch-search [title --content(-c)] {
+    let k = Q $"%($title)%"
+    let c = if $content { $"or content like ($k)" } else { '' }
+    run $"select id, title, content from scratch where title like ($k) ($c)"
+
+}

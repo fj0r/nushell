@@ -11,10 +11,10 @@ export def todo-add [
     --tag(-t): list<string@cmpl-tag-id>
     --deadline(-d): duration
     --done(-x)
-    --desc: string=''
     --relevant(-r): int@cmpl-relevant-id
     --edit(-e)
     title?: string
+    content?: string=''
 ] {
     let o = $in
     let title = if ($title | is-empty) {
@@ -27,12 +27,12 @@ export def todo-add [
         $title
     }
     let data = if $edit {
-        let input = $"($title)\n($desc)" | block-edit $"add-todo-XXX.todo" | split row "\n---\n"
+        let input = $"($title)\n($content)" | block-edit $"add-todo-XXX.todo" | split row "\n---\n"
         $input | each {|x|
             let y = $x | lines
             {
                 title: ($y | first)
-                desc: ($y | range 1.. | str join (char newline))
+                content: ($y | range 1.. | skip-empty-lines | str join (char newline))
             }
         }
 
@@ -40,7 +40,7 @@ export def todo-add [
         [
             {
                 title: $title
-                desc: $desc
+                content: $content
             }
         ]
     }
@@ -60,7 +60,7 @@ export def todo-add [
     let now = date now | fmt-date
     let vals = $data
     | each {|x|
-        [$now, $now, $x.title, $x.desc, ...($attrs | values)]
+        [$now, $now, $x.title, $x.content, ...($attrs | values)]
         | each { Q $in }
         | str join ','
         | $"\(($in)\)"
