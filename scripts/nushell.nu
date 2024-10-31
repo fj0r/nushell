@@ -15,24 +15,6 @@ export extern "nu" [
   ...script:string
 ]
 
-export def timesit [--duration(-d): duration = 1sec, action: closure] {
-    let begin = date now
-    mut end = date now
-    mut times = 0
-    loop {
-        do $action
-        $end = date now
-        $times += 1
-        if ($end - $begin) > $duration { break }
-    }
-    let total = $end - $begin
-    {
-        times: $times
-        total: $total
-        average: ($total / $times)
-    }
-}
-
 export def inspect-file [file:path='~/.cache/nonstdout'] {
     let x = $in
     $x | to yaml | save -f $file

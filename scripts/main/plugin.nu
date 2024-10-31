@@ -26,6 +26,7 @@ use os *
 use nvim *
 use netcat *
 use nushell.nu *
+use benchmark
 use history-utils *
 use history-utils/backup.nu *
 use resolvenv
