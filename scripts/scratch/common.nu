@@ -93,3 +93,7 @@ export def exec [type] {
         _ => { $o }
     }
 }
+
+export def cmpl-type [] {
+    [nu py js rs md]
+}

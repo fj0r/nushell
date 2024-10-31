@@ -6,7 +6,7 @@ def cmpl-scratch-id [] {
         from scratch order by updated desc limit 10;"
 }
 
-export def scratch-add [--type(-t): string='md'] {
+export def scratch-add [--type(-t): string@cmpl-type='md'] {
     let o = $in
     let now = date now | fmt-date
     let content = if ($o | is-empty) { char newline } else { $o }
@@ -30,7 +30,7 @@ export def scratch-add [--type(-t): string='md'] {
 
 export def scratch-edit [
     id:int@cmpl-scratch-id
-    --type(-t):string='md'
+    --type(-t):string@cmpl-type='md'
 ] {
     let o = $in
     let old = run $"select title, type, content from scratch where id = ($id)"
@@ -86,7 +86,7 @@ export def scratch-clean [
 
 export def scratch-in [
     id?:int@cmpl-scratch-id
-    --type(-t):string='md'
+    --type(-t):string@cmpl-type='md'
 ] {
     let o = $in
     if ($id | is-empty) {
@@ -99,7 +99,7 @@ export def scratch-in [
 
 export def scratch-out [
     id?:int@cmpl-scratch-id
-    --type(-t):string
+    --type(-t):string@cmpl-type
     --search(-s): string
     --num(-n):int = 20
 ] {
