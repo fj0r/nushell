@@ -1,7 +1,8 @@
 use common.nu *
 
 def cmpl-scratch-id [] {
-    run $"select id as value, updated || '│' || type || '│' ||  title as description
+    run $"select id as value, updated || '│' || type || '│' ||
+        case title when '' then '...' || substr\(ltrim\(content\), 0, 20\) else title end  as description
         from scratch order by updated desc limit 10;"
 }
 
