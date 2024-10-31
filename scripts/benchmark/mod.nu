@@ -1,6 +1,6 @@
-export def main [
-    --times: int = 5
-    --total: duration = 1sec
+export def std [
+    --count(-c): int = 5
+    --total(-t): duration = 1sec
     action: closure
 ] {
     let begin = date now
@@ -8,7 +8,7 @@ export def main [
     loop {
         do $action
         let now = date now 
-        if ($now - $begin) > $total and ($r | length) > $times { break }
+        if ($now - $begin) > $total and ($r | length) > $count { break }
         # TODO: optimize
         $r ++= $now
     }
@@ -21,7 +21,7 @@ export def main [
     }
     {
         QPS: (1sec / $average)
-        times: $times
+        count: $times
         total: $total
         average: $average
         median: ($n | math median | into int | $in * 1000 | into duration)
@@ -29,7 +29,11 @@ export def main [
     }
 }
 
-export def timesit [--duration(-d): duration = 1sec, action: closure] {
+export def main [
+    --count(-c): int = 5
+    --total(-t): duration = 1sec
+    action: closure
+] {
     let begin = date now
     mut end = date now
     mut times = 0
@@ -37,12 +41,14 @@ export def timesit [--duration(-d): duration = 1sec, action: closure] {
         do $action
         $end = date now
         $times += 1
-        if ($end - $begin) > $duration { break }
+        if ($end - $begin) > $total and $times >= $count { break }
     }
     let total = $end - $begin
+    let average = $total / $times
     {
-        times: $times
+        QPS: (1sec / $average)
+        count: $times
         total: $total
-        average: ($total / $times)
+        average: $average
     }
 }
