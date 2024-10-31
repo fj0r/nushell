@@ -6,3 +6,4 @@ export-env {
 
 export use core.nu *
 export use count.nu *
+export use stat.nu *
