@@ -85,7 +85,7 @@ export def scratch-out [id?:int@cmpl-scratch-id] {
     run $"select content from scratch where id = ($id);" | get 0.content
 }
 
-export def scratch-search [keyword --num(-n):int = 20] {
+export def scratch-find [keyword --num(-n):int = 20] {
     let k = Q $"%($keyword)%"
     run $"select id, title, content from \(
             select id, title, content, created from scratch where title like ($k)

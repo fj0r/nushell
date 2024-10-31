@@ -19,3 +19,4 @@
     - [x] Search #431
         - [x] SQLite fts #434
         - [x] Format output #435
+        - [x] Shortcut `scratch-find` #436
