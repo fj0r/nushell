@@ -99,3 +99,12 @@ export def scratch-find [keyword --num(-n):int = 20] {
         $acc | insert ($it.id | into string) $c
     }
 }
+
+export def scratch-clean [
+    --untitled
+] {
+    if $untitled {
+        run "delete from scratch where title = '' returning id, content"
+        | reduce -f {} {|it,acc| $acc | insert ($it.id | into string) $it.content }
+    }
+}

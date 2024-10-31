@@ -20,3 +20,5 @@
         - [x] SQLite fts #434
         - [x] Format output #435
         - [x] Shortcut `scratch-find` #436
+    - [x] Clean #438
+        - [x] --untitled #439
