@@ -54,6 +54,7 @@
     - [ ] Discussion #146
     - [x] Noninteraction mode as default in `Todo add` #147
     - [x] `todo-add` can read the title from stdin. #230
+        - [x] If there are no parameters and standard input, enter edit mode #440
 - [ ] Display #24
     - [x] Convert to tree #25
         - [x] Multi-level tree test #33
@@ -164,9 +165,12 @@
     - [x] scratch.nu as an independent project #364
     - [x] Filter empty #366
     - [ ] Code Runner #427
-    - [ ] Search #431
+    - [x] Search #431
         - [x] SQLite fts #434
-        - [ ] Format output #435
+        - [x] Format output #435
+        - [x] Shortcut `scratch-find` #436
+    - [x] Clean #438
+        - [x] --untitled #439
 - [ ] Count.nu #255
     - [ ] Only count leaf node #256
     - [x] New column named `value` with type `REAL` #257

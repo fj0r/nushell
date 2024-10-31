@@ -17,16 +17,8 @@ export def todo-add [
     content?: string=''
 ] {
     let o = $in
-    let title = if ($title | is-empty) {
-        if ($o | is-empty) {
-            'untitled'
-        } else {
-            $o
-        }
-    } else {
-        $title
-    }
-    let data = if $edit {
+    let title = $title | default $o
+    let data = if $edit or ($title | is-empty) {
         let input = $"($title)\n($content)" | block-edit $"add-todo-XXX.todo" | split row "\n---\n"
         $input | each {|x|
             let y = $x | lines
