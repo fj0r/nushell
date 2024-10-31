@@ -22,5 +22,5 @@
         - [x] Shortcut `scratch-find` #436
     - [x] Clean #438
         - [x] --untitled #439
-    - [ ] Logical/strict command combinations #441
+    - [x] Logical/strict command combinations #441
     - [x] If there is no title, truncate the first 20 characters of the content #445

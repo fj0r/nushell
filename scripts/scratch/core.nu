@@ -39,16 +39,19 @@ export def scratch-add [--type(-t): string='md'] {
     $content
 }
 
-export def scratch-edit [id?:int@cmpl-scratch-id --type(-t):string='md'] {
-    let id = if ($id | is-empty) {
-        run $"select id from scratch order by updated desc limit 1;"
-        | get 0.id
-    } else {
-        $id
-    }
-    let old = run $"select title, type, content from scratch where id = ($id);"
+export def scratch-edit [
+    id:int@cmpl-scratch-id
+    --type(-t):string='md'
+] {
+    let o = $in
+    let old = run $"select title, type, content from scratch where id = ($id)"
+    | get -i 0
     let type = if ($type | is-empty) { $old.type | first } else { $type }
-    let input = [...$old.title ...$old.content]
+    let now = date now | fmt-date
+    let content = if ($o | is-empty) { $old.content } else {
+        $"($o)\n>>>>>>($now)<<<<<<\n($old.content)"
+    }
+    let input = [$old.title $content]
     | str join (char newline)
     | block-edit $"scratch-XXX.($type)" --line 2
     | lines
@@ -57,7 +60,7 @@ export def scratch-edit [id?:int@cmpl-scratch-id --type(-t):string='md'] {
         title: ($input | first)
         content: $content
         type: $type
-        updated: (date now | fmt-date)
+        updated: $now
     }
     | items {|k,v|
         $"($k) = (Q $v)"
@@ -67,26 +70,7 @@ export def scratch-edit [id?:int@cmpl-scratch-id --type(-t):string='md'] {
     $content
 }
 
-export def scratch-in [id?:int@cmpl-scratch-id] {
-    let o = $in
-    if ($id | is-empty) {
-        $o | scratch-add
-    } else {
-        scratch-edit $id
-    }
-}
-
-export def scratch-out [id?:int@cmpl-scratch-id] {
-    let id = if ($id | is-empty) {
-        run $"select id from scratch order by updated desc limit 1;"
-        | get 0.id
-    } else {
-        $id
-    }
-    run $"select content from scratch where id = ($id);" | get 0.content
-}
-
-export def scratch-find [keyword --num(-n):int = 20] {
+export def scratch-search [keyword --num(-n):int = 20] {
     let k = Q $"%($keyword)%"
     run $"select id, title, content from \(
             select id, title, content, created from scratch where title like ($k)
@@ -109,3 +93,34 @@ export def scratch-clean [
         | reduce -f {} {|it,acc| $acc | insert ($it.id | into string) $it.content }
     }
 }
+
+export def scratch-in [
+    id?:int@cmpl-scratch-id
+    --type(-t):string='md'
+] {
+    let o = $in
+    if ($id | is-empty) {
+        $o | scratch-add --type=$type
+    } else {
+        $o | scratch-edit --type=$type $id
+    }
+}
+
+export def scratch-out [
+    id?:int@cmpl-scratch-id
+    --search(-s): string
+    --num(-n):int = 20
+] {
+    if ($search | is-not-empty) {
+        scratch-search --num=$num $search
+    } else {
+        let id = if ($id | is-empty) {
+            run $"select id from scratch order by updated desc limit 1;"
+            | get 0.id
+        } else {
+            $id
+        }
+        run $"select content from scratch where id = ($id);" | get 0.content
+    }
+}
+
