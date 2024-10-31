@@ -14,10 +14,20 @@ def variants-edit [file? --line:int] {
     }
 }
 
-export def block-edit [temp --line:int] {
+def maketemp [tmp] {
+    let o = $in
+    let t = mktemp -t $tmp
+    $o | save -f $t
+    return $t
+}
+
+export def block-edit [
+    temp
+    --line: int
+    --type: string
+] {
     let content = $in
-    let tf = mktemp -t $temp
-    $content | save -f $tf
+    let tf = $content | maketemp $temp
     variants-edit $tf --line $line
     let c = open $tf --raw
     rm -f $tf
@@ -66,10 +76,20 @@ export def 'from title' [type] {
     $"($typemap | get $type)($in)"
 }
 
+def run-file [type runner] {
+    let o = $in
+    let f = $o | maketemp $'scratch-XXX.($type)'
+    ^$runner $f
+    rm -f $f
+}
+
 export def exec [type] {
     let o = $in
     match $type {
-        nu => { nu -c $o --stdin }
+        nu => { $o | run-file nu nu }
+        py => { $o | run-file py python3 }
+        js => { $o | run-file js node }
+        rs => { $o | run-file rs rust-script }
         _ => { $o }
     }
 }

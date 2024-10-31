@@ -11,7 +11,8 @@ export def scratch-add [--type(-t): string='md'] {
     let now = date now | fmt-date
     let content = if ($o | is-empty) { char newline } else { $o }
     let input = $"('' | from title $type)\n($content)"
-    | block-edit $"scratch-XXX.($type)" --line 2 | lines
+    | block-edit $"scratch-XXX.($type)" --type $type --line 2
+    | lines
     let content = $input | range 1.. | skip-empty-lines | str join (char newline)
     if ($content | is-empty) { return }
     let d = {
@@ -42,7 +43,7 @@ export def scratch-edit [
     let title = $old.title | from title $type
     let input = [$title $content]
     | str join (char newline)
-    | block-edit $"scratch-XXX.($type)" --line 2
+    | block-edit $"scratch-XXX.($type)" --type $type --line 2
     | lines
     let content = $input | range 1.. | skip-empty-lines | str join (char newline)
     let d = {
@@ -98,6 +99,7 @@ export def scratch-in [
 
 export def scratch-out [
     id?:int@cmpl-scratch-id
+    --type(-t):string
     --search(-s): string
     --num(-n):int = 20
 ] {
@@ -111,7 +113,8 @@ export def scratch-out [
             $id
         }
         let x = run $"select content, type from scratch where id = ($id);" | get -i 0
-        $x.content | exec $x.type
+        let typ = if ($type | is-empty) { $x.type } else { $type }
+        $x.content | exec $typ
     }
 }
 
