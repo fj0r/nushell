@@ -85,9 +85,17 @@ export def scratch-out [id?:int@cmpl-scratch-id] {
     run $"select content from scratch where id = ($id);" | get 0.content
 }
 
-export def scratch-search [title --content(-c)] {
-    let k = Q $"%($title)%"
-    let c = if $content { $"or content like ($k)" } else { '' }
-    run $"select id, title, content from scratch where title like ($k) ($c)"
-
+export def scratch-search [keyword --num(-n):int = 20] {
+    let k = Q $"%($keyword)%"
+    run $"select id, title, content from \(
+            select id, title, content, created from scratch where title like ($k)
+            union
+            select id, title, content, created from scratch where content like ($k)
+        \) as t
+        order by t.created desc limit ($num)
+    "
+    | reduce -f {} {|it,acc|
+        let c = $"### ($it.title)\n\n($it.content)\n"
+        $acc | insert ($it.id | into string) $c
+    }
 }

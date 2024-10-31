@@ -16,3 +16,6 @@
     - [x] scratch.nu as an independent project #364
     - [x] Filter empty #366
     - [ ] Code Runner #427
+    - [x] Search #431
+        - [x] SQLite fts #434
+        - [x] Format output #435

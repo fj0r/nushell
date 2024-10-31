@@ -164,6 +164,9 @@
     - [x] scratch.nu as an independent project #364
     - [x] Filter empty #366
     - [ ] Code Runner #427
+    - [ ] Search #431
+        - [x] SQLite fts #434
+        - [ ] Format output #435
 - [ ] Count.nu #255
     - [ ] Only count leaf node #256
     - [x] New column named `value` with type `REAL` #257
