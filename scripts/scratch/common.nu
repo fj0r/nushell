@@ -32,3 +32,44 @@ export def Q [...t] {
 export def run [stmt] {
     open $env.SCRATCH_DB | query db $stmt
 }
+
+export def skip-empty-lines [] {
+    let o = $in
+    mut s = 0
+    for x in $o {
+        if ($x | str replace -ra '\s' '' | is-not-empty) {
+            break
+        } else {
+            $s += 1
+        }
+    }
+    $o | range $s..
+}
+
+const typemap = {
+    md: "# "
+    nu: "# "
+    py: "# "
+    rs: "// "
+    js: "// "
+    ts: "// "
+    hs: "-- "
+    sql: "-- "
+    lua: "-- "
+}
+
+export def 'to title' [type] {
+    $in | str replace ($typemap | get $type) ''
+}
+
+export def 'from title' [type] {
+    $"($typemap | get $type)($in)"
+}
+
+export def exec [type] {
+    let o = $in
+    match $type {
+        nu => { nu -c $o --stdin }
+        _ => { $o }
+    }
+}

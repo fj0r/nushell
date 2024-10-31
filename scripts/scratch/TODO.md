@@ -16,6 +16,7 @@
     - [x] scratch.nu as an independent project #364
     - [x] Filter empty #366
     - [ ] Code Runner #427
+        - [ ] pipe output #446
     - [x] Search #431
         - [x] SQLite fts #434
         - [x] Format output #435
@@ -24,3 +25,4 @@
         - [x] --untitled #439
     - [x] Logical/strict command combinations #441
     - [x] If there is no title, truncate the first 20 characters of the content #445
+    - [x] File type #447

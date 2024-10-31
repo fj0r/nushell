@@ -6,28 +6,16 @@ def cmpl-scratch-id [] {
         from scratch order by updated desc limit 10;"
 }
 
-def skip-empty-lines [] {
-    let o = $in
-    mut s = 0
-    for x in $o {
-        if ($x | str replace -ra '\s' '' | is-not-empty) {
-            break
-        } else {
-            $s += 1
-        }
-    }
-    $o | range $s..
-}
-
 export def scratch-add [--type(-t): string='md'] {
     let o = $in
     let now = date now | fmt-date
     let content = if ($o | is-empty) { char newline } else { $o }
-    let input = $"(char newline)($content)" | block-edit $"scratch-XXX.($type)" --line 2 | lines
+    let input = $"('' | from title $type)\n($content)"
+    | block-edit $"scratch-XXX.($type)" --line 2 | lines
     let content = $input | range 1.. | skip-empty-lines | str join (char newline)
     if ($content | is-empty) { return }
     let d = {
-        title: ($input | first)
+        title: ($input | first | to title $type)
         type: $type
         content: $content
         created: $now
@@ -51,13 +39,14 @@ export def scratch-edit [
     let content = if ($o | is-empty) { $old.content } else {
         $"($o)\n>>>>>>($now)<<<<<<\n($old.content)"
     }
-    let input = [$old.title $content]
+    let title = $old.title | from title $type
+    let input = [$title $content]
     | str join (char newline)
     | block-edit $"scratch-XXX.($type)" --line 2
     | lines
     let content = $input | range 1.. | skip-empty-lines | str join (char newline)
     let d = {
-        title: ($input | first)
+        title: ($input | first | to title $type)
         content: $content
         type: $type
         updated: $now
@@ -104,6 +93,7 @@ export def scratch-in [
     } else {
         $o | scratch-edit --type=$type $id
     }
+    | exec $type
 }
 
 export def scratch-out [
@@ -120,7 +110,8 @@ export def scratch-out [
         } else {
             $id
         }
-        run $"select content from scratch where id = ($id);" | get 0.content
+        let x = run $"select content, type from scratch where id = ($id);" | get -i 0
+        $x.content | exec $x.type
     }
 }
 
