@@ -10,24 +10,34 @@ export def --env start [] {
     print $"(ansi grey)created database: $env.SCRATCH_DB(ansi reset)"
     for s in [
         "DROP TABLE _;"
+        "CREATE TABLE IF NOT EXISTS person (
+            id INTEGER PRIMARY KEY,
+            name TEXT NOT NULL UNIQUE,
+            info TEXT default ''
+        );"
         "CREATE TABLE IF NOT EXISTS tag (
             id INTEGER PRIMARY KEY,
             parent_id INTEGER DEFAULT -1,
             name TEXT NOT NULL,
-            hidden BOOLEAN DEFAULT 0
+            alias TEXT NOT NULL DEFAULT '',
+            hidden BOOLEAN DEFAULT 0,
+            UNIQUE(parent_id, name)
         );"
         "CREATE TABLE IF NOT EXISTS scratch (
             id INTEGER PRIMARY KEY,
-            parent_id INTEGER DEFAULT -1,
-            title TEXT NOT NULL,
             type TEXT DEFAULT '',
+            title TEXT NOT NULL,
             content TEXT DEFAULT '',
             created TEXT DEFAULT (strftime('%Y-%m-%dT%H:%M:%S','now')),
             updated TEXT DEFAULT (strftime('%Y-%m-%dT%H:%M:%S','now')),
             deleted TEXT DEFAULT '',
+            deadline TEXT,
             important INTEGER DEFAULT -1,
             urgent INTEGER DEFAULT -1,
             challenge INTEGER DEFAULT -1
+            value REAL DEFAULT 0,
+            done BOOLEAN DEFAULT -1,
+            relevant INTEGER -- REFERENCES person(id)
         );"
         "CREATE TABLE IF NOT EXISTS scratch_tag (
             scratch_id INTEGER NOT NULL,
