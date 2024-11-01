@@ -17,7 +17,7 @@
     - [x] Filter empty #366
     - [ ] Code Runner #427
         - [ ] Prepair sandbox #448
-            - [ ] Internal block-edit --line follow type #452
+            - [x] Internal block-edit --line follow type #452
             - [ ] File hash #454
         - [ ] Exec #449
             - [ ] pipe output #446

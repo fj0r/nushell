@@ -1,13 +1,15 @@
 use libs *
 use completion.nu *
 
-export def scratch-add [--kind(-k): string@cmpl-kind='md'] {
+export def scratch-add [
+    --kind(-k): string@cmpl-kind='md'
+] {
     let o = $in
     let now = date now | fmt-date
     let cfg = get-config $kind
     let content = if ($o | is-empty) { char newline } else { $o }
     let input = $"('' | from title $cfg)\n($content)"
-    | block-edit $"scratch-XXX.($kind)" --kind $kind --line 2
+    | block-edit $"scratch-XXX.($kind)" ($cfg | update pos {|x| $x.pos + 1 })
     | lines
     let content = $input | range 1.. | skip-empty-lines | str join (char newline)
     if ($content | is-empty) { return }
@@ -40,7 +42,7 @@ export def scratch-edit [
     let title = $old.title | from title $cfg
     let input = [$title $content]
     | str join (char newline)
-    | block-edit $"scratch-XXX.($kind)" --kind $kind --line 2
+    | block-edit $"scratch-XXX.($kind)" ($cfg | update pos {|x| $x.pos + 1 })
     | lines
     let content = $input | range 1.. | skip-empty-lines | str join (char newline)
     let d = {

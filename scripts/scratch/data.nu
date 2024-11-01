@@ -50,9 +50,21 @@ export def --env init [] {
             comment TEXT NOT NULL DEFAULT '# ',
             runner TEXT NOT NULL DEFAULT '',
             cmd TEXT NOT NULL DEFAULT '',
+            pos INTEGER NOT NULL DEFAULT 1,
             created TEXT DEFAULT (strftime('%Y-%m-%dT%H:%M:%S','now')),
             updated TEXT DEFAULT (strftime('%Y-%m-%dT%H:%M:%S','now')),
             deleted TEXT DEFAULT ''
+        );"
+        "CREATE TABLE IF NOT EXISTS file (
+            hash TEXT PRIMARY KEY,
+            content TEXT NOT NULL DEFAULT ''
+        );"
+        "CREATE TABLE IF NOT EXISTS kind_file (
+            kind TEXT NOT NULL,
+            hash TEXT NOT NULL,
+            path TEXT NOT NULL DEFAULT '.',
+            name TEXT NOT NULL,
+            ext TEXT NOT NULL
         );"
     ] {
         run $s

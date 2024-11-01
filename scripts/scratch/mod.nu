@@ -5,3 +5,4 @@ export-env {
 }
 
 export use core.nu *
+export use stat.nu *

@@ -19,12 +19,11 @@ export def maketemp [tmp] {
 
 export def block-edit [
     temp
-    --line: int
-    --kind: string
+    cfg: record = {}
 ] {
     let content = $in
     let tf = $content | maketemp $temp
-    variants-edit $tf --line $line
+    variants-edit $tf --line $cfg.pos
     let c = open $tf --raw
     rm -f $tf
     $c
