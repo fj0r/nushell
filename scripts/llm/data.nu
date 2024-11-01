@@ -1,19 +1,17 @@
 use sqlite.nu *
 
-def add-prompts [] {
-    let prompts = $in
-    for p in $prompts {
-        {
-            system: $env.OPENAI_PROMPT_TEMPLATE
-            template: "```\n{}\n```"
-            placeholder: ''
-            description: ''
-        }
-        | merge $p
-        | update placeholder {|x| $x.placeholder | to json -r}
-        | select name system template placeholder description
-        | db-upsert --do-nothing 'prompt' 'name'
+export def add-prompt [] {
+    let p = $in
+    {
+        system: $env.OPENAI_PROMPT_TEMPLATE
+        template: "```\n{}\n```"
+        placeholder: ''
+        description: ''
     }
+    | merge $p
+    | update placeholder {|x| $x.placeholder | to json -r}
+    | select name system template placeholder description
+    | db-upsert --do-nothing 'prompt' 'name'
 }
 
 export def --env init [] {
@@ -311,7 +309,7 @@ export def --env init [] {
       placeholder: ''
       description: matrialized view
     "
-    | from yaml | add-prompts
+    | from yaml | each { $in | add-prompt }
 }
 
 export def make-session [created] {

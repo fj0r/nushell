@@ -17,10 +17,16 @@
     - [x] Filter empty #366
     - [ ] Code Runner #427
         - [ ] Prepair sandbox #448
+            - [ ] Internal block-edit --line follow type #452
+            - [ ] File hash #454
         - [ ] Exec #449
             - [ ] pipe output #446
             - [x] File runner #450
             - [ ] Dir runner #451
+            - [ ] Remote runner #453
+            - [ ] Pipe input to script #455
+        - [x] Config in db #456
+            - [x] Type #457
     - [x] Search #431
         - [x] SQLite fts #434
         - [x] Format output #435

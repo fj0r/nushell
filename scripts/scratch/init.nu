@@ -1,5 +1,6 @@
 use common.nu *
 
+
 export def --env start [] {
     if 'SCRATCH_DB' not-in $env {
         $env.SCRATCH_DB = [$nu.data-dir 'scratch.db'] | path join
@@ -32,6 +33,14 @@ export def --env start [] {
             scratch_id INTEGER NOT NULL,
             tag_id INTEGER NOT NULL,
             PRIMARY KEY (scratch_id, tag_id)
+        );"
+        "CREATE TABLE IF NOT EXISTS type (
+            name TEXT PRIMARY KEY,
+            comment TEXT DEFAULT '#',
+            runner TEXT NOT NULL DEFAULT 'file', -- file, dir, remote
+            created TEXT DEFAULT (strftime('%Y-%m-%dT%H:%M:%S','now')),
+            updated TEXT DEFAULT (strftime('%Y-%m-%dT%H:%M:%S','now')),
+            deleted TEXT DEFAULT ''
         );"
     ] {
         run $s

@@ -43,6 +43,33 @@ export def run [stmt] {
     open $env.SCRATCH_DB | query db $stmt
 }
 
+export def db-upsert [table pk --do-nothing] {
+    let r = $in
+    let d = if $do_nothing { 'NOTHING' } else {
+        $"UPDATE SET ($r| items {|k,v | $"($k)=(Q $v)" } | str join ',')"
+    }
+    run $"
+        INSERT INTO ($table)\(($r | columns | str join ',')\)
+        VALUES\(($r | values | each {Q $in} | str join ',')\)
+        ON CONFLICT\(($pk)\) DO ($d);"
+}
+
+def add-type [] {
+    let types = $in
+    for p in $types {
+        {
+            system: $env.OPENAI_PROMPT_TEMPLATE
+            template: "```\n{}\n```"
+            placeholder: ''
+            description: ''
+        }
+        | merge $p
+        | update placeholder {|x| $x.placeholder | to json -r}
+        | select name system template placeholder description
+        | db-upsert --do-nothing 'prompt' 'name'
+    }
+}
+
 export def skip-empty-lines [] {
     let o = $in
     mut s = 0
