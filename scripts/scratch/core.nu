@@ -94,12 +94,12 @@ export def scratch-in [
     if ($id | is-empty) {
         let type = if ($type | is-empty) { 'md' } else { $type }
         let cfg = get-config $type
-        $o | scratch-add --type=$type | exec $cfg
+        $o | scratch-add --type=$type | performance $cfg
     } else {
         let x = run $"select type from scratch where id = ($id);" | get -i 0
         let type = if ($type | is-empty) { $x.type } else { $type }
         let cfg = get-config $type
-        $o | scratch-edit --type=$type $id | exec $cfg
+        $o | scratch-edit --type=$type $id | performance $cfg
     }
 }
 
@@ -109,6 +109,7 @@ export def scratch-out [
     --search(-s): string
     --num(-n):int = 20
 ] {
+    let o = $in | default ''
     if ($search | is-not-empty) {
         scratch-search --num=$num $search
     } else {
@@ -121,7 +122,7 @@ export def scratch-out [
         let x = run $"select content, type from scratch where id = ($id);" | get -i 0
         let type = if ($type | is-empty) { $x.type } else { $type }
         let cfg = get-config $type
-        $x.content | exec $cfg
+        $x.content | performance $cfg $o
     }
 }
 

@@ -37,7 +37,7 @@ export def --env start [] {
         "CREATE TABLE IF NOT EXISTS type (
             name TEXT PRIMARY KEY,
             comment TEXT NOT NULL DEFAULT '# ',
-            runner TEXT NOT NULL DEFAULT 'none',
+            runner TEXT NOT NULL DEFAULT '',
             cmd TEXT NOT NULL DEFAULT '',
             created TEXT DEFAULT (strftime('%Y-%m-%dT%H:%M:%S','now')),
             updated TEXT DEFAULT (strftime('%Y-%m-%dT%H:%M:%S','now')),
@@ -50,15 +50,15 @@ export def --env start [] {
     let _ = "
     - name: md
       comment: '# '
-      runner: 'none'
+      runner: ''
     - name: nu
       comment: '# '
       runner: file
-      cmd: nu {}
+      cmd: 'open {stdin} | nu {}'
     - name: py
       comment: '# '
       runner: file
-      cmd: python3 {}
+      cmd: 'open {stdin} | python3 {}'
     - name: js
       comment: '// '
       runner: file

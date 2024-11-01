@@ -24,7 +24,7 @@
             - [x] File runner #450
             - [ ] Dir runner #451
             - [ ] Remote runner #453
-            - [ ] Pipe input to script #455
+            - [x] Pipe input to script #455
         - [x] Config in db #456
             - [x] Type #457
             - [x] Exec #458
@@ -37,3 +37,10 @@
     - [x] Logical/strict command combinations #441
     - [x] If there is no title, truncate the first 20 characters of the content #445
     - [x] File type #447
+- [ ] Merge Todo #459
+    - [ ] Plain scratch #460
+    - [ ] Treeview with tag #461
+        - [ ] Main tag in view #462
+    - [ ] Dynamic create tag in path #463
+    - [ ] Untagged as old scratch #464
+    - [ ] Template str replace #465

@@ -98,6 +98,16 @@ export def skip-empty-lines [] {
     $o | range $s..
 }
 
+export def render [scope: record] {
+    let tmpl = $in
+    $scope
+    | transpose k v
+    | reduce -f $tmpl {|i,a|
+        let k = if $i.k == '_' { '' } else { $i.k }
+        $a | str replace --all $"{($k)}" ($i.v | into string)
+    }
+}
+
 export def get-config [type] {
     run $"select * from type where name = (Q $type)" | first
 }
@@ -110,15 +120,34 @@ export def 'from title' [config] {
     $"($config.comment)($in)"
 }
 
-
-export def exec [config] {
-    let f = $in | maketemp $'scratch-XXX.($config.name)'
-    if $config.cmd == '' {
-        cat $f
-    } else {
-        nu -c ($config.cmd | str replace '{}' $f)
+def remove-file [...fs] {
+    for f in $fs {
+        if ($f | is-not-empty) {
+            rm -f $f
+        }
     }
-    rm -f $f
+}
+
+export def performance [config stdin?=''] {
+    let f = $in | maketemp $'scratch-XXX.($config.name)'
+    let i = $stdin | maketemp $'scratch-XXX.stdin'
+    match $config.runner {
+        'file' => {
+            nu -c ($config.cmd | render {_: $f, stdin: $i})
+            remove-file $f $i
+        }
+        'dir' => {
+            remove-file $f $i
+        }
+        'remote' => {
+            rm -f $f $i
+        }
+        _ => {
+            let o = open $f
+            remove-file $f $i
+            $o
+        }
+    }
 }
 
 export def cmpl-type [] {
