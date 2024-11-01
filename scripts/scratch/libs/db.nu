@@ -36,16 +36,3 @@ export def table-upsert [config] {
     | db-upsert --do-nothing $config.table $config.pk
 }
 
-export def add-kind [] {
-    $in | table-upsert {
-        default: {
-            name: 'md'
-            comment: "# "
-            runner: 'file'
-            cmd: ''
-        }
-        table: kind
-        pk: name
-        filter: {}
-    }
-}
