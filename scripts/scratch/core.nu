@@ -1,5 +1,8 @@
 use libs *
 use completion.nu *
+export use tag.nu *
+
+
 export def scratch-list [
     ...tags:string@cmpl-tag
     --search(-s): string
@@ -29,9 +32,10 @@ export def scratch-add [
     --title(-t): string
     --body(-b): string
     --kind(-k): string@cmpl-kind='md'
-    --important(-i): int@cmpl-level
-    --urgent(-u): int@cmpl-level
-    --challenge(-c): int@cmpl-level
+    --parent(-p): int@cmpl-sid
+    --important(-i): int
+    --urgent(-u): int
+    --challenge(-c): int
     --deadline(-d): duration
     --done(-x)
     --relevant(-r): int@cmpl-relevant-id

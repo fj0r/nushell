@@ -38,17 +38,24 @@
     - [x] If there is no title, truncate the first 20 characters of the content #445
     - [x] File type #447
 - [ ] Merge Todo #459
-    - [x] Plain scratch #460
+    - [ ] Plain scratch #460
+        - [ ] Child scratch no tag #493
+        - [ ] When viewing, child and main are considered as a group #494
     - [ ] Treeview with tag #461
-        - [ ] Main tag in view #462
+        - [ ] Main tag as branch #462
+        - [ ] Compute done status #488
+        - [ ] Other tags display in header #489
+        - [ ] First tag as main #491
     - [ ] Dynamic create tag in path #463
+        - [ ] Segmented cmpl-tag #490
     - [ ] Untagged as old scratch #464
     - [x] Template str replace #465
     - [ ] Core #470
         - [ ] add #471
+            - [ ] Noninteractive (sa -t) #492
         - [ ] attrs #472
         - [ ] done #474
-            - [ ] uplevel done #473
+            - [ ] ~uplevel done~ #473
         - [ ] delete #475
         - [ ] clean #476
         - [x] edit #477

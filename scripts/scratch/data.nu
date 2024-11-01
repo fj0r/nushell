@@ -26,6 +26,7 @@ export def --env init [] {
         );"
         "CREATE TABLE IF NOT EXISTS scratch (
             id INTEGER PRIMARY KEY,
+            parent_id INTEGER DEFAULT -1,
             kind TEXT DEFAULT '',
             title TEXT NOT NULL,
             body TEXT DEFAULT '',
