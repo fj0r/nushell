@@ -1,24 +1,24 @@
 use libs *
 
 def cmpl-scratch-id [] {
-    run $"select id as value, updated || '│' || type || '│' ||
+    run $"select id as value, updated || '│' || kind || '│' ||
         case title when '' then '...' || substr\(ltrim\(content\), 0, 20\) else title end  as description
         from scratch order by updated desc limit 10;"
 }
 
-export def scratch-add [--type(-t): string@cmpl-type='md'] {
+export def scratch-add [--kind(-k): string@cmpl-kind='md'] {
     let o = $in
     let now = date now | fmt-date
-    let cfg = get-config $type
+    let cfg = get-config $kind
     let content = if ($o | is-empty) { char newline } else { $o }
     let input = $"('' | from title $cfg)\n($content)"
-    | block-edit $"scratch-XXX.($type)" --type $type --line 2
+    | block-edit $"scratch-XXX.($kind)" --kind $kind --line 2
     | lines
     let content = $input | range 1.. | skip-empty-lines | str join (char newline)
     if ($content | is-empty) { return }
     let d = {
         title: ($input | first | to title $cfg)
-        type: $type
+        kind: $kind
         content: $content
         created: $now
         updated: $now
@@ -31,13 +31,13 @@ export def scratch-add [--type(-t): string@cmpl-type='md'] {
 
 export def scratch-edit [
     id:int@cmpl-scratch-id
-    --type(-t):string@cmpl-type='md'
+    --kind(-k):string@cmpl-kind='md'
 ] {
     let o = $in
-    let cfg = get-config $type
-    let old = run $"select title, type, content from scratch where id = ($id)"
+    let cfg = get-config $kind
+    let old = run $"select title, kind, content from scratch where id = ($id)"
     | get -i 0
-    let type = if ($type | is-empty) { $old.type | first } else { $type }
+    let kind = if ($kind | is-empty) { $old.kind | first } else { $kind }
     let now = date now | fmt-date
     let content = if ($o | is-empty) { $old.content } else {
         $"($o)\n>>>>>>($now)<<<<<<\n($old.content)"
@@ -45,13 +45,13 @@ export def scratch-edit [
     let title = $old.title | from title $cfg
     let input = [$title $content]
     | str join (char newline)
-    | block-edit $"scratch-XXX.($type)" --type $type --line 2
+    | block-edit $"scratch-XXX.($kind)" --kind $kind --line 2
     | lines
     let content = $input | range 1.. | skip-empty-lines | str join (char newline)
     let d = {
         title: ($input | first | to title $cfg)
         content: $content
-        type: $type
+        kind: $kind
         updated: $now
     }
     | items {|k,v|
@@ -88,24 +88,24 @@ export def scratch-clean [
 
 export def scratch-in [
     id?:int@cmpl-scratch-id
-    --type(-t):string@cmpl-type
+    --kind(-k):string@cmpl-kind
 ] {
     let o = $in
     if ($id | is-empty) {
-        let type = if ($type | is-empty) { 'md' } else { $type }
-        let cfg = get-config $type
-        $o | scratch-add --type=$type | performance $cfg
+        let kind = if ($kind | is-empty) { 'md' } else { $kind }
+        let cfg = get-config $kind
+        $o | scratch-add --kind=$kind | performance $cfg
     } else {
-        let x = run $"select type from scratch where id = ($id);" | get -i 0
-        let type = if ($type | is-empty) { $x.type } else { $type }
-        let cfg = get-config $type
-        $o | scratch-edit --type=$type $id | performance $cfg
+        let x = run $"select kind from scratch where id = ($id);" | get -i 0
+        let kind = if ($kind | is-empty) { $x.kind } else { $kind }
+        let cfg = get-config $kind
+        $o | scratch-edit --kind=$kind $id | performance $cfg
     }
 }
 
 export def scratch-out [
     id?:int@cmpl-scratch-id
-    --type(-t):string@cmpl-type
+    --kind(-k):string@cmpl-kind
     --search(-s): string
     --num(-n):int = 20
 ] {
@@ -119,9 +119,9 @@ export def scratch-out [
         } else {
             $id
         }
-        let x = run $"select content, type from scratch where id = ($id);" | get -i 0
-        let type = if ($type | is-empty) { $x.type } else { $type }
-        let cfg = get-config $type
+        let x = run $"select content, kind from scratch where id = ($id);" | get -i 0
+        let kind = if ($kind | is-empty) { $x.kind } else { $kind }
+        let cfg = get-config $kind
         $x.content | performance $cfg $o
     }
 }

@@ -1,9 +1,3 @@
-export def fmt-date [] {
-    $in | format date '%FT%H:%M:%S'
-}
-
-
-
 export def skip-empty-lines [] {
     let o = $in
     mut s = 0

@@ -20,7 +20,7 @@ export def maketemp [tmp] {
 export def block-edit [
     temp
     --line: int
-    --type: string
+    --kind: string
 ] {
     let content = $in
     let tf = $content | maketemp $temp

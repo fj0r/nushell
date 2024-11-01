@@ -1,10 +1,11 @@
 export use edit.nu *
 export use db.nu *
 export use str.nu *
+export use time.nu *
 
 
-export def get-config [type] {
-    run $"select * from type where name = (Q $type)" | first
+export def get-config [kind] {
+    run $"select * from kind where name = (Q $kind)" | first
 }
 
 export def 'to title' [config] {
@@ -45,6 +46,6 @@ export def performance [config stdin?=''] {
     }
 }
 
-export def cmpl-type [] {
-    run $"select name from type" | get name
+export def cmpl-kind [] {
+    run $"select name from kind" | get name
 }

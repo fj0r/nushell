@@ -35,7 +35,7 @@ export def table-upsert [config] {
     | db-upsert --do-nothing $config.table $config.pk
 }
 
-export def add-type [] {
+export def add-kind [] {
     $in | table-upsert {
         default: {
             name: 'md'
@@ -43,7 +43,7 @@ export def add-type [] {
             runner: 'file'
             cmd: ''
         }
-        table: type
+        table: kind
         pk: name
         filter: {}
     }

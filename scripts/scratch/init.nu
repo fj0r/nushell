@@ -25,7 +25,7 @@ export def --env start [] {
         );"
         "CREATE TABLE IF NOT EXISTS scratch (
             id INTEGER PRIMARY KEY,
-            type TEXT DEFAULT '',
+            kind TEXT DEFAULT '',
             title TEXT NOT NULL,
             content TEXT DEFAULT '',
             created TEXT DEFAULT (strftime('%Y-%m-%dT%H:%M:%S','now')),
@@ -34,7 +34,7 @@ export def --env start [] {
             deadline TEXT,
             important INTEGER DEFAULT -1,
             urgent INTEGER DEFAULT -1,
-            challenge INTEGER DEFAULT -1
+            challenge INTEGER DEFAULT -1,
             value REAL DEFAULT 0,
             done BOOLEAN DEFAULT -1,
             relevant INTEGER -- REFERENCES person(id)
@@ -44,7 +44,7 @@ export def --env start [] {
             tag_id INTEGER NOT NULL,
             PRIMARY KEY (scratch_id, tag_id)
         );"
-        "CREATE TABLE IF NOT EXISTS type (
+        "CREATE TABLE IF NOT EXISTS kind (
             name TEXT PRIMARY KEY,
             comment TEXT NOT NULL DEFAULT '# ',
             runner TEXT NOT NULL DEFAULT '',
@@ -56,7 +56,6 @@ export def --env start [] {
     ] {
         run $s
     }
-
     let _ = "
     - name: md
       comment: '# '
@@ -93,5 +92,5 @@ export def --env start [] {
       cmd: |-
         $env.PGPASSWORD = {password}
         psql -U {username} -d {database} -h {host} -p {port} -f {} --csv
-    " | from yaml | each { $in | add-type }
+    " | from yaml | each { $in | add-kind }
 }
