@@ -7,7 +7,7 @@ export def cmpl-sid [] {
 
 export def cmpl-scratch-id [] {
     run $"select id as value, updated || '│' || kind || '│' ||
-        case title when '' then '...' || substr\(ltrim\(content\), 0, 20\) else title end  as description
+        case title when '' then '...' || substr\(ltrim\(body\), 0, 20\) else title end  as description
         from scratch order by updated desc limit 10;"
 }
 

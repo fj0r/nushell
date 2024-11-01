@@ -28,7 +28,7 @@ export def --env init [] {
             id INTEGER PRIMARY KEY,
             kind TEXT DEFAULT '',
             title TEXT NOT NULL,
-            content TEXT DEFAULT '',
+            body TEXT DEFAULT '',
             created TEXT DEFAULT (strftime('%Y-%m-%dT%H:%M:%S','now')),
             updated TEXT DEFAULT (strftime('%Y-%m-%dT%H:%M:%S','now')),
             deleted TEXT DEFAULT '',
@@ -57,7 +57,7 @@ export def --env init [] {
         );"
         "CREATE TABLE IF NOT EXISTS file (
             hash TEXT PRIMARY KEY,
-            content TEXT NOT NULL DEFAULT ''
+            body TEXT NOT NULL DEFAULT ''
         );"
         "CREATE TABLE IF NOT EXISTS kind_file (
             kind TEXT NOT NULL,
@@ -122,7 +122,7 @@ export def --env theme [] {
             deadline: xterm_rosybrown
             created: xterm_paleturquoise4
             updated: xterm_lightsalmon3a
-            content: grey
+            body: grey
         }
         symbol: {
             box: [['☐' '🗹' '*'],['[ ]' '[x]' '']]
