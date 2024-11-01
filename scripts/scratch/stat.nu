@@ -23,7 +23,7 @@ export def scratch-activities [
         'year' => '%Y'
         _ => '%Y-%m-%d'
     }
-    run $"
+    sqlx $"
         select strftime\('($dfs)', ($subject)\) as date
         , count\(1\) as count
         from scratch

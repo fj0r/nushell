@@ -68,7 +68,7 @@ export def --env init [] {
             ext TEXT NOT NULL
         );"
     ] {
-        run $s
+        sqlx $s
     }
     let _ = "
     - name: md

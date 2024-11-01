@@ -56,7 +56,7 @@ export def scratch-add [
         created: $now
         updated: $now
     }
-    run $"insert into scratch \(($d | columns | str join ',')\)
+    sqlx $"insert into scratch \(($d | columns | str join ',')\)
         values \(($d | values | each {Q $in} | str join ',')\)
         returning id;"
     $body
@@ -68,7 +68,7 @@ export def scratch-edit [
 ] {
     let o = $in
     let cfg = get-config $kind
-    let old = run $"select title, kind, body from scratch where id = ($id)"
+    let old = sqlx $"select title, kind, body from scratch where id = ($id)"
     | get -i 0
     let kind = if ($kind | is-empty) { $old.kind | first } else { $kind }
     let now = date now | fmt-date
@@ -91,13 +91,13 @@ export def scratch-edit [
         $"($k) = (Q $v)"
     }
     | str join ','
-    run $"update scratch set ($d) where id = ($id) returning id;"
+    sqlx $"update scratch set ($d) where id = ($id) returning id;"
     $body
 }
 
 export def scratch-search [keyword --num(-n):int = 20] {
     let k = Q $"%($keyword)%"
-    run $"select id, title, body from \(
+    sqlx $"select id, title, body from \(
             select id, title, body, created from scratch where title like ($k)
             union
             select id, title, body, created from scratch where body like ($k)
@@ -116,7 +116,7 @@ export def scratch-clean [
     --deleted
 ] {
     if $untitled {
-        run "delete from scratch where title = '' returning id, body"
+        sqlx "delete from scratch where title = '' returning id, body"
         | reduce -f {} {|it,acc| $acc | insert ($it.id | into string) $it.body }
     }
     if $untagged {
@@ -137,7 +137,7 @@ export def scratch-in [
         let cfg = get-config $kind
         $o | scratch-add --kind=$kind | performance $cfg
     } else {
-        let x = run $"select kind from scratch where id = ($id);" | get -i 0
+        let x = sqlx $"select kind from scratch where id = ($id);" | get -i 0
         let kind = if ($kind | is-empty) { $x.kind } else { $kind }
         let cfg = get-config $kind
         $o | scratch-edit --kind=$kind $id | performance $cfg
@@ -155,12 +155,12 @@ export def scratch-out [
         scratch-search --num=$num $search
     } else {
         let id = if ($id | is-empty) {
-            run $"select id from scratch order by updated desc limit 1;"
+            sqlx $"select id from scratch order by updated desc limit 1;"
             | get 0.id
         } else {
             $id
         }
-        let x = run $"select body, kind from scratch where id = ($id);" | get -i 0
+        let x = sqlx $"select body, kind from scratch where id = ($id);" | get -i 0
         let kind = if ($kind | is-empty) { $x.kind } else { $kind }
         let cfg = get-config $kind
         $x.body | performance $cfg $o
