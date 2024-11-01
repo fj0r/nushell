@@ -1,4 +1,4 @@
-use common.nu *
+use libs *
 
 def cmpl-scratch-id [] {
     run $"select id as value, updated || '│' || type || '│' ||
