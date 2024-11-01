@@ -54,10 +54,10 @@
         - [x] edit #477
         - [ ] move #478
         - [ ] list #479
-        - [ ] tag-clean #480
-        - [ ] tag-add #481
-        - [ ] tag-rename #482
-        - [ ] tag-hidden #483
-        - [ ] tag-title #484
-        - [ ] tag-body #485
-        - [ ] tag-export #486
+        - [ ] title #484
+        - [ ] export #486
+    - [x] Tag Ops #487
+        - [x] tag-clean #480
+        - [x] tag-add #481
+        - [x] tag-rename #482
+        - [x] tag-hidden #483
