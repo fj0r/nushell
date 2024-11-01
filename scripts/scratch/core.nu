@@ -29,6 +29,12 @@ export def scratch-add [
     --title(-t): string
     --body(-b): string
     --kind(-k): string@cmpl-kind='md'
+    --important(-i): int@cmpl-level
+    --urgent(-u): int@cmpl-level
+    --challenge(-c): int@cmpl-level
+    --deadline(-d): duration
+    --done(-x)
+    --relevant(-r): int@cmpl-relevant-id
 ] {
     let o = $in
     let now = date now | fmt-date

@@ -38,9 +38,26 @@
     - [x] If there is no title, truncate the first 20 characters of the content #445
     - [x] File type #447
 - [ ] Merge Todo #459
-    - [ ] Plain scratch #460
+    - [x] Plain scratch #460
     - [ ] Treeview with tag #461
         - [ ] Main tag in view #462
     - [ ] Dynamic create tag in path #463
     - [ ] Untagged as old scratch #464
-    - [ ] Template str replace #465
+    - [x] Template str replace #465
+    - [ ] Core #470
+        - [ ] add #471
+        - [ ] attrs #472
+        - [ ] done #474
+            - [ ] uplevel done #473
+        - [ ] delete #475
+        - [ ] clean #476
+        - [x] edit #477
+        - [ ] move #478
+        - [ ] list #479
+        - [ ] tag-clean #480
+        - [ ] tag-add #481
+        - [ ] tag-rename #482
+        - [ ] tag-hidden #483
+        - [ ] tag-title #484
+        - [ ] tag-body #485
+        - [ ] tag-export #486
