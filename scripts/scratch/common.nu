@@ -54,19 +54,33 @@ export def db-upsert [table pk --do-nothing] {
         ON CONFLICT\(($pk)\) DO ($d);"
 }
 
-def add-type [] {
-    let types = $in
-    for p in $types {
-        {
-            system: $env.OPENAI_PROMPT_TEMPLATE
-            template: "```\n{}\n```"
-            placeholder: ''
-            description: ''
+export def table-upsert [config] {
+    let d = $in
+    let d = $config.default | merge $d
+    $config.default
+    | columns
+    | reduce -f {} {|i,a|
+        let x = $d | get $i
+        let x = if ($i in $config.filter) {
+            $x | do ($config.filter | get $i) $x
+        } else {
+            $x
         }
-        | merge $p
-        | update placeholder {|x| $x.placeholder | to json -r}
-        | select name system template placeholder description
-        | db-upsert --do-nothing 'prompt' 'name'
+        $a | insert $i $x
+    }
+    | db-upsert --do-nothing $config.table $config.pk
+}
+
+def add-type [] {
+    $in | table-upsert {
+        default: {
+            name: 'md'
+            comment: "# "
+            runner: 'file'
+        }
+        table: type
+        pk: name
+        filter: {}
     }
 }
 
