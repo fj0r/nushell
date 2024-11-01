@@ -9,7 +9,7 @@ export-env {
         $env.CONTCONFIG = [$nu.data-dir 'container-preset.yml'] | path join
     }
     if not ($env.CONTCONFIG | path exists) {
-        "
+        "_: |-
         preset:
         - name: rust
           image: rust
@@ -76,10 +76,7 @@ export-env {
           cmd: []
           args: []
         "
-        | lines
-        | range 1..-1
-        | str substring 8..
-        | str join (char newline)
+        | from yaml | get _
         | save -f $env.CONTCONFIG
     }
 }

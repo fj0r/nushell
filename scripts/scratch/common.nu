@@ -71,7 +71,7 @@ export def table-upsert [config] {
     | db-upsert --do-nothing $config.table $config.pk
 }
 
-def add-type [] {
+export def add-type [] {
     $in | table-upsert {
         default: {
             name: 'md'

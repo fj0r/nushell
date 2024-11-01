@@ -93,14 +93,6 @@ export def git-hooks-context [] {
     }
 }
 
-def outdent [indent] {
-    $in
-    | lines
-    | range 1..
-    | str substring $indent..
-    | str join (char newline)
-}
-
 export def git-install-hooks [
     ...hooks:string@cmpl-hooks
     --mod(-m)="__"
@@ -114,7 +106,7 @@ export def git-install-hooks [
     let hs = if ($hooks | is-empty) { $hs | filter {$in.v.default?} } else { $hs | where k in $hooks }
     for h in $hs {
         let p = [$hook_path $h.k] | path join
-        $"
+        $"_: |-
         #!/bin/env nu
         use project
         use ../../($mod).nu
@@ -130,7 +122,7 @@ export def git-install-hooks [
             }
         }
         "
-        | outdent 8
+        | from yaml | get _
         | save -f $p
         chmod +x $p
     }

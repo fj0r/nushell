@@ -37,7 +37,7 @@ export def --env start [] {
         "CREATE TABLE IF NOT EXISTS type (
             name TEXT PRIMARY KEY,
             comment TEXT DEFAULT '#',
-            runner TEXT NOT NULL DEFAULT 'file', -- file, dir, remote
+            runner TEXT NOT NULL DEFAULT 'none', -- file, dir, remote
             created TEXT DEFAULT (strftime('%Y-%m-%dT%H:%M:%S','now')),
             updated TEXT DEFAULT (strftime('%Y-%m-%dT%H:%M:%S','now')),
             deleted TEXT DEFAULT ''
@@ -45,4 +45,34 @@ export def --env start [] {
     ] {
         run $s
     }
+    "
+    - name: md
+      comment: '# '
+      runner: 'none'
+    - name: nu
+      comment: '# '
+      runner: file
+    - name: py
+      comment: '# '
+      runner: file
+    - name: js
+      comment: '// '
+      runner: file
+    - name: ts
+      comment: '// '
+      runner: file
+    - name: rs
+      comment: '// '
+      runner: dir
+    - name: hs
+      comment: '-- '
+      runner: dir
+    - name: lua
+      comment: '-- '
+      runner: file
+    - name: pg
+      comment: '-- '
+      runner: remote
+    "
+    | from yaml | each { $in | add-type }
 }
