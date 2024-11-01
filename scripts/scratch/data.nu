@@ -2,7 +2,7 @@ use libs *
 use common.nu *
 
 
-export def --env start [] {
+export def --env init [] {
     if 'SCRATCH_DB' not-in $env {
         $env.SCRATCH_DB = [$nu.data-dir 'scratch.db'] | path join
     }
@@ -94,4 +94,40 @@ export def --env start [] {
         $env.PGPASSWORD = {password}
         psql -U {username} -d {database} -h {host} -p {port} -f {} --csv
     " | from yaml | each { $in | add-kind }
+}
+
+
+export def --env theme [] {
+    $env.SCRATCH_THEME = {
+        color: {
+            title: default
+            id: xterm_grey39
+            cat: xterm_lightslategrey
+            tag: xterm_wheat4
+            important: yellow
+            urgent: red
+            challenge: blue
+            deadline: xterm_rosybrown
+            created: xterm_paleturquoise4
+            updated: xterm_lightsalmon3a
+            content: grey
+        }
+        symbol: {
+            box: [['☐' '🗹' '*'],['[ ]' '[x]' '']]
+            md_list: '-'
+        }
+        formatter: {
+            created: {|x| $x | into datetime | date humanize }
+            updated: {|x| $x | into datetime | date humanize }
+            deadline: {|x, o|
+                let t = $x | into datetime
+                let s = $t | date humanize
+                if ($t - (date now) | into int) > 0 { $s } else { $"!($s)" }
+            }
+            important: {|x| '' | fill -c '☆ ' -w $x }
+            urgent: {|x| '' | fill -c '🔥' -w $x }
+            challenge: {|x| '' | fill -c '⚡' -w $x }
+        }
+
+    }
 }

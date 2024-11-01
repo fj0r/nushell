@@ -1,10 +1,5 @@
 use libs *
-
-def cmpl-scratch-id [] {
-    run $"select id as value, updated || '│' || kind || '│' ||
-        case title when '' then '...' || substr\(ltrim\(content\), 0, 20\) else title end  as description
-        from scratch order by updated desc limit 10;"
-}
+use completion.nu *
 
 export def scratch-add [--kind(-k): string@cmpl-kind='md'] {
     let o = $in

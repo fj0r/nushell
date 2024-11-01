@@ -1,6 +1,7 @@
-use init.nu
+use data.nu
 export-env {
-    init start
+    data init
+    data theme
 }
 
 export use core.nu *
