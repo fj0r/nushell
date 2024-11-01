@@ -27,6 +27,7 @@
             - [ ] Pipe input to script #455
         - [x] Config in db #456
             - [x] Type #457
+            - [x] Exec #458
     - [x] Search #431
         - [x] SQLite fts #434
         - [x] Format output #435

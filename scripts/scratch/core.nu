@@ -9,14 +9,15 @@ def cmpl-scratch-id [] {
 export def scratch-add [--type(-t): string@cmpl-type='md'] {
     let o = $in
     let now = date now | fmt-date
+    let cfg = get-config $type
     let content = if ($o | is-empty) { char newline } else { $o }
-    let input = $"('' | from title $type)\n($content)"
+    let input = $"('' | from title $cfg)\n($content)"
     | block-edit $"scratch-XXX.($type)" --type $type --line 2
     | lines
     let content = $input | range 1.. | skip-empty-lines | str join (char newline)
     if ($content | is-empty) { return }
     let d = {
-        title: ($input | first | to title $type)
+        title: ($input | first | to title $cfg)
         type: $type
         content: $content
         created: $now
@@ -33,6 +34,7 @@ export def scratch-edit [
     --type(-t):string@cmpl-type='md'
 ] {
     let o = $in
+    let cfg = get-config $type
     let old = run $"select title, type, content from scratch where id = ($id)"
     | get -i 0
     let type = if ($type | is-empty) { $old.type | first } else { $type }
@@ -40,14 +42,14 @@ export def scratch-edit [
     let content = if ($o | is-empty) { $old.content } else {
         $"($o)\n>>>>>>($now)<<<<<<\n($old.content)"
     }
-    let title = $old.title | from title $type
+    let title = $old.title | from title $cfg
     let input = [$title $content]
     | str join (char newline)
     | block-edit $"scratch-XXX.($type)" --type $type --line 2
     | lines
     let content = $input | range 1.. | skip-empty-lines | str join (char newline)
     let d = {
-        title: ($input | first | to title $type)
+        title: ($input | first | to title $cfg)
         content: $content
         type: $type
         updated: $now
@@ -86,15 +88,19 @@ export def scratch-clean [
 
 export def scratch-in [
     id?:int@cmpl-scratch-id
-    --type(-t):string@cmpl-type='md'
+    --type(-t):string@cmpl-type
 ] {
     let o = $in
     if ($id | is-empty) {
-        $o | scratch-add --type=$type
+        let type = if ($type | is-empty) { 'md' } else { $type }
+        let cfg = get-config $type
+        $o | scratch-add --type=$type | exec $cfg
     } else {
-        $o | scratch-edit --type=$type $id
+        let x = run $"select type from scratch where id = ($id);" | get -i 0
+        let type = if ($type | is-empty) { $x.type } else { $type }
+        let cfg = get-config $type
+        $o | scratch-edit --type=$type $id | exec $cfg
     }
-    | exec $type
 }
 
 export def scratch-out [
@@ -113,8 +119,9 @@ export def scratch-out [
             $id
         }
         let x = run $"select content, type from scratch where id = ($id);" | get -i 0
-        let typ = if ($type | is-empty) { $x.type } else { $type }
-        $x.content | exec $typ
+        let type = if ($type | is-empty) { $x.type } else { $type }
+        let cfg = get-config $type
+        $x.content | exec $cfg
     }
 }
 

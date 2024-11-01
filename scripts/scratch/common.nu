@@ -77,6 +77,7 @@ export def add-type [] {
             name: 'md'
             comment: "# "
             runner: 'file'
+            cmd: ''
         }
         table: type
         pk: name
@@ -97,44 +98,29 @@ export def skip-empty-lines [] {
     $o | range $s..
 }
 
-const typemap = {
-    md: "# "
-    nu: "# "
-    py: "# "
-    rs: "// "
-    js: "// "
-    ts: "// "
-    hs: "-- "
-    sql: "-- "
-    lua: "-- "
+export def get-config [type] {
+    run $"select * from type where name = (Q $type)" | first
 }
 
-export def 'to title' [type] {
-    $in | str replace ($typemap | get $type) ''
+export def 'to title' [config] {
+    $in | str replace ($config.comment) ''
 }
 
-export def 'from title' [type] {
-    $"($typemap | get $type)($in)"
+export def 'from title' [config] {
+    $"($config.comment)($in)"
 }
 
-def run-file [type runner] {
-    let o = $in
-    let f = $o | maketemp $'scratch-XXX.($type)'
-    ^$runner $f
+
+export def exec [config] {
+    let f = $in | maketemp $'scratch-XXX.($config.name)'
+    if $config.cmd == '' {
+        cat $f
+    } else {
+        nu -c ($config.cmd | str replace '{}' $f)
+    }
     rm -f $f
 }
 
-export def exec [type] {
-    let o = $in
-    match $type {
-        nu => { $o | run-file nu nu }
-        py => { $o | run-file py python3 }
-        js => { $o | run-file js node }
-        rs => { $o | run-file rs rust-script }
-        _ => { $o }
-    }
-}
-
 export def cmpl-type [] {
-    [nu py js rs md]
+    run $"select name from type" | get name
 }

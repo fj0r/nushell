@@ -36,8 +36,9 @@ export def --env start [] {
         );"
         "CREATE TABLE IF NOT EXISTS type (
             name TEXT PRIMARY KEY,
-            comment TEXT DEFAULT '#',
-            runner TEXT NOT NULL DEFAULT 'none', -- file, dir, remote
+            comment TEXT NOT NULL DEFAULT '# ',
+            runner TEXT NOT NULL DEFAULT 'none',
+            cmd TEXT NOT NULL DEFAULT '',
             created TEXT DEFAULT (strftime('%Y-%m-%dT%H:%M:%S','now')),
             updated TEXT DEFAULT (strftime('%Y-%m-%dT%H:%M:%S','now')),
             deleted TEXT DEFAULT ''
@@ -45,34 +46,42 @@ export def --env start [] {
     ] {
         run $s
     }
-    "
+
+    let _ = "
     - name: md
       comment: '# '
       runner: 'none'
     - name: nu
       comment: '# '
       runner: file
+      cmd: nu {}
     - name: py
       comment: '# '
       runner: file
+      cmd: python3 {}
     - name: js
       comment: '// '
       runner: file
+      cmd: node {}
     - name: ts
       comment: '// '
       runner: file
     - name: rs
       comment: '// '
       runner: dir
+      cmd: 'cargo build; cargo run'
     - name: hs
       comment: '-- '
       runner: dir
     - name: lua
       comment: '-- '
       runner: file
+      cmd: lua {}
     - name: pg
       comment: '-- '
       runner: remote
-    "
-    | from yaml | each { $in | add-type }
+      cmd: |-
+        $env.PGPASSWORD = {password}
+        psql -U {username} -d {database} -h {host} -p {port} -f {} --csv
+    " | from yaml | each { $in | add-type }
 }
