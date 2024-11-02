@@ -21,11 +21,23 @@ export def add-kind [] {
             cmd: ''
         }
         table: kind
-        pk: name
+        pk: [name]
         filter: {}
     }
 }
 
+export def add-kind-preset [] {
+    $in | table-upsert {
+        default: {
+            kind: 'sqlite'
+            name: ''
+            yaml: ""
+        }
+        table: kind_preset
+        pk: [kind, name]
+        filter: {}
+    }
+}
 
 export def dbg [switch content -t:string] {
     if $switch {

@@ -356,23 +356,25 @@ export def scratch-search [
 export def scratch-in [
     id?:int@cmpl-untagged-scratch-id
     --kind(-k):string@cmpl-kind
+    --preset(-p):string@cmpl-kind-preset
 ] {
     let o = $in
     if ($id | is-empty) {
         let kind = if ($kind | is-empty) { 'md' } else { $kind }
         let cfg = get-config $kind
-        $o | scratch-add --kind=$kind --returning-body | performance $cfg
+        $o | scratch-add --kind=$kind --returning-body | performance $cfg --preset $preset
     } else {
         let x = sqlx $"select kind from scratch where id = ($id);" | get -i 0
         let kind = if ($kind | is-empty) { $x.kind } else { $kind }
         let cfg = get-config $kind
-        $o | scratch-edit --kind=$kind $id --returning-body | performance $cfg
+        $o | scratch-edit --kind=$kind $id --returning-body | performance $cfg --preset $preset
     }
 }
 
 export def scratch-out [
     id?:int@cmpl-untagged-scratch-id
     --kind(-k):string@cmpl-kind
+    --preset(-p):string@cmpl-kind-preset
     --search(-s): string
     --num(-n):int = 20
 ] {
@@ -389,7 +391,7 @@ export def scratch-out [
         let x = sqlx $"select body, kind from scratch where id = ($id);" | get -i 0
         let kind = if ($kind | is-empty) { $x.kind } else { $kind }
         let cfg = get-config $kind
-        $x.body | performance $cfg $o
+        $x.body | performance $cfg $o --preset $preset
     }
 }
 

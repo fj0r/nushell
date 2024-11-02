@@ -22,6 +22,7 @@
         - [ ] Exec #449
             - [ ] pipe output #446
             - [x] File runner #450
+                - [x] Preset options #502
             - [ ] Dir runner #451
             - [ ] Remote runner #453
             - [x] Pipe input to script #455

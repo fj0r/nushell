@@ -56,6 +56,12 @@ export def --env init [] {
             updated TEXT DEFAULT (strftime('%Y-%m-%dT%H:%M:%S','now')),
             deleted TEXT DEFAULT ''
         );"
+        "CREATE TABLE IF NOT EXISTS kind_preset (
+            kind TEXT NOT NULL,
+            name TEXT NOT NULL,
+            yaml TEXT NOT NULL DEFAULT '',
+            PRIMARY KEY (kind, name)
+        );"
         "CREATE TABLE IF NOT EXISTS file (
             hash TEXT PRIMARY KEY,
             body TEXT NOT NULL DEFAULT ''
@@ -102,11 +108,20 @@ export def --env init [] {
       cmd: lua {}
     - name: pg
       comment: '-- '
-      runner: remote
+      runner: file
       cmd: |-
         $env.PGPASSWORD = {password}
         psql -U {username} -d {database} -h {host} -p {port} -f {} --csv
+    - name: sqlite
+      comment: '-- '
+      runner: file
+      cmd: open {file} | query db (open {})
     " | from yaml | each { $in | add-kind }
+    {
+            kind: 'sqlite'
+            name: 'scratch'
+            yaml: "file: ~/.local/share/nushell/scratch.db"
+    } | add-kind-preset
 }
 
 
