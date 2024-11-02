@@ -4,21 +4,50 @@ export def scratch-format [--md --md-list] {
     $in | to tree | fmt tree --md=$md --md-list=$md_list
 }
 
+export def tag-format [--md --md-list] {
+    $in
+    | to tree
+    | tag tree
+    | fmt tag --md=$md --md-list=$md_list
+}
+
+# si 11
 export def 'tag tree' [] {
-    let i = $in
+    let o = $in
+    # dynamically determines the root node
+    let x = $o | each {|i|
+        let main = $i.tags.0
+        let node = $i | update tags {|x| $x.tags | range 1.. }
+        {tags: main, node: node}
+    }
+    mut r = []
+}
+
+def tag-tree [tags node] {
+}
+
+def 'fmt tag' [
+    level:int=0
+    --indent(-i):int=4
+    --padding(-p):int=0
+    --md
+    --md-list
+] {
+
 }
 
 export def 'to tree' [] {
     let i = $in
     # dynamically determines the root node
-    let rid = $i | get parent_id | uniq | filter { $in not-in ($i | get id)}
-    let root = $i | where parent_id in $rid
+    let all_ids = $i | get id | uniq
+    let root_ids = $i | get parent_id | uniq | filter { $in not-in $all_ids }
+    let root = $i | where parent_id in $root_ids
     if ($root | is-empty) { return }
     to-tree $root ($i | group-by parent_id)
 }
 
-def to-tree [r o] {
-    $r | each {|i|
+def to-tree [root o] {
+    $root | each {|i|
         let k = $i.id | into string
         let t = if $k in $o {
             to-tree ($o | get $k) $o
@@ -29,10 +58,16 @@ def to-tree [r o] {
     }
 }
 
-def 'fmt tree' [level:int=0 --indent(-i):int=4 --md --md-list] {
+def 'fmt tree' [
+    level:int=0
+    --indent(-i):int=4
+    --padding(-p):int=0
+    --md
+    --md-list
+] {
     mut out = []
     for i in $in {
-        let n = '' | fill -c ' ' -w ($level * $indent)
+        let n = '' | fill -c ' ' -w ($padding + $level * $indent)
         for j in ($i | reject children | fmt leaves $n --md=$md --md-list=$md_list) {
             $out ++= $j
         }

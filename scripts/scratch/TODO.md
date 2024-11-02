@@ -67,6 +67,7 @@
         - [x] list #479
             - [x] select root and then subnode #505
             - [x] split tags #506
+            - [x] tags tree #507
         - [ ] title #484
         - [ ] export #486
     - [ ] Tag Ops #487
