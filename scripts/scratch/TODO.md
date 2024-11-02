@@ -53,6 +53,7 @@
     - [ ] Core #470
         - [x] add #471
             - [x] Noninteractive (sa --batch) #492
+            - [x] tags #497
         - [x] attrs #472
         - [x] done #474
             - [ ] ~uplevel done~ #473

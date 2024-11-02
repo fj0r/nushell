@@ -66,6 +66,14 @@ export def scratch-add [
         values \(($d | values | each {Q $in} | str join ',')\)
         returning id;" | get 0.id
 
+    if ($tags | is-not-empty) {
+        scratch-ensure-tags $tags
+        let children = $"select ($id), tags.id from tags where name in \(($tags | each {Q $in} | str join ',')\)"
+        sqlx $"with (tag-tree) insert into scratch_tag ($children)
+          on conflict \(scratch_id, tag_id\) do nothing
+        ;"
+    }
+
     scratch-done $id --reverse=(not $done)
 
     if $returning_body {
