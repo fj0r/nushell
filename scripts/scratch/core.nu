@@ -79,6 +79,7 @@ export def scratch-add [
 export def scratch-edit [
     id:int@cmpl-scratch-id
     --kind(-k):string@cmpl-kind
+    --returning-body
 ] {
     let o = $in
     let old = sqlx $"select title, kind, body from scratch where id = ($id)" | get -i 0
@@ -93,9 +94,13 @@ export def scratch-edit [
     let e = $d
     | items {|k,v| $"($k) = (Q $v)" }
     | str join ','
-    sqlx $"update scratch set ($e) where id = ($id) returning id;"
+    let id = sqlx $"update scratch set ($e) where id = ($id) returning id;" | get 0.id
 
-    $d.body
+    if $returning_body {
+        $d.body
+    } else {
+        $id
+    }
 }
 
 export def scratch-done [
@@ -157,7 +162,7 @@ export def scratch-in [
         let x = sqlx $"select kind from scratch where id = ($id);" | get -i 0
         let kind = if ($kind | is-empty) { $x.kind } else { $kind }
         let cfg = get-config $kind
-        $o | scratch-edit --kind=$kind $id | performance $cfg
+        $o | scratch-edit --kind=$kind $id --returning-body | performance $cfg
     }
 }
 

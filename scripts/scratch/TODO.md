@@ -52,13 +52,14 @@
     - [x] Template str replace #465
     - [ ] Core #470
         - [x] add #471
-            - [ ] Noninteractive (sa -t) #492
+            - [x] Noninteractive (sa --batch) #492
         - [ ] attrs #472
         - [ ] done #474
             - [ ] ~uplevel done~ #473
         - [ ] delete #475
         - [ ] clean #476
         - [x] edit #477
+            - [x] --returing-body #495
         - [ ] move #478
         - [ ] list #479
         - [ ] title #484
