@@ -165,6 +165,17 @@ export def scratch-done [
     }
 }
 
+export def scratch-move [
+    id: int@cmpl-sid
+    to: int@cmpl-sid
+] {
+    let now = date now | fmt-date | Q $in
+    let pid = sqlx $"select parent_id from scratch where id = ($id);" | get 0.parent_id
+    sqlx $"update scratch set parent_id = ($to) where id = ($id);"
+    uplevel done $pid $now true
+    uplevel done $to $now true
+}
+
 export def scratch-search [keyword --num(-n):int = 20] {
     let k = Q $"%($keyword)%"
     sqlx $"select id, title, body from \(

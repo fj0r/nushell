@@ -54,18 +54,19 @@
         - [x] add #471
             - [x] Noninteractive (sa --batch) #492
         - [x] attrs #472
-        - [ ] done #474
+        - [x] done #474
             - [ ] ~uplevel done~ #473
         - [ ] delete #475
         - [ ] clean #476
         - [x] edit #477
             - [x] --returing-body #495
-        - [ ] move #478
+        - [x] move #478
         - [ ] list #479
         - [ ] title #484
         - [ ] export #486
-    - [x] Tag Ops #487
+    - [ ] Tag Ops #487
         - [x] tag-clean #480
         - [x] tag-add #481
         - [x] tag-rename #482
         - [x] tag-hidden #483
+        - [ ] Optimize scratch-ensure-tags #496
