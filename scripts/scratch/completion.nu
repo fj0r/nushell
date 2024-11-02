@@ -1,8 +1,10 @@
 use common.nu *
 
 export def cmpl-scratch-id [] {
-    sqlx 'select id, title from scratch order by updated desc;'
-    | each { $"($in.id) # ($in.title)" }
+    sqlx "select id, title,
+        case parent_id when -1 then '#' else '' end as root
+        from scratch order by updated desc;"
+    | each { $"($in.id) #($in.root) ($in.title)" }
 }
 
 export def cmpl-untagged-scratch-id [] {
