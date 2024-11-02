@@ -19,7 +19,6 @@ export def scratch-list [
     --work-in-process(-W)
     --finished(-F)
     --untagged(-U)
-    --no-branch(-N)
     --md(-m)
     --md-list(-l)
     --raw
@@ -111,24 +110,10 @@ export def scratch-list [
         $r
     }
 
-
     if $raw {
         $r
     } else {
-        if $no_branch {
-            $r
-        } else {
-            let ids = $r | get id | str join ', '
-            let fp = [id, parent_id, title]
-            let ft = $fp | each { $"t.($in)" } | str join ', '
-            let x = sqlx $"with recursive p as \(
-                select ($fp | str join ', '), 2 as done from scratch where id in \(($ids)\)
-                union all
-                select ($ft), 2 as done from scratch as t join p on p.parent_id = t.id
-                \) select * from p;"
-            $r | append $x | uniq-by id
-        }
-        | scratch-format --md=$md --md-list=$md_list
+        $r | scratch-format --md=$md --md-list=$md_list
     }
 }
 
