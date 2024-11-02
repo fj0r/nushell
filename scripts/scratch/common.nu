@@ -65,3 +65,47 @@ export def dbg [switch content -t:string] {
         print $"(ansi grey)($t)│($content)(ansi reset)"
     }
 }
+
+export def get-config [kind] {
+    sqlx $"select * from kind where name = (Q $kind)" | first
+}
+
+export def 'to title' [config] {
+    $in | str replace ($config.comment) ''
+}
+
+export def 'from title' [config] {
+    $"($config.comment)($in)"
+}
+
+
+export def entity [
+    cfg
+    --title:string
+    --kind: string
+    --edit
+    --created
+] {
+    let o = $in
+    let now = date now | fmt-date
+    let e = if $edit {
+        let l = [($title | from title $cfg) $o]
+        | str join (char newline)
+        | block-edit $"scratch-XXX.($kind)" ($cfg | update pos {|x| $x.pos + 1 })
+        | lines
+        let title = $l | first | to title $cfg
+        let body = $l | range 1.. | skip-empty-lines | str join (char newline)
+        {title: $title, body: $body}
+    } else {
+        {title: $title, body: $o}
+    }
+    let created = if $created { {created: $now} } else { {} }
+    {
+        title: $e.title
+        kind: $kind
+        body: $e.body
+        ...$created
+        updated: $now
+    }
+}
+

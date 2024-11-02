@@ -1,4 +1,5 @@
 use libs *
+use common.nu *
 use completion.nu *
 export use tag.nu *
 
@@ -27,6 +28,7 @@ export def scratch-list [
 
 }
 
+
 export def scratch-add [
     ...tags:string@cmpl-tag
     --title(-t): string
@@ -41,25 +43,17 @@ export def scratch-add [
     --relevant(-r): int@cmpl-relevant-id
 ] {
     let o = $in
-    let now = date now | fmt-date
     let cfg = get-config $kind
     let body = if ($o | is-empty) { char newline } else { $o }
-    let input = $"('' | from title $cfg)\n($body)"
-    | block-edit $"scratch-XXX.($kind)" ($cfg | update pos {|x| $x.pos + 1 })
-    | lines
-    let body = $input | range 1.. | skip-empty-lines | str join (char newline)
-    if ($body | is-empty) { return }
-    let d = {
-        title: ($input | first | to title $cfg)
-        kind: $kind
-        body: $body
-        created: $now
-        updated: $now
-    }
+
+    let d = $body | entity --edit $cfg --title "" --kind $kind --created
+    if ($d.body | is-empty) { return }
+
     sqlx $"insert into scratch \(($d | columns | str join ',')\)
         values \(($d | values | each {Q $in} | str join ',')\)
         returning id;"
-    $body
+
+    $d.body
 }
 
 export def scratch-edit [
@@ -71,28 +65,18 @@ export def scratch-edit [
     let old = sqlx $"select title, kind, body from scratch where id = ($id)"
     | get -i 0
     let kind = if ($kind | is-empty) { $old.kind | first } else { $kind }
-    let now = date now | fmt-date
     let body = if ($o | is-empty) { $old.body } else {
-        $"($o)\n>>>>>>($now)<<<<<<\n($old.body)"
+        $"($o)\n>>>>>>\n($old.body)"
     }
-    let title = $old.title | from title $cfg
-    let input = [$title $body]
-    | str join (char newline)
-    | block-edit $"scratch-XXX.($kind)" ($cfg | update pos {|x| $x.pos + 1 })
-    | lines
-    let body = $input | range 1.. | skip-empty-lines | str join (char newline)
-    let d = {
-        title: ($input | first | to title $cfg)
-        body: $body
-        kind: $kind
-        updated: $now
-    }
-    | items {|k,v|
-        $"($k) = (Q $v)"
-    }
+
+    let d = $body | entity --edit $cfg --title $old.title --kind $kind
+
+    let e = $d
+    | items {|k,v| $"($k) = (Q $v)" }
     | str join ','
-    sqlx $"update scratch set ($d) where id = ($id) returning id;"
-    $body
+    sqlx $"update scratch set ($e) where id = ($id) returning id;"
+
+    $d.body
 }
 
 export def scratch-search [keyword --num(-n):int = 20] {
