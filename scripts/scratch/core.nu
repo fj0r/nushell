@@ -302,21 +302,6 @@ export def scratch-move [
     uplevel done $to $now true
 }
 
-export def scratch-search [keyword --num(-n):int = 20] {
-    let k = Q $"%($keyword)%"
-    sqlx $"select id, title, body from \(
-            select id, title, body, created from scratch where title like ($k)
-            union
-            select id, title, body, created from scratch where body like ($k)
-        \) as t
-        order by t.created desc limit ($num)
-    "
-    | reduce -f {} {|it,acc|
-        let c = $"### ($it.title)\n\n($it.body)\n"
-        $acc | insert ($it.id | into string) $c
-    }
-}
-
 export def scratch-clean [
     --untitled
     --untagged
@@ -336,6 +321,35 @@ export def scratch-clean [
             scratch: $scratch
             scratch_tags: $tags
         }
+    }
+}
+
+export def scratch-search [
+    keyword
+    --num(-n):int = 20
+    --untagged
+] {
+    let k = Q $"%($keyword)%"
+    mut i = [$"title like ($k)"]
+    mut r = [$"body like ($k)"]
+    if $untagged {
+        $i ++= 'tag_id is null'
+        $r ++= 'tag_id is null'
+    }
+    sqlx $"select id, title, body from \(
+            select id, title, body, created from scratch
+            left outer join scratch_tag on scratch.id = scratch_id
+            where ($i | str join ' and ')
+            union
+            select id, title, body, created from scratch
+            left outer join scratch_tag on scratch.id = scratch_id
+            where ($r | str join ' and ')
+        \) as t
+        order by t.created desc limit ($num)
+    "
+    | reduce -f {} {|it,acc|
+        let c = $"### ($it.title)\n\n($it.body)\n"
+        $acc | insert ($it.id | into string) $c
     }
 }
 
@@ -364,7 +378,7 @@ export def scratch-out [
 ] {
     let o = $in | default ''
     if ($search | is-not-empty) {
-        scratch-search --num=$num $search
+        scratch-search --untagged --num=$num $search
     } else {
         let id = if ($id | is-empty) {
             sqlx $"select id from scratch order by updated desc limit 1;"
