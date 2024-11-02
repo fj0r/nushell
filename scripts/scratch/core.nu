@@ -49,11 +49,11 @@ export def scratch-add [
     let d = $body | entity --edit $cfg --title "" --kind $kind --created
     if ($d.body | is-empty) { return }
 
-    sqlx $"insert into scratch \(($d | columns | str join ',')\)
+    let id = sqlx $"insert into scratch \(($d | columns | str join ',')\)
         values \(($d | values | each {Q $in} | str join ',')\)
-        returning id;"
+        returning id;" | get 0.id
 
-    $d.body
+    $id
 }
 
 export def scratch-edit [
