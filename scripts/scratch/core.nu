@@ -107,7 +107,13 @@ export def scratch-list [
     dbg $debug $stmt -t stmt
     let r = sqlx $stmt
     | group-by id
-    | items {|k, x| $x | first | insert tags ($x | get tag) | reject tag }
+    | items {|k, x|
+        let t = $x
+        | get tag
+        | filter { $in | is-not-empty }
+        | each {$in | default '' | split row ':'}
+        $x | first | reject tag | insert tags $t
+    }
 
     let flt = $flt
     let r = if ($flt.and | is-not-empty) or ($flt.not | is-not-empty) {
