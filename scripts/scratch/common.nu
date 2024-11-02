@@ -109,3 +109,32 @@ export def entity [
     }
 }
 
+export def 'uplevel done' [pid now done:bool] {
+    mut p = $pid
+    loop {
+        if $done {
+            # Check if all nodes at the current level are Done
+            let all_done = (sqlx $"select count\(1\) as c from scratch
+                where parent_id = ($p) and deleted = '' and done = 0"
+            | get 0.c | default 0) == 0
+            if $all_done {
+                let r = sqlx $"update scratch set done = 1, updated = ($now) where id = ($p) returning parent_id;"
+                if ($r | is-empty) {
+                    break
+                } else {
+                    $p = $r | get 0.parent_id
+                }
+            } else {
+                sqlx $"update scratch set done = 0, updated = ($now) where id = ($p)"
+                break
+            }
+        } else {
+            let x = sqlx $"update scratch set done = 0, updated = ($now) where id = ($p) and done = 1 returning parent_id;"
+            if ($x | is-empty) {
+                break
+            } else {
+                $p = $x | get 0.parent_id
+            }
+        }
+    }
+}

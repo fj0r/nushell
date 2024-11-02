@@ -51,7 +51,7 @@
     - [ ] Untagged as old scratch #464
     - [x] Template str replace #465
     - [ ] Core #470
-        - [ ] add #471
+        - [x] add #471
             - [ ] Noninteractive (sa -t) #492
         - [ ] attrs #472
         - [ ] done #474

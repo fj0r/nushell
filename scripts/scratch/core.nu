@@ -61,9 +61,13 @@ export def scratch-add [
         done: (if $done { 1 } else { 0 })
     } | filter-empty
 
+    let d = {...$d, ...$attrs}
+
     let id = sqlx $"insert into scratch \(($d | columns | str join ',')\)
         values \(($d | values | each {Q $in} | str join ',')\)
         returning id;" | get 0.id
+
+    scratch-done $id --reverse=(not $done)
 
     if $returning_body {
         $d.body
@@ -92,6 +96,20 @@ export def scratch-edit [
     sqlx $"update scratch set ($e) where id = ($id) returning id;"
 
     $d.body
+}
+
+export def scratch-done [
+    ...id: int@cmpl-sid
+    --reverse(-r)
+] {
+    let d = if $reverse { 0 } else { 1 }
+    let now = date now | fmt-date | Q $in
+    let ids = $id | str join ','
+    let pid = sqlx $"update scratch set done = ($d), updated = ($now) where id in \(($ids)\) returning parent_id;" | get parent_id
+    # update parents status
+    for i in $pid {
+        uplevel done $i $now (not $reverse)
+    }
 }
 
 export def scratch-search [keyword --num(-n):int = 20] {
