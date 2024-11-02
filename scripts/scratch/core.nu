@@ -74,13 +74,12 @@ export def scratch-add [
 
 export def scratch-edit [
     id:int@cmpl-scratch-id
-    --kind(-k):string@cmpl-kind='md'
+    --kind(-k):string@cmpl-kind
 ] {
     let o = $in
+    let old = sqlx $"select title, kind, body from scratch where id = ($id)" | get -i 0
+    let kind = if ($kind | is-empty) { $old.kind } else { $kind }
     let cfg = get-config $kind
-    let old = sqlx $"select title, kind, body from scratch where id = ($id)"
-    | get -i 0
-    let kind = if ($kind | is-empty) { $old.kind | first } else { $kind }
     let body = if ($o | is-empty) { $old.body } else {
         $"($o)\n>>>>>>\n($old.body)"
     }
