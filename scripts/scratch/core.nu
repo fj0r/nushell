@@ -151,7 +151,7 @@ export def scratch-add [
     let cfg = get-config $kind
     let body = if ($o | is-empty) { char newline } else { $o }
 
-    let d = $body | entity --batch=$batch $cfg --title $title --kind $kind --created
+    let d = $body | entity --batch=$batch $cfg --title $title --created
     if ($d.body | is-empty) { return }
 
     let attrs = {
@@ -200,7 +200,7 @@ export def scratch-edit [
         $"($o)\n>>>>>>\n($old.body)"
     }
 
-    let d = $body | entity $cfg --title $old.title --kind $kind
+    let d = $body | entity $cfg --title $old.title
 
     let e = $d
     | items {|k,v| $"($k) = (Q $v)" }

@@ -16,6 +16,7 @@ export def add-kind [] {
     $in | table-upsert {
         default: {
             name: 'md'
+            ext: ''
             comment: "# "
             runner: 'file'
             cmd: ''
@@ -61,7 +62,6 @@ export def 'from title' [config] {
 export def entity [
     cfg
     --title:string
-    --kind: string
     --batch
     --created
 ] {
@@ -70,7 +70,7 @@ export def entity [
     let e = if not $batch {
         let l = [($title | from title $cfg) $o]
         | str join (char newline)
-        | block-edit $"scratch-XXX.($kind)" ($cfg | update pos {|x| $x.pos + 1 })
+        | block-edit $"scratch-XXX.($cfg.ext)" ($cfg | update pos {|x| $x.pos + 1 })
         | lines
         let title = $l | first | to title $cfg
         let body = $l | range 1.. | skip-empty-lines | str join (char newline)
@@ -81,7 +81,7 @@ export def entity [
     let created = if $created { {created: $now} } else { {} }
     {
         title: $e.title
-        kind: $kind
+        kind: $cfg.name
         body: $e.body
         ...$created
         updated: $now

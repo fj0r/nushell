@@ -48,6 +48,7 @@ export def --env init [] {
         );"
         "CREATE TABLE IF NOT EXISTS kind (
             name TEXT PRIMARY KEY,
+            ext TEXT NOT NULL DEFAULT '',
             comment TEXT NOT NULL DEFAULT '# ',
             runner TEXT NOT NULL DEFAULT '',
             cmd TEXT NOT NULL DEFAULT '',
@@ -78,50 +79,64 @@ export def --env init [] {
     }
     let _ = "
     - name: md
+      ext: md
       comment: '# '
       runner: ''
-    - name: nu
+    - name: markdown
+      ext: md
+      comment: '# '
+      runner: ''
+    - name: nushell
+      ext: nu
       comment: '# '
       runner: file
       cmd: 'open {stdin} | nu {}'
-    - name: py
+    - name: python
+      ext: py
       comment: '# '
       runner: file
       cmd: 'open {stdin} | python3 {}'
-    - name: js
+    - name: javascript
+      ext: js
       comment: '// '
       runner: file
       cmd: node {}
-    - name: ts
+    - name: typescript
+      ext: ts
       comment: '// '
       runner: file
-    - name: rs
+    - name: rust
+      ext: rs
       comment: '// '
       runner: dir
       cmd: 'cargo build; cargo run'
-    - name: hs
+    - name: haskell
+      ext: hs
       comment: '-- '
       runner: dir
     - name: lua
+      ext: lua
       comment: '-- '
       runner: file
       cmd: lua {}
-    - name: pg
+    - name: postgresql
+      ext: sql
       comment: '-- '
       runner: file
       cmd: |-
         $env.PGPASSWORD = {password}
         psql -U {username} -d {database} -h {host} -p {port} -f {} --csv
     - name: sqlite
+      ext: sql
       comment: '-- '
       runner: file
       cmd: open {file} | query db (open {})
     " | from yaml | each { $in | add-kind }
-    {
-            kind: 'sqlite'
-            name: 'scratch'
-            yaml: "file: ~/.local/share/nushell/scratch.db"
-    } | add-kind-preset
+    "
+    - kind: sqlite
+      name: scratch
+      yaml: 'file: ~/.local/share/nushell/scratch.db'
+    " | from yaml | each { $in | add-kind-preset }
 }
 
 

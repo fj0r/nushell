@@ -11,21 +11,18 @@ export def performance [
     stdin?=''
     --preset: string
 ] {
-    let f = $in | maketemp $'scratch-XXX.($config.name)'
+    let f = $in | maketemp $'scratch-XXX.($config.ext)'
     let i = $stdin | maketemp $'scratch-XXX.stdin'
     let opt = if $config.runner in ['file', 'dir'] {
-        if ($preset | is-empty) {
-            print $"(ansi red)`--preset` cannot be empty when the target is executable(ansi reset)"
-            return
-        }
         let q = $"select yaml from kind_preset where kind = (Q $config.name) and name = (Q $preset)"
-        sqlx $q | get 0.yaml | from yaml
+        sqlx $q | get -i 0.yaml | default '{}' | from yaml
     } else {
         {}
     }
     match $config.runner {
         'file' => {
-            nu -c ($config.cmd | render {_: $f, stdin: $i, ...$opt})
+            let cmd = $config.cmd | render {_: $f, stdin: $i, ...$opt}
+            nu -m light -c $cmd
             remove-file $f $i
         }
         'dir' => {

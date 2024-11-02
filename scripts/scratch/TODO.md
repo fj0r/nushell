@@ -26,6 +26,7 @@
             - [ ] Dir runner #451
             - [ ] Remote runner #453
             - [x] Pipe input to script #455
+            - [x] kind: decouple name and ext #504
         - [x] Config in db #456
             - [x] Type #457
             - [x] Exec #458
