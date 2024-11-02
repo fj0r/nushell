@@ -48,7 +48,7 @@ export def --env init [] {
         );"
         "CREATE TABLE IF NOT EXISTS kind (
             name TEXT PRIMARY KEY,
-            ext TEXT NOT NULL DEFAULT '',
+            entry TEXT NOT NULL DEFAULT '',
             comment TEXT NOT NULL DEFAULT '# ',
             runner TEXT NOT NULL DEFAULT '',
             cmd TEXT NOT NULL DEFAULT '',
@@ -79,55 +79,55 @@ export def --env init [] {
     }
     let _ = "
     - name: md
-      ext: md
+      entry: README.md
       comment: '# '
       runner: ''
     - name: markdown
-      ext: md
+      entry: README.md
       comment: '# '
       runner: ''
     - name: nushell
-      ext: nu
+      entry: main.nu
       comment: '# '
       runner: file
       cmd: 'open {stdin} | nu {}'
     - name: python
-      ext: py
+      entry: __main__.py
       comment: '# '
       runner: file
       cmd: 'open {stdin} | python3 {}'
     - name: javascript
-      ext: js
+      entry: index.js
       comment: '// '
       runner: file
       cmd: node {}
     - name: typescript
-      ext: ts
+      entry: index.ts
       comment: '// '
       runner: file
     - name: rust
-      ext: rs
+      entry: src/main.rs
       comment: '// '
       runner: dir
       cmd: 'cargo build; cargo run'
     - name: haskell
-      ext: hs
+      entry: app/Main.hs
       comment: '-- '
       runner: dir
     - name: lua
-      ext: lua
+      entry: init.lua
       comment: '-- '
       runner: file
       cmd: lua {}
     - name: postgresql
-      ext: sql
+      entry: main.sql
       comment: '-- '
       runner: file
       cmd: |-
         $env.PGPASSWORD = {password}
         psql -U {username} -d {database} -h {host} -p {port} -f {} --csv
     - name: sqlite
-      ext: sql
+      entry: main.sql
       comment: '-- '
       runner: file
       cmd: open {file} | query db (open {})

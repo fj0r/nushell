@@ -16,10 +16,10 @@ export def add-kind [] {
     $in | table-upsert {
         default: {
             name: 'md'
-            ext: ''
+            entry: ''
             comment: "# "
             runner: 'file'
-            cmd: ''
+            cmd: 'open {}'
         }
         table: kind
         pk: [name]
@@ -70,7 +70,8 @@ export def entity [
     let e = if not $batch {
         let l = [($title | from title $cfg) $o]
         | str join (char newline)
-        | block-edit $"scratch-XXX.($cfg.ext)" ($cfg | update pos {|x| $x.pos + 1 })
+        | block-edit $"scratch-XXX" $cfg.entry ($cfg | update pos {|x| $x.pos + 1 })
+        | get content
         | lines
         let title = $l | first | to title $cfg
         let body = $l | range 1.. | skip-empty-lines | str join (char newline)

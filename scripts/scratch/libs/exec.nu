@@ -1,6 +1,7 @@
 export def performance [
     config
     stdin?=''
+    --tmpfile: record
     --preset: string
 ] {
     let o = $in
@@ -11,26 +12,32 @@ export def performance [
         {}
     }
     match $config.runner {
-        'file' => {
-            let f = $o | maketemp $'scratch-XXX.($config.ext)'
-            let i = $stdin | maketemp $'scratch-XXX.stdin'
-            let wd = $f | path dirname
-            let cmd = $config.cmd | render {_: ($f | path basename), stdin: $i, ...$opt}
+        'file' | 'dir' => {
+            let f = if ($tmpfile | is-empty) {
+                $o | mktmpdir $'scratch-XXX' $config.entry
+            } else {
+                $tmpfile
+            }
+            let opwd = $env.PWD
+            cd $f.dir
+            let i = [$f.dir .stdin] | path join
+            $stdin | save -f $i
+            let cmd = $config.cmd | render {_: $f.entry, stdin: $i, ...$opt}
             do -i {
-                cd $wd
                 nu -m light -c $cmd
             }
-            rm -f $f
-            rm -f $i
-        }
-        'dir' => {
-            let f = mktemp -d $'scratch-XXX'
-            let i = $stdin | maketemp $'scratch-XXX.stdin'
-            rm -rf $f
-            rm -f $i
+            cd $opwd
+            rm -rf $f.dir
         }
         _ => {
-            let f = $o | maketemp $'scratch-XXX.($config.ext)'
+            let f = if ($tmpfile | is-empty) {
+                let ext = $config.entry| path parse | get extension
+                let f = mktemp -t $'scratch-XXX.($ext)'
+                $o | save -f $f
+                $f
+            } else {
+                $tmpfile
+            }
             let r = open $f
             rm -f $f
             $r
