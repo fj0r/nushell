@@ -31,7 +31,7 @@ export def scratch-list [
     ]
     let fields = [
         "scratch.id as id", "scratch.parent_id as parent_id",
-        title, content, ...$sortable, relevant,
+        title, body, ...$sortable, relevant,
         "tags.name as tag"
     ] | str join ', '
 
@@ -68,7 +68,7 @@ export def scratch-list [
     if ($tags | is-not-empty) {
         $flt = $tags | tag-group
         let tags = $flt.normal
-        let tags_id = run $"with (tag-tree), tid as \(
+        let tags_id = sqlx $"with (tag-tree), tid as \(
             select id from tags where name in \(($tags | each {Q $in} | str join ', ')\)
         \), (tag-branch ids --where 'id in (select id from tid)')
         select id from ids"
@@ -95,7 +95,7 @@ export def scratch-list [
         left outer join tags on scratch_tag.tag_id = tags.id
         ($cond) order by ($sort);"
     dbg $debug $stmt -t stmt
-    let r = run $stmt
+    let r = sqlx $stmt
     | group-by id
     | items {|k, x| $x | first | insert tags ($x | get tag) | reject tag }
 
@@ -121,7 +121,7 @@ export def scratch-list [
             let ids = $r | get id | str join ', '
             let fp = [id, parent_id, title]
             let ft = $fp | each { $"t.($in)" } | str join ', '
-            let x = run $"with recursive p as \(
+            let x = sqlx $"with recursive p as \(
                 select ($fp | str join ', '), 2 as done from scratch where id in \(($ids)\)
                 union all
                 select ($ft), 2 as done from scratch as t join p on p.parent_id = t.id
@@ -137,7 +137,7 @@ export def scratch-add [
     ...tags:string@cmpl-tag
     --title(-t): string=""
     --kind(-k): string@cmpl-kind='md'
-    --parent(-p): int@cmpl-sid
+    --parent(-p): int@cmpl-scratch-id
     --important(-i): int
     --urgent(-u): int
     --challenge(-c): int
@@ -215,7 +215,7 @@ export def scratch-edit [
 }
 
 export def scratch-delete [
-    ...id: int@cmpl-sid
+    ...id: int@cmpl-scratch-id
     --reverse(-r)
 ] {
     let now = date now | fmt-date | Q $in
@@ -229,11 +229,11 @@ export def scratch-delete [
 }
 
 export def scratch-attrs [
-    ...ids: int@cmpl-sid
+    ...ids: int@cmpl-scratch-id
     --important(-i): int
     --urgent(-u): int
     --challenge(-c): int
-    --parent(-p): int@cmpl-sid
+    --parent(-p): int@cmpl-scratch-id
     --deadline(-d): duration
     --done(-x): int
     --tag(-t): list<string@cmpl-tag>
@@ -278,7 +278,7 @@ export def scratch-attrs [
 }
 
 export def scratch-done [
-    ...id: int@cmpl-sid
+    ...id: int@cmpl-scratch-id
     --reverse(-r)
 ] {
     let d = if $reverse { 0 } else { 1 }
@@ -292,8 +292,8 @@ export def scratch-done [
 }
 
 export def scratch-move [
-    id: int@cmpl-sid
-    to: int@cmpl-sid
+    id: int@cmpl-scratch-id
+    to: int@cmpl-scratch-id
 ] {
     let now = date now | fmt-date | Q $in
     let pid = sqlx $"select parent_id from scratch where id = ($id);" | get 0.parent_id
@@ -340,7 +340,7 @@ export def scratch-clean [
 }
 
 export def scratch-in [
-    id?:int@cmpl-scratch-id
+    id?:int@cmpl-untagged-scratch-id
     --kind(-k):string@cmpl-kind
 ] {
     let o = $in
@@ -357,7 +357,7 @@ export def scratch-in [
 }
 
 export def scratch-out [
-    id?:int@cmpl-scratch-id
+    id?:int@cmpl-untagged-scratch-id
     --kind(-k):string@cmpl-kind
     --search(-s): string
     --num(-n):int = 20
