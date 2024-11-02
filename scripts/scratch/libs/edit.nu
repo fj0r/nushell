@@ -23,6 +23,7 @@ export def block-edit [
 ] {
     let content = $in
     let tf = $content | maketemp $temp
+    cd ($tf | path dirname)
     variants-edit $tf --line $cfg.pos
     let c = open $tf --raw
     rm -f $tf

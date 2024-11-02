@@ -1,18 +1,9 @@
-def remove-file [...fs] {
-    for f in $fs {
-        if ($f | is-not-empty) {
-            rm -f $f
-        }
-    }
-}
-
 export def performance [
     config
     stdin?=''
     --preset: string
 ] {
-    let f = $in | maketemp $'scratch-XXX.($config.ext)'
-    let i = $stdin | maketemp $'scratch-XXX.stdin'
+    let o = $in
     let opt = if $config.runner in ['file', 'dir'] {
         let q = $"select yaml from kind_preset where kind = (Q $config.name) and name = (Q $preset)"
         sqlx $q | get -i 0.yaml | default '{}' | from yaml
@@ -21,17 +12,28 @@ export def performance [
     }
     match $config.runner {
         'file' => {
-            let cmd = $config.cmd | render {_: $f, stdin: $i, ...$opt}
-            nu -m light -c $cmd
-            remove-file $f $i
+            let f = $o | maketemp $'scratch-XXX.($config.ext)'
+            let i = $stdin | maketemp $'scratch-XXX.stdin'
+            let wd = $f | path dirname
+            let cmd = $config.cmd | render {_: ($f | path basename), stdin: $i, ...$opt}
+            do -i {
+                cd $wd
+                nu -m light -c $cmd
+            }
+            rm -f $f
+            rm -f $i
         }
         'dir' => {
-            remove-file $f $i
+            let f = mktemp -d $'scratch-XXX'
+            let i = $stdin | maketemp $'scratch-XXX.stdin'
+            rm -rf $f
+            rm -f $i
         }
         _ => {
-            let o = open $f
-            remove-file $f $i
-            $o
+            let f = $o | maketemp $'scratch-XXX.($config.ext)'
+            let r = open $f
+            rm -f $f
+            $r
         }
     }
 }
