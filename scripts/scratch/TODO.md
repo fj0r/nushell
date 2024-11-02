@@ -64,7 +64,8 @@
         - [x] edit #477
             - [x] --returing-body #495
         - [x] move #478
-        - [ ] list #479
+        - [x] list #479
+            - [x] select root and then subnode #505
         - [ ] title #484
         - [ ] export #486
     - [ ] Tag Ops #487

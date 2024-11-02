@@ -1,14 +1,14 @@
 use common.nu *
 
 export def scratch-format [--md --md-list] {
-    $in | to tree | fmt tree --md=$md --md-list=$md_list
+    $in | to tree  | fmt tree --md=$md --md-list=$md_list
 }
 
-export def scratch-tree [] {
-    $in | to tree
+export def 'tag tree' [] {
+    let i = $in
 }
 
-def 'to tree' [] {
+export def 'to tree' [] {
     let i = $in
     # dynamically determines the root node
     let rid = $i | get parent_id | uniq | filter { $in not-in ($i | get id)}

@@ -1,6 +1,7 @@
 use libs *
 use common.nu *
 use completion.nu *
+use format.nu *
 export use tag.nu *
 
 
@@ -38,7 +39,7 @@ export def scratch-list [
     | each { $"scratch.($in)" }
     | str join ', '
 
-    mut cond = []
+    mut cond = ['parent_id = -1']
 
     # (not $trash) hide deleted
     let exclude_deleted = ["scratch.deleted = ''", "scratch.deleted != ''"]
@@ -89,10 +90,20 @@ export def scratch-list [
 
     let $cond = if ($cond | is-empty) { '' } else { $cond | str join ' and ' | $"where ($in)" }
 
-    let stmt = $"with (tag-tree) select ($fields) from scratch
+    let stmt = $"with (tag-tree), root as \(
+        select ($fields) from scratch
         left outer join scratch_tag on scratch.id = scratch_tag.scratch_id
         left outer join tags on scratch_tag.tag_id = tags.id
-        ($cond) order by ($sort);"
+        ($cond) order by ($sort)
+    \), r as \(
+        select * from root
+        union all
+        select s.id, s.parent_id, s.title, s.body,
+            ($sortable | each { $"s.($in)" } | str join ', '),
+            s.relevant, null as tag
+        from scratch as s join r on r.id = s.parent_id
+    \) select * from r;"
+
     dbg $debug $stmt -t stmt
     let r = sqlx $stmt
     | group-by id
