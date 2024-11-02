@@ -83,12 +83,12 @@ export def entity [
     cfg
     --title:string
     --kind: string
-    --edit
+    --batch
     --created
 ] {
     let o = $in
     let now = date now | fmt-date
-    let e = if $edit {
+    let e = if not $batch {
         let l = [($title | from title $cfg) $o]
         | str join (char newline)
         | block-edit $"scratch-XXX.($kind)" ($cfg | update pos {|x| $x.pos + 1 })

@@ -41,19 +41,35 @@ export def scratch-add [
     --deadline(-d): duration
     --done(-x)
     --relevant(-r): int@cmpl-relevant-id
+    --returning-body
+    --batch
 ] {
     let o = $in
     let cfg = get-config $kind
     let body = if ($o | is-empty) { char newline } else { $o }
 
-    let d = $body | entity --edit $cfg --title "" --kind $kind --created
+    let d = $body | entity --batch=$batch $cfg --title "" --kind $kind --created
     if ($d.body | is-empty) { return }
+
+    let attrs = {
+        important: $important
+        urgent: $urgent
+        challenge: $challenge
+        parent_id: $parent
+        relevant: $relevant
+        deadline: (if ($deadline | is-not-empty) {(date now) + $deadline | fmt-date})
+        done: (if $done { 1 } else { 0 })
+    } | filter-empty
 
     let id = sqlx $"insert into scratch \(($d | columns | str join ',')\)
         values \(($d | values | each {Q $in} | str join ',')\)
         returning id;" | get 0.id
 
-    $id
+    if $returning_body {
+        $d.body
+    } else {
+        $id
+    }
 }
 
 export def scratch-edit [
@@ -69,7 +85,7 @@ export def scratch-edit [
         $"($o)\n>>>>>>\n($old.body)"
     }
 
-    let d = $body | entity --edit $cfg --title $old.title --kind $kind
+    let d = $body | entity $cfg --title $old.title --kind $kind
 
     let e = $d
     | items {|k,v| $"($k) = (Q $v)" }
@@ -119,7 +135,7 @@ export def scratch-in [
     if ($id | is-empty) {
         let kind = if ($kind | is-empty) { 'md' } else { $kind }
         let cfg = get-config $kind
-        $o | scratch-add --kind=$kind | performance $cfg
+        $o | scratch-add --kind=$kind --returning-body | performance $cfg
     } else {
         let x = sqlx $"select kind from scratch where id = ($id);" | get -i 0
         let kind = if ($kind | is-empty) { $x.kind } else { $kind }
