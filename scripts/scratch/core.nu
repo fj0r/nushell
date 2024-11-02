@@ -25,7 +25,111 @@ export def scratch-list [
     --raw
     --debug
 ] {
+    let sortable = [
+        created, updated, deadline,
+        done, important, urgent, challenge
+    ]
+    let fields = [
+        "scratch.id as id", "scratch.parent_id as parent_id",
+        title, content, ...$sortable, relevant,
+        "tags.name as tag"
+    ] | str join ', '
 
+    let sort = if ($sort | is-empty) { ['created'] } else { $sort }
+    | each { $"scratch.($in)" }
+    | str join ', '
+
+    mut cond = []
+
+    # (not $trash) hide deleted
+    let exclude_deleted = ["scratch.deleted = ''", "scratch.deleted != ''"]
+    # ($tags | is-empty) tags.hidden = 0
+    let exclude_tags_hidden = "tags.hidden = 0"
+    # ($untagged)
+    let include_untagged = "tags.name is null"
+    dbg $debug {trash: $trash, notags: ($tags | is-empty), untagged: $untagged} -t cond
+    $cond ++= match [($tags | is-empty) $untagged] {
+        # --untagged
+        [true true] => $include_untagged
+        #
+        [true false] => $exclude_tags_hidden
+        # [ --untagged tag ]
+        [false true] => $include_untagged
+        # tag
+        [false false] => ""
+    }
+    | do { let x = $in
+        [($exclude_deleted | get ($trash | into int)) $x]
+        | filter { $in | is-not-empty}
+        | str join ' and '
+    }
+
+    mut flt = {and:[], not:[]}
+    if ($tags | is-not-empty) {
+        $flt = $tags | tag-group
+        let tags = $flt.normal
+        let tags_id = run $"with (tag-tree), tid as \(
+            select id from tags where name in \(($tags | each {Q $in} | str join ', ')\)
+        \), (tag-branch ids --where 'id in (select id from tid)')
+        select id from ids"
+        | get id | each { $in | into string } | str join ', '
+        $cond ++= $"scratch.id in \(select scratch_id from scratch_tag where tag_id in \(($tags_id)\)\)"
+    }
+
+    let now = date now
+    if ($search | is-not-empty) { $cond ++= $"title like '%($search)%'" }
+    if ($challenge | is-not-empty) { $cond ++= $"challenge >= ($challenge)"}
+    if ($important | is-not-empty) { $cond ++= $"important >= ($important)"}
+    if ($urgent | is-not-empty) { $cond ++= $"urgent >= ($urgent)"}
+    if ($updated | is-not-empty) { $cond ++= $"updated >= ($now - $updated | fmt-date | Q $in)"}
+    if ($created | is-not-empty) { $cond ++= $"created >= ($now - $created | fmt-date | Q $in)"}
+    if ($deadline | is-not-empty) { $cond ++= $"deadline >= ($now - $deadline | fmt-date | Q $in)"}
+    if ($relevant | is-not-empty) { $cond ++= $"relevant = ($relevant)"}
+    if ($work_in_process) { $cond ++= $"done = 0" }
+    if ($finished) { $cond ++= $"done = 1" }
+
+    let $cond = if ($cond | is-empty) { '' } else { $cond | str join ' and ' | $"where ($in)" }
+
+    let stmt = $"with (tag-tree) select ($fields) from scratch
+        left outer join scratch_tag on scratch.id = scratch_tag.scratch_id
+        left outer join tags on scratch_tag.tag_id = tags.id
+        ($cond) order by ($sort);"
+    dbg $debug $stmt -t stmt
+    let r = run $stmt
+    | group-by id
+    | items {|k, x| $x | first | insert tags ($x | get tag) | reject tag }
+
+    let flt = $flt
+    let r = if ($flt.and | is-not-empty) or ($flt.not | is-not-empty) {
+        $r
+        | filter {|x|
+            let n = not ($flt.not | any {|y| $y in $x.tags })
+            let a = $flt.and | all {|y| $y in $x.tags }
+            $n and $a
+        }
+    } else {
+        $r
+    }
+
+
+    if $raw {
+        $r
+    } else {
+        if $no_branch {
+            $r
+        } else {
+            let ids = $r | get id | str join ', '
+            let fp = [id, parent_id, title]
+            let ft = $fp | each { $"t.($in)" } | str join ', '
+            let x = run $"with recursive p as \(
+                select ($fp | str join ', '), 2 as done from scratch where id in \(($ids)\)
+                union all
+                select ($ft), 2 as done from scratch as t join p on p.parent_id = t.id
+                \) select * from p;"
+            $r | append $x | uniq-by id
+        }
+        | scratch-format --md=$md --md-list=$md_list
+    }
 }
 
 
@@ -124,14 +228,6 @@ export def scratch-delete [
     }
 }
 
-export def todo-clean [] {
-    let tags = sqlx $"delete from todo_tag where todo_id in \(select id from todo where deleted != ''\) returning todo_id, tag_id"
-    let todo = sqlx $"delete from todo where deleted != '' returning id"
-    {
-        todo: $todo
-        todo_tags: $tags
-    }
-}
 export def scratch-attrs [
     ...ids: int@cmpl-sid
     --important(-i): int
@@ -234,7 +330,12 @@ export def scratch-clean [
 
     }
     if $deleted {
-
+        let tags = sqlx $"delete from scratch_tag where scratch_id in \(select id from scratch where deleted != ''\) returning scratch_id, tag_id"
+        let scratch = sqlx $"delete from scratch where deleted != '' returning id"
+        {
+            scratch: $scratch
+            scratch_tags: $tags
+        }
     }
 }
 

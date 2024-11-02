@@ -71,3 +71,4 @@
         - [x] tag-rename #482
         - [x] tag-hidden #483
         - [ ] Optimize scratch-ensure-tags #496
+        - [x] Improve the cohesion of the tag.nu #498

@@ -22,14 +22,6 @@ export def cmpl-relevant-id [] {
 }
 
 
-export def cmpl-tag [] {
-    sqlx $"with (tag-tree) select * from tags" | get name | filter { $in | is-not-empty }
-}
-
-export def cmpl-tag-id [] {
-   sqlx $"with (tag-tree) select * from tags" | each { $"($in.id) # ($in.name)" }
-}
-
 export def cmpl-todo-md [] {
     ls **/TODO.md | get name
 }
