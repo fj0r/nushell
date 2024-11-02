@@ -31,8 +31,7 @@ export def scratch-list [
 
 export def scratch-add [
     ...tags:string@cmpl-tag
-    --title(-t): string
-    --body(-b): string
+    --title(-t): string=""
     --kind(-k): string@cmpl-kind='md'
     --parent(-p): int@cmpl-sid
     --important(-i): int
@@ -48,7 +47,7 @@ export def scratch-add [
     let cfg = get-config $kind
     let body = if ($o | is-empty) { char newline } else { $o }
 
-    let d = $body | entity --batch=$batch $cfg --title "" --kind $kind --created
+    let d = $body | entity --batch=$batch $cfg --title $title --kind $kind --created
     if ($d.body | is-empty) { return }
 
     let attrs = {
@@ -100,6 +99,55 @@ export def scratch-edit [
         $d.body
     } else {
         $id
+    }
+}
+
+export def scratch-attrs [
+    ...ids: int@cmpl-sid
+    --important(-i): int
+    --urgent(-u): int
+    --challenge(-c): int
+    --parent(-p): int@cmpl-sid
+    --deadline(-d): duration
+    --done(-x): int
+    --tag(-t): list<string@cmpl-tag>
+    --remove(-r)
+] {
+    let args = {
+        important: $important
+        urgent: $urgent
+        challenge: $challenge
+        parent_id: $parent
+        deadline: (if ($deadline | is-not-empty) {(date now) + $deadline | fmt-date})
+    }
+    | filter-empty
+
+    if ($args | is-not-empty) {
+        let attrs = $args
+        | items {|k, v| $"($k) = (Q $v)"}
+        | str join ','
+        sqlx $"update scratch set ($attrs) where id in \(($ids | str join ',')\);"
+    }
+
+    if ($done | is-not-empty) {
+        for id in $ids {
+            scratch-done $id --reverse=($done == 0)
+        }
+    }
+
+    if ($tag | is-not-empty) {
+        scratch-ensure-tags $tag
+        if $remove {
+            let children = sqlx $"with (tag-tree) select tags.id from tags where name in \(($tag | each {Q $in} | str join ',')\)" | get id
+            sqlx $"delete from scratch_tag where scratch_id in \(($ids | str join ',')\) and tag_id in \(($children | str join ',')\);"
+        } else {
+            for id in $ids {
+                let children = $"select ($id), tags.id from tags where name in \(($tag | each {Q $in} | str join ',')\)"
+                sqlx $"with (tag-tree) insert into scratch_tag ($children)
+                  on conflict \(scratch_id, tag_id\) do nothing
+                ;"
+            }
+        }
     }
 }
 
