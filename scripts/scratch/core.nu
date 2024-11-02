@@ -110,6 +110,28 @@ export def scratch-edit [
     }
 }
 
+export def scratch-delete [
+    ...id: int@cmpl-sid
+    --reverse(-r)
+] {
+    let now = date now | fmt-date | Q $in
+    let d = if $reverse { '' } else { $now }
+    let ids = $id | str join ','
+    let pid = sqlx $"update scratch set deleted = ($d) where id in \(($ids)\) returning parent_id;" | get parent_id
+    # update parents status
+    for i in $pid {
+        uplevel done $i $now (not $reverse)
+    }
+}
+
+export def todo-clean [] {
+    let tags = sqlx $"delete from todo_tag where todo_id in \(select id from todo where deleted != ''\) returning todo_id, tag_id"
+    let todo = sqlx $"delete from todo where deleted != '' returning id"
+    {
+        todo: $todo
+        todo_tags: $tags
+    }
+}
 export def scratch-attrs [
     ...ids: int@cmpl-sid
     --important(-i): int

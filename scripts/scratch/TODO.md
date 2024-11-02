@@ -57,7 +57,7 @@
         - [x] attrs #472
         - [x] done #474
             - [ ] ~uplevel done~ #473
-        - [ ] delete #475
+        - [x] delete #475
         - [ ] clean #476
         - [x] edit #477
             - [x] --returing-body #495
