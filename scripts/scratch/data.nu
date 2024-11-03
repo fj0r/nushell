@@ -70,10 +70,10 @@ export def --env init [] {
         "CREATE TABLE IF NOT EXISTS kind_file (
             kind TEXT NOT NULL,
             hash TEXT NOT NULL,
-            path TEXT NOT NULL DEFAULT '.',
-            name TEXT NOT NULL,
-            ext TEXT NOT NULL,
-            PRIMARY KEY (kind, path, name, ext)
+            parent TEXT NOT NULL DEFAULT '.',
+            stem TEXT NOT NULL,
+            extension TEXT NOT NULL,
+            PRIMARY KEY (kind, parent, stem, extension)
         );"
     ] {
         sqlx $s
