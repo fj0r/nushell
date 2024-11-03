@@ -5,15 +5,21 @@ def variants-edit [file? --line:int] {
         ^$env.EDITOR $file
     } else {
         if ($env.EDITOR | find vim | is-not-empty) {
-            ^$env.EDITOR $"+($line)" "+normal $" $file
+            ^$env.EDITOR $"+($line)" $"+normal $" $file
         } else {
             ^$env.EDITOR $file
         }
     }
 }
 
-export def mktmpdir [tmp entry --kind: string] {
-    let o = $in
+export def mktmpdir [
+    tmp
+    entry
+    --title: string
+    --kind: string
+    --created
+] {
+    let body = $in
     let dir = mktemp -d -t $tmp
     let file = [$dir $entry] | path join
     let relative_dir = $entry | path dirname
@@ -21,8 +27,18 @@ export def mktmpdir [tmp entry --kind: string] {
         mkdir ($file | path dirname)
     }
     scratch-files-load $kind $dir
-    # TODO
-    $o | default '' | save -f $file
+
+    if $created {
+        let body = if ($body | is-empty) { $"\n" } else { $"\n<<<<<<< STDIN\n($body)\n=======" }
+        let tmpl = if ($file | path exists) {
+            open --raw $file
+        } else {
+            ''
+        }
+        $"($title)($body)\n($tmpl)" | save -f $file
+    } else {
+        $"($title)\n($body)" | save -f $file
+    }
     {
         file: $file
         dir: $dir
@@ -34,11 +50,13 @@ export def block-edit [
     temp: string
     entry: string
     pos: int
+    --title: string
     --kind: string
+    --created
     --retain
 ] {
     let content = $in
-    let tf = $content | mktmpdir $temp $entry --kind $kind
+    let tf = $content | mktmpdir $temp $entry --kind $kind --title $title --created=$created
     let opwd = $env.PWD
     cd $tf.dir
     variants-edit $tf.file --line $pos

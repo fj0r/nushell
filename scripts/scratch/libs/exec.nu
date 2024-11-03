@@ -14,7 +14,7 @@ export def performance [
     match $config.runner {
         'file' | 'dir' => {
             let f = if ($tmpfile | is-empty) {
-                $o | mktmpdir $'scratch-XXXXXX' $config.entry
+                $o | mktmpdir $'scratch-XXXXXX' $config.entry --kind $config.name
             } else {
                 $tmpfile
             }

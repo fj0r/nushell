@@ -114,11 +114,14 @@ export def --env init [] {
       entry: src/main.rs
       comment: '// '
       runner: dir
-      cmd: 'cargo build; cargo run'
+      cmd: 'cargo run'
+      pos: 2
     - name: haskell
       entry: app/Main.hs
       comment: '-- '
       runner: dir
+      pos: 6
+      cmd: 'stack run'
     - name: lua
       entry: init.lua
       comment: '-- '

@@ -151,9 +151,8 @@ export def scratch-add [
     --locate-body
     --ignore-empty-body
 ] {
-    let o = $in
+    let body = $in
     let cfg = get-config $kind
-    let body = if ($o | is-empty) { char newline } else { $o }
 
     let d = $body | entity --batch=$batch $cfg --title $title --created --locate-body=$locate_body
     if ($d.body | is-empty) and $ignore_empty_body { return }
@@ -198,12 +197,12 @@ export def scratch-edit [
     --returning-body
     --locate-body
 ] {
-    let o = $in
+    let body = $in
     let old = sqlx $"select title, kind, body from scratch where id = ($id)" | get -i 0
     let kind = if ($kind | is-empty) { $old.kind } else { $kind }
     let cfg = get-config $kind
-    let body = if ($o | is-empty) { $old.body } else {
-        $"($o)\n>>>>>>\n($old.body)"
+    let body = if ($body | is-empty) { $old.body } else {
+        $"<<<<<<< STDIN \n($body)\n=======\n($old.body)"
     }
 
     let d = $body | entity $cfg --title $old.title --locate-body=$locate_body
@@ -367,18 +366,18 @@ export def scratch-in [
     --kind(-k):string@cmpl-kind
     --preset(-p):string@cmpl-kind-preset
 ] {
-    let o = $in
+    let body = $in
     if ($id | is-empty) {
         let kind = if ($kind | is-empty) { 'md' } else { $kind }
         let cfg = get-config $kind
-        $o
+        $body
         | scratch-add --kind=$kind --returning-body --locate-body --ignore-empty-body
         | performance $cfg --preset $preset
     } else {
         let x = sqlx $"select kind from scratch where id = ($id);" | get -i 0
         let kind = if ($kind | is-empty) { $x.kind } else { $kind }
         let cfg = get-config $kind
-        $o
+        $body
         | scratch-edit --kind=$kind $id --returning-body --locate-body
         | performance $cfg --preset $preset
     }
@@ -391,7 +390,7 @@ export def scratch-out [
     --search(-s): string
     --num(-n):int = 20
 ] {
-    let o = $in | default ''
+    let stdin = $in | default ''
     if ($search | is-not-empty) {
         scratch-search --untagged --num=$num $search
     } else {
@@ -404,7 +403,7 @@ export def scratch-out [
         let x = sqlx $"select body, kind from scratch where id = ($id);" | get -i 0
         let kind = if ($kind | is-empty) { $x.kind } else { $kind }
         let cfg = get-config $kind
-        $x.body | performance $cfg $o --preset $preset
+        $x.body | performance $cfg $stdin --preset $preset
     }
 }
 
