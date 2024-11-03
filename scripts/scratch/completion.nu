@@ -8,7 +8,7 @@ export def cmpl-scratch-id [] {
 }
 
 export def cmpl-untagged-scratch-id [] {
-    sqlx $"select id as value, updated || '│' || kind || '│' ||
+    sqlx $"select id as value, updated || '│' || printf\('%10s', kind\) || '│' ||
         case title when '' then '...' || substr\(ltrim\(body\), 0, 20\) else title end  as description
         from scratch
         left outer join scratch_tag on scratch.id = scratch_id
