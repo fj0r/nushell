@@ -146,14 +146,15 @@ export def scratch-add [
     --deadline(-d): duration
     --done(-x)
     --relevant(-r): int@cmpl-relevant-id
-    --returning-body
     --batch
+    --returning-body
+    --locate-body
 ] {
     let o = $in
     let cfg = get-config $kind
     let body = if ($o | is-empty) { char newline } else { $o }
 
-    let d = $body | entity --batch=$batch $cfg --title $title --created
+    let d = $body | entity --batch=$batch $cfg --title $title --created  --locate-body=$locate_body
     if ($d.body | is-empty) { return }
 
     let attrs = {
@@ -193,6 +194,7 @@ export def scratch-edit [
     id:int@cmpl-scratch-id
     --kind(-k):string@cmpl-kind
     --returning-body
+    --locate-body
 ] {
     let o = $in
     let old = sqlx $"select title, kind, body from scratch where id = ($id)" | get -i 0
@@ -202,7 +204,7 @@ export def scratch-edit [
         $"($o)\n>>>>>>\n($old.body)"
     }
 
-    let d = $body | entity $cfg --title $old.title
+    let d = $body | entity $cfg --title $old.title --locate-body=$locate_body
 
     let e = $d
     | items {|k,v| $"($k) = (Q $v)" }
@@ -364,12 +366,16 @@ export def scratch-in [
     if ($id | is-empty) {
         let kind = if ($kind | is-empty) { 'md' } else { $kind }
         let cfg = get-config $kind
-        $o | scratch-add --kind=$kind --returning-body | performance $cfg --preset $preset
+        $o
+        | scratch-add --kind=$kind --returning-body --locate-body
+        | performance $cfg --preset $preset
     } else {
         let x = sqlx $"select kind from scratch where id = ($id);" | get -i 0
         let kind = if ($kind | is-empty) { $x.kind } else { $kind }
         let cfg = get-config $kind
-        $o | scratch-edit --kind=$kind $id --returning-body | performance $cfg --preset $preset
+        $o
+        | scratch-edit --kind=$kind $id --returning-body --locate-body
+        | performance $cfg --preset $preset
     }
 }
 

@@ -64,13 +64,19 @@ export def entity [
     --title:string
     --batch
     --created
+    --locate-body
 ] {
     let o = $in
     let now = date now | fmt-date
+    let pos = if $locate_body {
+        $cfg.pos + 1
+    } else {
+        1
+    }
     let e = if not $batch {
         let l = [($title | from title $cfg) $o]
         | str join (char newline)
-        | block-edit $"scratch-XXX" $cfg.entry ($cfg | update pos {|x| $x.pos + 1 })
+        | block-edit $"scratch-XXX" $cfg.entry $pos
         | get content
         | lines
         let title = $l | first | to title $cfg

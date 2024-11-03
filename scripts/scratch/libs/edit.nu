@@ -30,14 +30,14 @@ export def mktmpdir [tmp entry] {
 export def block-edit [
     temp: string
     entry: string
-    cfg: record = {}
+    pos: int
     --retain
 ] {
     let content = $in
     let tf = $content | mktmpdir $temp $entry
     let opwd = $env.PWD
     cd $tf.dir
-    variants-edit $tf.file --line $cfg.pos
+    variants-edit $tf.file --line $pos
     let c = open $tf.file --raw
     if not $retain {
         cd $opwd
