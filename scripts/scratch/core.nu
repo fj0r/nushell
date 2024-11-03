@@ -175,10 +175,12 @@ export def scratch-add [
         returning id;" | get 0.id
 
     if ($tags | is-not-empty) {
-        scratch-ensure-tags $tags
-        let children = $"select ($id), tags.id from tags where name in \(($tags | each {Q $in} | str join ',')\)"
-        let q = $"with (tag-tree) insert into scratch_tag ($children)
-          on conflict \(scratch_id, tag_id\) do nothing"
+        let tids = scratch-ensure-tags $tags | each { $"\(($in)\)"} | str join ', '
+        let children = $"select ($id) as scratch_id, x.tag_id from x where 1"
+        let q = $"with x\(tag_id\) as \(VALUES ($tids)\)
+            insert into scratch_tag ($children)
+          on conflict \(scratch_id, tag_id\) do nothing returning tag_id"
+          print $q
         sqlx $q
     }
 
@@ -267,16 +269,19 @@ export def scratch-attrs [
     }
 
     if ($tag | is-not-empty) {
-        scratch-ensure-tags $tag
+        let tids = scratch-ensure-tags $tag
         if $remove {
-            let children = sqlx $"with (tag-tree) select tags.id from tags where name in \(($tag | each {Q $in} | str join ',')\)" | get id
-            sqlx $"delete from scratch_tag where scratch_id in \(($ids | str join ',')\) and tag_id in \(($children | str join ',')\);"
-        } else {
+            let tids = $tids | into string | str join ', '
             for id in $ids {
-                let children = $"select ($id), tags.id from tags where name in \(($tag | each {Q $in} | str join ',')\)"
-                sqlx $"with (tag-tree) insert into scratch_tag ($children)
-                  on conflict \(scratch_id, tag_id\) do nothing
-                ;"
+                sqlx $"delete from scratch_tag where scratch_id = ($id) and tag_id in \(($tids)\);"
+            }
+            let children = sqlx $"with (tag-tree) select tags.id from tags where name in \(($tag | each {Q $in} | str join ',')\)" | get id
+        } else {
+            let tids = $tids | each { $"\(($in)\)"} | str join ', '
+            for id in $ids {
+                sqlx $"with x\(tag_id\) as \(VALUES ($tids)\)
+                    insert into scratch_tag select ($id) as scratch_id, x.tag_id from x where 1
+                  on conflict \(scratch_id, tag_id\) do nothing"
             }
         }
     }
