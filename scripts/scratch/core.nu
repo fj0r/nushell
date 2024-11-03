@@ -149,13 +149,14 @@ export def scratch-add [
     --batch
     --returning-body
     --locate-body
+    --ignore-empty-body
 ] {
     let o = $in
     let cfg = get-config $kind
     let body = if ($o | is-empty) { char newline } else { $o }
 
     let d = $body | entity --batch=$batch $cfg --title $title --created  --locate-body=$locate_body
-    if ($d.body | is-empty) { return }
+    if ($d.body | is-empty) and $ignore_empty_body { return }
 
     let attrs = {
         important: $important
@@ -176,9 +177,9 @@ export def scratch-add [
     if ($tags | is-not-empty) {
         scratch-ensure-tags $tags
         let children = $"select ($id), tags.id from tags where name in \(($tags | each {Q $in} | str join ',')\)"
-        sqlx $"with (tag-tree) insert into scratch_tag ($children)
-          on conflict \(scratch_id, tag_id\) do nothing
-        ;"
+        let q = $"with (tag-tree) insert into scratch_tag ($children)
+          on conflict \(scratch_id, tag_id\) do nothing"
+        sqlx $q
     }
 
     scratch-done $id --reverse=(not $done)
@@ -367,7 +368,7 @@ export def scratch-in [
         let kind = if ($kind | is-empty) { 'md' } else { $kind }
         let cfg = get-config $kind
         $o
-        | scratch-add --kind=$kind --returning-body --locate-body
+        | scratch-add --kind=$kind --returning-body --locate-body --ignore-empty-body
         | performance $cfg --preset $preset
     } else {
         let x = sqlx $"select kind from scratch where id = ($id);" | get -i 0
