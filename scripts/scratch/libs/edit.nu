@@ -13,10 +13,15 @@ def variants-edit [file? --line:int] {
 export def mktmpdir [tmp entry] {
     let o = $in
     let dir = mktemp -d -t $tmp
-    let f = [$dir $entry] | path join
-    $o | default '' | save -f $f
+    let file = [$dir $entry] | path join
+    let relative_dir = $entry | path dirname
+    if ($relative_dir | is-not-empty) and ($relative_dir != '.') {
+        mkdir ($file | path dirname)
+    }
+
+    $o | default '' | save -f $file
     {
-        file: $f
+        file: $file
         dir: $dir
         entry: $entry
     }
