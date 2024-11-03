@@ -76,7 +76,7 @@ export def entity [
     let e = if not $batch {
         let l = [($title | from title $cfg) $o]
         | str join (char newline)
-        | block-edit $"scratch-XXX" $cfg.entry $pos
+        | block-edit $"scratch-XXXXXX" $cfg.entry $pos --kind $cfg.name
         | get content
         | lines
         let title = $l | first | to title $cfg

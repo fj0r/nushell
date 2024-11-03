@@ -61,7 +61,7 @@ export def 'test in container' [] {
         --name test-nu
         --rm -it
         -v $"($env.PWD):/etc/nushell"
-    ] io
+    ] io:x
 }
 
 export def 'add nupm.nuon' [] {

@@ -72,7 +72,8 @@ export def --env init [] {
             hash TEXT NOT NULL,
             path TEXT NOT NULL DEFAULT '.',
             name TEXT NOT NULL,
-            ext TEXT NOT NULL
+            ext TEXT NOT NULL,
+            PRIMARY KEY (kind, path, name, ext)
         );"
     ] {
         sqlx $s

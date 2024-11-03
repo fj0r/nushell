@@ -10,7 +10,8 @@ export def sqlx [stmt] {
 export def db-upsert [table pk --do-nothing] {
     let r = $in
     let d = if $do_nothing { 'NOTHING' } else {
-        $"UPDATE SET ($r| items {|k,v | $"($k)=(Q $v)" } | str join ',')"
+        let u = $r | columns | each {|x| $"($x) = EXCLUDED.($x)" } | str join ', '
+        $"UPDATE SET ($u)"
     }
     sqlx $"INSERT INTO ($table)\(($r | columns | str join ',')\)
             VALUES\(($r | values | each {Q $in} | str join ',')\)

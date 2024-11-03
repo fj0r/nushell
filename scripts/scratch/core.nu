@@ -155,7 +155,7 @@ export def scratch-add [
     let cfg = get-config $kind
     let body = if ($o | is-empty) { char newline } else { $o }
 
-    let d = $body | entity --batch=$batch $cfg --title $title --created  --locate-body=$locate_body
+    let d = $body | entity --batch=$batch $cfg --title $title --created --locate-body=$locate_body
     if ($d.body | is-empty) and $ignore_empty_body { return }
 
     let attrs = {

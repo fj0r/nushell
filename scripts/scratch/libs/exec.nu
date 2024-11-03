@@ -14,7 +14,7 @@ export def performance [
     match $config.runner {
         'file' | 'dir' => {
             let f = if ($tmpfile | is-empty) {
-                $o | mktmpdir $'scratch-XXX' $config.entry
+                $o | mktmpdir $'scratch-XXXXXX' $config.entry
             } else {
                 $tmpfile
             }
@@ -32,7 +32,7 @@ export def performance [
         _ => {
             let f = if ($tmpfile | is-empty) {
                 let ext = $config.entry| path parse | get extension
-                let f = mktemp -t $'scratch-XXX.($ext)'
+                let f = mktemp -t $'scratch-XXXXXX.($ext)'
                 $o | save -f $f
                 $f
             } else {
