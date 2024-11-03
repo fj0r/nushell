@@ -1,29 +1,42 @@
 use db.nu *
 
-export def scratch-files-save [kind, dir: string='.'] {
+def cmpl-kind [] {
+    sqlx $"select name from kind" | get name
+}
+
+export def scratch-files-import [x] {
+    sqlx $"insert into kind_file \(kind, parent, stem, extension, body\) values \(
+        (Q $x.kind), (Q $x.parent), (Q $x.stem), (Q $x.extension), (Q $x.body)
+    \) on conflict \(kind, parent, stem, extension\) do update set
+        kind=EXCLUDED.kind, parent = EXCLUDED.parent, stem=EXCLUDED.stem,
+        extension=EXCLUDED.extension, body=EXCLUDED.body
+    "
+}
+
+export def scratch-files-export [kind: string@cmpl-kind] {
+    sqlx $"select * from kind_file where kind = (Q $kind)"
+}
+
+export def scratch-files-save [
+    kind: string
+    dir: string='.'
+] {
     cd $dir
     let lst = ls **/* | where type == 'file'
     for f in $lst {
         let c = open --raw $f.name
-        let hash = $c | hash sha256
         let c = $c | to z64
         let x = $f.name | path parse
-        sqlx $"insert into kind_file \(kind, hash, parent, stem, extension\) values \(
-            (Q $kind), (Q $hash), (Q $x.parent), (Q $x.stem), (Q $x.extension)
-        \) on conflict \(kind, parent, stem, extension\) do update set
-            kind=EXCLUDED.kind, hash=EXCLUDED.hash, parent = EXCLUDED.parent,
-            stem=EXCLUDED.stem, extension=EXCLUDED.extension
-        "
-        sqlx $"insert into file \(hash, body\) values \(
-            (Q $hash), (Q $c)
-        \) on conflict \(hash\) do nothing"
+        scratch-files-import {body: $c, ...$x}
     }
 }
 
-export def scratch-files-load [kind, dir: string="."] {
+export def scratch-files-load [
+    kind: string@cmpl-kind
+    dir: string="."
+] {
     cd $dir
-    let files = sqlx $"select k.parent, k.stem, k.extension, f.body from kind_file as k
-        join file as f on k.hash = f.hash where k.kind = (Q $kind)"
+    let files = scratch-files-export $kind
     for f in $files {
         if ($f.parent | is-not-empty) and ($f.parent != '.') {
             if not ($f.parent | path exists) {
@@ -43,8 +56,3 @@ export def 'from z64' [] {
     $in | decode base64 | from msgpackz
 }
 
-export def scratch-files-gc [] {
-    sqlx $"delete from file where hash not in \(
-        select hash from kind_file
-    \) returning hash"
-}
