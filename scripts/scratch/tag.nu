@@ -66,7 +66,7 @@ export def scratch-tag-clean [
 }
 
 # add tag
-export def scratch-ensure-tags [...tags] {
+export def scratch-ensure-tags [tags] {
     mut ids = []
     for tag in $tags {
         let ts = $tag | split row ':'

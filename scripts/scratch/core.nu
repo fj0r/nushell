@@ -180,7 +180,6 @@ export def scratch-add [
         let q = $"with x\(tag_id\) as \(VALUES ($tids)\)
             insert into scratch_tag ($children)
           on conflict \(scratch_id, tag_id\) do nothing returning tag_id"
-          print $q
         sqlx $q
     }
 
