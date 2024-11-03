@@ -78,6 +78,10 @@ export def --env init [] {
         sqlx $s
     }
     let _ = "
+    - name: txt
+      entry: a.txt
+      comment: '# '
+      runner: ''
     - name: md
       entry: README.md
       comment: '# '

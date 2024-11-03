@@ -346,19 +346,19 @@ export def scratch-search [
         $i ++= 'tag_id is null'
         $r ++= 'tag_id is null'
     }
-    sqlx $"select id, title, body from \(
-            select id, title, body, created from scratch
+    sqlx $"select id, kind, title, body from \(
+            select id, kind, title, body, created from scratch
             left outer join scratch_tag on scratch.id = scratch_id
             where ($i | str join ' and ')
             union
-            select id, title, body, created from scratch
+            select id, kind, title, body, created from scratch
             left outer join scratch_tag on scratch.id = scratch_id
             where ($r | str join ' and ')
         \) as t
         order by t.created desc limit ($num)
     "
     | reduce -f {} {|it,acc|
-        let c = $"### ($it.title)\n\n($it.body)\n"
+        let c = $"### ($it.title) [($it.kind)]\n\n($it.body)\n"
         $acc | insert ($it.id | into string) $c
     }
 }
