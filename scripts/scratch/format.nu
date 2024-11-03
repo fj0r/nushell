@@ -100,7 +100,7 @@ def 'fmt leaves' [
 
     let tags = if $verbose and ($o.tags? | is-not-empty) {
         let ct = ansi $color.tag
-        $o.tags | each {|x| $"($ct)($x)" }
+        $o.tags | each {|x| $"($ct)($x | str join ':')" }
         # :TODO:
         #| group-by cat
         #| items {|k,v| $"(ansi $color.cat)($k):(ansi $color.tag)($v.tag | str join '/')"}
