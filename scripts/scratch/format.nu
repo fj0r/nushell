@@ -15,7 +15,7 @@ export def tag-format [tags --md --md-list] {
 def 'tagsplit' [tags] {
     let o = $in
     let tag = if ($tags | is-not-empty) {
-        $tags.0 | split row ':' | first
+        $tags.0 | split row ':'
     }
     let x = $o | each {|i|
         let t = $i.tags
@@ -25,9 +25,10 @@ def 'tagsplit' [tags] {
                 ($i.tags | range 1..)
             ]
         } else {
+            let l = $tag | length
             [
-                ($i.tags | where { $in.0 == $tag } | first)
-                ($i.tags | where { $in.0 != $tag })
+                ($i.tags | where { ($in | range ..<$l) == $tag } | first)
+                ($i.tags | where { ($in | range ..<$l) != $tag })
             ]
         }
         let main = $s.0
