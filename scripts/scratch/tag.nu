@@ -95,6 +95,14 @@ export def scratch-ensure-tags [tags] {
     return $ids
 }
 
+export def scratch-tagged [id] {
+    let tids = $in | each { $"\(($in)\)"} | str join ', '
+    let q = $"with x\(tag_id\) as \(VALUES ($tids)\)
+        insert into scratch_tag select ($id) as scratch_id, x.tag_id from x where 1
+        on conflict \(scratch_id, tag_id\) do nothing returning tag_id"
+    sqlx $q
+}
+
 export def scratch-tag-rename [from:string@cmpl-tag-id to] {
     sqlx $"update tag set name = (Q $to) where id = ($from)"
 }
@@ -114,5 +122,14 @@ export def scratch-tag-move [
     \) where scratch_id = ($id) and tag_id = \(
         select id from tags where name = (Q $from)
     \)"
+}
+
+export def scratch-tag-toggle [
+    id: int@cmpl-scratch-id
+    ...tags: string@cmpl-xtag
+] {
+    let tags = $tags | tag-group
+    let tids = scratch-ensure-tags $tags.normal
+    $tids | scratch-tagged $id
 }
 

@@ -178,12 +178,7 @@ export def scratch-add [
         returning id;" | get 0.id
 
     if ($tags | is-not-empty) {
-        let tids = scratch-ensure-tags $tags | each { $"\(($in)\)"} | str join ', '
-        let children = $"select ($id) as scratch_id, x.tag_id from x where 1"
-        let q = $"with x\(tag_id\) as \(VALUES ($tids)\)
-            insert into scratch_tag ($children)
-          on conflict \(scratch_id, tag_id\) do nothing returning tag_id"
-        sqlx $q
+        scratch-ensure-tags $tags | scratch-tagged $id
     }
 
     scratch-done $id --reverse=(not $done)
@@ -279,11 +274,8 @@ export def scratch-attrs [
             }
             let children = sqlx $"with (tag-tree) select tags.id from tags where name in \(($tag | each {Q $in} | str join ',')\)" | get id
         } else {
-            let tids = $tids | each { $"\(($in)\)"} | str join ', '
             for id in $ids {
-                sqlx $"with x\(tag_id\) as \(VALUES ($tids)\)
-                    insert into scratch_tag select ($id) as scratch_id, x.tag_id from x where 1
-                  on conflict \(scratch_id, tag_id\) do nothing"
+                $tids | scratch-tagged $id
             }
         }
     }
