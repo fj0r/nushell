@@ -234,7 +234,6 @@ export def --env theme [] {
         color: {
             title: default
             id: xterm_grey39
-            cat: xterm_lightslategrey
             tag: xterm_wheat4
             important: yellow
             urgent: red
@@ -243,6 +242,7 @@ export def --env theme [] {
             created: xterm_paleturquoise4
             updated: xterm_lightsalmon3a
             body: grey
+            branch: green_reverse
         }
         symbol: {
             box: [['☐' '🗹' '*'],['[ ]' '[x]' '']]

@@ -9,7 +9,7 @@ export def tag-format [tags --md --md-list] {
     | to tree
     | tagsplit $tags
     | tag tree
-    | fmt tag --md=$md --md-list=$md_list
+    | fmt tag-tree --md=$md --md-list=$md_list
 }
 
 def 'tagsplit' [tags] {
@@ -37,7 +37,7 @@ def 'tagsplit' [tags] {
     $x
 }
 
-def 'fmt tag' [
+def 'fmt tag-tree' [
     level:int=0
     --indent(-i):int=4
     --padding(-p):int=0
@@ -50,12 +50,32 @@ def 'fmt tag' [
             let j = $i.v | fmt tree ($level) --md=$md --md-list=$md_list
             $out ++= $j
         } else {
-            let n = '' | fill -c ' ' -w ($padding + $level * $indent)
-            $out ++= $"($n)($i.k)"
-            $out ++= $i.v | fmt tag ($level + 1) --md=$md --md-list=$md_list
+            let indent = '' | fill -c ' ' -w ($padding + $level * $indent)
+            $out ++= $i.k | fmt tag $indent --md=$md --md-list=$md_list
+
+            $out ++= $i.v | fmt tag-tree ($level + 1) --md=$md --md-list=$md_list
         }
     }
     $out | flatten | str join (char newline)
+}
+
+def 'fmt tag' [
+    indent
+    --md
+    --md-list
+    --done
+] {
+    let o = $in
+    let color = $env.SCRATCH_THEME.color
+    let done = $env.SCRATCH_THEME.symbol.box | get ($md | into int) | get ($done | into  int)
+    if $md_list {
+        [$"($indent)($env.SCRATCH_THEME.symbol.md_list)" $o]
+    } else if $md {
+        [$"($indent)($env.SCRATCH_THEME.symbol.md_list)" $done $o]
+    } else {
+        [$"($indent)($done)" $"(ansi $color.branch)($o)(ansi reset)"]
+    }
+    | str join ' '
 }
 
 
@@ -137,7 +157,7 @@ def 'fmt leaves' [
     } else if $md {
         [$"($indent)($env.SCRATCH_THEME.symbol.md_list)" $done $o.title $"#($o.id)"]
     } else {
-        [$indent $done $"(ansi $color.title)($o.title)" $"(ansi $color.id)#($o.id)"]
+        [$"($indent)($done)" $"(ansi $color.title)($o.title)" $"(ansi $color.id)#($o.id)"]
     }
     let verbose = not $md and not $md_list
 
