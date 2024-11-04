@@ -1,3 +1,5 @@
+migrate to [scratch.nu](https://github.com/fj0r/scratch.nu)
+
 Quick Start:
 - `todo-cat-add` to add a category
     - Supports multiple tags under the same category: `category:tag1/tag2/tag3`
