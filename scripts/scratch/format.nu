@@ -11,8 +11,13 @@ export def tag-format [--md --md-list] {
     | fmt tag --md=$md --md-list=$md_list
 }
 
-# si 11
-export def 'tag tree' [] {
+def 'fmt tag' [
+    level:int=0
+    --indent(-i):int=4
+    --padding(-p):int=0
+    --md
+    --md-list
+] {
     let o = $in
     # dynamically determines the root node
     let x = $o | each {|i|
@@ -21,19 +26,27 @@ export def 'tag tree' [] {
         {tags: main, node: node}
     }
     mut r = []
+
 }
 
-def tag-tree [tags node] {
+
+def 'tag tree' [l] {
+    mut r = {}
+    for i in $l {
+        $r = tag-tree $i $r
+    }
+    $r
 }
 
-def 'fmt tag' [
-    level:int=0
-    --indent(-i):int=4
-    --padding(-p):int=0
-    --md
-    --md-list
-] {
-
+def tag-tree [x r={}] {
+    let o = $r | get -i $x.tags.0 | default {}
+    if ($x.tags | length) > 1 {
+        $r | upsert $x.tags.0 (
+            tag-tree ($x | update tags ($x.tags | range 1..)) $o
+        )
+    } else {
+        $r | upsert $x.tags.0 {...$o, ':': $x.node}
+    }
 }
 
 export def 'to tree' [] {
