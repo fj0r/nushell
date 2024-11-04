@@ -59,7 +59,7 @@ def 'fmt leaves' [
     } else if $md {
         [$"($indent)($env.TODO_THEME.symbol.md_list)" $done $o.title $"#($o.id)"]
     } else {
-        [$indent $done $"(ansi $color.title)($o.title)" $"(ansi $color.id)#($o.id)"]
+        [$"($indent)($done)" $"(ansi $color.title)($o.title)" $"(ansi $color.id)#($o.id)"]
     }
     let verbose = not $md and not $md_list
 
