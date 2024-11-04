@@ -102,3 +102,17 @@ export def scratch-tag-rename [from:string@cmpl-tag-id to] {
 export def scratch-tag-hidden [tag:int@cmpl-tag-id] {
     sqlx $"update tag set hidden = not hidden where id = ($tag) returning hidden"
 }
+
+export def scratch-tag-move [
+    id: int@cmpl-scratch-id
+    --from(-f):string@cmpl-tag
+    --to(-t):string@cmpl-tag
+] {
+    sqlx $"with (tag-tree)
+    update scratch_tag set tag_id = \(
+        select id from tags where name = (Q $to)
+    \) where scratch_id = ($id) and tag_id = \(
+        select id from tags where name = (Q $from)
+    \)"
+}
+
