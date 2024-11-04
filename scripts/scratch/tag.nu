@@ -19,7 +19,7 @@ export def tag-group [] {
     mut $r = { not: [], and: [], normal: [], other: [] }
     for i in $x {
         match ($i | str substring ..<1) {
-            '!' => { $r.not ++= $i | str substring 1.. }
+            '^' => { $r.not ++= $i | str substring 1.. }
             '&' => { $r.and ++= $i | str substring 1.. }
             ':' => { $r.normal ++= $i | str substring 1.. }
             _ => { $r.other ++= $i }
@@ -103,6 +103,11 @@ export def scratch-tagged [id] {
     sqlx $q
 }
 
+export def scratch-untagged [id] {
+    let tids = $in | into string | str join ', '
+    sqlx $"delete from scratch_tag where scratch_id = ($id) and tag_id in \(($tids)\)"
+}
+
 export def scratch-tag-rename [from:string@cmpl-tag-id to] {
     sqlx $"update tag set name = (Q $to) where id = ($from)"
 }
@@ -131,5 +136,11 @@ export def scratch-tag-toggle [
     let tags = $tags | tag-group
     let tids = scratch-ensure-tags $tags.normal
     $tids | scratch-tagged $id
+    if ($tags.not | is-not-empty) {
+        let tids = sqlx $"with (tag-tree) select tags.id from tags
+            where name in \(($tags.not | each {Q $in} | str join ',')\)
+        " | get id
+        $tids | scratch-untagged $id
+    }
 }
 
