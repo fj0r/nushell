@@ -242,7 +242,7 @@ export def --env theme [] {
             created: xterm_paleturquoise4
             updated: xterm_lightsalmon3a
             body: grey
-            branch: green_reverse
+            branch: xterm_wheat1
         }
         symbol: {
             box: [['☐' '🗹' '*'],['[ ]' '[x]' '']]
