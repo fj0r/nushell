@@ -81,24 +81,24 @@ export def --env init [] {
     }
     let _ = "
     - name: txt
-      entry: a.txt
+      entry: scratch.txt
       comment: '# '
       runner: ''
     - name: md
-      entry: README.md
+      entry: scratch.md
       comment: '# '
       runner: ''
     - name: markdown
-      entry: README.md
+      entry: scratch.md
       comment: '# '
       runner: ''
     - name: nushell
-      entry: main.nu
+      entry: scratch.nu
       comment: '# '
       runner: file
       cmd: 'open {stdin} | nu {}'
     - name: python
-      entry: __main__.py
+      entry: scratch.py
       comment: '# '
       runner: file
       cmd: 'open {stdin} | python3 {}'
@@ -129,14 +129,14 @@ export def --env init [] {
       runner: file
       cmd: lua {}
     - name: postgresql
-      entry: main.sql
+      entry: scratch.sql
       comment: '-- '
       runner: file
       cmd: |-
         $env.PGPASSWORD = {password}
         psql -U {username} -d {database} -h {host} -p {port} -f {} --csv
     - name: sqlite
-      entry: main.sql
+      entry: scratch.sql
       comment: '-- '
       runner: file
       cmd: open {file} | query db (open {})
