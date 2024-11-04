@@ -95,7 +95,12 @@ def tag-tree [x r={}] {
             tag-tree ($x | update tags ($x.tags | range 1..)) $o
         )
     } else {
-        $r | upsert $x.tags.0 {':': $x.node, ...$o}
+        let n = if ':' in $o {
+            $o | update ':' {|m| $m | get ':' | append $x.node}
+        } else {
+            $o | insert ':' [$x.node]
+        }
+        $r | upsert $x.tags.0 $n
     }
 }
 
