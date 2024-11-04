@@ -23,6 +23,7 @@ export def scratch-list [
     --md(-m)
     --md-list(-l)
     --raw
+    --scratch-tree
     --debug
 ] {
     let sortable = [
@@ -129,8 +130,10 @@ export def scratch-list [
 
     if $raw {
         $r
-    } else {
+    } else if $scratch_tree {
         $r | scratch-format --md=$md --md-list=$md_list
+    } else {
+        $r | tag-format $tags --md=$md --md-list=$md_list
     }
 }
 

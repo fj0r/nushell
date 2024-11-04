@@ -4,11 +4,37 @@ export def scratch-format [--md --md-list] {
     $in | to tree | fmt tree --md=$md --md-list=$md_list
 }
 
-export def tag-format [--md --md-list] {
+export def tag-format [tags --md --md-list] {
     $in
     | to tree
+    | tagsplit $tags
     | tag tree
     | fmt tag --md=$md --md-list=$md_list
+}
+
+def 'tagsplit' [tags] {
+    let o = $in
+    let tag = if ($tags | is-not-empty) {
+        $tags.0 | split row ':' | first
+    }
+    let x = $o | each {|i|
+        let t = $i.tags
+        let s = if ($tag | is-empty) {
+            [
+                $i.tags.0
+                ($i.tags | range 1..)
+            ]
+        } else {
+            [
+                ($i.tags | where { $in.0 == $tag } | first)
+                ($i.tags | where { $in.0 != $tag })
+            ]
+        }
+        let main = $s.0
+        let node = $i | update tags {|x| $s.1 }
+        {tags: $main, node: $node}
+    }
+    $x
 }
 
 def 'fmt tag' [
@@ -18,21 +44,25 @@ def 'fmt tag' [
     --md
     --md-list
 ] {
-    let o = $in
-    # dynamically determines the root node
-    let x = $o | each {|i|
-        let main = $i.tags.0
-        let node = $i | update tags {|x| $x.tags | range 1.. }
-        {tags: main, node: node}
+    mut out = []
+    for i in ($in | transpose k v) {
+        if ($i.k == ':') {
+            let j = $i.v | fmt tree ($level) --md=$md --md-list=$md_list
+            $out ++= $j
+        } else {
+            let n = '' | fill -c ' ' -w ($padding + $level * $indent)
+            $out ++= $"($n)($i.k)"
+            $out ++= $i.v | fmt tag ($level + 1) --md=$md --md-list=$md_list
+        }
     }
-    mut r = []
-
+    $out | flatten | str join (char newline)
 }
 
 
-def 'tag tree' [l] {
+def 'tag tree' [] {
+    let a = $in
     mut r = {}
-    for i in $l {
+    for i in $a {
         $r = tag-tree $i $r
     }
     $r
@@ -45,7 +75,7 @@ def tag-tree [x r={}] {
             tag-tree ($x | update tags ($x.tags | range 1..)) $o
         )
     } else {
-        $r | upsert $x.tags.0 {...$o, ':': $x.node}
+        $r | upsert $x.tags.0 {':': $x.node, ...$o}
     }
 }
 
