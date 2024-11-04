@@ -6,7 +6,7 @@ export use tag.nu *
 
 
 export def scratch-list [
-    ...tags:string@cmpl-tag
+    ...xtags:string@cmpl-xtag
     --search(-s): string
     --trash(-T) # show trash
     --important(-i): int
@@ -48,8 +48,8 @@ export def scratch-list [
     let exclude_tags_hidden = "tags.hidden = 0"
     # ($untagged)
     let include_untagged = "tags.name is null"
-    dbg $debug {trash: $trash, notags: ($tags | is-empty), untagged: $untagged} -t cond
-    $cond ++= match [($tags | is-empty) $untagged] {
+    dbg $debug {trash: $trash, notags: ($xtags | is-empty), untagged: $untagged} -t cond
+    $cond ++= match [($xtags | is-empty) $untagged] {
         # --untagged
         [true true] => $include_untagged
         #
@@ -65,10 +65,10 @@ export def scratch-list [
         | str join ' and '
     }
 
-    mut flt = {and:[], not:[]}
-    if ($tags | is-not-empty) {
-        $flt = $tags | tag-group
-        let tags = $flt.normal
+    let tags = $xtags | tag-group
+
+    if ($xtags | is-not-empty) {
+        let tags = $tags.normal
         let tags_id = sqlx $"with (tag-tree), tid as \(
             select id from tags where name in \(($tags | each {Q $in} | str join ', ')\)
         \), (tag-branch ids --where 'id in (select id from tid)')
@@ -116,12 +116,11 @@ export def scratch-list [
         $x | first | reject tag | insert tags $t
     }
 
-    let flt = $flt
-    let r = if ($flt.and | is-not-empty) or ($flt.not | is-not-empty) {
+    let r = if ($tags.and | is-not-empty) or ($tags.not | is-not-empty) {
         $r
         | filter {|x|
-            let n = not ($flt.not | any {|y| $y in $x.tags })
-            let a = $flt.and | all {|y| $y in $x.tags }
+            let n = not ($tags.not | any {|y| $y in $x.tags })
+            let a = $tags.and | all {|y| $y in $x.tags }
             $n and $a
         }
     } else {
@@ -133,14 +132,13 @@ export def scratch-list [
     } else if $scratch_tree {
         $r | scratch-format --md=$md --md-list=$md_list
     } else {
-        $r | tag-format $tags --md=$md --md-list=$md_list
+        $r | tag-format $tags.normal --md=$md --md-list=$md_list
     }
 }
 
 
 export def scratch-add [
-    ...tags:string@cmpl-tag
-    --title(-t): string=""
+    ...xtags:string@cmpl-atag
     --kind(-k): string@cmpl-kind='md'
     --parent(-p): int@cmpl-scratch-id
     --important(-i): int
@@ -157,6 +155,9 @@ export def scratch-add [
     let body = $in
     let cfg = get-config $kind
 
+    let xtags = $xtags | tag-group
+    let tags = $xtags.normal
+    let title = $xtags.other | str join ' '
     let d = $body | entity --batch=$batch $cfg --title $title --created --locate-body=$locate_body
     if ($d.body | is-empty) and $ignore_empty_body { return }
 

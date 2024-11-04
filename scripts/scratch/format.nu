@@ -17,7 +17,7 @@ def 'tagsplit' [tags] {
     let tag = if ($tags | is-not-empty) {
         $tags.0 | split row ':'
     }
-    let x = $o | each {|i|
+    let x = $o | default [] | each {|i|
         let t = $i.tags
         let s = if ($tag | is-empty) {
             [

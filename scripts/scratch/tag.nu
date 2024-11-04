@@ -2,18 +2,27 @@ export def cmpl-tag [] {
     sqlx $"with (tag-tree) select * from tags" | get name | filter { $in | is-not-empty }
 }
 
+export def cmpl-atag [] {
+    cmpl-tag | each {|x| $":($x)" }
+}
+
+export def cmpl-xtag [] {
+    cmpl-tag | each {|x| [$":($x)" $"&($x)" $"^($x)"]} | flatten
+}
+
 export def cmpl-tag-id [] {
    sqlx $"with (tag-tree) select * from tags" | each { $"($in.id) # ($in.name)" }
 }
 
 export def tag-group [] {
     let x = $in
-    mut $r = { not: [], and: [], normal: [] }
+    mut $r = { not: [], and: [], normal: [], other: [] }
     for i in $x {
         match ($i | str substring ..<1) {
             '!' => { $r.not ++= $i | str substring 1.. }
             '&' => { $r.and ++= $i | str substring 1.. }
-            _ => { $r.normal ++= $i}
+            ':' => { $r.normal ++= $i | str substring 1.. }
+            _ => { $r.other ++= $i }
         }
     }
     $r
