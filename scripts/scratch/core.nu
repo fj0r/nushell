@@ -138,7 +138,7 @@ export def scratch-list [
 
 
 export def scratch-add [
-    ...xtags:string@cmpl-atag
+    ...xargs:string@cmpl-atag
     --kind(-k): string@cmpl-kind='md'
     --parent(-p): int@cmpl-scratch-id
     --important(-i): int
@@ -155,9 +155,9 @@ export def scratch-add [
     let body = $in
     let cfg = get-config $kind
 
-    let xtags = $xtags | tag-group
-    let tags = $xtags.normal
-    let title = $xtags.other | str join ' '
+    let xargs = $xargs | tag-group
+    let tags = $xargs.normal
+    let title = $xargs.other | str join ' '
     let d = $body | entity --batch=$batch $cfg --title $title --created --locate-body=$locate_body
     if ($d.body | is-empty) and $ignore_empty_body { return }
 
@@ -233,16 +233,17 @@ export def scratch-delete [
 }
 
 export def scratch-attrs [
-    ...ids: int@cmpl-scratch-id
+    ...xargs: any@cmpl-xtag
     --important(-i): int
     --urgent(-u): int
     --challenge(-c): int
     --parent(-p): int@cmpl-scratch-id
     --deadline(-d): duration
     --done(-x): int
-    --tag(-t): list<string@cmpl-tag>
-    --remove(-r)
 ] {
+    let ids = $xargs | filter { ($in | describe) == 'int' }
+    let xtags = $xargs | filter { ($in | describe) != 'int' }
+
     let args = {
         important: $important
         urgent: $urgent
@@ -265,17 +266,19 @@ export def scratch-attrs [
         }
     }
 
-    if ($tag | is-not-empty) {
-        let tids = scratch-ensure-tags $tag
-        if $remove {
-            let tids = $tids | into string | str join ', '
+    if ($xtags | is-not-empty) {
+        let tags = $xtags | tag-group
+        let tids = scratch-ensure-tags $tags.normal
+        for id in $ids {
+            $tids | scratch-tagged $id
+        }
+        if ($tags.not | is-not-empty) {
+            print $tags.not
+            let tids = sqlx $"with (tag-tree) select tags.id from tags
+                where name in \(($tags.not | each {Q $in} | str join ',')\)
+            " | get id
             for id in $ids {
-                sqlx $"delete from scratch_tag where scratch_id = ($id) and tag_id in \(($tids)\);"
-            }
-            let children = sqlx $"with (tag-tree) select tags.id from tags where name in \(($tag | each {Q $in} | str join ',')\)" | get id
-        } else {
-            for id in $ids {
-                $tids | scratch-tagged $id
+                $tids | scratch-untagged $id
             }
         }
     }
