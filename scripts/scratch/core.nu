@@ -352,6 +352,16 @@ export def scratch-clean [
     }
 }
 
+export def scratch-title [id: int@cmpl-scratch-id] {
+    sqlx $'select title from scratch where id = ($id);'
+    | get 0.title
+}
+
+export def scratch-body [id: int@cmpl-scratch-id] {
+    sqlx $'select body from scratch where id = ($id);'
+    | get 0.body
+}
+
 export def scratch-search [
     keyword
     --num(-n):int = 20
