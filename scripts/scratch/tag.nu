@@ -7,7 +7,7 @@ export def cmpl-atag [] {
 }
 
 export def cmpl-xtag [] {
-    cmpl-tag | each {|x| [$":($x)" $"&($x)" $"^($x)"]} | flatten
+    cmpl-tag | each {|x| [$":($x)" $"+($x)" $"^($x)"]} | flatten
 }
 
 export def cmpl-tag-id [] {
@@ -20,7 +20,7 @@ export def tag-group [] {
     for i in $x {
         match ($i | str substring ..<1) {
             '^' => { $r.not ++= $i | str substring 1.. }
-            '&' => { $r.and ++= $i | str substring 1.. }
+            '+' => { $r.and ++= $i | str substring 1.. }
             ':' => { $r.normal ++= $i | str substring 1.. }
             _ => { $r.other ++= $i }
         }
