@@ -224,7 +224,7 @@ export def scratch-edit [
 
     if ($preset | is-not-empty) {
         sqlx $"insert into scratch_preset \(scratch_id, preset\)
-            VALUES \(($id), (Q $preset)\) on conflict \(id\) do update
+            VALUES \(($id), (Q $preset)\) on conflict \(scratch_id\) do update
             set preset=EXCLUDED.preset"
     }
 
