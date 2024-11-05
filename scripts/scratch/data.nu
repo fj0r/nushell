@@ -64,11 +64,10 @@ export def --env init [] {
             yaml TEXT NOT NULL DEFAULT '',
             PRIMARY KEY (kind, name)
         );"
-        "CREATE TABLE IF NOT EXISTS scratch_kind_preset (
+        "CREATE TABLE IF NOT EXISTS scratch_preset (
             scratch_id INTEGER NOT NULL,
-            kind TEXT NOT NULL,
-            name TEXT NOT NULL,
-            PRIMARY KEY (scratch_id, kind, name)
+            preset TEXT NOT NULL,
+            PRIMARY KEY (scratch_id)
         );"
         "CREATE TABLE IF NOT EXISTS kind_file (
             kind TEXT NOT NULL,

@@ -8,11 +8,17 @@ export def cmpl-scratch-id [] {
 }
 
 export def cmpl-untagged-scratch-id [] {
-    sqlx $"select id as value, updated || '│' || printf\('%10s', kind\) || '│' ||
-        case title when '' then '...' || substr\(ltrim\(body\), 0, 20\) else title end  as description
-        from scratch
-        left outer join scratch_tag on scratch.id = scratch_id
-        where tag_id is null
+    let rw = (term size).columns - 52
+    sqlx $"select s.id as value,
+                updated || '│' ||
+                printf\('%-10s', s.kind\) || '│' ||
+                printf\('%-10s', p.preset\) || '│' ||
+                substr\(ltrim\(s.title || ' '\) || '...' || ltrim\(s.body\), 0, ($rw)\)
+            as description
+        from scratch as s
+        left outer join scratch_tag as t on s.id = t.scratch_id
+        left outer join scratch_preset as p on s.id = p.scratch_id
+        where t.tag_id is null
         order by updated desc limit 20;"
 }
 

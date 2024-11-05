@@ -141,6 +141,7 @@ export def scratch-add [
     ...xargs:string@cmpl-atag
     --kind(-k): string@cmpl-kind='md'
     --config: record
+    --preset: string
     --parent(-p): int@cmpl-scratch-id
     --important(-i): int
     --urgent(-u): int
@@ -182,6 +183,11 @@ export def scratch-add [
         scratch-ensure-tags $tags | scratch-tagged $id
     }
 
+    if ($preset | is-not-empty) {
+        sqlx $"insert into scratch_preset \(scratch_id, preset\)
+            VALUES \(($id), (Q $preset)\)"
+    }
+
     scratch-done $id --reverse=(not $done)
 
     if $returning_body {
@@ -195,6 +201,7 @@ export def scratch-edit [
     id:int@cmpl-scratch-id
     --kind(-k):string@cmpl-kind
     --config: record
+    --preset: string
     --returning-body
     --locate-body
 ] {
@@ -212,10 +219,14 @@ export def scratch-edit [
 
     let d = $body | entity $cfg --title $old.title --locate-body=$locate_body
 
-    let e = $d
-    | items {|k,v| $"($k) = (Q $v)" }
-    | str join ','
+    let e = $d | items {|k,v| $"($k) = (Q $v)" } | str join ','
     let id = sqlx $"update scratch set ($e) where id = ($id) returning id;" | get 0.id
+
+    if ($preset | is-not-empty) {
+        sqlx $"insert into scratch_preset \(scratch_id, preset\)
+            VALUES \(($id), (Q $preset)\) on conflict \(id\) do update
+            set preset=EXCLUDED.preset"
+    }
 
     if $returning_body {
         $d.body
@@ -376,19 +387,21 @@ export def scratch-in [
     --preset(-p):string@cmpl-kind-preset
 ] {
     let body = $in
-    mut $kind = $kind
     if ($id | is-empty) {
-        $kind = if ($kind | is-empty) { 'md' } else { $kind }
+        let kind = if ($kind | is-empty) { 'md' } else { $kind }
         let cfg = get-config $kind
         $body
-        | scratch-add --config $cfg --returning-body --locate-body --ignore-empty-body
+        | scratch-add --config $cfg --preset $preset --returning-body --locate-body --ignore-empty-body
         | performance $cfg --preset $preset
     } else {
-        let x = sqlx $"select kind from scratch where id = ($id);" | get -i 0
-        $kind = if ($kind | is-empty) { $x.kind } else { $kind }
+        let x = sqlx $"select s.kind, p.preset from scratch as s
+            left join scratch_preset as p on s.id = p.scratch_id
+            where s.id = ($id);" | get -i 0
+        let kind = if ($kind | is-empty) { $x.kind } else { $kind }
+        let preset = if ($preset | is-empty) { $x.preset } else { $preset }
         let cfg = get-config $kind
         $body
-        | scratch-edit --config $cfg $id --returning-body --locate-body
+        | scratch-edit $id --config $cfg --preset $preset --returning-body --locate-body
         | performance $cfg --preset $preset
     }
 }
@@ -410,9 +423,12 @@ export def scratch-out [
         } else {
             $id
         }
-        let x = sqlx $"select body, kind from scratch where id = ($id);" | get -i 0
+        let x = sqlx $"select s.body, s.kind, p.preset from scratch as s
+            left join scratch_preset as p on s.id = p.scratch_id
+            where s.id = ($id);" | get -i 0
         let kind = if ($kind | is-empty) { $x.kind } else { $kind }
         let cfg = get-config $kind
+        let preset = if ($preset | is-empty) { $x.preset } else { $preset }
         $x.body | performance $cfg $stdin --preset $preset
     }
 }
