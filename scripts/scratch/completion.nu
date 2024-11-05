@@ -13,7 +13,7 @@ export def cmpl-untagged-scratch-id [] {
         from scratch
         left outer join scratch_tag on scratch.id = scratch_id
         where tag_id is null
-        order by updated desc limit 10;"
+        order by updated desc limit 20;"
 }
 
 export def cmpl-sort [] {

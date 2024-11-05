@@ -319,7 +319,11 @@ export def scratch-clean [
         | reduce -f {} {|it,acc| $acc | insert ($it.id | into string) $it.body }
     }
     if $untagged {
-
+        sqlx $"with x as \(
+            select id from scratch
+            left outer join scratch_tag on scratch.id = scratch_id
+            where tag_id is null
+        \) delete from scratch where id in \(select id from x\) "
     }
     if $deleted {
         let tags = sqlx $"delete from scratch_tag where scratch_id in \(select id from scratch where deleted != ''\) returning scratch_id, tag_id"
