@@ -82,9 +82,13 @@ export def scratch-list [
     if ($challenge | is-not-empty) { $cond ++= $"challenge >= ($challenge)"}
     if ($important | is-not-empty) { $cond ++= $"important >= ($important)"}
     if ($urgent | is-not-empty) { $cond ++= $"urgent >= ($urgent)"}
-    if ($updated | is-not-empty) { $cond ++= $"updated >= ($now - $updated | fmt-date | Q $in)"}
-    if ($created | is-not-empty) { $cond ++= $"created >= ($now - $created | fmt-date | Q $in)"}
-    if ($deadline | is-not-empty) { $cond ++= $"deadline >= ($now - $deadline | fmt-date | Q $in)"}
+
+    mut $time_cond = []
+    if ($updated | is-not-empty) { $time_cond ++= $"updated >= ($now - $updated | fmt-date | Q $in)"}
+    if ($created | is-not-empty) { $time_cond ++= $"created >= ($now - $created | fmt-date | Q $in)"}
+    if ($deadline | is-not-empty) { $time_cond ++= $"deadline >= ($now - $deadline | fmt-date | Q $in)"}
+    $cond ++= $time_cond | str join ' or ' | if ($in | is-not-empty) { $"\(($in)\)" }
+
     if ($relevant | is-not-empty) { $cond ++= $"relevant = ($relevant)"}
     if ($done == 0) { $cond ++= $"done = 0" }
     if ($done == 1) { $cond ++= $"done = 1" }

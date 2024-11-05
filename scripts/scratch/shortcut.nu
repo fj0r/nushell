@@ -30,14 +30,15 @@ export def scratch-today [
     --md
     --md-list
     --raw
-    --no-branch(-N)
     --done(-x): int
     --untagged(-U)
+    --deadline
 ] {
-    let d = (date now) - (date now | format date '%FT00:00:00' | into datetime)
+    let t = (date now) - (date now | format date '%FT00:00:00' | into datetime)
+
     (scratch-list
-        ...$xtags
-        --updated $d --trash=$trash
+        ...$xtags --trash=$trash
+        --updated $t --deadline $t
         --md-list=$md_list --md=$md --raw=$raw
         --done $done
         )
