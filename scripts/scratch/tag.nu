@@ -134,8 +134,10 @@ export def scratch-tag-toggle [
     ...tags: string@cmpl-xtag
 ] {
     let tags = $tags | tag-group
-    let tids = scratch-ensure-tags $tags.normal
-    $tids | scratch-tagged $id
+    if ($tags.normal | is-not-empty) {
+        let tids = scratch-ensure-tags $tags.normal
+        $tids | scratch-tagged $id
+    }
     if ($tags.not | is-not-empty) {
         let tids = sqlx $"with (tag-tree) select tags.id from tags
             where name in \(($tags.not | each {Q $in} | str join ',')\)

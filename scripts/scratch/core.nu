@@ -287,12 +287,13 @@ export def scratch-attrs [
 
     if ($xtags | is-not-empty) {
         let tags = $xtags | tag-group
-        let tids = scratch-ensure-tags $tags.normal
-        for id in $ids {
-            $tids | scratch-tagged $id
+        if ($tags.normal | is-not-empty) {
+            let tids = scratch-ensure-tags $tags.normal
+            for id in $ids {
+                $tids | scratch-tagged $id
+            }
         }
         if ($tags.not | is-not-empty) {
-            print $tags.not
             let tids = sqlx $"with (tag-tree) select tags.id from tags
                 where name in \(($tags.not | each {Q $in} | str join ',')\)
             " | get id
