@@ -30,7 +30,7 @@ from = "lg"
 to = "lg"
 
 [[manifest]]
-from = "todo"
+from = "legacy/todo"
 to = "todo"
 
 [[manifest]]

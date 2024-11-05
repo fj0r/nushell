@@ -13,9 +13,9 @@ use scratch/shortcut.nu *
 use scratch/integration.nu *
 use llm *
 use llm/shortcut.nu *
-use todo *
-use todo/shortcut.nu *
-use todo/integration.nu *
+use legacy/todo *
+use legacy/todo/shortcut.nu *
+use legacy/todo/integration.nu *
 use project *
 use ssh *
 use cwdhist *
