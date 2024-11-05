@@ -1,15 +1,15 @@
 use common.nu *
 
-export def scratch-format [--md --md-list] {
-    $in | to tree | fmt tree --md=$md --md-list=$md_list
+export def scratch-format [--md --md-list --body-lines: int=2] {
+    $in | to tree | fmt tree --body-lines $body_lines --md=$md --md-list=$md_list
 }
 
-export def tag-format [tags --md --md-list] {
+export def tag-format [tags --md --md-list --body-lines: int=2] {
     $in
     | to tree
     | tagsplit $tags
     | tag tree
-    | fmt tag-tree --md=$md --md-list=$md_list
+    | fmt tag-tree --body-lines $body_lines --md=$md --md-list=$md_list
 }
 
 def 'tagsplit' [tags] {
@@ -42,19 +42,20 @@ def 'fmt tag-tree' [
     level:int=0
     --indent(-i):int=4
     --padding(-p):int=0
+    --body-lines: int=2
     --md
     --md-list
 ] {
     mut out = []
     for i in ($in | transpose k v) {
         if ($i.k == ':') {
-            let j = $i.v | fmt tree ($level) --md=$md --md-list=$md_list
+            let j = $i.v | fmt tree ($level) --body-lines $body_lines --md=$md --md-list=$md_list
             $out ++= $j
         } else {
             let indent = '' | fill -c ' ' -w ($padding + $level * $indent)
             $out ++= $i.k | fmt tag $indent --md=$md --md-list=$md_list
 
-            $out ++= $i.v | fmt tag-tree ($level + 1) --md=$md --md-list=$md_list
+            $out ++= $i.v | fmt tag-tree ($level + 1) --body-lines $body_lines --md=$md --md-list=$md_list
         }
     }
     $out | flatten | str join (char newline)
@@ -131,17 +132,18 @@ def 'fmt tree' [
     level:int=0
     --indent(-i):int=4
     --padding(-p):int=0
+    --body-lines: int=2
     --md
     --md-list
 ] {
     mut out = []
     for i in $in {
         let n = '' | fill -c ' ' -w ($padding + $level * $indent)
-        for j in ($i | reject children | fmt leaves $n --md=$md --md-list=$md_list) {
+        for j in ($i | reject children | fmt leaves $n --body-lines $body_lines --md=$md --md-list=$md_list) {
             $out ++= $j
         }
         if ($i.children | is-not-empty) {
-            $out ++= $i.children | fmt tree ($level + 1) --md=$md --md-list=$md_list
+            $out ++= $i.children | fmt tree ($level + 1) --body-lines $body_lines --md=$md --md-list=$md_list
         }
     }
     $out | flatten | str join (char newline)
@@ -151,6 +153,7 @@ def 'fmt leaves' [
     indent
     --md
     --md-list
+    --body-lines: int=2
 ] {
     let o = $in
     let color = $env.SCRATCH_THEME.color
@@ -197,6 +200,7 @@ def 'fmt leaves' [
     let body = if $verbose and ($o.body? | is-not-empty) {
         $o.body
         | lines
+        | range ..<$body_lines
         | each {$"($endent)(ansi $color.body)($in)(ansi reset)"}
     } else { [] }
 
