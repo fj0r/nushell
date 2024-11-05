@@ -140,6 +140,7 @@ export def scratch-list [
 export def scratch-add [
     ...xargs:string@cmpl-atag
     --kind(-k): string@cmpl-kind='md'
+    --config: record
     --parent(-p): int@cmpl-scratch-id
     --important(-i): int
     --urgent(-u): int
@@ -153,7 +154,7 @@ export def scratch-add [
     --ignore-empty-body
 ] {
     let body = $in
-    let cfg = get-config $kind
+    let cfg = if ($config | is-empty) { get-config $kind } else { $config }
 
     let xargs = $xargs | tag-group
     let tags = $xargs.normal
@@ -193,13 +194,18 @@ export def scratch-add [
 export def scratch-edit [
     id:int@cmpl-scratch-id
     --kind(-k):string@cmpl-kind
+    --config: record
     --returning-body
     --locate-body
 ] {
     let body = $in
     let old = sqlx $"select title, kind, body from scratch where id = ($id)" | get -i 0
-    let kind = if ($kind | is-empty) { $old.kind } else { $kind }
-    let cfg = get-config $kind
+    let cfg = if ($config | is-empty) {
+        let kind = if ($kind | is-empty) { $old.kind } else { $kind }
+        get-config $kind
+    } else {
+        $config
+    }
     let body = if ($body | is-empty) { $old.body } else {
         $"<<<<<<< STDIN \n($body)\n=======\n($old.body)"
     }
@@ -370,18 +376,19 @@ export def scratch-in [
     --preset(-p):string@cmpl-kind-preset
 ] {
     let body = $in
+    mut $kind = $kind
     if ($id | is-empty) {
-        let kind = if ($kind | is-empty) { 'md' } else { $kind }
+        $kind = if ($kind | is-empty) { 'md' } else { $kind }
         let cfg = get-config $kind
         $body
-        | scratch-add --kind=$kind --returning-body --locate-body --ignore-empty-body
+        | scratch-add --config $cfg --returning-body --locate-body --ignore-empty-body
         | performance $cfg --preset $preset
     } else {
         let x = sqlx $"select kind from scratch where id = ($id);" | get -i 0
-        let kind = if ($kind | is-empty) { $x.kind } else { $kind }
+        $kind = if ($kind | is-empty) { $x.kind } else { $kind }
         let cfg = get-config $kind
         $body
-        | scratch-edit --kind=$kind $id --returning-body --locate-body
+        | scratch-edit --config $cfg $id --returning-body --locate-body
         | performance $cfg --preset $preset
     }
 }
