@@ -31,8 +31,7 @@ export def scratch-today [
     --md-list
     --raw
     --no-branch(-N)
-    --work-in-process(-W)
-    --finished(-F)
+    --done(-x): int
     --untagged(-U)
 ] {
     let d = (date now) - (date now | format date '%FT00:00:00' | into datetime)
@@ -40,7 +39,6 @@ export def scratch-today [
         ...$xtags
         --updated $d --trash=$trash
         --md-list=$md_list --md=$md --raw=$raw
-        --finished=$finished
-        --work-in-process=$work_in_process
+        --done $done
         )
 }

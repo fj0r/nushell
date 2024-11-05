@@ -17,8 +17,7 @@ export def scratch-list [
     --deadline: duration
     --relevant(-r): int@cmpl-relevant-id
     --sort(-s): list<string@cmpl-sort>
-    --work-in-process(-W)
-    --finished(-F)
+    --done(-x):int
     --untagged(-U)
     --md(-m)
     --md-list(-l)
@@ -87,8 +86,8 @@ export def scratch-list [
     if ($created | is-not-empty) { $cond ++= $"created >= ($now - $created | fmt-date | Q $in)"}
     if ($deadline | is-not-empty) { $cond ++= $"deadline >= ($now - $deadline | fmt-date | Q $in)"}
     if ($relevant | is-not-empty) { $cond ++= $"relevant = ($relevant)"}
-    if ($work_in_process) { $cond ++= $"done = 0" }
-    if ($finished) { $cond ++= $"done = 1" }
+    if ($done == 0) { $cond ++= $"done = 0" }
+    if ($done == 1) { $cond ++= $"done = 1" }
 
     let $cond = if ($cond | is-empty) { '' } else { $cond | str join ' and ' | $"where ($in)" }
 
