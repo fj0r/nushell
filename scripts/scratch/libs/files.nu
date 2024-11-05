@@ -29,7 +29,7 @@ export def scratch-files-save [
     let lst = ls **/* | where type == 'file'
     for f in $lst {
         let c = open --raw $f.name
-        let hash = $c | hash 64
+        let hash = $c | hash sha256-base64
         let c = $c | to z64
         let x = $f.name | path parse
         scratch-files-import {kind: $kind, body: $c, hash: $hash, ...$x}
@@ -53,7 +53,7 @@ export def scratch-files-load [
     }
 }
 
-export def 'hash 64' [] {
+export def 'hash sha256-base64' [] {
     $in | hash sha256 | decode hex | encode base64
 }
 

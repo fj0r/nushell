@@ -1,4 +1,5 @@
 use mod.nu *
+use completion.nu *
 
 export alias sl = scratch-list
 export alias sa = scratch-add
@@ -17,3 +18,29 @@ export alias sactivities = scratch-activities
 
 export alias so = scratch-out
 export alias si = scratch-in
+
+
+export def scratch-trash [] {
+    scratch-list --trash
+}
+
+export def scratch-today [
+    ...xtags:string@cmpl-xtag
+    --trash(-T)
+    --md
+    --md-list
+    --raw
+    --no-branch(-N)
+    --work-in-process(-W)
+    --finished(-F)
+    --untagged(-U)
+] {
+    let d = (date now) - (date now | format date '%FT00:00:00' | into datetime)
+    (scratch-list
+        ...$xtags
+        --updated $d --trash=$trash
+        --md-list=$md_list --md=$md --raw=$raw
+        --finished=$finished
+        --work-in-process=$work_in_process
+        )
+}

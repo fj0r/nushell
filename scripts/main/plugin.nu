@@ -10,6 +10,7 @@ use docker *
 use docker/shortcut.nu *
 use scratch *
 use scratch/shortcut.nu *
+use scratch/integration.nu *
 use llm *
 use llm/shortcut.nu *
 use todo *
