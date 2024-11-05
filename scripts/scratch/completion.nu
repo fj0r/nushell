@@ -20,7 +20,7 @@ export def cmpl-untagged-scratch-id [] {
     from scratch as s
     left outer join scratch_tag as t on s.id = t.scratch_id
     left outer join scratch_preset as p on s.id = p.scratch_id
-    where t.tag_id is null
+    where t.tag_id is null and s.deleted = ''
     order by updated desc limit 20;"
     sqlx $q
 }
