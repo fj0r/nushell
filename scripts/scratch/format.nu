@@ -158,7 +158,6 @@ def 'fmt leaves' [
     let o = $in
     let color = $env.SCRATCH_THEME.color
     let formatter = $env.SCRATCH_THEME.formatter
-    let endent = $"($indent)   "
 
     let done = $env.SCRATCH_THEME.symbol.box | get ($md | into int) | get $o.done
     let title = if $md_list {
@@ -201,7 +200,7 @@ def 'fmt leaves' [
         $o.body
         | lines
         | range ..<$body_lines
-        | each {$"($endent)(ansi $color.body)($in)(ansi reset)"}
+        | each {$"($indent)  (ansi $color.body)($in)(ansi reset)"}
     } else { [] }
 
     [$header ...$body]
