@@ -93,7 +93,8 @@ def 'fmt tag' [
 
 
 def 'tag tree' [] {
-    let a = $in
+    # Siblings' leaf come before branch
+    let a = $in | sort-by -c {|a, b| ($a.tags | length) < ($b.tags | length) }
     mut r = {}
     for i in $a {
         $r = tag-tree $i $r
