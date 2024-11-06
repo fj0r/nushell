@@ -25,7 +25,7 @@ export def scratch-trash [] {
 }
 
 export def scratch-today [
-    ...xtags:string@cmpl-xtag
+    ...xtags:string@cmpl-tag-3
     --trash(-T)
     --md
     --md-list

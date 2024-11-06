@@ -1,7 +1,7 @@
 use completion.nu *
 
 export def snew [
-    ...xtags:string@cmpl-xtag
+    ...xtags:string@cmpl-tag-3
     --parent(-p):int
     --scratch(-t): int@cmpl-scratch-id
 ] {
@@ -16,7 +16,7 @@ export def cmpl-todo-md [] {
 }
 
 export def scommit [
-    ...xtags:string@cmpl-xtag
+    ...xtags:string@cmpl-tag-3
     --scratch(-t): int@cmpl-scratch-id
     --file(-f): string@cmpl-todo-md
     --amend(-a)

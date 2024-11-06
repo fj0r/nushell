@@ -1,13 +1,21 @@
-export def cmpl-tag [] {
-    sqlx $"with (tag-tree) select * from tags" | get name | filter { $in | is-not-empty }
+def cmpl-tags [...prefix] {
+    sqlx $"with (tag-tree) select * from tags"
+    | get name
+    | filter { $in | is-not-empty }
+    | each {|x| $prefix | each {|y| $"($y)($x)" } }
+    | flatten
 }
 
-export def cmpl-atag [] {
-    cmpl-tag | each {|x| $":($x)" }
+export def cmpl-tag-1 [] {
+    cmpl-tags ':'
 }
 
-export def cmpl-xtag [] {
-    cmpl-tag | each {|x| [$":($x)" $"+($x)" $"^($x)"]} | flatten
+export def cmpl-tag-2 [] {
+    cmpl-tags '+' '^'
+}
+
+export def cmpl-tag-3 [] {
+    cmpl-tags ':' '+' '^'
 }
 
 export def cmpl-tag-id [] {
@@ -16,12 +24,12 @@ export def cmpl-tag-id [] {
 
 export def tag-group [] {
     let x = $in
-    mut $r = { not: [], and: [], normal: [], other: [] }
+    mut $r = { not: [], and: [], or: [], other: [] }
     for i in $x {
         match ($i | str substring ..<1) {
             '^' => { $r.not ++= $i | str substring 1.. }
             '+' => { $r.and ++= $i | str substring 1.. }
-            ':' => { $r.normal ++= $i | str substring 1.. }
+            ':' => { $r.or ++= $i | str substring 1.. }
             _ => { $r.other ++= $i }
         }
     }
@@ -50,7 +58,7 @@ export def tag-tree [name?: string='tags' --where: string='parent_id in (-1)'] {
 
 # delete scratch in tag
 export def scratch-tag-clean [
-    ...tags: string@cmpl-tag
+    ...tags: string@cmpl-tag-1
     --with-tag(-T)
 ] {
     let tags_id = sqlx $"with (tag-tree), tid as \(
@@ -118,8 +126,8 @@ export def scratch-tag-hidden [tag:int@cmpl-tag-id] {
 
 export def scratch-tag-move [
     id: int@cmpl-scratch-id
-    --from(-f):string@cmpl-tag
-    --to(-t):string@cmpl-tag
+    --from(-f):string@cmpl-tag-1
+    --to(-t):string@cmpl-tag-1
 ] {
     sqlx $"with (tag-tree)
     update scratch_tag set tag_id = \(
@@ -131,11 +139,11 @@ export def scratch-tag-move [
 
 export def scratch-tag-toggle [
     id: int@cmpl-scratch-id
-    ...tags: string@cmpl-xtag
+    ...tags: string@cmpl-tag-2
 ] {
     let tags = $tags | tag-group
-    if ($tags.normal | is-not-empty) {
-        let tids = scratch-ensure-tags $tags.normal
+    if ($tags.and | is-not-empty) {
+        let tids = scratch-ensure-tags $tags.and
         $tids | scratch-tagged $id
     }
     if ($tags.not | is-not-empty) {

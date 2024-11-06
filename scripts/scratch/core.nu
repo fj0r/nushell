@@ -6,7 +6,7 @@ export use tag.nu *
 
 
 export def scratch-list [
-    ...xtags:string@cmpl-xtag
+    ...xtags:string@cmpl-tag-3
     --search(-s): string
     --trash(-T) # show trash
     --important(-i): int
@@ -68,7 +68,7 @@ export def scratch-list [
     let tags = $xtags | tag-group
 
     if ($xtags | is-not-empty) {
-        let tags = $tags.normal
+        let tags = $tags.or
         let tags_id = sqlx $"with (tag-tree), tid as \(
             select id from tags where name in \(($tags | each {Q $in} | str join ', ')\)
         \), (tag-branch ids --where 'id in (select id from tid)')
@@ -138,13 +138,13 @@ export def scratch-list [
     } else if $scratch_tree {
         $r | scratch-format --body-lines $body_lines --md=$md --md-list=$md_list
     } else {
-        $r | tag-format $tags.normal --body-lines $body_lines --md=$md --md-list=$md_list
+        $r | tag-format $tags.or --body-lines $body_lines --md=$md --md-list=$md_list
     }
 }
 
 
 export def scratch-add [
-    ...xargs:string@cmpl-atag
+    ...xargs:string@cmpl-tag-1
     --kind(-k): string@cmpl-kind='md'
     --config: record
     --preset: string
@@ -164,7 +164,7 @@ export def scratch-add [
     let cfg = if ($config | is-empty) { get-config $kind } else { $config }
 
     let xargs = $xargs | tag-group
-    let tags = $xargs.normal
+    let tags = $xargs.or
     let title = $xargs.other | str join ' '
     let d = $body | entity --batch=$batch $cfg --title $title --created --locate-body=$locate_body
     if ($d.body | is-empty) and $ignore_empty_body { return }
@@ -256,7 +256,7 @@ export def scratch-delete [
 }
 
 export def scratch-attrs [
-    ...xargs: any@cmpl-xtag
+    ...xargs: any@cmpl-tag-2
     --important(-i): int
     --urgent(-u): int
     --challenge(-c): int
@@ -291,8 +291,8 @@ export def scratch-attrs [
 
     if ($xtags | is-not-empty) {
         let tags = $xtags | tag-group
-        if ($tags.normal | is-not-empty) {
-            let tids = scratch-ensure-tags $tags.normal
+        if ($tags.and | is-not-empty) {
+            let tids = scratch-ensure-tags $tags.and
             for id in $ids {
                 $tids | scratch-tagged $id
             }
