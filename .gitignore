@@ -1,4 +1,5 @@
 plugin.msgpackz
 history.txt
 history.sqlite3*
+*.db
 cache/
