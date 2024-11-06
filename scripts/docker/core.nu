@@ -404,7 +404,7 @@ export def container-create [
     --nvidia:int
     --privileged(-P)
     --namespace(-n): string@cmpl-docker-ns
-    --xargs: list<string>
+    --options: list<string>
     image: string@cmpl-docker-images           # image
     ...cmd                                              # command args
 ] {
@@ -504,12 +504,12 @@ export def container-create [
         $name
     }
 
-    let xargs = if ($xargs | is-empty) { [] } else { $xargs }
+    let options = if ($options | is-empty) { [] } else { $options }
 
     if $dry_run {
-        echo ([docker run --name $name $xargs $args $image $cmd] | flatten | str join ' ')
+        echo ([docker run --name $name $options $args $image $cmd] | flatten | str join ' ')
     } else {
-        ^$env.CONTCTL run --name $name ...$xargs ...$args $image ...($cmd | flatten)
+        ^$env.CONTCTL run --name $name ...$options ...$args $image ...($cmd | flatten)
     }
 }
 
@@ -535,14 +535,14 @@ export def container-preset [
     } else {
         let c = $c.0
         let image = $c.image
-        let cmd = if ($cmd | is-empty) { $c.cmd } else { $cmd }
+        let cmd = if ($cmd | is-empty) { $c.command } else { $cmd }
         (container-create --namespace=$namespace
             --name=$c.container_name?
             --daemon=$c.daemon
-            --envs {...$c.env, ...$envs}
-            --vols {...$c.volumn, ...$vols}
-            --ports {...$c.port, ...$ports}
-            --workdir=$c.workdir?
+            --envs {...$c.environment, ...$envs}
+            --vols {...$c.volumns, ...$vols}
+            --ports {...$c.ports, ...$ports}
+            --workdir=$c.working_dir?
             --debug=$debug
             --privileged=$privileged
             --netadmin=$netadmin
@@ -551,7 +551,7 @@ export def container-preset [
             --ssh=$ssh
             --dry-run=$dry_run
             --entrypoint=$c.entrypoint?
-            --xargs=$c.args?
+            --options=$c.options?
             $image ...$cmd)
     }
 }

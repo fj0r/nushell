@@ -14,15 +14,15 @@ export-env {
         - name: rust
           image: rust
           daemon: false
-          env:
+          environment:
             CARGO_HOME: /opt/cargo
-          volumn:
+          volumns:
             .: /world
             ~/.cargo: /opt/cargo
-          port:
+          ports:
             '8000': 80
-          cmd: []
-          args:
+          command: []
+          options:
           - --cap-add=SYS_ADMIN
           - --cap-add=SYS_PTRACE
           - --security-opt
@@ -31,14 +31,14 @@ export-env {
           image: ollama
           container_name: ollama
           daemon: true
-          env: {}
-          volumn:
+          environment: {}
+          volumns:
             ~/.ollama: /root/.ollama
             ~/pub/Platform/llm: /world
-          port:
+          ports:
             '11434': 11434
-          cmd: []
-          args:
+          command: []
+          options:
           - --gpus
           - all
           - --ipc=host
@@ -46,35 +46,35 @@ export-env {
           image: ollama
           container_name: ollama
           daemon: true
-          env: {}
-          volumn:
+          environment: {}
+          volumns:
             ~/.ollama: /root/.ollama
             ~/pub/Platform/llm: /world
-          port:
+          ports:
             '11434': 11434
-          cmd: []
-          args:
+          command: []
+          options:
           - --ipc=host
         - name: postgres
           image: postgres
           container_name: postgres
           daemon: true
-          env: {}
-          volumn: {}
-          port:
+          environment: {}
+          volumns: {}
+          ports:
             '5432': 5432
-          cmd: []
-          args: []
+          command: []
+          options: []
         - name: surreal
           image: surreal
           container_name: surrealdb
           daemon: true
-          env: {}
-          volumn: {}
-          port:
+          environment: {}
+          volumns: {}
+          ports:
             '8000': 8000
-          cmd: []
-          args: []
+          command: []
+          options: []
         "
         | from yaml | get _
         | save -f $env.CONTCONFIG
