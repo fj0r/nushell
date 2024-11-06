@@ -16,7 +16,7 @@ export def upsert-kind [--delete --action: closure] {
     $in | table-upsert --delete=$delete --action $action {
         default: {
             name: 'md'
-            entry: ''
+            entry: null
             comment: "# "
             runner: 'file'
             cmd: 'open {}'

@@ -49,7 +49,7 @@ export def --env init [] {
         );"
         "CREATE TABLE IF NOT EXISTS kind (
             name TEXT PRIMARY KEY,
-            entry TEXT NOT NULL DEFAULT '',
+            entry TEXT NOT NULL,
             comment TEXT NOT NULL DEFAULT '# ',
             runner TEXT NOT NULL DEFAULT '',
             cmd TEXT NOT NULL DEFAULT '',
