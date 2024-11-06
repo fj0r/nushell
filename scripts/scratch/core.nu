@@ -22,6 +22,7 @@ export def scratch-list [
     --md(-m)
     --md-list(-l)
     --raw
+    --indent: int=2
     --body-lines: int=2
     --scratch-tree
     --debug
@@ -136,9 +137,9 @@ export def scratch-list [
     if $raw {
         $r
     } else if $scratch_tree {
-        $r | scratch-format --body-lines $body_lines --md=$md --md-list=$md_list
+        $r | scratch-format --indent $indent --body-lines $body_lines --md=$md --md-list=$md_list
     } else {
-        $r | tag-format $tags.or --body-lines $body_lines --md=$md --md-list=$md_list
+        $r | tag-format $tags.or --indent $indent --body-lines $body_lines --md=$md --md-list=$md_list
     }
 }
 

@@ -1,15 +1,26 @@
 use common.nu *
 
-export def scratch-format [--md --md-list --body-lines: int=2] {
-    $in | to tree | fmt tree --body-lines $body_lines --md=$md --md-list=$md_list
+export def scratch-format [
+    --md
+    --md-list
+    --body-lines: int=2
+    --indent: int=2
+] {
+    $in | to tree | fmt tree --indent $indent --body-lines $body_lines --md=$md --md-list=$md_list
 }
 
-export def tag-format [tags --md --md-list --body-lines: int=2] {
+export def tag-format [
+    tags
+    --md
+    --md-list
+    --body-lines: int=2
+    --indent: int=2
+] {
     $in
     | to tree
     | tagsplit $tags
     | tag tree
-    | fmt tag-tree --body-lines $body_lines --md=$md --md-list=$md_list
+    | fmt tag-tree --indent $indent --body-lines $body_lines --md=$md --md-list=$md_list
 }
 
 def 'tagsplit' [tags] {
@@ -40,7 +51,7 @@ def 'tagsplit' [tags] {
 
 def 'fmt tag-tree' [
     level:int=0
-    --indent(-i):int=4
+    --indent(-i):int=2
     --padding(-p):int=0
     --body-lines: int=2
     --md
@@ -49,13 +60,13 @@ def 'fmt tag-tree' [
     mut out = []
     for i in ($in | transpose k v) {
         if ($i.k == ':') {
-            let j = $i.v | fmt tree ($level) --body-lines $body_lines --md=$md --md-list=$md_list
+            let j = $i.v | fmt tree ($level) --indent $indent --body-lines $body_lines --md=$md --md-list=$md_list
             $out ++= $j
         } else {
-            let indent = '' | fill -c ' ' -w ($padding + $level * $indent)
-            $out ++= $i.k | fmt tag $indent --md=$md --md-list=$md_list
+            let instr = '' | fill -c ' ' -w ($padding + $level * $indent)
+            $out ++= $i.k | fmt tag $instr --md=$md --md-list=$md_list
 
-            $out ++= $i.v | fmt tag-tree ($level + 1) --body-lines $body_lines --md=$md --md-list=$md_list
+            $out ++= $i.v | fmt tag-tree ($level + 1) --indent $indent --body-lines $body_lines --md=$md --md-list=$md_list
         }
     }
     $out | flatten | str join (char newline)
@@ -130,7 +141,7 @@ def to-tree [root o] {
 
 def 'fmt tree' [
     level:int=0
-    --indent(-i):int=4
+    --indent(-i):int=2
     --padding(-p):int=0
     --body-lines: int=2
     --md
@@ -143,7 +154,7 @@ def 'fmt tree' [
             $out ++= $j
         }
         if ($i.children | is-not-empty) {
-            $out ++= $i.children | fmt tree ($level + 1) --body-lines $body_lines --md=$md --md-list=$md_list
+            $out ++= $i.children | fmt tree ($level + 1) --indent $indent --body-lines $body_lines --md=$md --md-list=$md_list
         }
     }
     $out | flatten | str join (char newline)
