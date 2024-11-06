@@ -463,7 +463,7 @@ export def scratch-upsert-kind [
         $in
         | to yaml
         | $"# ($config.pk| str join ', ') is the primary key, do not modify it\n($in)"
-        | block-file-edit $"scratch-kind-XXXXXX.yaml"
+        | block-edit $"scratch-kind-XXXXXX.yaml"
         | from yaml
     }
 }
@@ -482,7 +482,7 @@ export def scratch-upsert-preset [
         | update yaml {|x| $x.yaml | from yaml }
         | to yaml
         | $"# ($config.pk| str join ', ') is the primary key, do not modify it\n($in)"
-        | block-file-edit $"scratch-preset-XXXXXX.yaml"
+        | block-edit $"scratch-preset-XXXXXX.yaml"
         | from yaml
     }
 }

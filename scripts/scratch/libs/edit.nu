@@ -46,7 +46,7 @@ export def mktmpdir [
     }
 }
 
-export def block-edit [
+export def block-project-edit [
     temp: string
     entry: string
     pos: int
@@ -72,7 +72,7 @@ export def block-edit [
 }
 
 
-export def block-file-edit [temp] {
+export def block-edit [temp] {
     let content = $in
     let tf = mktemp -t $temp
     $content | save -f $tf
