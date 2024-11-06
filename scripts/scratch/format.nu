@@ -57,17 +57,18 @@ def 'fmt tag-tree' [
     --md
     --md-list
 ] {
+    let o = $in
     mut out = []
-    for i in ($in | transpose k v) {
-        if ($i.k == ':') {
-            let j = $i.v | fmt tree ($level) --indent $indent --body-lines $body_lines --md=$md --md-list=$md_list
-            $out ++= $j
-        } else {
-            let instr = '' | fill -c ' ' -w ($padding + $level * $indent)
-            $out ++= $i.k | fmt tag $instr --md=$md --md-list=$md_list
+    # Siblings' leaf come before branch
+    if ':' in $o {
+        let j = $o | get ':' | fmt tree ($level) --indent $indent --body-lines $body_lines --md=$md --md-list=$md_list
+        $out ++= $j
+    }
+    for i in ($o | transpose k v | filter {|x| $x.k != ':' }) {
+        let instr = '' | fill -c ' ' -w ($padding + $level * $indent)
+        $out ++= $i.k | fmt tag $instr --md=$md --md-list=$md_list
 
-            $out ++= $i.v | fmt tag-tree ($level + 1) --indent $indent --body-lines $body_lines --md=$md --md-list=$md_list
-        }
+        $out ++= $i.v | fmt tag-tree ($level + 1) --indent $indent --body-lines $body_lines --md=$md --md-list=$md_list
     }
     $out | flatten | str join (char newline)
 }
@@ -93,8 +94,7 @@ def 'fmt tag' [
 
 
 def 'tag tree' [] {
-    # Siblings' leaf come before branch
-    let a = $in | sort-by -c {|a, b| ($a.tags | length) < ($b.tags | length) }
+    let a = $in
     mut r = {}
     for i in $a {
         $r = tag-tree $i $r
