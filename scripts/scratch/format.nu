@@ -102,19 +102,23 @@ def 'tag tree' [] {
 }
 
 def tag-tree [x r={}] {
-    let t = $x.tags.0? | default ':'
+    let t = $x.tags.0? | default ''
     let o = $r | get -i $t | default {}
-    if ($x.tags | length) > 1 {
+    if ($x.tags | length) > 0 {
         $r | upsert $x.tags.0 (
             tag-tree ($x | update tags ($x.tags | range 1..)) $o
         )
     } else {
-        let n = if ':' in $o {
-            $o | update ':' {|m| $m | get ':' | append $x.node}
+        let n = if ':' in $r {
+            $r | update ':' {|m| $m | get ':' | append $x.node}
         } else {
-            $o | insert ':' [$x.node]
+            $r | insert ':' [$x.node]
         }
-        $r | upsert $t $n
+        if ($t == '') {
+            $r | merge $n
+        } else {
+            $r | upsert $t $n
+        }
     }
 }
 
