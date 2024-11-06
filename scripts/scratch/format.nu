@@ -38,7 +38,7 @@ def 'tagsplit' [tags] {
         } else {
             let l = $tag | length
             [
-                ($i.tags | where { ($in | range ..<$l) == $tag } | first)
+                ($i.tags | where { ($in | range ..<$l) == $tag } | first | range $l..)
                 ($i.tags | where { ($in | range ..<$l) != $tag })
             ]
         }
@@ -102,7 +102,8 @@ def 'tag tree' [] {
 }
 
 def tag-tree [x r={}] {
-    let o = $r | get -i $x.tags.0 | default {}
+    let t = $x.tags.0? | default ':'
+    let o = $r | get -i $t | default {}
     if ($x.tags | length) > 1 {
         $r | upsert $x.tags.0 (
             tag-tree ($x | update tags ($x.tags | range 1..)) $o
@@ -113,7 +114,7 @@ def tag-tree [x r={}] {
         } else {
             $o | insert ':' [$x.node]
         }
-        $r | upsert $x.tags.0 $n
+        $r | upsert $t $n
     }
 }
 
