@@ -70,3 +70,14 @@ export def block-edit [
         ...$tf
     }
 }
+
+
+export def block-file-edit [temp] {
+    let content = $in
+    let tf = mktemp -t $temp
+    $content | save -f $tf
+    ^$env.EDITOR $tf
+    let c = open $tf --raw
+    rm -f $tf
+    $c
+}

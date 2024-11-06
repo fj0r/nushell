@@ -145,12 +145,13 @@ export def --env init [] {
       comment: '-- '
       runner: file
       cmd: open {file} | query db (open {})
-    " | from yaml | each { $in | add-kind }
+    " | from yaml | each { $in | upsert-kind }
     "
     - kind: sqlite
       name: scratch
-      yaml: 'file: ~/.local/share/nushell/scratch.db'
-    " | from yaml | each { $in | add-kind-preset }
+      yaml:
+        file: ~/.local/share/nushell/scratch.db
+    " | from yaml | each { $in | upsert-kind-preset }
     "
     - kind: rust
       hash: +AY8hpE2ROFEO6c6THhiJzLAG6/ZwP3lriL3FDPOaf4=

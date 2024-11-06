@@ -451,3 +451,38 @@ export def scratch-out [
     }
 }
 
+export def scratch-upsert-kind [
+    name?: string@cmpl-kind
+] {
+    let x = if ($name | is-empty) {
+        {}
+    } else {
+        sqlx $"select * from kind where name = (Q $name)" | get -i 0
+    }
+    $x | upsert-kind --action {|config|
+        $in
+        | to yaml
+        | $"# ($config.pk| str join ', ') is the primary key, do not modify it\n($in)"
+        | block-file-edit $"scratch-kind-XXXXXX.yaml"
+        | from yaml
+    }
+}
+
+export def scratch-upsert-preset [
+    kind?: string@cmpl-kind
+    name?: string@cmpl-kind-preset
+] {
+    let x = if ($kind | is-empty) {
+        {}
+    } else {
+        sqlx $"select * from kind_preset where kind = (Q $kind) and name = (Q $name)" | get -i 0
+    }
+    $x | upsert-kind-preset --action {|config|
+        $in
+        | update yaml {|x| $x.yaml | from yaml }
+        | to yaml
+        | $"# ($config.pk| str join ', ') is the primary key, do not modify it\n($in)"
+        | block-file-edit $"scratch-preset-XXXXXX.yaml"
+        | from yaml
+    }
+}

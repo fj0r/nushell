@@ -12,8 +12,8 @@ export def filter-empty [] {
     }
 }
 
-export def add-kind [] {
-    $in | table-upsert {
+export def upsert-kind [--action: closure] {
+    $in | table-upsert --action $action {
         default: {
             name: 'md'
             entry: ''
@@ -27,8 +27,8 @@ export def add-kind [] {
     }
 }
 
-export def add-kind-preset [] {
-    $in | table-upsert {
+export def upsert-kind-preset [--action: closure] {
+    $in | table-upsert --action $action {
         default: {
             kind: 'sqlite'
             name: ''
@@ -36,7 +36,9 @@ export def add-kind-preset [] {
         }
         table: kind_preset
         pk: [kind, name]
-        filter: {}
+        filter: {
+            yaml: {|x| $x | to yaml }
+        }
     }
 }
 
