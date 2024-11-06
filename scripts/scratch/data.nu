@@ -61,7 +61,7 @@ export def --env init [] {
         "CREATE TABLE IF NOT EXISTS kind_preset (
             kind TEXT NOT NULL,
             name TEXT NOT NULL,
-            yaml TEXT NOT NULL DEFAULT '',
+            data TEXT NOT NULL DEFAULT '',
             PRIMARY KEY (kind, name)
         );"
         "CREATE TABLE IF NOT EXISTS scratch_preset (
@@ -149,7 +149,7 @@ export def --env init [] {
     "
     - kind: sqlite
       name: scratch
-      yaml:
+      data: |-
         file: ~/.local/share/nushell/scratch.db
     " | from yaml | each { $in | upsert-kind-preset }
     "

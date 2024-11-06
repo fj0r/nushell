@@ -6,8 +6,8 @@ export def performance [
 ] {
     let o = $in
     let opt = if $config.runner in ['file', 'dir'] {
-        let q = $"select yaml from kind_preset where kind = (Q $config.name) and name = (Q $preset)"
-        sqlx $q | get -i 0.yaml | default '{}' | from yaml
+        let q = $"select data from kind_preset where kind = (Q $config.name) and name = (Q $preset)"
+        sqlx $q | get -i 0.data | default '{}' | from yaml
     } else {
         {}
     }

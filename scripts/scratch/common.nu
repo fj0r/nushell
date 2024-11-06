@@ -12,8 +12,8 @@ export def filter-empty [] {
     }
 }
 
-export def upsert-kind [--action: closure] {
-    $in | table-upsert --action $action {
+export def upsert-kind [--delete --action: closure] {
+    $in | table-upsert --delete=$delete --action $action {
         default: {
             name: 'md'
             entry: ''
@@ -27,17 +27,22 @@ export def upsert-kind [--action: closure] {
     }
 }
 
-export def upsert-kind-preset [--action: closure] {
-    $in | table-upsert --action $action {
+export def upsert-kind-preset [--delete --action: closure] {
+    $in | table-upsert --delete=$delete --action $action {
         default: {
             kind: 'sqlite'
             name: ''
-            yaml: ""
+            data: ""
         }
         table: kind_preset
         pk: [kind, name]
         filter: {
-            yaml: {|x| $x | to yaml }
+            out: {
+                data: {|x| $x | to yaml }
+            }
+            in: {
+                data: {|x| $x | from yaml }
+            }
         }
     }
 }

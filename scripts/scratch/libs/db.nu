@@ -25,18 +25,34 @@ export def table-merge [
 ] {
     let d = $in
     let d = $config.default | merge $d
+    let fi = $config.filter?.in?
+    let d = if ($fi | is-empty) {
+        $d
+    } else {
+        $config.default
+        | columns
+        | reduce -f {} {|i,a|
+            let x = $d | get $i
+            let x = if ($i in $fi) {
+                $x | do ($fi | get $i) $x
+            } else {
+                $x
+            }
+            $a | insert $i $x
+        }
+    }
     let d = if ($action | is-not-empty) {
         $d | do $action $config
     } else {
         $d
     }
-    let f = $config.filter? | default {}
+    let fo = $config.filter?.out? | default {}
     $config.default
     | columns
     | reduce -f {} {|i,a|
         let x = $d | get $i
-        let x = if ($i in $f) {
-            $x | do ($f | get $i) $x
+        let x = if ($i in $fo) {
+            $x | do ($fo | get $i) $x
         } else {
             $x
         }
@@ -46,10 +62,27 @@ export def table-merge [
 
 export def table-upsert [
     config
+    --delete
     --action: closure
 ] {
-    $in
+    let r = $in
     | table-merge $config --action $action
-    | db-upsert $config.table $config.pk
+    if $delete {
+        let pks = $config.default
+        | columns
+        | reduce -f {} {|i,a|
+            if $i in $config.pk {
+                $a | insert $i ($r | get $i)
+            } else {
+                $a
+            }
+        }
+        | items {|k,v|
+            $"($k) = (Q $v)"
+        }
+        | str join ' and '
+        sqlx $"delete from ($config.table) where ($pks)"
+    } else {
+        $r | db-upsert $config.table $config.pk
+    }
 }
-
