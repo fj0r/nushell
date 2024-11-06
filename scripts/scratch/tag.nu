@@ -129,12 +129,16 @@ export def scratch-tag-move [
     --from(-f):string@cmpl-tag-1
     --to(-t):string@cmpl-tag-1
 ] {
-    sqlx $"with (tag-tree)
+    let from = $from | tag-group | get or.0
+    let to = $to | tag-group | get or.0
+    scratch-ensure-tags [$to]
+    let q = $"with (tag-tree)
     update scratch_tag set tag_id = \(
         select id from tags where name = (Q $to)
-    \) where scratch_id = ($id) and tag_id = \(
+    \) where scratch_id = ($id) and tag_id in \(
         select id from tags where name = (Q $from)
     \)"
+    sqlx $q
 }
 
 export def scratch-tag-toggle [
