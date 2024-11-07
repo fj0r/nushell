@@ -272,7 +272,7 @@ def up_center_prompt [segment] {
             [
                 $"(ansi $sep.color)('' | fill -c $sep.char -w $fl.0)(ansi reset)"
                 $ss
-                $"(ansi $sep.color)('' | fill -c $sep.char -w $fl.1)(ansi reset)"
+                $"(ansi $sep.color)('' | fill -c $sep.char -w ($fl.1))(ansi reset)"
             ]
             | str join
         } else {
@@ -283,8 +283,8 @@ def up_center_prompt [segment] {
                 $"($color)($c.upperleft)(ansi reset)"
                 $"($color)('' | fill -c $sep.char -w $fl.0)(ansi reset)"
                 $ss
-                $"($color)('' | fill -c $sep.char -w $fl.1)(ansi reset)"
-                $"($color)($c.lowerleft)(ansi reset)"
+                $"($color)('' | fill -c $sep.char -w ($fl.1 - $c.upperright_size))(ansi reset)"
+                $"($color)(($c.upperright))($c.lowerleft)(ansi reset)"
             ]
             | str join
         }
@@ -565,6 +565,8 @@ export-env {
                 upperleft: '┌'
                 upperleft_size: 1
                 lowerleft: '└'
+                upperright: '┐'
+                upperright_size: 1
             }
         }
     )
