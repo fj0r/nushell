@@ -207,8 +207,8 @@ def up_prompt [segment] {
         } else {
             let c = $env.NU_POWER_FRAME_HEADER
             let color = if (is-admin) { ansi light_red_bold } else { ansi light_cyan }
-            $ss | str join $"(ansi xterm_grey)('' | fill -c '-' -w ($fl - $c.upperleft_size))(ansi reset)"
-            | $"($color)($c.upperleft)($in)($color)($c.lowerleft)(ansi reset)"
+            $ss | str join $"(ansi xterm_grey)('' | fill -c '-' -w ($fl - $c.upperleft_size - 1))(ansi reset)"
+            | $"($color)($c.upperleft)(ansi light_yellow)|($in)($color)($c.lowerleft)(ansi reset)"
         }
     }
 }
