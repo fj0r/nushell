@@ -233,7 +233,13 @@ export def --env init [] {
 
     $env.PROMPT_INDICATOR = {||
         match $env.NU_POWER_DECORATOR {
-            'plain' => { "> " }
+            'plain' => {
+                if (is-admin) {
+                    $"(ansi light_red_bold)> (ansi reset)"
+                } else {
+                    $"> "
+                }
+            }
             _ => { " " }
         }
     }
