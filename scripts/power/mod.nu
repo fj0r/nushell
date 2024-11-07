@@ -198,6 +198,7 @@ def up_prompt [segment] {
         let sep = $env.NU_POWER_CONFIG.separator_bar
         let dlm = $env.NU_POWER_CONFIG.delimitor
         let dlm = $"(ansi $dlm.color)($dlm.char)"
+        let adc = $env.NU_POWER_CONFIG.admin.color
         let ss = $thunk
             | each {|y|
                 $y
@@ -218,7 +219,7 @@ def up_prompt [segment] {
             let c = $env.NU_POWER_FRAME_HEADER
             let dlm = if $c.delimitor { $dlm } else { '' }
             let fl = $ss | calc bar width -n ($c.upperleft_size + (if $c.delimitor {1} else {0}))
-            let color = if (is-admin) { ansi light_red_bold } else { ansi light_cyan }
+            let color = if (is-admin) { ansi $adc } else { ansi light_cyan }
             $ss | str join $"(ansi $sep.color)('' | fill -c $sep.char -w $fl)(ansi reset)"
             | $"($color)($c.upperleft)(ansi reset)($dlm)($in)($color)($c.lowerleft)(ansi reset)"
         }
@@ -254,7 +255,8 @@ export def --env init [] {
         match $env.NU_POWER_DECORATOR {
             'plain' => {
                 if (is-admin) {
-                    $"(ansi light_red_bold)> (ansi reset)"
+                    let adc = $env.NU_POWER_CONFIG.admin.color
+                    $"(ansi $adc)> (ansi reset)"
                 } else {
                     $"> "
                 }
@@ -271,13 +273,27 @@ export def --env init [] {
         }
     }
 
-    $env.config.menus = $env.config.menus
-    | each {|x|
-        if ($x.marker in $env.NU_POWER_MENU_MARKER) {
-            let c = ($env.NU_POWER_MENU_MARKER | get $x.marker)
-            $x | upsert marker $'(ansi -e {fg: $c})(char nf_left_segment_thin) '
-        } else {
-            $x
+    if $env.NU_POWER_DECORATOR == 'power' {
+        $env.config.menus = $env.config.menus
+        | each {|x|
+            if ($x.marker in $env.NU_POWER_MENU_MARKER) {
+                let c = ($env.NU_POWER_MENU_MARKER | get $x.marker)
+                $x | upsert marker $'(ansi -e {fg: $c})(char nf_left_segment_thin) '
+            } else {
+                $x
+            }
+        }
+    } else {
+        $env.config.menus = $env.config.menus
+        | each {|x|
+            $x | upsert marker (
+                if (is-admin) {
+                    let adc = $env.NU_POWER_CONFIG.admin.color
+                    $"(ansi $adc)($x.marker)(ansi reset)"
+                } else {
+                    $x.marker
+                }
+            )
         }
     }
 
@@ -465,6 +481,9 @@ export-env {
         {
             time: {
                 style: null
+            }
+            admin: {
+                color: light_red_bold
             }
             delimitor: {
                 color: xterm_grey
