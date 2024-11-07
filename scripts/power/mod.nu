@@ -175,6 +175,14 @@ def right_prompt [segment] {
     }
 }
 
+
+def 'str len unicode' [--width(-w):int=2] {
+    let o = $in
+    let a = $o | str length -g
+    let u = $o | str replace -a -r $'[^\x00-\x7F($env.NU_POWER_SINGLE_WIDTH)]+' '' | str length -g
+    $u + ($a - $u) * $width
+}
+
 def up_prompt [segment] {
     let thunk = $segment
         | each {|y| $y | each {|x| get_component $x } }
@@ -192,8 +200,7 @@ def up_prompt [segment] {
                 }
                 | str join $'(ansi light_yellow)|'
             }
-        # TODO: length of unicode char is 3
-        let fl = (term size).columns - ($ss | str join ''| ansi strip | str length) | math abs
+        let fl = (term size).columns - ($ss | str join ''| ansi strip | str len unicode) | math abs
         $ss | str join $"(ansi xterm_grey)('' | fill -c '-' -w $fl)(ansi reset)"
     }
 }
@@ -382,6 +389,8 @@ export-env {
             ]
         ]
     )
+
+    $env.NU_POWER_SINGLE_WIDTH = '↑↓'
 
     $env.NU_POWER_FRAME = (default_env
         NU_POWER_FRAME
