@@ -210,7 +210,11 @@ def up_prompt [segment] {
                         $acc | append $y.1
                     }
                 }
-                | ['' ...$in '']
+                | if ($env.NU_POWER_FRAME_BARE? | default false) {
+                    $in
+                } else {
+                    ['' ...$in '']
+                }
                 | str join $dlm
             }
         if ($env.NU_POWER_FRAME_HEADER? | is-empty) {
