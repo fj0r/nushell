@@ -183,6 +183,12 @@ def 'str len unicode' [--width(-w):int=2] {
     $u + ($a - $u) * $width
 }
 
+def 'calc bar width' [-n:int=0] {
+    let s = $in
+    (term size).columns - ($s | str join '' | ansi strip | str len unicode) - $n
+    | if $in > 0 { $in } else { 0 }
+}
+
 def up_prompt [segment] {
     let thunk = $segment
         | each {|y| $y | each {|x| get_component $x } }
@@ -200,14 +206,14 @@ def up_prompt [segment] {
                 }
                 | str join $'(ansi light_yellow)|'
             }
-        let fl = (term size).columns - ($ss | str join ''| ansi strip | str len unicode)
-        | if $in > 0 { $in } else { 0 }
         if ($env.NU_POWER_FRAME_HEADER? | is-empty) {
+            let fl = $ss | calc bar width
             $ss | str join $"(ansi xterm_grey)('' | fill -c '-' -w $fl)(ansi reset)"
         } else {
             let c = $env.NU_POWER_FRAME_HEADER
+            let fl = $ss | calc bar width -n ($c.upperleft_size + 1)
             let color = if (is-admin) { ansi light_red_bold } else { ansi light_cyan }
-            $ss | str join $"(ansi xterm_grey)('' | fill -c '-' -w ($fl - $c.upperleft_size - 1))(ansi reset)"
+            $ss | str join $"(ansi xterm_grey)('' | fill -c '-' -w $fl)(ansi reset)"
             | $"($color)($c.upperleft)(ansi light_yellow)|($in)($color)($c.lowerleft)(ansi reset)"
         }
     }
