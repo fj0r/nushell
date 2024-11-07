@@ -216,7 +216,8 @@ def up_prompt [segment] {
             $ss | str join $"(ansi $sep.color)('' | fill -c $sep.char -w $fl)(ansi reset)"
         } else {
             let c = $env.NU_POWER_FRAME_HEADER
-            let fl = $ss | calc bar width -n ($c.upperleft_size + 1)
+            let dlm = if $c.delimitor { $dlm } else { '' }
+            let fl = $ss | calc bar width -n ($c.upperleft_size + (if $c.delimitor {1} else {0}))
             let color = if (is-admin) { ansi light_red_bold } else { ansi light_cyan }
             $ss | str join $"(ansi $sep.color)('' | fill -c $sep.char -w $fl)(ansi reset)"
             | $"($color)($c.upperleft)($dlm)($in)($color)($c.lowerleft)(ansi reset)"
