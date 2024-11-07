@@ -14,6 +14,7 @@ export def performance [
     stdin?=''
     --tmpfile: record
     --preset: string
+    --transform(-t): closure
 ] {
     let o = $in
     let opt = if $config.runner in ['file', 'dir', 'docker', 'container'] {
@@ -35,6 +36,7 @@ export def performance [
             $stdin | save -f $i
             let cmd = $config.cmd | render {_: $f.entry, stdin: $i, ...$opt}
             do -i {
+                let cmd = if ($transform | is-empty) { $cmd } else { $"($cmd) | do (view source $transform)" }
                 nu -m light -c $cmd
             }
             cd $opwd

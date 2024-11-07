@@ -403,6 +403,7 @@ export def scratch-in [
     id?:int@cmpl-untagged-scratch-id
     --kind(-k):string@cmpl-kind
     --preset(-p):string@cmpl-kind-preset
+    --transform(-t): closure
 ] {
     let body = $in
     if ($id | is-empty) {
@@ -410,7 +411,7 @@ export def scratch-in [
         let cfg = get-config $kind
         $body
         | scratch-add --config $cfg --preset $preset --returning-body --locate-body --ignore-empty-body
-        | performance $cfg --preset $preset
+        | performance $cfg --preset $preset --transform $transform
     } else {
         let x = sqlx $"select s.kind, p.preset from scratch as s
             left join scratch_preset as p on s.id = p.scratch_id
@@ -420,7 +421,7 @@ export def scratch-in [
         let cfg = get-config $kind
         $body
         | scratch-edit $id --config $cfg --preset $preset --returning-body --locate-body
-        | performance $cfg --preset $preset
+        | performance $cfg --preset $preset --transform $transform
     }
 }
 
@@ -430,6 +431,7 @@ export def scratch-out [
     --preset(-p):string@cmpl-kind-preset
     --search(-s): string
     --num(-n):int = 20
+    --transform(-t): closure
 ] {
     let stdin = $in | default ''
     if ($search | is-not-empty) {
@@ -447,7 +449,7 @@ export def scratch-out [
         let kind = if ($kind | is-empty) { $x.kind } else { $kind }
         let cfg = get-config $kind
         let preset = if ($preset | is-empty) { $x.preset } else { $preset }
-        $x.body | performance $cfg $stdin --preset $preset
+        $x.body | performance $cfg $stdin --preset $preset --transform $transform
     }
 }
 
