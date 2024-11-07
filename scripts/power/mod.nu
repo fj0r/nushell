@@ -202,7 +202,14 @@ def up_prompt [segment] {
             }
         let fl = (term size).columns - ($ss | str join ''| ansi strip | str len unicode)
         | if $in > 0 { $in } else { 0 }
-        $ss | str join $"(ansi xterm_grey)('' | fill -c '-' -w $fl)(ansi reset)"
+        if ($env.NU_POWER_FRAME_HEADER? | is-empty) {
+            $ss | str join $"(ansi xterm_grey)('' | fill -c '-' -w $fl)(ansi reset)"
+        } else {
+            let c = $env.NU_POWER_FRAME_HEADER
+            let color = if (is-admin) { ansi light_red_bold } else { ansi light_cyan }
+            $ss | str join $"(ansi xterm_grey)('' | fill -c '-' -w ($fl - $c.upperleft_size))(ansi reset)"
+            | $"($color)($c.upperleft)($in)($color)($c.lowerleft)(ansi reset)"
+        }
     }
 }
 
