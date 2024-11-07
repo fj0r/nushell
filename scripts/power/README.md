@@ -20,9 +20,17 @@ power init
 ```
 or
 ```
-use power
-use power/plugin/git.nu *
-use power/plugin/kube.nu *
+## {{{ Simplified style
+$env.NU_POWER_SINGLE_WIDTH = '↑↓'
+$env.NU_POWER_DECORATOR = 'plain'
+$env.NU_POWER_FRAME = 'fill'
+$env.NU_POWER_FRAME_HEADER = {
+    upperleft: '┌'
+    upperleft_size: 1
+    lowerleft: '└'
+}
+## }}}
+
 $env.NU_POWER_SCHEMA = [
     [
         [source, color];
@@ -37,6 +45,9 @@ $env.NU_POWER_SCHEMA = [
         [time, xterm_grey27]
     ]
 ]
+use power
+use power/plugin/git.nu *
+use power/plugin/kube.nu *
 power set time {
     config: { style: compact }
 }
