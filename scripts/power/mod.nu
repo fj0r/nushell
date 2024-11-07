@@ -265,7 +265,7 @@ def up_center_prompt [segment] {
             }
         }
         | flatten
-        | ['' ...$in '']
+        | if ($env.NU_POWER_CONFIG.frame_bare? | default false) { $in } else { ['' ...$in ''] }
         | str join $dlm
         if ($env.NU_POWER_CONFIG.frame_header? | is-empty) {
             let fl = $ss | calc sides width
@@ -560,7 +560,7 @@ export-env {
                 char: '─'
             }
             single_width_char: '↑↓'
-            bare: false
+            frame_bare: false
             frame_header: {
                 upperleft: '┌'
                 upperleft_size: 1
