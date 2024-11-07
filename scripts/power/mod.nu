@@ -199,24 +199,30 @@ def up_prompt [segment] {
         let dlm = $env.NU_POWER_CONFIG.delimitor
         let dlm = $"(ansi $dlm.color)($dlm.char)"
         let adc = $env.NU_POWER_CONFIG.admin.color
+        let last_idx = ($thunk | length) - 1
         let ss = $thunk
-            | each {|y|
-                $y
-                | reduce -f [] {|x, acc|
-                    let y = (do $x null)
-                    if $y.1 == null {
-                        $acc
-                    } else {
-                        $acc | append $y.1
-                    }
+        | enumerate
+        | each {|y|
+            $y.item
+            | reduce -f [] {|x, acc|
+                let y = (do $x null)
+                if $y.1 == null {
+                    $acc
+                } else {
+                    $acc | append $y.1
                 }
-                | if ($env.NU_POWER_FRAME_BARE? | default false) {
-                    $in
+            }
+            | if ($env.NU_POWER_FRAME_BARE? | default false) {
+                $in
+            } else {
+                if $y.index == $last_idx {
+                    ['' ...$in]
                 } else {
                     ['' ...$in '']
                 }
-                | str join $dlm
             }
+            | str join $dlm
+        }
         if ($env.NU_POWER_FRAME_HEADER? | is-empty) {
             let fl = $ss | calc bar width
             $ss | str join $"(ansi $sep.color)('' | fill -c $sep.char -w $fl)(ansi reset)"
