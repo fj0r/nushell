@@ -7,3 +7,4 @@ export use clip.nu *
 export use network.nu *
 export use proxy.nu *
 export use sh.nu *
+export use web.nu *
