@@ -220,7 +220,7 @@ def up_prompt [segment] {
             let fl = $ss | calc bar width -n ($c.upperleft_size + (if $c.delimitor {1} else {0}))
             let color = if (is-admin) { ansi light_red_bold } else { ansi light_cyan }
             $ss | str join $"(ansi $sep.color)('' | fill -c $sep.char -w $fl)(ansi reset)"
-            | $"($color)($c.upperleft)($dlm)($in)($color)($c.lowerleft)(ansi reset)"
+            | $"($color)($c.upperleft)(ansi reset)($dlm)($in)($color)($c.lowerleft)(ansi reset)"
         }
     }
 }
