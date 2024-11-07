@@ -53,15 +53,8 @@ $env.NU_POWER_SCHEMA = [
     ]
 ]
 $env.NU_POWER_DECORATOR = 'plain'
-$env.NU_POWER_SINGLE_WIDTH = '↑↓'
 $env.NU_POWER_FRAME = 'fill'
-$env.NU_POWER_FRAME_BARE = false
-$env.NU_POWER_FRAME_HEADER = {
-    upperleft: '┌'
-    upperleft_size: 1
-    lowerleft: '└'
-}
-$env.NU_POWER_CONFIG.delimitor.char = "|"
+#$env.NU_POWER_CONFIG.separator_bar.char = "-"
 use power/plugin/git.nu *
 use power/plugin/kube.nu *
 power set time {

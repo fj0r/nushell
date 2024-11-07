@@ -181,7 +181,7 @@ def right_prompt [segment] {
 def 'str len unicode' [--width(-w):int=2] {
     let o = $in
     let a = $o | str length -g
-    let u = $o | str replace -a -r $'[^\x00-\x7F($env.NU_POWER_SINGLE_WIDTH)]+' '' | str length -g
+    let u = $o | str replace -a -r $'[^\x00-\x7F($env.NU_POWER_CONFIG.single_width_char)]+' '' | str length -g
     $u + ($a - $u) * $width
 }
 
@@ -212,7 +212,7 @@ def up_prompt [segment] {
                     $acc | append $y.1
                 }
             }
-            | if ($env.NU_POWER_FRAME_BARE? | default false) {
+            | if ($env.NU_POWER_CONFIG.frame_bare? | default false) {
                 $in
             } else {
                 if $y.index == $last_idx {
@@ -223,15 +223,70 @@ def up_prompt [segment] {
             }
             | str join $dlm
         }
-        if ($env.NU_POWER_FRAME_HEADER? | is-empty) {
+        if ($env.NU_POWER_CONFIG.frame_header? | is-empty) {
             let fl = $ss | calc bar width
             $ss | str join $"(ansi $sep.color)('' | fill -c $sep.char -w $fl)(ansi reset)"
         } else {
-            let c = $env.NU_POWER_FRAME_HEADER
+            let c = $env.NU_POWER_CONFIG.frame_header
             let fl = $ss | calc bar width -n $c.upperleft_size
             let color = if (is-admin) { ansi $adc } else { ansi light_cyan }
             $ss | str join $"(ansi $sep.color)('' | fill -c $sep.char -w $fl)(ansi reset)"
             | $"($color)($c.upperleft)(ansi reset)($in)($color)($c.lowerleft)(ansi reset)"
+        }
+    }
+}
+
+def 'calc sides width' [-n:int=0] {
+    let s = $in
+    let l = (term size).columns - ($s | str join '' | ansi strip | str len unicode) - $n
+    | if $in > 0 { $in } else { 0 }
+    | $in / 2
+    [($l | math ceil) ($l | math floor)]
+}
+
+def up_center_prompt [segment] {
+    let thunk = $segment
+    | each {|y| $y | each {|x| get_component $x } }
+    { ||
+        let sep = $env.NU_POWER_CONFIG.separator_bar
+        let dlm = $env.NU_POWER_CONFIG.delimitor
+        let dlm = $"(ansi $dlm.color)($dlm.char)"
+        let adc = $env.NU_POWER_CONFIG.admin.color
+        let ss = $thunk
+        | each {|y|
+            $y
+            | reduce -f [] {|x, acc|
+                let y = (do $x null)
+                if $y.1 == null {
+                    $acc
+                } else {
+                    $acc | append $y.1
+                }
+            }
+        }
+        | flatten
+        | ['' ...$in '']
+        | str join $dlm
+        if ($env.NU_POWER_CONFIG.frame_header? | is-empty) {
+            let fl = $ss | calc sides width
+            [
+                $"(ansi $sep.color)('' | fill -c $sep.char -w $fl.0)(ansi reset)"
+                $ss
+                $"(ansi $sep.color)('' | fill -c $sep.char -w $fl.1)(ansi reset)"
+            ]
+            | str join
+        } else {
+            let c = $env.NU_POWER_CONFIG.frame_header
+            let fl = $ss | calc sides width -n $c.upperleft_size
+            let color = if (is-admin) { ansi $adc } else { ansi light_cyan }
+            [
+                $"($color)($c.upperleft)(ansi reset)"
+                $"($color)('' | fill -c $sep.char -w $fl.0)(ansi reset)"
+                $ss
+                $"($color)('' | fill -c $sep.char -w $fl.1)(ansi reset)"
+                $"($color)($c.lowerleft)(ansi reset)"
+            ]
+            | str join
         }
     }
 }
@@ -258,6 +313,9 @@ export def --env init [] {
         }
         'fill' => {
             $env.PROMPT_COMMAND = (up_prompt $env.NU_POWER_SCHEMA)
+        }
+        'center' => {
+            $env.PROMPT_COMMAND = (up_center_prompt $env.NU_POWER_SCHEMA)
         }
     }
 
@@ -442,8 +500,6 @@ export-env {
         ]
     )
 
-    $env.NU_POWER_SINGLE_WIDTH = '↑↓'
-
     $env.NU_POWER_FRAME = (default_env
         NU_POWER_FRAME
         'default' # default | fill
@@ -501,7 +557,14 @@ export-env {
             }
             separator_bar: {
                 color: xterm_grey
-                char: '-'
+                char: '─'
+            }
+            single_width_char: '↑↓'
+            bare: false
+            frame_header: {
+                upperleft: '┌'
+                upperleft_size: 1
+                lowerleft: '└'
             }
         }
     )
