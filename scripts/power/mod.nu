@@ -210,6 +210,7 @@ def up_prompt [segment] {
                         $acc | append $y.1
                     }
                 }
+                | ['' ...$in '']
                 | str join $dlm
             }
         if ($env.NU_POWER_FRAME_HEADER? | is-empty) {
@@ -217,11 +218,10 @@ def up_prompt [segment] {
             $ss | str join $"(ansi $sep.color)('' | fill -c $sep.char -w $fl)(ansi reset)"
         } else {
             let c = $env.NU_POWER_FRAME_HEADER
-            let dlm = if $c.delimitor { $dlm } else { '' }
-            let fl = $ss | calc bar width -n ($c.upperleft_size + (if $c.delimitor {1} else {0}))
+            let fl = $ss | calc bar width -n $c.upperleft_size
             let color = if (is-admin) { ansi $adc } else { ansi light_cyan }
             $ss | str join $"(ansi $sep.color)('' | fill -c $sep.char -w $fl)(ansi reset)"
-            | $"($color)($c.upperleft)(ansi reset)($dlm)($in)($color)($c.lowerleft)(ansi reset)"
+            | $"($color)($c.upperleft)(ansi reset)($in)($color)($c.lowerleft)(ansi reset)"
         }
     }
 }

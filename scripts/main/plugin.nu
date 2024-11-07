@@ -56,7 +56,6 @@ $env.NU_POWER_DECORATOR = 'plain'
 $env.NU_POWER_SINGLE_WIDTH = '↑↓'
 $env.NU_POWER_FRAME = 'fill'
 $env.NU_POWER_FRAME_HEADER = {
-    delimitor: true
     upperleft: '┌'
     upperleft_size: 1
     lowerleft: '└'
