@@ -37,9 +37,9 @@ use surrealdb
 #use just.nu *
 #use completion-generator.nu *
 
-
-$env.NU_POWER_SINGLE_WIDTH = '↑↓┌└'
+$env.NU_POWER_CONFIG.separator = $"(ansi grey)|"
 $env.NU_POWER_DECORATOR = 'plain'
+$env.NU_POWER_SINGLE_WIDTH = '↑↓'
 $env.NU_POWER_FRAME = 'fill'
 $env.NU_POWER_FRAME_HEADER = {
     upperleft: '┌'

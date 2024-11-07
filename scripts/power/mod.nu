@@ -72,16 +72,17 @@ def decorator [ ] {
     match $env.NU_POWER_DECORATOR {
         'plain' => {
             {|s, direction?: string, color?: string = 'light_yellow', next_color?: string|
+                let sep = $env.NU_POWER_CONFIG.separator
                 match $direction {
                     '|>'|'>' => {
-                        let r = $'(ansi light_yellow)|'
+                        let r = $sep
                         $"($s)($r)"
                     }
                     '>>'|'<<' => {
                         $s
                     }
                     '<' => {
-                        let l = $'(ansi light_yellow)|'
+                        let l = $sep
                         $"($l)($s)"
                     }
                 }
@@ -191,8 +192,9 @@ def 'calc bar width' [-n:int=0] {
 
 def up_prompt [segment] {
     let thunk = $segment
-        | each {|y| $y | each {|x| get_component $x } }
+    | each {|y| $y | each {|x| get_component $x } }
     { ||
+        let sep = $env.NU_POWER_CONFIG.separator
         let ss = $thunk
             | each {|y|
                 $y
@@ -204,7 +206,7 @@ def up_prompt [segment] {
                         $acc | append $y.1
                     }
                 }
-                | str join $'(ansi light_yellow)|'
+                | str join $sep
             }
         if ($env.NU_POWER_FRAME_HEADER? | is-empty) {
             let fl = $ss | calc bar width
@@ -214,7 +216,7 @@ def up_prompt [segment] {
             let fl = $ss | calc bar width -n ($c.upperleft_size + 1)
             let color = if (is-admin) { ansi light_red_bold } else { ansi light_cyan }
             $ss | str join $"(ansi xterm_grey)('' | fill -c '-' -w $fl)(ansi reset)"
-            | $"($color)($c.upperleft)(ansi light_yellow)|($in)($color)($c.lowerleft)(ansi reset)"
+            | $"($color)($c.upperleft)($sep)($in)($color)($c.lowerleft)(ansi reset)"
         }
     }
 }
@@ -460,6 +462,7 @@ export-env {
             time: {
                 style: null
             }
+            separator: $"(ansi light_yellow)|"
         }
     )
 
