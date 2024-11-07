@@ -200,7 +200,8 @@ def up_prompt [segment] {
                 }
                 | str join $'(ansi light_yellow)|'
             }
-        let fl = (term size).columns - ($ss | str join ''| ansi strip | str len unicode) | math abs
+        let fl = (term size).columns - ($ss | str join ''| ansi strip | str len unicode)
+        | if $in > 0 { $in } else { 0 }
         $ss | str join $"(ansi xterm_grey)('' | fill -c '-' -w $fl)(ansi reset)"
     }
 }
