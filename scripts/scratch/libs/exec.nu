@@ -113,6 +113,14 @@ export def cmpl-kind [] {
     sqlx $"select name from kind" | get name
 }
 
-export def cmpl-kind-preset [] {
-    sqlx $"select name as value, kind as description from kind_preset"
+export def cmpl-kind-preset [ctx] {
+    if (scope commands | where name == 'argx parse' | is-empty) {
+        sqlx $"select name as value, kind as description from kind_preset"
+    } else {
+        let k = $ctx | argx parse
+        let k1 = $k | get -i opt.kind
+        let k2 = $k | get -i pos.kind
+        let k = ($k1 | default $k2)
+        sqlx $"select name as value, kind as description from kind_preset where kind = (Q $k)"
+    }
 }
