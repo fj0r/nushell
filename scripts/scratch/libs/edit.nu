@@ -1,6 +1,8 @@
 use files.nu *
+use str.nu *
 
-def variants-edit [file? --line:int] {
+def variants-edit [file? --line:int --command: string] {
+    $env.SCRATCH_EXEC = $command
     if ($line | is-empty) {
         ^$env.EDITOR $file
     } else {
@@ -52,6 +54,8 @@ export def block-project-edit [
     pos: int
     --title: string
     --kind: string
+    --command: string
+    --preset: record
     --created
     --retain
 ] {
@@ -59,7 +63,8 @@ export def block-project-edit [
     let tf = $content | mktmpdir $temp $entry --kind $kind --title $title --created=$created
     let opwd = $env.PWD
     cd $tf.dir
-    variants-edit $tf.file --line $pos
+    let $cmd = $command | render {_: $entry, stdin: '.stdin', ...$preset}
+    variants-edit $tf.file --line $pos --command $cmd
     let c = open $tf.file --raw
     if not $retain {
         cd $opwd

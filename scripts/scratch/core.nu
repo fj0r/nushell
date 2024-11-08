@@ -162,7 +162,7 @@ export def scratch-add [
     --ignore-empty-body
 ] {
     let body = $in
-    let cfg = if ($config | is-empty) { get-config $kind } else { $config }
+    let cfg = if ($config | is-empty) { get-config $kind --preset $preset } else { $config }
 
     let xargs = $xargs | tag-group
     let tags = $xargs.or
@@ -216,7 +216,7 @@ export def scratch-edit [
     let old = sqlx $"select title, kind, body from scratch where id = ($id)" | get -i 0
     let cfg = if ($config | is-empty) {
         let kind = if ($kind | is-empty) { $old.kind } else { $kind }
-        get-config $kind
+        get-config $kind --preset $preset
     } else {
         $config
     }
@@ -408,7 +408,7 @@ export def scratch-in [
     let body = $in
     if ($id | is-empty) {
         let kind = if ($kind | is-empty) { 'md' } else { $kind }
-        let cfg = get-config $kind
+        let cfg = get-config $kind --preset $preset
         $body
         | scratch-add --config $cfg --preset $preset --returning-body --locate-body --ignore-empty-body
         | performance $cfg --preset $preset --transform $transform
@@ -418,7 +418,7 @@ export def scratch-in [
             where s.id = ($id);" | get -i 0
         let kind = if ($kind | is-empty) { $x.kind } else { $kind }
         let preset = if ($preset | is-empty) { $x.preset } else { $preset }
-        let cfg = get-config $kind
+        let cfg = get-config $kind --preset $preset
         $body
         | scratch-edit $id --config $cfg --preset $preset --returning-body --locate-body
         | performance $cfg --preset $preset --transform $transform
@@ -447,7 +447,7 @@ export def scratch-out [
             left join scratch_preset as p on s.id = p.scratch_id
             where s.id = ($id);" | get -i 0
         let kind = if ($kind | is-empty) { $x.kind } else { $kind }
-        let cfg = get-config $kind
+        let cfg = get-config $kind --preset $preset
         let preset = if ($preset | is-empty) { $x.preset } else { $preset }
         $x.body | performance $cfg $stdin --preset $preset --transform $transform
     }

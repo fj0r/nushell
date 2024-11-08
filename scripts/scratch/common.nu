@@ -53,8 +53,14 @@ export def dbg [switch content -t:string] {
     }
 }
 
-export def get-config [kind] {
-    sqlx $"select * from kind where name = (Q $kind)" | first
+export def get-config [kind --preset:string] {
+    if ($preset | is-empty) {
+        sqlx $"select * from kind where name = (Q $kind)" | first
+    } else {
+        sqlx $"select k.name, k.entry, k.comment, k.runner, k.cmd, k.pos, p.name as preset, p.data
+        from kind as k left join kind_preset as p on k.name = p.kind
+        where k.name = (Q $kind) and p.name = (Q $preset)" | first
+    }
 }
 
 export def 'to title' [config] {
@@ -82,8 +88,9 @@ export def entity [
     }
     let e = if not $batch {
         let title = $title | from title $cfg
+        let preset = if ($cfg.data? | is-empty) { {} } else { $cfg.data | from yaml }
         let l = $o
-        | block-project-edit $"scratch-XXXXXX" $cfg.entry $pos --kind $cfg.name --title $title --created=$created
+        | block-project-edit $"scratch-XXXXXX" $cfg.entry $pos --kind $cfg.name --title $title --created=$created --preset $preset --command $cfg.cmd
         | get content
         | lines
         let title = $l | first | to title $cfg
