@@ -6,6 +6,14 @@ def cmpl-tags [...prefix] {
     | flatten
 }
 
+def id-tag [] {
+    let id = $in
+    sqlx $"with (tag-tree) select * from tags
+        join scratch_tag on tags.id = scratch_tag.tag_id
+        where scratch_tag.scratch_id = ($id)
+    " | get name | each { $":($in)" }
+}
+
 export def cmpl-tag-1 [] {
     cmpl-tags ':'
 }
@@ -20,6 +28,14 @@ export def cmpl-tag-3 [] {
 
 export def cmpl-tag-id [] {
    sqlx $"with (tag-tree) select * from tags" | each { $"($in.id) # ($in.name)" }
+}
+
+export def cmpl-id-tag [ctx] {
+    if (scope commands | where name == 'argx parse' | is-empty) {
+        cmpl-tags ':'
+    } else {
+        $ctx | argx parse | get -i pos.id | id-tag
+    }
 }
 
 export def tag-group [] {
@@ -156,7 +172,7 @@ export def scratch-tag-hidden [tag:int@cmpl-tag-id] {
 
 export def scratch-tag-move [
     id: int@cmpl-scratch-id
-    --from(-f):string@cmpl-tag-1
+    --from(-f):string@cmpl-id-tag
     --to(-t):string@cmpl-tag-1
 ] {
     let from = $from | tag-group | get or.0
