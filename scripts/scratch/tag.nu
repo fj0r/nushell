@@ -87,19 +87,49 @@ export def scratch-ensure-tags [tags] {
     mut ids = []
     for tag in $tags {
         let ts = $tag | split row ':'
-        mut pid = sqlx $"insert into tag \(parent_id, name\) values \(-1, (Q $ts.0)\)
-            on conflict \(parent_id, name\) do update set parent_id = EXCLUDED.parent_id
-            returning id, name;"
-            | get 0.id
-        for t in ($ts | range 1..) {
-            $pid = sqlx $"insert into tag \(parent_id, name\) values
-            \(($pid), (Q $t)\)
-            on conflict \(parent_id, name\) do update set parent_id = EXCLUDED.parent_id
-            returning id, name;"
-            | get 0.id
+        let tq = $ts | each { $"\((Q $in)\)" } | str join ', '
+        let r = sqlx $"with recursive input\(name\) as \(
+                values ($tq)
+            \), v as \(
+                select row_number\(\) over \(\) as lv, name from input
+            \), g as \(
+                select 1 as lv, parent_id, id, tag.name from tag
+                join v on lv = v.lv
+                where v.lv = 1 and tag.name = v.name
+                union all
+                select g.lv + 1 as lv, t.parent_id, t.id, t.name from tag as t
+                join v on \(g.lv + 1\) = v.lv
+                join g on g.id = t.parent_id
+                where t.name = v.name
+            \) select * from g;"
+
+        mut idx = 0
+        mut pid = -1
+        mut name = null
+        for i in $ts {
+            let x = $r | where parent_id == $pid and name == $i
+            if ($x | is-empty) {
+                $name = $i
+                break
+            } else {
+                $pid = $x.0.id
+            }
+            $idx += 1
+        }
+
+        if ($name != null) {
+            for t in ($ts | range $idx..) {
+                $pid = sqlx $"insert into tag \(parent_id, name\) values
+                \(($pid), (Q $t)\)
+                on conflict \(parent_id, name\) do update set parent_id = EXCLUDED.parent_id
+                returning id, name;"
+                | get 0.id
+                print $"(ansi grey)Tag has been created: (ansi yellow)($t)(ansi reset)"
+            }
         }
         $ids ++= $pid
     }
+
     return $ids
 }
 
