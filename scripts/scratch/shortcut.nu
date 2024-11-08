@@ -1,6 +1,5 @@
 use mod.nu *
 use completion.nu *
-use libs/exec.nu *
 
 export alias sl = scratch-list
 export alias sa = scratch-add
@@ -43,8 +42,4 @@ export def scratch-today [
         --md-list=$md_list --md=$md --raw=$raw
         --done $done
         )
-}
-
-export def scratch-editor-run [transform?:closure] {
-    run-cmd $env.SCRATCH_EDITOR_CONTEXT --transform $transform
 }

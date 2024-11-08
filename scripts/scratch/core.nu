@@ -489,3 +489,9 @@ export def scratch-upsert-preset [
         | from yaml
     }
 }
+
+export def scratch-editor-run [transform?:closure] {
+    let ctx = $env.SCRATCH_EDITOR_CONTEXT?
+    if ($ctx | is-empty) { error make -u { msg: "Must be run in the Scratch editor" } }
+    run-cmd ($ctx | from nuon) --transform $transform
+}

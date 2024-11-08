@@ -2,7 +2,7 @@ use files.nu *
 use str.nu *
 
 def variants-edit [file? --line:int --context: record] {
-    $env.SCRATCH_EDITOR_CONTEXT = $context
+    $env.SCRATCH_EDITOR_CONTEXT = $context | to nuon
     if ($line | is-empty) {
         ^$env.EDITOR $file
     } else {

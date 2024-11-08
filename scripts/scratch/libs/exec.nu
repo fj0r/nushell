@@ -23,7 +23,7 @@ export def run-cmd [
     if ($dir | is-not-empty) { cd $dir }
 
     let i = [$dir $stdin_file] | path join
-    $stdin | save -f $i
+    $stdin | default '' | save -f $i
     let cmd = $cmd | render {_: $entry, stdin: $i, ...$opt}
     do -i {
         let cmd = if ($transform | is-empty) { $cmd } else { $"($cmd) | do (view source $transform)" }
