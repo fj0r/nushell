@@ -196,8 +196,8 @@ def up_prompt [segment] {
     | each {|y| $y | each {|x| get_component $x } }
     { ||
         let sep = $env.NU_POWER_CONFIG.separator_bar
-        let dlm = $env.NU_POWER_CONFIG.delimitor
-        let dlm = $"(ansi $dlm.color)($dlm.char)"
+        let d = $env.NU_POWER_CONFIG.delimitor
+        let dlm = $"(ansi $d.color)($d.char)"
         let adc = $env.NU_POWER_CONFIG.admin.color
         let last_idx = ($thunk | length) - 1
         let ss = $thunk
@@ -212,25 +212,19 @@ def up_prompt [segment] {
                     $acc | append $y.1
                 }
             }
-            | if ($env.NU_POWER_CONFIG.frame_bare? | default false) {
-                $in
-            } else {
-                if $y.index == $last_idx {
-                    ['' ...$in]
-                } else {
-                    ['' ...$in '']
-                }
-            }
             | str join $dlm
         }
         if ($env.NU_POWER_CONFIG.frame_header? | is-empty) {
+            let ss = [$"($ss.0)(ansi $sep.color)($d.right)" $"($d.left)(ansi reset)($ss.1)"]
             let fl = $ss | calc bar width
-            $ss | str join $"(ansi $sep.color)('' | fill -c $sep.char -w $fl)(ansi reset)"
+            $ss | str join $"('' | fill -c $sep.char -w $fl)"
         } else {
             let c = $env.NU_POWER_CONFIG.frame_header
-            let fl = $ss | calc bar width -n $c.upperleft_size
             let color = if (is-admin) { ansi $adc } else { ansi light_cyan }
-            $ss | str join $"(ansi $sep.color)('' | fill -c $sep.char -w $fl)(ansi reset)"
+            let ss = [$"($color)($d.left)($ss.0)(ansi $sep.color)($d.right)" $"($d.left)(ansi reset)($ss.1)"]
+            let fl = $ss | calc bar width -n $c.upperleft_size
+            $ss
+            | str join $"('' | fill -c $sep.char -w $fl)"
             | $"($color)($c.upperleft)(ansi reset)($in)($color)($c.lowerleft)(ansi reset)"
         }
     }
@@ -249,8 +243,8 @@ def up_center_prompt [segment] {
     | each {|y| $y | each {|x| get_component $x } }
     { ||
         let sep = $env.NU_POWER_CONFIG.separator_bar
-        let dlm = $env.NU_POWER_CONFIG.delimitor
-        let dlm = $"(ansi $dlm.color)($dlm.char)"
+        let d = $env.NU_POWER_CONFIG.delimitor
+        let dlm = $"(ansi $d.color)($d.char)"
         let adc = $env.NU_POWER_CONFIG.admin.color
         let ss = $thunk
         | each {|y|
@@ -265,20 +259,21 @@ def up_center_prompt [segment] {
             }
         }
         | flatten
-        | if ($env.NU_POWER_CONFIG.frame_bare? | default false) { $in } else { ['' ...$in ''] }
         | str join $dlm
         if ($env.NU_POWER_CONFIG.frame_header? | is-empty) {
+            let ss = $"($d.left)(ansi reset)($ss)(ansi $sep.color)($d.right)"
             let fl = $ss | calc sides width
             [
-                $"(ansi $sep.color)('' | fill -c $sep.char -w $fl.0)(ansi reset)"
+                $"(ansi $sep.color)('' | fill -c $sep.char -w $fl.0)"
                 $ss
-                $"(ansi $sep.color)('' | fill -c $sep.char -w ($fl.1))(ansi reset)"
+                $"('' | fill -c $sep.char -w ($fl.1))(ansi reset)"
             ]
             | str join
         } else {
             let c = $env.NU_POWER_CONFIG.frame_header
-            let fl = $ss | calc sides width -n $c.upperleft_size
             let color = if (is-admin) { ansi $adc } else { ansi light_cyan }
+            let ss = $"($color)($d.left)($ss)($color)($d.right)"
+            let fl = $ss | calc sides width -n $c.upperleft_size
             [
                 $"($color)($c.upperleft)(ansi reset)"
                 $"($color)('' | fill -c $sep.char -w $fl.0)(ansi reset)"
@@ -354,12 +349,13 @@ export def --env init [] {
     } else {
         $env.config.menus = $env.config.menus
         | each {|x|
+            let marker = if $x.marker == '| ' { '┤ ' } else { $x.marker }
             $x | upsert marker (
                 if (is-admin) {
                     let adc = $env.NU_POWER_CONFIG.admin.color
-                    $"(ansi $adc)($x.marker)(ansi reset)"
+                    $"(ansi $adc)($marker)(ansi reset)"
                 } else {
-                    $x.marker
+                    $marker
                 }
             )
         }
@@ -553,19 +549,20 @@ export-env {
             }
             delimitor: {
                 color: xterm_grey
-                char: '|'
+                char: '│'
+                left: '┤'
+                right: '├'
             }
             separator_bar: {
                 color: xterm_grey
                 char: '─'
             }
-            single_width_char: '↑↓'
-            frame_bare: false
+            single_width_char: '↑↓│─├┤'
             frame_header: {
-                upperleft: '┌'
+                upperleft: '┌' # ┌╭
                 upperleft_size: 1
-                lowerleft: '└'
-                upperright: '┐'
+                lowerleft: '└' # └╰
+                upperright: '┐' # ┐╮
                 upperright_size: 1
             }
         }

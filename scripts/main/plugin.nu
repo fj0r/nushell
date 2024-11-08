@@ -54,6 +54,7 @@ $env.NU_POWER_SCHEMA = [
 ]
 $env.NU_POWER_DECORATOR = 'plain'
 $env.NU_POWER_FRAME = 'fill'
+#$env.NU_POWER_FRAME = 'center'
 #$env.NU_POWER_CONFIG.separator_bar.char = "-"
 use power/plugin/git.nu *
 use power/plugin/kube.nu *
