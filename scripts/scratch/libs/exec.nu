@@ -52,7 +52,7 @@ export def performance [
             cd $f.dir
             let i = [$f.dir .stdin] | path join
             $stdin | save -f $i
-            let cmd = $config.cmd | render {_: $f.entry, stdin: $i, ...$opt}
+
 
             let vols = $opt.volumes? | default {}
             | items {|k, v| [-v $"($k):($v)"] } | flatten
@@ -60,24 +60,24 @@ export def performance [
             | items {|k, v| [-p $"($k):($v)"] } | flatten
             let envs = $opt.environment? | default {}
             | items {|k, v| [-e $"($k):($v)"] } | flatten
+            let entrypoint = if ('entrypoint' in $opt) { [--entrypoint $opt.entrypoint] } else { [] }
+            let wd = $opt.workdir? | default '/app'
+            let entry = [$wd $f.entry] | path join
+            let cmd = $config.cmd | render {_: $entry, stdin: $i, ...$opt}
 
             let container_name = $f.dir | path basename
             let args = [
-                --name $container_name -d
-                -v $"($f.dir):($opt.workdir? | default '/app')"
+                --name $container_name --rm -it
+                --workdir $wd
+                -v $"($f.dir):($wd)"
                 ...$vols
                 ...$ports
                 ...$envs
+                ...$entrypoint
                 $opt.image
-                $opt.command?
+                $cmd
             ] | filter {|x| $x | is-not-empty }
             ^$env.CONTCTL run ...$args
-
-            wait-value -t $"wait container ($container_name)" {
-                $container_name in (container-list | get name)
-            }
-            ^$env.CONTCTL exec -it $container_name $cmd
-            ^$env.CONTCTL rm -f $container_name
         }
         _ => {
             let f = if ($tmpfile | is-empty) {
