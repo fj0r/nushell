@@ -9,6 +9,28 @@ export def wait-value [action -i: duration = 1sec  -t: string='waiting'] {
     }
 }
 
+export def run-cmd [
+    ctx
+    --stdin-file: string = '.stdin'
+    --transform: closure
+] {
+    let stdin = $in
+    let cmd = $ctx.cmd
+    let dir = $ctx.dir?
+    let entry = $ctx.entry
+    let opt = $ctx.opt? | default {}
+
+    if ($dir | is-not-empty) { cd $dir }
+
+    let i = [$dir $stdin_file] | path join
+    $stdin | save -f $i
+    let cmd = $cmd | render {_: $entry, stdin: $i, ...$opt}
+    do -i {
+        let cmd = if ($transform | is-empty) { $cmd } else { $"($cmd) | do (view source $transform)" }
+        nu -m light -c $cmd
+    }
+}
+
 export def performance [
     config
     stdin?=''
@@ -30,16 +52,14 @@ export def performance [
             } else {
                 $tmpfile
             }
-            let opwd = $env.PWD
-            cd $f.dir
-            let i = [$f.dir .stdin] | path join
-            $stdin | save -f $i
-            let cmd = $config.cmd | render {_: $f.entry, stdin: $i, ...$opt}
-            do -i {
-                let cmd = if ($transform | is-empty) { $cmd } else { $"($cmd) | do (view source $transform)" }
-                nu -m light -c $cmd
+
+            $stdin | run-cmd --transform $transform {
+                cmd: $config.cmd
+                entry: $f.entry
+                dir: $f.dir
+                opt: $opt
             }
-            cd $opwd
+
             rm -rf $f.dir
         }
         'docker' | 'container' => {
