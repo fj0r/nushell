@@ -7,6 +7,17 @@ export def run [s] {
     open $env.OPENAI_DB | query db $s
 }
 
+export def --env init-db [env_name:string, file:string, hook: closure] {
+    if $env_name not-in $env {
+        {$env_name: $file} | load-env
+    }
+    if ($file | path exists) { return }
+    {_: '.'} | into sqlite -t _ $file
+    print $"(ansi grey)created database: $env.($env_name)(ansi reset)"
+    open $file | query db "DROP TABLE _;"
+    do $hook {|s| open $file | query db $s } {|...t| Q ...$t }
+}
+
 export def db-upsert [table pk --do-nothing] {
     let r = $in
     let d = if $do_nothing { 'NOTHING' } else {
