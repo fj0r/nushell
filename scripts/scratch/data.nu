@@ -4,14 +4,8 @@ use libs/files.nu *
 
 
 export def --env init [] {
-    if 'SCRATCH_DB' not-in $env {
-        $env.SCRATCH_DB = [$nu.data-dir 'scratch.db'] | path join
-    }
-    if ($env.SCRATCH_DB | path exists) { return }
-    {_: '.'} | into sqlite -t _ $env.SCRATCH_DB
-    print $"(ansi grey)created database: $env.SCRATCH_DB(ansi reset)"
+    init-db SCRATCH_DB ([$nu.data-dir 'scratch.db'] | path join) {|run, Q|
     for s in [
-        "DROP TABLE _;"
         "CREATE TABLE IF NOT EXISTS person (
             id INTEGER PRIMARY KEY,
             name TEXT NOT NULL UNIQUE,
@@ -82,7 +76,7 @@ export def --env init [] {
             body TEXT NOT NULL DEFAULT ''
         );"
     ] {
-        sqlx $s
+        do $run $s
     }
     let _ = "
     - name: txt
@@ -232,6 +226,7 @@ export def --env init [] {
       extension: hs
       body: hx8AAMCaW19Jx5KGOtAuCAYNRfDCg/8OdwuGFK2FRIqH/+ynBUrBsmEY05xQu3a9ayAfbELrJiIe4aNgXm86Q7yyAQM=
     " | from yaml | each { scratch-files-import $in }
+    }
 }
 
 
