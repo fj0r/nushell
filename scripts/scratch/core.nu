@@ -19,16 +19,18 @@ export def scratch-list [
     --sort(-s): list<string@cmpl-sort>
     --done(-x):int
     --untagged(-U)
+    --raw
     --md(-m)
     --md-list(-l)
-    --raw
     --indent: int=2
     --body-lines: int=2
     --scratch-tree
     --debug
+    --accumulator: closure
+    --monitor: closure
 ] {
     let sortable = [
-        created, updated, deadline,
+        value, created, updated, deadline,
         done, important, urgent, challenge
     ]
     let fields = [
@@ -139,7 +141,7 @@ export def scratch-list [
     } else if $scratch_tree {
         $r | scratch-format --indent $indent --body-lines $body_lines --md=$md --md-list=$md_list
     } else {
-        $r | tag-format $tags.or --indent $indent --body-lines $body_lines --md=$md --md-list=$md_list
+        $r | tag-format $tags.or --indent $indent --body-lines $body_lines --md=$md --md-list=$md_list --accumulator $accumulator --monitor $monitor
     }
 }
 

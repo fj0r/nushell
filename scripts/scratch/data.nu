@@ -240,6 +240,7 @@ export def --env theme [] {
         color: {
             title: default
             id: xterm_grey39
+            value: purple_bold
             tag: xterm_wheat4
             important: yellow
             urgent: red

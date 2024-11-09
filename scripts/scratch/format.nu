@@ -6,7 +6,7 @@ export def scratch-format [
     --body-lines: int=2
     --indent: int=2
 ] {
-    $in | to tree | fmt tree --indent $indent --body-lines $body_lines --md=$md --md-list=$md_list
+    $in | to tree | fmt tree --indent $indent --body-lines $body_lines --md=$md --md-list=$md_list | get txt
 }
 
 export def tag-format [
@@ -15,12 +15,14 @@ export def tag-format [
     --md-list
     --body-lines: int=2
     --indent: int=2
+    --accumulator: closure
+    --monitor: closure
 ] {
     $in
     | to tree
     | tagsplit $tags
     | tag tree
-    | fmt tag-tree --indent $indent --body-lines $body_lines --md=$md --md-list=$md_list
+    | fmt tag-tree --indent $indent --body-lines $body_lines --md=$md --md-list=$md_list --accumulator $accumulator --monitor $monitor
 }
 
 def 'tagsplit' [tags] {
@@ -56,13 +58,15 @@ def 'fmt tag-tree' [
     --body-lines: int=2
     --md
     --md-list
+    --accumulator: closure
+    --monitor: closure
 ] {
     let o = $in
     mut out = []
     # Siblings' leaf come before branch
     if ':' in $o {
-        let j = $o | get ':' | fmt tree ($level) --indent $indent --body-lines $body_lines --md=$md --md-list=$md_list
-        $out ++= $j
+        let j = $o | get ':' | fmt tree ($level) --indent $indent --body-lines $body_lines --md=$md --md-list=$md_list --accumulator $accumulator --monitor $monitor
+        $out ++= $j.txt
     }
     for i in ($o | transpose k v | filter {|x| $x.k != ':' }) {
         let instr = '' | fill -c ' ' -w ($padding + $level * $indent)
@@ -152,18 +156,25 @@ def 'fmt tree' [
     --body-lines: int=2
     --md
     --md-list
+    --accumulator: closure
+    --monitor: closure
 ] {
     mut out = []
+    mut value = []
     for i in $in {
-        let n = '' | fill -c ' ' -w ($padding + $level * $indent)
-        for j in ($i | reject children | fmt leaves $n --body-lines $body_lines --md=$md --md-list=$md_list) {
+        let prefix = '' | fill -c ' ' -w ($padding + $level * $indent)
+        for j in ($i | reject children | fmt leaves $prefix --body-lines $body_lines --md=$md --md-list=$md_list) {
             $out ++= $j
         }
         if ($i.children | is-not-empty) {
-            $out ++= $i.children | fmt tree ($level + 1) --indent $indent --body-lines $body_lines --md=$md --md-list=$md_list
+            let x = $i.children | fmt tree ($level + 1) --indent $indent --body-lines $body_lines --md=$md --md-list=$md_list --accumulator $accumulator --monitor $monitor
+            $out ++= $x.txt
         }
     }
-    $out | flatten | str join (char newline)
+    {
+        txt: ($out | flatten | str join (char newline))
+        value: 0
+    }
 }
 
 def 'fmt leaves' [
@@ -186,13 +197,19 @@ def 'fmt leaves' [
     }
     let verbose = not $md and not $md_list
 
+    let value = if $verbose and ($o.value != 0) {
+        $"(ansi $color.value)($o.value)(ansi reset)"
+    }
+
     let tags = if $verbose and ($o.tags? | is-not-empty) {
         let ct = ansi $color.tag
         $o.tags | each {|x| $"($ct)($x | str join ':')" }
         # :TODO:
         #| group-by cat
         #| items {|k,v| $"(ansi $color.cat)($k):(ansi $color.tag)($v.tag | str join '/')"}
-    } else { [] }
+    } else {
+        []
+    }
 
     let meta = [important urgent challenge created updated]
     | if $o.done == 0 { $in | append 'deadline' } else { $in }
@@ -208,7 +225,7 @@ def 'fmt leaves' [
         }
     }
 
-    let header = [...$title ...$tags ...$meta]
+    let header = [...$title $value ...$tags ...$meta]
     | filter { $in | is-not-empty }
     | str join ' '
     |  if $verbose { $"($in)(ansi reset)" } else { $in }
