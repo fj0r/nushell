@@ -2,7 +2,8 @@ use libs *
 use common.nu *
 use completion.nu *
 use format.nu *
-export use tag.nu *
+use tag_base.nu *
+use tag.nu *
 
 
 export def scratch-list [

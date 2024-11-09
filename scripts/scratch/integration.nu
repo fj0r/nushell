@@ -1,4 +1,5 @@
 use completion.nu *
+use tag_base.nu *
 
 export def snew [
     ...xtags:string@cmpl-tag-3
