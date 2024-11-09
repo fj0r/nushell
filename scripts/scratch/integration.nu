@@ -3,7 +3,7 @@ use tag_base.nu *
 
 export def snew [
     ...xtags:string@cmpl-tag-3
-    --parent(-p):int
+    --parent(-f):int
     --scratch(-t): int@cmpl-scratch-id
 ] {
     if ($scratch | is-not-empty) { scratch-out } else { $in | scratch-in }

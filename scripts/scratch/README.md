@@ -11,3 +11,5 @@
     - set done
         - --done(-x) `1 | 0`
         - see also: scratch-done
+- scratch-add
+    - `:tag:a:b :tag:c`

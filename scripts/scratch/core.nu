@@ -96,7 +96,7 @@ export def scratch-list [
     mut $time_cond = []
     if ($updated | is-not-empty) { $time_cond ++= $"updated >= ($now - $updated | fmt-date | Q $in)"}
     if ($created | is-not-empty) { $time_cond ++= $"created >= ($now - $created | fmt-date | Q $in)"}
-    if ($deadline | is-not-empty) { $time_cond ++= $"deadline >= ($now - $deadline | fmt-date | Q $in)"}
+    if ($deadline | is-not-empty) { $time_cond ++= $"deadline <= ($now + $deadline | fmt-date | Q $in)"}
     let time_cond = $time_cond | str join ' or ' | if ($in | is-not-empty) { $"\(($in)\)" }
     if ($time_cond | is-not-empty) { $cond ++= $time_cond }
 
@@ -167,8 +167,8 @@ export def scratch-add [
     ...xargs:string@cmpl-tag-1
     --kind(-k): string@cmpl-kind='md'
     --config: record
-    --preset: string
-    --parent(-p): int@cmpl-scratch-id
+    --preset(-p): string@cmpl-kind-preset
+    --parent(-f): int@cmpl-scratch-id
     --important(-i): int
     --urgent(-u): int
     --challenge(-c): int
@@ -229,7 +229,7 @@ export def scratch-edit [
     id:int@cmpl-scratch-id
     --kind(-k):string@cmpl-kind
     --config: record
-    --preset: string
+    --preset(-p): string@cmpl-kind-preset
     --returning-body
     --locate-body
 ] {
@@ -282,7 +282,7 @@ export def scratch-attrs [
     --important(-i): int
     --urgent(-u): int
     --challenge(-c): int
-    --parent(-p): int@cmpl-scratch-id
+    --parent(-f): int@cmpl-scratch-id
     --deadline(-d): duration
     --done(-x): int
     --value(-v): number
