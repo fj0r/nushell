@@ -105,7 +105,11 @@ def 'fmt tag' [
     } else if $md {
         [$"($indent)($env.SCRATCH_THEME.symbol.md_list)" $done $o.k]
     } else {
-        let vs = $o.v | items {|k, v| $"(ansi grey)($o.k):(ansi $color.value)($v)(ansi reset)" } | str join ' '
+        let vs = $o.v | items {|k, v|
+            let c = if $v < 0 { $color.value.negative } else { $color.value.positive }
+            $"(ansi grey)($k):(ansi $c)($v)(ansi reset)"
+        }
+        | str join ' '
         [$"($indent)($done)" $"(ansi $color.branch)($o.k)(ansi reset)" $vs]
     }
     | str join ' '
@@ -199,7 +203,10 @@ def 'fmt tree' [
         $col ++= $i.value
         $done ++= $i.done
         let prefix = '' | fill -c ' ' -w ($padding + $level * $indent)
-        for j in ($i | reject children | fmt leaves $prefix --body-lines $body_lines --md=$md --md-list=$md_list) {
+        let l = $i
+        | reject children
+        | fmt leaves $prefix --body-lines $body_lines --md=$md --md-list=$md_list --show-value=($accumulator | is-not-empty)
+        for j in $l {
             $out ++= $j
         }
         if ($i.children | is-not-empty) {
@@ -225,6 +232,7 @@ def 'fmt leaves' [
     --md
     --md-list
     --body-lines: int=2
+    --show-value
 ] {
     let o = $in
     let color = $env.SCRATCH_THEME.color
@@ -240,8 +248,9 @@ def 'fmt leaves' [
     }
     let verbose = not $md and not $md_list
 
-    let value = if $verbose and ($o.value != 0) {
-        $"(ansi $color.value)($o.value)(ansi reset)"
+    let value = if $verbose and $show_value {
+        let c = if $o.value < 0 { $color.value.negative } else { $color.value.positive }
+        $"(ansi $c)($o.value)(ansi reset)"
     }
 
     let tags = if $verbose and ($o.tags? | is-not-empty) {
