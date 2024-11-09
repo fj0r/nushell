@@ -264,7 +264,7 @@ export def --env theme [] {
             deadline: {|x, o|
                 let t = $x | into datetime
                 let s = $t | date humanize
-                if ($t - (date now) | into int) > 0 { $s } else { $"!($s)" }
+                if ($t - (date now) | into int) > 0 { $s } else { $"(ansi purple_reverse)($s)(ansi reset)" }
             }
             important: {|x| '' | fill -c '☆ ' -w $x }
             urgent: {|x| '' | fill -c '🔥' -w $x }
