@@ -162,8 +162,9 @@ export def scratch-untagged [id] {
     sqlx $"delete from scratch_tag where scratch_id = ($id) and tag_id in \(($tids)\)"
 }
 
-export def scratch-tag-rename [from:string@cmpl-tag-id to] {
-    sqlx $"update tag set name = (Q $to) where id = ($from)"
+export def scratch-tag-rename [from:string@cmpl-tag-1 to] {
+    let tag = $from | tag-group | get or | scratch-ensure-tags $in | get 0
+    sqlx $"update tag set name = (Q $to) where id = ($tag)"
 }
 
 export def scratch-tag-hidden [tag:int@cmpl-tag-id] {
