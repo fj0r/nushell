@@ -15,7 +15,7 @@ export def tag-format [
     --md-list
     --body-lines: int=2
     --indent: int=2
-    --accumulator: closure
+    --accumulator: record
     --monitor: closure
 ] {
     $in
@@ -23,6 +23,7 @@ export def tag-format [
     | tagsplit $tags
     | tag tree
     | fmt tag-tree --indent $indent --body-lines $body_lines --md=$md --md-list=$md_list --accumulator $accumulator --monitor $monitor
+    | get txt
 }
 
 def 'tagsplit' [tags] {
@@ -58,32 +59,46 @@ def 'fmt tag-tree' [
     --body-lines: int=2
     --md
     --md-list
-    --accumulator: closure
+    --accumulator: record
     --monitor: closure
 ] {
     let o = $in
     mut out = []
+    mut acc = []
     # Siblings' leaf come before branch
     if ':' in $o {
-        let j = $o | get ':' | fmt tree ($level) --indent $indent --body-lines $body_lines --md=$md --md-list=$md_list --accumulator $accumulator --monitor $monitor
+        let j = $o | get ':' | fmt tree ($level) --indent $indent --body-lines $body_lines --md=$md --md-list=$md_list --accumulator $accumulator
         $out ++= $j.txt
+        $acc ++= $j.acc
     }
     for i in ($o | transpose k v | filter {|x| $x.k != ':' }) {
         let instr = '' | fill -c ' ' -w ($padding + $level * $indent)
-        $out ++= $i.k | fmt tag $instr --md=$md --md-list=$md_list
-
-        $out ++= $i.v | fmt tag-tree ($level + 1) --indent $indent --body-lines $body_lines --md=$md --md-list=$md_list
+        # TODO:
+        let x = $i.v | fmt tag-tree ($level + 1) --indent $indent --body-lines $body_lines --md=$md --md-list=$md_list --accumulator $accumulator --monitor $monitor
+        $out ++= {k: $i.k, v: $x.acc} | fmt tag $instr --monitor $monitor --md=$md --md-list=$md_list
+        $out ++= $x.txt
+        $acc ++= $x.acc
     }
-    $out | flatten | str join (char newline)
+    let acc = if ($accumulator | is-empty) {
+        {}
+    } else {
+        $acc | reduce -f {} {|i,a| $a | map-acc $accumulator $i }
+    }
+    {
+        txt: ($out | flatten | str join (char newline))
+        acc: $acc
+    }
 }
 
 def 'fmt tag' [
     indent
+    --monitor: closure
     --md
     --md-list
     --done
 ] {
-    let o = $in
+    let stdin = $in
+    let o = $stdin.k
     let color = $env.SCRATCH_THEME.color
     let done = $env.SCRATCH_THEME.symbol.box | get ($md | into int) | get ($done | into  int)
     if $md_list {
@@ -91,7 +106,8 @@ def 'fmt tag' [
     } else if $md {
         [$"($indent)($env.SCRATCH_THEME.symbol.md_list)" $done $o]
     } else {
-        [$"($indent)($done)" $"(ansi $color.branch)($o)(ansi reset)"]
+        let vs = $stdin.v | items {|k, v| $"(ansi grey)($k):(ansi $color.value)($v)(ansi reset)" } | str join ' '
+        [$"($indent)($done)" $"(ansi $color.branch)($o)(ansi reset)" $vs]
     }
     | str join ' '
 }
@@ -149,6 +165,24 @@ def to-tree [root o] {
     }
 }
 
+def map-acc [acc:record merge?:record] {
+    let o = $in
+    $acc
+    | items {|k, v|
+        let v = if ($v | describe) == 'closure' { [$v $v] } else { $v }
+        let v = if ($merge | describe) == 'nothing' {
+            $o | do $v.0 $o
+        } else {
+            let o = [$o $merge] | each { $in | get -i $k | default 0 }
+            $o | do $v.1 $o
+        }
+        {k: $k, v: $v}
+    }
+    | reduce -f {} {|i, a|
+        $a | insert $i.k $i.v
+    }
+}
+
 def 'fmt tree' [
     level:int=0
     --indent(-i):int=2
@@ -156,24 +190,32 @@ def 'fmt tree' [
     --body-lines: int=2
     --md
     --md-list
-    --accumulator: closure
-    --monitor: closure
+    --accumulator: record
 ] {
     mut out = []
-    mut value = []
+    mut col = []
+    mut acc = {}
     for i in $in {
+        $col ++= $i.value
         let prefix = '' | fill -c ' ' -w ($padding + $level * $indent)
         for j in ($i | reject children | fmt leaves $prefix --body-lines $body_lines --md=$md --md-list=$md_list) {
             $out ++= $j
         }
         if ($i.children | is-not-empty) {
-            let x = $i.children | fmt tree ($level + 1) --indent $indent --body-lines $body_lines --md=$md --md-list=$md_list --accumulator $accumulator --monitor $monitor
+            let x = $i.children | fmt tree ($level + 1) --indent $indent --body-lines $body_lines --md=$md --md-list=$md_list --accumulator $accumulator
             $out ++= $x.txt
+            $acc = $x.acc
         }
+    }
+    let acc = if ($accumulator | is-empty) {
+        {}
+    } else {
+        let col = $col | filter { $in | is-not-empty }
+        $col | map-acc $accumulator | map-acc $accumulator $acc
     }
     {
         txt: ($out | flatten | str join (char newline))
-        value: 0
+        acc: $acc
     }
 }
 

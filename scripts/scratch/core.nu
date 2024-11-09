@@ -26,7 +26,7 @@ export def scratch-list [
     --body-lines: int=2
     --scratch-tree
     --debug
-    --accumulator: closure
+    --accumulator: record
     --monitor: closure
 ] {
     let sortable = [

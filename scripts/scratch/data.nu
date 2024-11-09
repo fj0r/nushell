@@ -269,4 +269,8 @@ export def --env theme [] {
         }
 
     }
+    $env.SCRATCH_DEFAULT_ACCUMULATOR = {
+        sum: { $in | math sum }
+        count: [{ $in | length }, { $in | math sum }]
+    }
 }
