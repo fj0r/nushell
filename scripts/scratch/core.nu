@@ -278,6 +278,7 @@ export def scratch-attrs [
     --deadline(-d): duration
     --done(-x): int
     --value(-v): number
+    --adder(-a): number
 ] {
     let ids = $xargs | filter { ($in | describe) == 'int' }
     let xtags = $xargs | filter { ($in | describe) != 'int' }
@@ -297,6 +298,11 @@ export def scratch-attrs [
         | items {|k, v| $"($k) = (Q $v)"}
         | str join ','
         sqlx $"update scratch set ($attrs) where id in \(($ids | str join ',')\);"
+    }
+
+    if ($adder | is-not-empty) and ($adder != 0) {
+        let o = if $adder > 0 { $"+ ($adder)" } else { $"- ($adder | math abs)" }
+        sqlx $"update scratch set value = value ($o) where id in \(($ids | str join ',')\);"
     }
 
     if ($done | is-not-empty) {
