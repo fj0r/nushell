@@ -27,7 +27,6 @@ export def scratch-list [
     --scratch-tree
     --debug
     --accumulator: record
-    --monitor: closure
 ] {
     let sortable = [
         value, created, updated, deadline,
@@ -141,7 +140,7 @@ export def scratch-list [
     } else if $scratch_tree {
         $r | scratch-format --indent $indent --body-lines $body_lines --md=$md --md-list=$md_list
     } else {
-        $r | tag-format $tags.or --indent $indent --body-lines $body_lines --md=$md --md-list=$md_list --accumulator $accumulator --monitor $monitor
+        $r | tag-format $tags.or --indent $indent --body-lines $body_lines --md=$md --md-list=$md_list --accumulator $accumulator
     }
 }
 

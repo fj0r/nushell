@@ -16,13 +16,12 @@ export def tag-format [
     --body-lines: int=2
     --indent: int=2
     --accumulator: record
-    --monitor: closure
 ] {
     $in
     | to tree
     | tagsplit $tags
     | tag tree
-    | fmt tag-tree --indent $indent --body-lines $body_lines --md=$md --md-list=$md_list --accumulator $accumulator --monitor $monitor
+    | fmt tag-tree --indent $indent --body-lines $body_lines --md=$md --md-list=$md_list --accumulator $accumulator
     | get txt
 }
 
@@ -60,7 +59,6 @@ def 'fmt tag-tree' [
     --md
     --md-list
     --accumulator: record
-    --monitor: closure
 ] {
     let o = $in
     mut out = []
@@ -74,8 +72,8 @@ def 'fmt tag-tree' [
     for i in ($o | transpose k v | filter {|x| $x.k != ':' }) {
         let instr = '' | fill -c ' ' -w ($padding + $level * $indent)
         # TODO:
-        let x = $i.v | fmt tag-tree ($level + 1) --indent $indent --body-lines $body_lines --md=$md --md-list=$md_list --accumulator $accumulator --monitor $monitor
-        $out ++= {k: $i.k, v: $x.acc} | fmt tag $instr --monitor $monitor --md=$md --md-list=$md_list
+        let x = $i.v | fmt tag-tree ($level + 1) --indent $indent --body-lines $body_lines --md=$md --md-list=$md_list --accumulator $accumulator
+        $out ++= {k: $i.k, v: $x.acc} | fmt tag $instr --md=$md --md-list=$md_list
         $out ++= $x.txt
         $acc ++= $x.acc
     }
@@ -92,7 +90,6 @@ def 'fmt tag-tree' [
 
 def 'fmt tag' [
     indent
-    --monitor: closure
     --md
     --md-list
     --done
