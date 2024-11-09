@@ -44,3 +44,5 @@ export def scratch-today [
         --done $done
         )
 }
+
+export alias sto = scratch-today

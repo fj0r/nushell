@@ -85,4 +85,3 @@ export def scratch-tag-toggle [
         $tids | scratch-untagged $id
     }
 }
-

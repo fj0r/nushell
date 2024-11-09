@@ -49,8 +49,11 @@ export def scratch-list [
 
     # (not $trash) hide deleted
     let exclude_deleted = ["scratch.deleted = ''", "scratch.deleted != ''"]
-    # ($tags | is-empty) tags.hidden = 0
     let exclude_tags_hidden = "tags.hidden = 0"
+    let a_exclude_tags_hidden = $"scratch.id not in \(
+        select scratch_id from scratch_tag where tag_id in \(
+            select id from tag where hidden = 1\)\)
+        "
     # ($untagged)
     let include_untagged = "tags.name is null"
     dbg $debug {trash: $trash, notags: ($xtags | is-empty), untagged: $untagged} -t cond
@@ -71,11 +74,15 @@ export def scratch-list [
     }
 
     if ($xtags | is-not-empty) {
-        let tags = $tags.or
-        let tags_id = $"with (tag-tree), tid as \(
-            select id from tags where name in \(($tags | each {Q $in} | str join ', ')\)
-        \), (tag-branch ids --where 'id in (select id from tid)')
-        select id from ids"
+        let tags_id = $tags.or
+        | each { scratch-tag-path-id ($in | split row ':') | last | get id }
+        | str join ', '
+        let tags_id = $"with recursive g as \(
+            select id, parent_id from tag where id in \(($tags_id)\)
+            union all
+            select t.id, t.parent_id from tag as t join g on g.id = t.parent_id
+        \) select id from g
+        "
         let tags_id = sqlx $tags_id | get id | each { $in | into string } | str join ', '
         $cond ++= $"scratch.id in \(select scratch_id from scratch_tag where tag_id in \(($tags_id)\)\)"
     }
