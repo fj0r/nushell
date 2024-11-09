@@ -39,3 +39,7 @@ export def cmpl-relevant-id [] {
 export def cmpl-todo-md [] {
     ls **/TODO.md | get name
 }
+
+export def cmpl-accumulator [] {
+    $env.SCRATCH_ACCUMULATOR | columns
+}
