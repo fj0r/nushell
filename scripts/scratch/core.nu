@@ -28,6 +28,8 @@ export def scratch-list [
     --debug
     --accumulator(-a): any
 ] {
+    let tags = $xtags | tag-group
+
     let sortable = [
         value, created, updated, deadline,
         done, important, urgent, challenge
@@ -67,15 +69,13 @@ export def scratch-list [
         | str join ' and '
     }
 
-    let tags = $xtags | tag-group
-
     if ($xtags | is-not-empty) {
         let tags = $tags.or
-        let tags_id = sqlx $"with (tag-tree), tid as \(
+        let tags_id = $"with (tag-tree), tid as \(
             select id from tags where name in \(($tags | each {Q $in} | str join ', ')\)
         \), (tag-branch ids --where 'id in (select id from tid)')
         select id from ids"
-        | get id | each { $in | into string } | str join ', '
+        let tags_id = sqlx $tags_id | get id | each { $in | into string } | str join ', '
         $cond ++= $"scratch.id in \(select scratch_id from scratch_tag where tag_id in \(($tags_id)\)\)"
     }
 

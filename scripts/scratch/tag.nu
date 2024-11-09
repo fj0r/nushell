@@ -98,26 +98,30 @@ export def scratch-tag-clean [
     }
 }
 
+export def get-tag-path-id [tag_path: list<string>] {
+    let ts = $tag_path | each { $"\((Q $in)\)" } | str join ', '
+    sqlx $"with recursive input\(name\) as \(
+            values ($ts)
+        \), v as \(
+            select row_number\(\) over \(\) as lv, name from input
+        \), g as \(
+            select 1 as lv, parent_id, id, tag.name from tag
+            join v on lv = v.lv
+            where v.lv = 1 and tag.name = v.name
+            union all
+            select g.lv + 1 as lv, t.parent_id, t.id, t.name from tag as t
+            join v on \(g.lv + 1\) = v.lv
+            join g on g.id = t.parent_id
+            where t.name = v.name
+        \) select * from g;"
+}
+
 # add tag
 export def scratch-ensure-tags [tags] {
     mut ids = []
     for tag in $tags {
         let ts = $tag | split row ':'
-        let tq = $ts | each { $"\((Q $in)\)" } | str join ', '
-        let r = sqlx $"with recursive input\(name\) as \(
-                values ($tq)
-            \), v as \(
-                select row_number\(\) over \(\) as lv, name from input
-            \), g as \(
-                select 1 as lv, parent_id, id, tag.name from tag
-                join v on lv = v.lv
-                where v.lv = 1 and tag.name = v.name
-                union all
-                select g.lv + 1 as lv, t.parent_id, t.id, t.name from tag as t
-                join v on \(g.lv + 1\) = v.lv
-                join g on g.id = t.parent_id
-                where t.name = v.name
-            \) select * from g;"
+        let r = get-tag-path-id $ts
 
         mut idx = 0
         mut pid = -1
