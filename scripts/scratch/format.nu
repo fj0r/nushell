@@ -263,8 +263,8 @@ def 'fmt leaves' [
         []
     }
 
-    let meta = [important urgent challenge created updated]
-    | if $o.done == 0 { $in | append 'deadline' } else { $in }
+    let dd = if $o.done == 0 { [deadline] } else { [] }
+    let meta = [important urgent challenge ...$dd created updated]
     | each {|x|
         let y = $o | get -i $x
         let z = match ($y | describe) {
