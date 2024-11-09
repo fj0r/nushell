@@ -155,6 +155,7 @@ export def scratch-add [
     --challenge(-c): int
     --deadline(-d): duration
     --done(-x)
+    --value(-v): number
     --relevant(-r): int@cmpl-relevant-id
     --batch
     --returning-body
@@ -177,6 +178,7 @@ export def scratch-add [
         parent_id: $parent
         relevant: $relevant
         deadline: (if ($deadline | is-not-empty) {(date now) + $deadline | fmt-date})
+        value: $value
         done: (if $done { 1 } else { 0 })
     } | filter-empty
 
@@ -264,11 +266,13 @@ export def scratch-attrs [
     --parent(-p): int@cmpl-scratch-id
     --deadline(-d): duration
     --done(-x): int
+    --value(-v): number
 ] {
     let ids = $xargs | filter { ($in | describe) == 'int' }
     let xtags = $xargs | filter { ($in | describe) != 'int' }
 
     let args = {
+        value: $value
         important: $important
         urgent: $urgent
         challenge: $challenge
