@@ -207,7 +207,6 @@ def 'fmt tree' [
     let acc = if ($accumulator | is-empty) {
         {}
     } else {
-        let col = $col | filter { $in | is-not-empty }
         $col | map-acc $accumulator | map-acc $accumulator $acc
     }
     {
