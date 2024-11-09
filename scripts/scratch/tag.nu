@@ -85,3 +85,15 @@ export def scratch-tag-toggle [
         $tids | scratch-untagged $id
     }
 }
+
+export def scratch-tag-add [
+    ...tags: string@cmpl-tag-1
+] {
+    $tags | tag-group | get or | scratch-ensure-tags $in
+}
+
+export def scratch-tag-delete [
+    ...tags: string@cmpl-tag-1
+] {
+    # TODO:
+}
