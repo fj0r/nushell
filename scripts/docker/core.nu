@@ -274,9 +274,15 @@ export def system-prune-all [-n: string@cmpl-docker-ns] {
 }
 
 # remove image
-export def image-remove [image: string@cmpl-docker-images -n: string@cmpl-docker-ns] {
-    let ns = if ($n | is-empty) {[]} else {[-n $n]}
-    ^$env.CONTCTL ...$ns rmi $image
+export def image-remove [
+    image: string@cmpl-docker-images
+    -n: string@cmpl-docker-ns
+    --force(-f)
+] {
+    mut args = []
+    if ($n | is-not-empty) { $args ++= [-n $n] }
+    if $force { $args ++= [--force] }
+    ^$env.CONTCTL rmi ...$args $image
 }
 
 # add new tag
