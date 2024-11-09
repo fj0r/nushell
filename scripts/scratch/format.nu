@@ -63,19 +63,22 @@ def 'fmt tag-tree' [
     let o = $in
     mut out = []
     mut acc = []
+    mut done = []
     # Siblings' leaf come before branch
     if ':' in $o {
         let j = $o | get ':' | fmt tree ($level) --indent $indent --body-lines $body_lines --md=$md --md-list=$md_list --accumulator $accumulator
         $out ++= $j.txt
         $acc ++= $j.acc
+        $done ++= $j.done
     }
     for i in ($o | transpose k v | filter {|x| $x.k != ':' }) {
         let instr = '' | fill -c ' ' -w ($padding + $level * $indent)
         # TODO:
         let x = $i.v | fmt tag-tree ($level + 1) --indent $indent --body-lines $body_lines --md=$md --md-list=$md_list --accumulator $accumulator
-        $out ++= {k: $i.k, v: $x.acc} | fmt tag $instr --md=$md --md-list=$md_list
+        $out ++= {k: $i.k, v: $x.acc, d: $x.done} | fmt tag $instr --md=$md --md-list=$md_list
         $out ++= $x.txt
         $acc ++= $x.acc
+        $done ++= $x.done
     }
     let acc = if ($accumulator | is-empty) {
         {}
@@ -85,6 +88,7 @@ def 'fmt tag-tree' [
     {
         txt: ($out | flatten | str join (char newline))
         acc: $acc
+        done: ($done | all { $in })
     }
 }
 
@@ -92,19 +96,17 @@ def 'fmt tag' [
     indent
     --md
     --md-list
-    --done
 ] {
-    let stdin = $in
-    let o = $stdin.k
+    let o = $in
     let color = $env.SCRATCH_THEME.color
-    let done = $env.SCRATCH_THEME.symbol.box | get ($md | into int) | get ($done | into  int)
+    let done = $env.SCRATCH_THEME.symbol.box | get ($md | into int) | get ($o.d | into int)
     if $md_list {
-        [$"($indent)($env.SCRATCH_THEME.symbol.md_list)" $o]
+        [$"($indent)($env.SCRATCH_THEME.symbol.md_list)" $o.k]
     } else if $md {
-        [$"($indent)($env.SCRATCH_THEME.symbol.md_list)" $done $o]
+        [$"($indent)($env.SCRATCH_THEME.symbol.md_list)" $done $o.k]
     } else {
-        let vs = $stdin.v | items {|k, v| $"(ansi grey)($k):(ansi $color.value)($v)(ansi reset)" } | str join ' '
-        [$"($indent)($done)" $"(ansi $color.branch)($o)(ansi reset)" $vs]
+        let vs = $o.v | items {|k, v| $"(ansi grey)($o.k):(ansi $color.value)($v)(ansi reset)" } | str join ' '
+        [$"($indent)($done)" $"(ansi $color.branch)($o.k)(ansi reset)" $vs]
     }
     | str join ' '
 }
@@ -192,8 +194,10 @@ def 'fmt tree' [
     mut out = []
     mut col = []
     mut acc = {}
+    mut done = []
     for i in $in {
         $col ++= $i.value
+        $done ++= $i.done
         let prefix = '' | fill -c ' ' -w ($padding + $level * $indent)
         for j in ($i | reject children | fmt leaves $prefix --body-lines $body_lines --md=$md --md-list=$md_list) {
             $out ++= $j
@@ -212,6 +216,7 @@ def 'fmt tree' [
     {
         txt: ($out | flatten | str join (char newline))
         acc: $acc
+        done: ($done | all { $in == 1 })
     }
 }
 
