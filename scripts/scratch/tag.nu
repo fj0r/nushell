@@ -77,10 +77,12 @@ export def scratch-tag-clean [
     ...tags: string@cmpl-tag-1
     --with-tag(-T)
 ] {
-    let tags_id = sqlx $"with (tag-tree), tid as \(
-        select id from tags where name in \(($tags | each {Q $in} | str join ', ')\)
-    \), (tag-branch ids --where 'id in (select id from tid)')
-    select id from ids"
+    let tags_id = $tags | tag-group | get or | each { scratch-tag-path-id ($in | split row ':') | last | get id } | str join ', '
+    let tags_id = sqlx $"with recursive g as \(
+        select id, parent_id from tag where id in \(($tags_id)\)
+        union all
+        select t.id, t.parent_id from tag as t join g on g.id = t.parent_id
+    \) select id from g"
     | get id | each { $in | into string } | str join ', '
     let id = sqlx $"delete from scratch where id in \(
         select scratch_id from scratch_tag where tag_id in \(($tags_id)\)
@@ -98,7 +100,7 @@ export def scratch-tag-clean [
     }
 }
 
-export def get-tag-path-id [tag_path: list<string>] {
+export def scratch-tag-path-id [tag_path: list<string>] {
     let ts = $tag_path | each { $"\((Q $in)\)" } | str join ', '
     sqlx $"with recursive input\(name\) as \(
             values ($ts)
@@ -121,7 +123,7 @@ export def scratch-ensure-tags [tags] {
     mut ids = []
     for tag in $tags {
         let ts = $tag | split row ':'
-        let r = get-tag-path-id $ts
+        let r = scratch-tag-path-id $ts
 
         mut idx = 0
         mut pid = -1
