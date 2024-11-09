@@ -429,7 +429,7 @@ export def scratch-search [
 }
 
 export def scratch-in [
-    id?:int@cmpl-untagged-scratch-id
+    id?:int@cmpl-untagged-root-scratch
     --kind(-k):string@cmpl-kind
     --preset(-p):string@cmpl-kind-preset
     --transform(-t): closure
@@ -455,7 +455,7 @@ export def scratch-in [
 }
 
 export def scratch-out [
-    id?:int@cmpl-untagged-scratch-id
+    id?:int@cmpl-untagged-root-scratch
     --kind(-k):string@cmpl-kind
     --preset(-p):string@cmpl-kind-preset
     --search(-s): string

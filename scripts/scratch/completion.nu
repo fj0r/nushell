@@ -7,7 +7,7 @@ export def cmpl-scratch-id [] {
     | each { $"($in.id) #($in.root) ($in.title)" }
 }
 
-export def cmpl-untagged-scratch-id [] {
+export def cmpl-untagged-root-scratch [] {
     let rw = (term size).columns - 8
     let q = $"select s.id as value,
         substr\(
@@ -20,7 +20,7 @@ export def cmpl-untagged-scratch-id [] {
     from scratch as s
     left outer join scratch_tag as t on s.id = t.scratch_id
     left outer join scratch_preset as p on s.id = p.scratch_id
-    where t.tag_id is null and s.deleted = ''
+    where t.tag_id is null and s.parent_id = -1 and s.deleted = ''
     order by updated desc limit 20;"
     sqlx $q
 }
