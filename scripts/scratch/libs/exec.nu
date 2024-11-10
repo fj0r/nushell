@@ -104,10 +104,19 @@ export def performance [
                 # print $"(ansi blue)Runner[($config.runner)] use the file created earlier(ansi reset)"
                 $context
             }
-            if ($config.cmd | is-empty) {
-                open $f.file
-            } else {
-                $o
+            match $config.name {
+                yaml | nuon | json | toml | csv | ssv | xml => {
+                    open $f.file
+                }
+                lines => {
+                    open $f.file | lines
+                }
+                jsonl => {
+                    open $f.file | from json -o
+                }
+                _ => {
+                    $o
+                }
             }
         }
         _ => {

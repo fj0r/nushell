@@ -63,11 +63,11 @@ export def get-config [kind --preset:string] {
     }
 }
 
-export def 'to title' [config] {
+def 'to title' [config] {
     $in | str replace ($config.comment) ''
 }
 
-export def 'from title' [config] {
+def 'from title' [config] {
     $"($config.comment)($in)"
 }
 

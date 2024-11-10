@@ -91,6 +91,11 @@ export def --env init [] {
       entry: scratch.md
       comment: '# '
       runner: ''
+    - name: nuon
+      entry: 'scratch.nuon'
+      comment: '# '
+      cmd: ''
+      runner: 'data'
     - name: yaml
       entry: 'scratch.yaml'
       comment: '# '
@@ -116,11 +121,21 @@ export def --env init [] {
       comment: '# '
       cmd: ''
       runner: 'data'
+    - name: ssv
+      entry: 'scratch.ssv'
+      comment: '# '
+      cmd: ''
+      runner: 'data'
+    - name: xml
+      entry: 'scratch.xml'
+      comment: '# '
+      cmd: ''
+      runner: 'data'
     - name: lines
       entry: 'scratch'
       comment: '# '
       cmd: 'open {} | lines'
-      runner: 'lines'
+      runner: 'data'
     - name: nushell
       entry: scratch.nu
       comment: '# '
