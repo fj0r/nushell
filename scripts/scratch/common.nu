@@ -78,6 +78,7 @@ export def entity [
     --batch
     --created
     --locate-body
+    --retain
 ] {
     let o = $in
     let now = date now | fmt-date
@@ -86,11 +87,13 @@ export def entity [
     } else {
         1
     }
+    mut x = {}
     let e = if not $batch {
         let title = $title | from title $cfg
         let preset = if ($cfg.data? | is-empty) { {} } else { $cfg.data | from yaml }
-        let l = $o
-        | block-project-edit $"scratch-XXXXXX" $cfg.entry $pos --kind $cfg.name --title $title --created=$created --preset $preset --command $cfg.cmd
+        $x = $o
+        | block-project-edit $"scratch-XXXXXX" $cfg.entry $pos --kind $cfg.name --title $title --created=$created --preset $preset --command $cfg.cmd --retain=$retain
+        let l = $x
         | get content
         | lines
         let title = $l | first | to title $cfg
@@ -101,11 +104,14 @@ export def entity [
     }
     let created = if $created { {created: $now} } else { {} }
     {
-        title: $e.title
-        kind: $cfg.name
-        body: $e.body
-        ...$created
-        updated: $now
+        context: $x
+        value: {
+            title: $e.title
+            kind: $cfg.name
+            body: $e.body
+            ...$created
+            updated: $now
+        }
     }
 }
 

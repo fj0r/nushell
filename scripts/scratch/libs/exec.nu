@@ -68,7 +68,7 @@ export def run-cmd [
 export def performance [
     config
     stdin?=''
-    --tmpfile: record
+    --context: record
     --preset: string
     --transform(-t): closure
 ] {
@@ -78,10 +78,11 @@ export def performance [
             let opt = sqlx $"select data from kind_preset where kind = (Q $config.name) and name = (Q $preset)"
             | get -i 0.data | default '{}' | from yaml
 
-            let f = if ($tmpfile | is-empty) {
+            let f = if ($context | is-empty) {
                 $o | mktmpdir $'scratch-XXXXXX' $config.entry --kind $config.name
             } else {
-                $tmpfile
+                # print $"(ansi blue)Runner[($config.runner)] use the file created earlier(ansi reset)"
+                $context
             }
 
             $stdin | run-cmd --runner $config.runner --transform $transform {
@@ -94,16 +95,20 @@ export def performance [
             rm -rf $f.dir
         }
         _ => {
-            let f = if ($tmpfile | is-empty) {
-                let ext = $config.entry| path parse | get extension
-                let f = mktemp -t $'scratch-XXXXXX.($ext)'
-                $o | save -f $f
-                $f
+            let f = if ($context | is-empty) {
+                $o | mktmpdir $'scratch-XXXXXX' $config.entry --kind $config.name
             } else {
-                $tmpfile
+                # print $"(ansi blue)Runner[($config.runner)] use the file created earlier(ansi reset)"
+                $context
             }
-            let r = open $f
-            rm -f $f
+
+            let r = open $f.file
+            | lines
+            | range 1..
+            | skip-empty-lines
+            | str join (char newline)
+
+            rm -rf $f.dir
             $r
         }
     }
