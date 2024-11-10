@@ -401,6 +401,15 @@ export def scratch-title [id: int@cmpl-scratch-id] {
 export def scratch-body [id: int@cmpl-scratch-id] {
     sqlx $'select body from scratch where id = ($id);'
     | get 0.body
+    | lines
+}
+
+export def scratch-tags-body [...tags:string@cmpl-tag-3] {
+    scratch-list ...$tags --raw
+    | get body
+    | each { $in | lines }
+    | filter { $in | is-not-empty }
+    | flatten
 }
 
 export def scratch-search [

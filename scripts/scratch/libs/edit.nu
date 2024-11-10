@@ -68,10 +68,10 @@ export def block-project-edit [
         cmd: $command
         entry: $entry
         opt: $preset
-        args: $perf_ctx.args
+        args: $perf_ctx.args?
     }
     let c = open $tf.file --raw
-    if not $perf_ctx.retain {
+    if not ($perf_ctx.retain? | default false) {
         cd $opwd
         rm -rf $tf.dir
     }
