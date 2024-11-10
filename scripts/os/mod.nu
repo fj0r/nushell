@@ -8,3 +8,5 @@ export use network.nu *
 export use proxy.nu *
 export use sh.nu *
 export use web.nu *
+export use qutebrowser.nu *
+export use hyprland.nu *
