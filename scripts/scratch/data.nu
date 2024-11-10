@@ -96,6 +96,11 @@ export def --env init [] {
       comment: '# '
       runner: file
       cmd: 'open {stdin} | nu {}'
+    - name: bash
+      entry: scratch.bash
+      comment: '# '
+      runner: file
+      cmd: 'open {stdin} | bash {}'
     - name: python
       entry: scratch.py
       comment: '# '
