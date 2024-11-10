@@ -57,7 +57,7 @@ export def block-project-edit [
     --command: string
     --preset: record
     --created
-    --retain
+    --perf-ctx: record
 ] {
     let content = $in
     let tf = $content | mktmpdir $temp $entry --kind $kind --title $title --created=$created
@@ -68,9 +68,10 @@ export def block-project-edit [
         cmd: $command
         entry: $entry
         opt: $preset
+        args: $perf_ctx.args
     }
     let c = open $tf.file --raw
-    if not $retain {
+    if not $perf_ctx.retain {
         cd $opwd
         rm -rf $tf.dir
     }

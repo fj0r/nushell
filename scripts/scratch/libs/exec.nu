@@ -19,6 +19,7 @@ export def run-cmd [
     let cmd = $ctx.cmd
     let dir = $ctx.dir?
     let entry = $ctx.entry
+    let args = if ($ctx.args? | is-empty) { '' } else { $ctx.args | str join ' ' }
     let opt = $ctx.opt? | default {}
 
     if ($dir | is-not-empty) { cd $dir }
@@ -37,7 +38,7 @@ export def run-cmd [
             let entrypoint = if ('entrypoint' in $opt) { [--entrypoint $opt.entrypoint] } else { [] }
             let wd = $opt.workdir? | default '/app'
             let entry = [$wd $entry] | path join
-            let cmd = $cmd | render {_: $entry, stdin: $i, ...$opt}
+            let cmd = $cmd | render {_: $entry, stdin: $i, args: $args, ...$opt}
 
             let container_name = $dir | path basename
             let args = [
@@ -55,7 +56,7 @@ export def run-cmd [
             do -i { ^$env.CONTCTL run ...$args }
         }
         _ => {
-            let cmd = $cmd | render {_: $entry, stdin: $i, ...$opt}
+            let cmd = $cmd | render {_: $entry, stdin: $i, args: $args, ...$opt}
             do -i {
                 let cmd = if ($transform | is-empty) { $cmd } else { $"($cmd) | do (view source $transform)" }
                 nu -m light -c $cmd
@@ -70,6 +71,7 @@ export def performance [
     stdin?=''
     --context: record
     --preset: string
+    --args:list<string>
     --transform(-t): closure
 ] {
     let o = $in
@@ -87,6 +89,7 @@ export def performance [
 
             $stdin | run-cmd --runner $config.runner --transform $transform {
                 cmd: $config.cmd
+                args: $args
                 entry: $f.entry
                 dir: $f.dir
                 opt: $opt

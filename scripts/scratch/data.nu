@@ -95,22 +95,22 @@ export def --env init [] {
       entry: scratch.nu
       comment: '# '
       runner: file
-      cmd: 'open {stdin} | nu {}'
+      cmd: 'open {stdin} | nu {} {args}'
     - name: bash
       entry: scratch.bash
       comment: '# '
       runner: file
-      cmd: 'open {stdin} | bash {}'
+      cmd: 'open {stdin} | bash {} {args}'
     - name: python
       entry: scratch.py
       comment: '# '
       runner: file
-      cmd: 'open {stdin} | python3 {}'
+      cmd: 'open {stdin} | python3 {} {args}'
     - name: javascript
       entry: index.js
       comment: '// '
       runner: file
-      cmd: node {}
+      cmd: node {} {args}
     - name: typescript
       entry: index.ts
       comment: '// '
@@ -119,7 +119,7 @@ export def --env init [] {
       entry: src/main.rs
       comment: '// '
       runner: dir
-      cmd: 'cargo run'
+      cmd: 'cargo run {args}'
       pos: 2
     - name: haskell
       entry: app/Main.hs
