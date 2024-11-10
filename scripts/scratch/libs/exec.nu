@@ -97,6 +97,19 @@ export def performance [
 
             rm -rf $f.dir
         }
+        'data' => {
+            let f = if ($context | is-empty) {
+                $o | mktmpdir $'scratch-XXXXXX' $config.entry --kind $config.name
+            } else {
+                # print $"(ansi blue)Runner[($config.runner)] use the file created earlier(ansi reset)"
+                $context
+            }
+            if ($config.cmd | is-empty) {
+                open $f.file
+            } else {
+                $o
+            }
+        }
         _ => {
             let f = if ($context | is-empty) {
                 $o | mktmpdir $'scratch-XXXXXX' $config.entry --kind $config.name

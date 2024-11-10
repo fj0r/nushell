@@ -91,6 +91,36 @@ export def --env init [] {
       entry: scratch.md
       comment: '# '
       runner: ''
+    - name: yaml
+      entry: 'scratch.yaml'
+      comment: '# '
+      cmd: ''
+      runner: 'data'
+    - name: json
+      entry: 'scratch.json'
+      comment: '# '
+      cmd: ''
+      runner: 'data'
+    - name: jsonl
+      entry: 'scratch.jsonl'
+      cmd: 'open {} | from json -o'
+      comment: '# '
+      runner: 'data'
+    - name: toml
+      entry: 'scratch.toml'
+      comment: '# '
+      cmd: ''
+      runner: 'data'
+    - name: csv
+      entry: 'scratch.csv'
+      comment: '# '
+      cmd: ''
+      runner: 'data'
+    - name: lines
+      entry: 'scratch'
+      comment: '# '
+      cmd: 'open {} | lines'
+      runner: 'lines'
     - name: nushell
       entry: scratch.nu
       comment: '# '
