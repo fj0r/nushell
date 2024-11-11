@@ -104,6 +104,8 @@ export def performance [
                 # print $"(ansi blue)Runner[($config.runner)] use the file created earlier(ansi reset)"
                 $context
             }
+            open --raw $f.file | lines | range 1.. | str join (char newline)
+            | collect | save -f $f.file
             match $config.name {
                 yaml | nuon | json | toml | csv | ssv | xml => {
                     open $f.file

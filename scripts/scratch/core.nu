@@ -400,12 +400,35 @@ export def scratch-data [...xargs: any@cmpl-tag-3] {
     let ids = $xargs | filter { ($in | describe) == 'int' }
     let xtags = $xargs | filter { ($in | describe) != 'int' }
 
-    let t = scratch-list ...$xtags --raw
-    | select id kind title body
-    let tids = $t | get id
-    let i = sqlx $"select id, kind, title, body from scratch where id in \(($ids | str join ', ')\);"
-    $t
-    | append ($i | filter {|x| $x.id not-in $tids })
+    let tags_id = $xtags | tag-group | get or
+    let t = if ($tags_id | is-not-empty) {
+        let tags_id = $tags_id
+        | each { scratch-tag-path-id ($in | split row ':') | last | get id }
+        | str join ', '
+
+        sqlx $"with recursive g as \(
+            select id, parent_id from tag where id in \(($tags_id)\)
+            union all
+            select t.id, t.parent_id from tag as t join g on g.id = t.parent_id
+        \), root as \(
+            select s.id, s.parent_id, s.kind, s.title, s.body from g
+            join scratch_tag as t on g.id = t.tag_id
+            join scratch as s on t.scratch_id = s.id
+        \), r as \(
+            select * from root
+            union all
+            select s.id, s.parent_id, s.kind, s.title, s.body
+            from scratch as s join r on r.id = s.parent_id
+        \) select * from r;"
+    }
+    let i = sqlx $"select id, parent_id, kind, title, body from scratch where id in \(($ids | str join ', ')\);"
+
+    if ($tags_id | is-empty) {
+        $i
+    } else {
+        let tids = $t | get id
+        $t | append ($i | filter {|x| $x.id not-in $tids })
+    }
     | update body {|x|
         match $x.kind {
             json => { $x.body | from json }
