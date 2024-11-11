@@ -25,30 +25,52 @@ export def tag-format [
     | get txt
 }
 
+def 'list starts-with' [b] {
+    let a = $in
+    if ($a | length) < ($b | length) { return false }
+    for i in ($b | enumerate) {
+        if $i.item != ($a | get $i.index) {
+            return false
+        }
+    }
+    true
+}
+
 def 'tagsplit' [tags] {
     let o = $in
     let tag = if ($tags | is-not-empty) {
-        $tags.0 | split row ':'
+        $tags | each { $in | split row ':' }
     }
     let x = $o | default [] | each {|i|
         let t = $i.tags
         let s = if ($tag | is-empty) {
             [
-                $i.tags.0
+                [$i.tags.0]
                 ($i.tags | range 1..)
             ]
         } else {
-            let l = $tag | length
-            [
-                ($i.tags | where { ($in | range ..<$l) == $tag } | first | range $l..)
-                ($i.tags | where { ($in | range ..<$l) != $tag })
-            ]
+            let l = $tag.0 | length
+            let multi_tags = ($tags | length) > 1
+            mut m = []
+            mut n = []
+            for x in $i.tags {
+                if ($tag | any {|y| $x | list starts-with $y }) {
+                    if $multi_tags {
+                        $m ++= [$x]
+                    } else {
+                        $m ++= [($x | range $l..)]
+                    }
+                } else {
+                    $n ++= [$x]
+                }
+            }
+            [$m $n]
         }
         let main = $s.0
         let node = $i | update tags {|x| $s.1 }
-        {tags: $main, node: $node}
+        $main | each {|m| {tags: $m, node: $node} }
     }
-    $x
+    $x | flatten
 }
 
 def 'fmt tag-tree' [
