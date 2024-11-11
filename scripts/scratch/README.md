@@ -13,3 +13,9 @@
         - see also: scratch-done
 - scratch-add
     - `:tag:a:b :tag:c`
+- scratch-edit
+- scratch-data
+
+- scratch-in
+    - -k <kind>
+- scratch-out
