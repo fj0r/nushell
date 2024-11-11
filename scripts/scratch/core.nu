@@ -17,7 +17,7 @@ export def scratch-list [
     --created: duration
     --deadline: duration
     --relevant(-r): int@cmpl-relevant-id
-    --sort(-s): list<string@cmpl-sort>
+    --sort: list<string@cmpl-sort>
     --done(-x):int
     --untagged(-U)
     --raw
