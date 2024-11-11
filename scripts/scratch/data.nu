@@ -182,19 +182,51 @@ export def --env init [] {
       comment: '-- '
       runner: file
       cmd: |-
-        $env.PGPASSWORD = {password}
-        psql -U {username} -d {database} -h {host} -p {port} -f {} --csv
+        $env.PGPASSWORD = '{password}'
+        psql -U {username} -d {database} -h {host} -p {port} -f {} --csv | from csv
     - name: sqlite
       entry: scratch.sql
       comment: '-- '
       runner: file
       cmd: open {file} | query db (open {})
+    - name: surreal
+      entry: scratch.surql
+      comment: '-- '
+      runner: file
+      cmd: |-
+        let auth = [
+            -u $'{username}:{password}'
+            -H $'surreal-ns: {ns}'
+            -H $'surreal-db: {db}'
+            -H 'Accept: application/json'
+        ]
+        let url = $'{protocol}://{host}:{port}/{path}'
+        open {}
+        | curl -sSL -X POST ...$auth $url --data-binary @-
+        | from json
     " | from yaml | each { $in | upsert-kind }
     "
     - kind: sqlite
       name: scratch
       data: |-
         file: ~/.local/share/nushell/scratch.db
+    - kind: postgresql
+      name: localhost
+      data: |-
+        host: localhost
+        port: 5432
+        database: foo
+        username: foo
+        password: foo
+    - kind: surreal
+      name: localhost
+      data: |-
+        host: localhost
+        port: 8000
+        db: foo
+        ns: foo
+        username: foo
+        password: foo
     " | from yaml | each { $in | upsert-kind-preset }
     "
     - kind: rust
