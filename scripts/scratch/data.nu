@@ -195,13 +195,13 @@ export def --env init [] {
       runner: file
       cmd: |-
         let auth = [
-            -u $'{username}:{password}'
-            -H $'surreal-ns: {ns}'
-            -H $'surreal-db: {db}'
+            -u '{username}:{password}'
+            -H 'surreal-ns: {ns}'
+            -H 'surreal-db: {db}'
             -H 'Accept: application/json'
         ]
-        let url = $'{protocol}://{host}:{port}/{path}'
-        open {}
+        let url = '{protocol}://{host}:{port}/sql'
+        open -r {}
         | curl -sSL -X POST ...$auth $url --data-binary @-
         | from json
     " | from yaml | each { $in | upsert-kind }
@@ -221,6 +221,7 @@ export def --env init [] {
     - kind: surreal
       name: localhost
       data: |-
+        protocol: http
         host: localhost
         port: 8000
         db: foo
