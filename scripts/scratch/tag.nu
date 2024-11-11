@@ -57,15 +57,13 @@ export def scratch-tag-move [
     --from(-f):string@cmpl-id-tag
     --to(-t):string@cmpl-tag-1
 ] {
-    let from = $from | tag-group | get or.0
+    let fr = $from | tag-group | get or.0 | split row ':'
+    let fo = scratch-tag-path-id $fr
+    let fo = if ($fr | length) == ($fo | length) { $fo | last | get id }
+    if ($fo | is-empty) { error make {msg: $"`tag ($from)` not exists" }}
     let to = $to | tag-group | get or.0
-    scratch-ensure-tags [$to]
-    let q = $"with (tag-tree)
-    update scratch_tag set tag_id = \(
-        select id from tags where name = (Q $to)
-    \) where scratch_id = ($id) and tag_id in \(
-        select id from tags where name = (Q $from)
-    \)"
+    let to = scratch-ensure-tags [$to] | last
+    let q = $"update scratch_tag set tag_id = ($to) where scratch_id = ($id) and tag_id = ($fo)"
     sqlx $q
 }
 
@@ -79,10 +77,13 @@ export def scratch-tag-toggle [
         $tids | scratch-tagged $id
     }
     if ($tags.not | is-not-empty) {
-        let tids = sqlx $"with (tag-tree) select tags.id from tags
-            where name in \(($tags.not | each {Q $in} | str join ',')\)
-        " | get id
-        $tids | scratch-untagged $id
+        $tags.not | each {
+            let o = $in | split row ':'
+            let i = scratch-tag-path-id $o
+            if ($o | length) == ($i | length) {
+                $i | last | get id
+            }
+        } | scratch-untagged $id
     }
 }
 
