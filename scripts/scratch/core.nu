@@ -335,9 +335,13 @@ export def scratch-attrs [
             }
         }
         if ($tags.not | is-not-empty) {
-            let tids = sqlx $"with (tag-tree) select tags.id from tags
-                where name in \(($tags.not | each {Q $in} | str join ',')\)
-            " | get id
+            let tids = $tags.not | each {
+                let o = $in | split row ':'
+                let i = $o | scratch-tag-path-id $in
+                if ($o | length) == ($i | length) {
+                    $i | last | get id
+                }
+            }
             for id in $ids {
                 $tids | scratch-untagged $id
             }
