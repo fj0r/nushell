@@ -32,8 +32,9 @@ export def scratch-list [
     let tags = $xtags | tag-group
 
     let sortable = [
-        value, created, updated, deadline,
-        done, important, urgent, challenge
+        value, done, kind,
+        created, updated, deadline,
+        important, urgent, challenge
     ]
     let fields = [
         "scratch.id as id", "scratch.parent_id as parent_id",
@@ -291,12 +292,14 @@ export def scratch-attrs [
     --done(-x): int
     --value(-v): number
     --adder(-a): number
+    --kind(-k):string@cmpl-kind
 ] {
     let ids = $xargs | filter { ($in | describe) == 'int' }
     let xtags = $xargs | filter { ($in | describe) != 'int' }
 
     let args = {
         value: $value
+        kind: $kind
         important: $important
         urgent: $urgent
         challenge: $challenge
@@ -393,23 +396,30 @@ export def scratch-clean [
     }
 }
 
-export def scratch-title [id: int@cmpl-scratch-id] {
-    sqlx $'select title from scratch where id = ($id);'
-    | get 0.title
-}
+export def scratch-data [...xargs: any@cmpl-tag-3] {
+    let ids = $xargs | filter { ($in | describe) == 'int' }
+    let xtags = $xargs | filter { ($in | describe) != 'int' }
 
-export def scratch-body [id: int@cmpl-scratch-id] {
-    sqlx $'select body from scratch where id = ($id);'
-    | get 0.body
-    | lines
-}
-
-export def scratch-tags-body [...tags:string@cmpl-tag-3] {
-    scratch-list ...$tags --raw
-    | get body
-    | each { $in | lines }
-    | filter { $in | is-not-empty }
-    | flatten
+    let t = scratch-list ...$xtags --raw
+    | select id kind title body
+    let tids = $t | get id
+    let i = sqlx $"select id, kind, title, body from scratch where id in \(($ids | str join ', ')\);"
+    $t
+    | append ($i | filter {|x| $x.id not-in $tids })
+    | update body {|x|
+        match $x.kind {
+            json => { $x.body | from json }
+            jsonl => { $x.body | from json -o }
+            yaml => { $x.body | from yaml }
+            toml => { $x.body | from toml }
+            nuon => { $x.body | from nuon }
+            csv => { $x.body | from csv }
+            ssv => { $x.body | from ssv }
+            xml => { $x.body | from xml }
+            lines => { $x.body | lines }
+            _ => $x.body
+        }
+    }
 }
 
 export def scratch-search [

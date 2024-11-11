@@ -8,6 +8,7 @@ export alias se = scratch-edit
 export alias sm = scratch-move
 export alias st = scratch-attrs
 export alias sdn = scratch-done
+export alias sda = scratch-data
 export alias stm = scratch-tag-move
 export alias stt = scratch-tag-toggle
 export alias sdel = scratch-delete
