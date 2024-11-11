@@ -14,7 +14,7 @@ export def cmpl-untagged-root-scratch [] {
             updated || '│' ||
             printf\('%-10s', s.kind\) || '│' ||
             printf\('%-10s', p.preset\) || '│' ||
-            ltrim\(s.title || ' '\) || '...' || ltrim\(s.body\),
+            ltrim\(s.title || ' '\) || '│' || ltrim\(s.body\),
             0 , ($rw)
         \) as description
     from scratch as s
