@@ -4,3 +4,7 @@ export def --wrapped 'mdurl' [...args --transform(-t): closure] {
     | if ($transform | is-empty) { $in } else { $in | do $transform }
     | ^($env.MARKDOWN_RENDER? | default 'mdcat')
 }
+
+export def --wrapped 'mdurl-summary' [...args] {
+    mdurl -t { $in | ad text-summary zh -o } ...$args
+}
