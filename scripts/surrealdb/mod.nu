@@ -35,3 +35,10 @@ export def import [dump] {
 export def export [dump] {
     curl -X GET ...(surreal-conn $env.SURREALDB 'export') -o $dump
 }
+
+# jsonl
+export def post [table data] {
+    for i in (open $data | lines) {
+        curl -X POST ...(surreal-conn $env.SURREALDB $'key/($table)') --data-binary $i
+    }
+}
