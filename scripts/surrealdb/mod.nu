@@ -27,3 +27,11 @@ export def query [] {
     |curl -sSL -X POST ...(surreal-conn $env.SURREALDB 'sql') --data-binary @-
     | from json
 }
+
+export def import [dump] {
+    curl -sL -X POST ...(surreal-conn $env.SURREALDB 'import') --data-binary $"@($dump)"
+}
+
+export def export [dump] {
+    curl -X GET ...(surreal-conn $env.SURREALDB 'export') -o $dump
+}
