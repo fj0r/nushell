@@ -92,6 +92,35 @@ export def scratch-tag-path-id [tag_path: list<string>] {
         \) select * from g;"
 }
 
+export def scratch-tag-paths-id [...tag_path: list<string>] {
+    let a = $tag_path | enumerate
+    let ts = $a
+    | each {|x| $x.item | each { $"\(($x.index), (Q $in)\)" } }
+    | flatten
+    | str join ', '
+
+    let q = sqlx $"with recursive input\(gr, name\) as \(
+        values ($ts)
+    \), v as \(
+        select  row_number\(\) over \(partition by gr\) as lv, gr, name from input
+    \), g as \(
+        select 1 as lv, v.gr, parent_id, id, tag.name from tag
+        join v on lv = v.lv
+        where v.lv = 1 and tag.name = v.name
+        union all
+        select g.lv + 1 as lv, g.gr, t.parent_id, t.id, t.name from tag as t
+        join v on \(g.lv + 1\) = v.lv and g.gr = v.gr
+        join g on g.id = t.parent_id
+        where t.name = v.name
+    \) select * from g order by gr;"
+
+    mut r = []
+    for i in $a {
+        $r ++= [($q | where gr == $i.index | reject gr)]
+    }
+    $r
+}
+
 # add tag
 export def scratch-ensure-tags [tags] {
     mut ids = []
