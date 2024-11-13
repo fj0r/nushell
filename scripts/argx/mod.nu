@@ -1,14 +1,25 @@
+def fold-command [] {
+    let i = $in | split row -r '\s+'
+    (($i | length) - 1)..0 | each {|t|
+        $i | range ..$t | str join ' '
+    }
+}
+
 def query-sign [] {
-    let i = $in
+    let o = $in
+    let cs = $o | fold-command
     let a = scope aliases
-    | filter {|x| $i | str starts-with $x.name}
-    | sort-by name -r
-    let e = if ($a | is-empty) { $i } else { $i | str replace $a.0.name $a.0.expansion }
-    scope commands
-    | filter {|x| $e | str starts-with $x.name}
-    | sort-by name -r
-    | first
-    | insert expansion $e
+    let a = $a | filter {|x| $x.name in $cs }
+    let cs = if ($a | is-empty) { $cs } else {
+        $o | str replace $a.0.name $a.0.expansion | fold-command
+    }
+    let c = scope commands
+    mut r = {}
+    for x in $c {
+        if $x.name in $cs {
+            return ($x | insert expansion $cs.0)
+        }
+    }
 }
 
 def get-sign [] {
@@ -134,16 +145,16 @@ export def parse [--plain(-p)] {
             $sw = ''
         }
     }
-    let pos = $args| range 0..<($sign.positional | length)
-    | enumerate
+    let pr = [...$sign.positional ...$sign.rest]
+    let args = $args
+    let plix = ($pr | length) - 1
+    let pos = $pr | enumerate
     | reduce -f {} {|it, acc|
-        $acc | upsert ($sign.positional | get $it.index) $it.item
+        $acc | upsert $it.item (if $it.index == $plix { $args | range $it.index.. } else { $args | get $it.index })
     }
-    let rest = $args | range ($sign.positional | length)..-1 | default []
     {
         args: $args
         pos: $pos
-        rest: $rest
         opt: $opt
         cmd: $sign.cmd
     }

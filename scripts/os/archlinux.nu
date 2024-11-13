@@ -36,29 +36,32 @@ def parse_pkg_list [] {
     $r
 }
 
+use argx *
+
 def cmpl-aur [ctx] {
-    let k = $ctx | split row ' ' | last | str trim
-    if ($k | str length) < 2 {
-        return
-    }
-    paru -Ss $k | lines | parse_pkg_list
+    let k = $ctx | argx parse
+    paru -Ss ($k.args | last) | lines | parse_pkg_list
 }
 
 
 def cmpl-installed [ctx] {
-    let k = $ctx | split row ' ' | last | str trim
-    if ($k | str length) < 2 {
-        return
-    }
-    paru -Qs $k | lines | parse_pkg_list
+    let k = $ctx | argx parse
+    $k.args | to json -r | save -a ~/.cache/nonstdout
+    paru -Qs ($k.args | last) | lines | parse_pkg_list
 }
 
 
 export def --wrapped pa [
     --remove (-R): string@cmpl-installed
+    --query (-q): string
+    --list (-l): string@cmpl-installed
     ...args: string@cmpl-aur
 ] {
-    if ($remove | is-not-empty) {
+    if ($query | is-not-empty) {
+        paru -Qo $query
+    } else if ($list | is-not-empty) {
+        paru -Ql $list
+    } else if ($remove | is-not-empty) {
         paru -Rsu $remove
     } else if ($args | is-empty) {
         paru -Syu
