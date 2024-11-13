@@ -50,5 +50,3 @@ $env.PREFER_ALT = '1'
 $env.TERM = 'screen-256color'
 
 $env.EDITOR = 'nvim'
-$env.NVIM_SEMICOLON = '1'
-
