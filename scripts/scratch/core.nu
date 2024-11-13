@@ -571,8 +571,22 @@ export def scratch-upsert-preset [
     }
 }
 
-export def scratch-editor-run [transform?:closure] {
+export def scratch-editor-run [
+    --watch(-w)
+    --clear(-c)
+    transform?:closure
+] {
     let ctx = $env.SCRATCH_EDITOR_CONTEXT?
     if ($ctx | is-empty) { error make -u { msg: "Must be run in the Scratch editor" } }
-    run-cmd ($ctx | from nuon) --transform $transform
+    let ctx = $ctx | from nuon
+    run-cmd $ctx --transform $transform
+    if $watch {
+        watch . -g $ctx.entry -q  {|op, path, new_path|
+            if $op in ['Write'] {
+                if $clear { ansi cls }
+                run-cmd $ctx --transform $transform
+                if not $clear { print $"(char newline)(ansi grey)------(ansi reset)(char newline)" }
+            }
+        }
+    }
 }
