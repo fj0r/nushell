@@ -40,21 +40,25 @@ use argx *
 
 def cmpl-aur [ctx] {
     let k = $ctx | argx parse
-    paru -Ss ($k.args | last) | lines | parse_pkg_list
+    paru -Ss ($k.args | last) | parse_pkg_list
 }
 
 
-def cmpl-installed [ctx] {
+def cmpl-list [ctx] {
     let k = $ctx | argx parse
-    $k.args | to json -r | save -a ~/.cache/nonstdout
-    paru -Qs ($k.args | last) | lines | parse_pkg_list
+    paru -Qs $k.opt.list | parse_pkg_list
+}
+
+def cmpl-remove [ctx] {
+    let k = $ctx | argx parse
+    paru -Qs $k.opt.remove | parse_pkg_list
 }
 
 
 export def --wrapped pa [
-    --remove (-R): string@cmpl-installed
+    --remove (-R): string@cmpl-remove
     --query (-q): string
-    --list (-l): string@cmpl-installed
+    --list (-l): string@cmpl-list
     ...args: string@cmpl-aur
 ] {
     if ($query | is-not-empty) {
