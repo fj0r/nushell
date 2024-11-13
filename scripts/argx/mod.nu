@@ -145,12 +145,12 @@ export def parse [--plain(-p)] {
             $sw = ''
         }
     }
-    let pr = [...$sign.positional ...$sign.rest]
     let args = $args
-    let plix = ($pr | length) - 1
-    let pos = $pr | enumerate
-    | reduce -f {} {|it, acc|
-        $acc | upsert $it.item (if $it.index == $plix { $args | range $it.index.. } else { $args | get $it.index })
+    mut pos = $sign.positional
+    | enumerate
+    | reduce -f {} {|it, acc| $acc | insert $it.item ($args | get -i $it.index) }
+    if ($sign.rest | is-not-empty) {
+        $pos = $pos | insert $sign.rest.0 ($args | range ($sign.positional | length).. )
     }
     {
         args: $args
