@@ -433,20 +433,7 @@ export def scratch-data [...xargs: any@cmpl-tag-3] {
         let tids = $t | get id
         $t | append ($i | filter {|x| $x.id not-in $tids })
     }
-    | update body {|x|
-        match $x.kind {
-            json => { $x.body | from json }
-            jsonl => { $x.body | from json -o }
-            yaml => { $x.body | from yaml }
-            toml => { $x.body | from toml }
-            nuon => { $x.body | from nuon }
-            csv => { $x.body | from csv }
-            ssv => { $x.body | from ssv }
-            xml => { $x.body | from xml }
-            lines => { $x.body | lines }
-            _ => $x.body
-        }
-    }
+    | update body {|x| $x.body | from-all $x.kind }
 }
 
 export def scratch-search [
@@ -532,6 +519,28 @@ export def scratch-out [
         let preset = if ($preset | is-empty) { $x.preset } else { $preset }
         $x.body | performance $cfg $stdin --preset $preset --args $args --transform $transform
     }
+}
+
+
+export def scratch-upsert [
+    id?:int@cmpl-untagged-root-scratch
+    --kind(-k):string@cmpl-kind
+    --preset(-p):string@cmpl-kind-preset
+] {
+    let o = $in
+    let kind = if ($kind | is-empty) {
+        sqlx $"select kind from scratch where id = ($id);" | get -i 0.kind
+    } else {
+        $kind
+    }
+    {
+        id: $id
+        body: ($o | to-all $kind)
+        kind: $kind
+        preset: $preset
+    }
+    | filter-empty
+    | db-upsert scratch id
 }
 
 export def scratch-upsert-kind [

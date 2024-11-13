@@ -107,7 +107,7 @@ export def performance [
             open --raw $f.file | lines | range 1.. | str join (char newline)
             | collect | save -f $f.file
             match $config.name {
-                yaml | nuon | json | toml | csv | ssv | xml => {
+                yaml | nuon | json | toml | csv | tsv | xml => {
                     open $f.file
                 }
                 lines => {

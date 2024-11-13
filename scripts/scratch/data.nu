@@ -23,7 +23,7 @@ export def --env init [] {
             id INTEGER PRIMARY KEY,
             parent_id INTEGER DEFAULT -1,
             kind TEXT DEFAULT '',
-            title TEXT NOT NULL,
+            title TEXT NOT NULL DEFAULT '',
             body TEXT DEFAULT '',
             created TEXT DEFAULT (strftime('%Y-%m-%dT%H:%M:%S','now')),
             updated TEXT DEFAULT (strftime('%Y-%m-%dT%H:%M:%S','now')),
@@ -121,8 +121,8 @@ export def --env init [] {
       comment: '# '
       cmd: ''
       runner: 'data'
-    - name: ssv
-      entry: 'scratch.ssv'
+    - name: tsv
+      entry: 'scratch.tsv'
       comment: '# '
       cmd: ''
       runner: 'data'
