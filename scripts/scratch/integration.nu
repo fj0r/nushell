@@ -8,7 +8,7 @@ export def snew [
 ] {
     if ($scratch | is-not-empty) { scratch-out } else { $in | scratch-in }
     | ai-do trans-to en -o
-    | scratch-add ...$xtags -p $parent
+    | scratch-add ...$xtags -f $parent
 }
 
 
