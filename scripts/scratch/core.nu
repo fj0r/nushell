@@ -470,7 +470,6 @@ export def scratch-in [
     --kind(-k):string@cmpl-kind
     --preset(-p):string@cmpl-kind-preset
     --args(-a):list<string>
-    --transform(-t): closure
 ] {
     let body = $in
     if ($id | is-empty) {
@@ -478,7 +477,7 @@ export def scratch-in [
         let cfg = get-config $kind --preset $preset
         let x = $body
         | scratch-add --config $cfg --preset $preset --complete --locate-body --ignore-empty-body --perf-ctx { retain: true, args: $args }
-        $x.value.body | performance $cfg --preset $preset --context $x.context --args $args --transform $transform
+        $x.value.body | performance $cfg --preset $preset --context $x.context --args $args
     } else {
         let x = sqlx $"select s.kind, p.preset from scratch as s
             left join scratch_preset as p on s.id = p.scratch_id
@@ -488,7 +487,7 @@ export def scratch-in [
         let cfg = get-config $kind --preset $preset
         let x = $body
         | scratch-edit $id --config $cfg --preset $preset --complete --locate-body --perf-ctx { retain: true, args: $args }
-        $x.value.body | performance $cfg --preset $preset --context $x.context --args $args --transform $transform
+        $x.value.body | performance $cfg --preset $preset --context $x.context --args $args
     }
 }
 
@@ -499,7 +498,6 @@ export def scratch-out [
     --args(-a):list<string>
     --search(-s): string
     --num(-n):int = 20
-    --transform(-t): closure
 ] {
     let stdin = $in | default ''
     if ($search | is-not-empty) {
@@ -517,7 +515,7 @@ export def scratch-out [
         let kind = if ($kind | is-empty) { $x.kind } else { $kind }
         let cfg = get-config $kind --preset $preset
         let preset = if ($preset | is-empty) { $x.preset } else { $preset }
-        $x.body | performance $cfg $stdin --preset $preset --args $args --transform $transform
+        $x.body | performance $cfg $stdin --preset $preset --args $args
     }
 }
 
@@ -603,12 +601,12 @@ export def scratch-editor-run [
     let ctx = $env.SCRATCH_EDITOR_CONTEXT?
     if ($ctx | is-empty) { error make -u { msg: "Must be run in the Scratch editor" } }
     let ctx = $ctx | from nuon
-    run-cmd $ctx --transform $transform
+    run-cmd $ctx | do $transform
     if $watch {
         watch . -g $ctx.entry -q  {|op, path, new_path|
             if $op in ['Write'] {
                 if $clear { ansi cls }
-                run-cmd $ctx --transform $transform
+                run-cmd $ctx | do $transform
                 if not $clear { print $"(char newline)(ansi grey)------(ansi reset)(char newline)" }
             }
         }

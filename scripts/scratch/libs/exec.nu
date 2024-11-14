@@ -12,7 +12,6 @@ export def wait-value [action -i: duration = 1sec  -t: string='waiting'] {
 export def run-cmd [
     ctx
     --stdin-file: string = '.stdin'
-    --transform: closure
     --runner: string
 ] {
     let stdin = $in
@@ -58,8 +57,7 @@ export def run-cmd [
         _ => {
             let cmd = $cmd | render {_: $entry, stdin: $i, args: $args, ...$opt}
             do -i {
-                let cmd = if ($transform | is-empty) { $cmd } else { $"($cmd) | do (view source $transform)" }
-                nu -m light -c $cmd
+                nu -c $"($cmd) | to nuon" | from nuon
             }
         }
     }
@@ -72,7 +70,6 @@ export def performance [
     --context: record
     --preset: string
     --args:list<string>
-    --transform(-t): closure
 ] {
     let o = $in
     match $config.runner {
@@ -87,7 +84,7 @@ export def performance [
                 $context
             }
 
-            $stdin | run-cmd --runner $config.runner --transform $transform {
+            let r = $stdin | run-cmd --runner $config.runner {
                 cmd: $config.cmd
                 args: $args
                 entry: $f.entry
@@ -96,6 +93,7 @@ export def performance [
             }
 
             rm -rf $f.dir
+            $r
         }
         'data' => {
             let f = if ($context | is-empty) {
