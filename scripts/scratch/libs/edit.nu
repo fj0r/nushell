@@ -69,6 +69,7 @@ export def block-project-edit [
         entry: $entry
         opt: $preset
         args: $perf_ctx.args?
+        kind: $kind
     }
     let c = open $tf.file --raw
     if not ($perf_ctx.retain? | default false) {

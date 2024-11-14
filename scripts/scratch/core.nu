@@ -602,12 +602,13 @@ export def scratch-editor-run [
     let ctx = $env.SCRATCH_EDITOR_CONTEXT?
     if ($ctx | is-empty) { error make -u { msg: "Must be run in the Scratch editor" } }
     let ctx = $ctx | from nuon
-    run-cmd $ctx | do $transform
+    let transform = $transform | default {|x| print $x }
+    do $transform (run-cmd $ctx)
     if $watch {
         watch . -g $ctx.entry -q  {|op, path, new_path|
             if $op in ['Write'] {
                 if $clear { ansi cls }
-                run-cmd $ctx | do $transform
+                do $transform (run-cmd $ctx)
                 if not $clear { print $"(char newline)(ansi grey)------(ansi reset)(char newline)" }
             }
         }

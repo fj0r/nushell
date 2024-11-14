@@ -15,7 +15,6 @@ export def run-cmd [
     ctx
     --stdin-file: string = '.stdin'
     --runner: string
-    --kind: string
 ] {
     let stdin = $in
     let cmd = $ctx.cmd
@@ -29,7 +28,7 @@ export def run-cmd [
     let i = [$dir $stdin_file] | path join
     $stdin | default '' | save -f $i
 
-    if $kind == nushell {
+    if $ctx.kind? == nushell {
         # TODO:
         let r = open $i | nu -c $"(open -r $ctx.entry) | to json" | from json
         return $r
@@ -92,12 +91,13 @@ export def performance [
                 $context
             }
 
-            let r = $stdin | run-cmd --runner $config.runner --kind $config.name {
+            let r = $stdin | run-cmd --runner $config.runner {
                 cmd: $config.cmd
                 args: $args
                 entry: $f.entry
                 dir: $f.dir
                 opt: $opt
+                kind: $config.name
             }
 
             rm -rf $f.dir
