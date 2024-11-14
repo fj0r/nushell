@@ -1,5 +1,6 @@
 use libs *
 use common.nu *
+use libs/convert.nu *
 use completion.nu *
 use format.nu *
 use tag_base.nu *

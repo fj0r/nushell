@@ -1,3 +1,5 @@
+use convert.nu *
+
 export def wait-value [action -i: duration = 1sec  -t: string='waiting'] {
     mut time = 0
     loop {
@@ -13,6 +15,7 @@ export def run-cmd [
     ctx
     --stdin-file: string = '.stdin'
     --runner: string
+    --kind: string
 ] {
     let stdin = $in
     let cmd = $ctx.cmd
@@ -26,6 +29,11 @@ export def run-cmd [
     let i = [$dir $stdin_file] | path join
     $stdin | default '' | save -f $i
 
+    if $kind == nushell {
+        # TODO:
+        let r = open $i | nu -c $"(open -r $ctx.entry) | to json" | from json
+        return $r
+    }
     match $runner {
         docker | container => {
             let vols = $opt.volumes? | default {}
@@ -84,7 +92,7 @@ export def performance [
                 $context
             }
 
-            let r = $stdin | run-cmd --runner $config.runner {
+            let r = $stdin | run-cmd --runner $config.runner --kind $config.name {
                 cmd: $config.cmd
                 args: $args
                 entry: $f.entry
@@ -105,14 +113,8 @@ export def performance [
             open --raw $f.file | lines | range 1.. | str join (char newline)
             | collect | save -f $f.file
             match $config.name {
-                yaml | nuon | json | toml | csv | tsv | xml => {
-                    open $f.file
-                }
-                lines => {
-                    open $f.file | lines
-                }
-                jsonl => {
-                    open $f.file | from json -o
+                yaml | nuon | json | toml | csv | tsv | xml | lines | jsonl => {
+                    open -r $f.file | from-all $config.name
                 }
                 _ => {
                     $o
