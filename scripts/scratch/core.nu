@@ -522,13 +522,16 @@ export def scratch-out [
 }
 
 
-export def scratch-upsert [
+export def scratch-flush [
     id?:int@cmpl-untagged-root-scratch
     --kind(-k):string@cmpl-kind
     --preset(-p):string@cmpl-kind-preset
 ] {
     let o = $in
     let kind = if ($kind | is-empty) {
+        if ($id | is-empty) {
+            error make -u { msg: 'id and kind cannot both be empty' }
+        }
         sqlx $"select kind from scratch where id = ($id);" | get -i 0.kind
     } else {
         $kind

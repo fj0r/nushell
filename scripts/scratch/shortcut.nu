@@ -20,7 +20,7 @@ export alias sactivities = scratch-activities
 
 export alias so = scratch-out
 export alias si = scratch-in
-export alias sp = scratch-upsert
+export alias sf = scratch-flush
 
 
 export def scratch-trash [] {
