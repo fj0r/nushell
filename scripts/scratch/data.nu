@@ -140,7 +140,7 @@ export def --env init [] {
       entry: scratch.nu
       comment: '# '
       runner: file
-      cmd: 'open {stdin} | nu {} {args}'
+      cmd: ''
     - name: bash
       entry: scratch.bash
       comment: '# '
