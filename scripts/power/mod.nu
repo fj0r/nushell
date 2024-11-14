@@ -18,7 +18,7 @@ def host_abbr [] {
     {|bg|
         let theme = $env.NU_POWER_THEME.host
         let n = (sys host).hostname
-        let ucl = if (is-admin) {
+        let ucl = if ($env.SSH_CONNECTION? | is-not-empty) {
                 $theme.is_admin
             } else {
                 $theme.default
