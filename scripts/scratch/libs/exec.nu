@@ -57,7 +57,7 @@ export def run-cmd [
         _ => {
             let cmd = $cmd | render {_: $entry, stdin: $i, args: $args, ...$opt}
             do -i {
-                nu -c $"($cmd) | to nuon" | from nuon
+                nu -c $"($cmd) | to json" | from json
             }
         }
     }
