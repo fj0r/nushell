@@ -597,11 +597,13 @@ export def scratch-upsert-preset [
 export def scratch-editor-run [
     --watch(-w)
     --clear(-c)
+    --args(-a): list<string>
     transform?:closure
 ] {
     let ctx = $env.SCRATCH_EDITOR_CONTEXT?
     if ($ctx | is-empty) { error make -u { msg: "Must be run in the Scratch editor" } }
     let ctx = $ctx | from nuon
+    let ctx = if ($args | is-empty) { $ctx } else { $ctx | upsert args $args }
     let transform = $transform | default {|x| print $x }
     do $transform (run-cmd $ctx)
     if $watch {

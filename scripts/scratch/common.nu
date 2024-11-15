@@ -20,6 +20,7 @@ export def upsert-kind [--delete --action: closure] {
             comment: "# "
             runner: 'file'
             cmd: 'open {}'
+            pos: 1
         }
         table: kind
         pk: [name]

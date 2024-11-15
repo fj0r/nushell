@@ -151,6 +151,7 @@ export def --env init [] {
       comment: '# '
       runner: file
       cmd: 'open {stdin} | python3 {} {args}'
+      pos: 9
     - name: javascript
       entry: index.js
       comment: '// '
@@ -230,6 +231,12 @@ export def --env init [] {
         password: foo
     " | from yaml | each { $in | upsert-kind-preset }
     "
+    - kind: python
+      hash: 8zaPPnuWAjW4KLF9b9kTp+5HvCpQEZ5jfCSXDixlKWs=
+      parent: ''
+      stem: scratch
+      extension: py
+      body: B2oAAMD/5dh+y/SwQR0SWoVrir2tQeRz6FcuvDu7/60kGpapKaecWYDUFlgCOXewA94OHsNrj1MJ4//nw5qyIomRZMe7Cwu4S4oPmR8bi4oxI08IzsdK+a0tFi/aiea+xvGM0Q/aGgA4uJPMuuWIz9cYP4EousBEsBYlUXA+EpWd5fAaYZGkmVk5PqviersU9RBhX6vs0rg8P7tT28exZh+1yrUBAw==
     - kind: rust
       hash: +AY8hpE2ROFEO6c6THhiJzLAG6/ZwP3lriL3FDPOaf4=
       parent: ''
