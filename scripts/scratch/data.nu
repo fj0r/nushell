@@ -359,7 +359,10 @@ export def --env theme [] {
     }
     $env.SCRATCH_ACCUMULATOR = {
         sum: {
-            sum: { $in | math sum }
+            sum: [{ $in.value | math sum }, { $in | math sum }]
+        }
+        done: {
+            done: [{ $in.done | filter { $in == 1 } | length }, { $in | math sum }]
         }
         count: {
             count: [{ $in | length }, { $in | math sum }]

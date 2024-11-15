@@ -222,7 +222,7 @@ def 'fmt tree' [
     mut acc = {}
     mut done = []
     for i in $in {
-        $col ++= $i.value
+        $col ++= $i
         $done ++= $i.done
         let prefix = '' | fill -c ' ' -w ($padding + $level * $indent)
         let l = $i
