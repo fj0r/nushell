@@ -61,6 +61,12 @@ export def run-cmd [
 
             do -i { ^$env.CONTCTL run ...$args }
         }
+        raw => {
+            let cmd = $cmd | render {_: $entry, stdin: $i, args: $args, ...$opt}
+            do -i {
+                nu -c $"($cmd)"
+            }
+        }
         _ => {
             let cmd = $cmd | render {_: $entry, stdin: $i, args: $args, ...$opt}
             do -i {
@@ -80,7 +86,7 @@ export def performance [
 ] {
     let o = $in
     match $config.runner {
-        'file' | 'dir' | 'docker' | 'container' => {
+        'file' | 'dir' | 'docker' | 'container' | 'raw' => {
             let opt = sqlx $"select data from kind_preset where kind = (Q $config.name) and name = (Q $preset)"
             | get -i 0.data | default '{}' | from yaml
 
