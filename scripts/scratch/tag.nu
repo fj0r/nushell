@@ -7,7 +7,10 @@ export def scratch-tag-clean [
     ...tags: string@cmpl-tag-1
     --with-tag(-T)
 ] {
-    let tags_id = $tags | tag-group | get or | each { scratch-tag-path-id ($in | split row ':') | last | get id } | str join ', '
+    let tags_id = $tags | tag-group | get or
+    | scratch-tag-paths-id ...($in | each {|x| $x | split row ':' })
+    | each { $in.data | last | get id }
+    | str join ', '
     let tags_id = sqlx $"with recursive g as \(
         select id, parent_id from tag where id in \(($tags_id)\)
         union all
@@ -58,7 +61,7 @@ export def scratch-tag-move [
     --to(-t):string@cmpl-tag-1
 ] {
     let fr = $from | tag-group | get or.0 | split row ':'
-    let fo = scratch-tag-path-id $fr
+    let fo = scratch-tag-paths-id $fr | get data.0
     let fo = if ($fr | length) == ($fo | length) { $fo | last | get id }
     if ($fo | is-empty) { error make {msg: $"`tag ($from)` not exists" }}
     let to = $to | tag-group | get or.0
@@ -79,7 +82,7 @@ export def scratch-tag-toggle [
     if ($tags.not | is-not-empty) {
         $tags.not | each {
             let o = $in | split row ':'
-            let i = scratch-tag-path-id $o
+            let i = scratch-tag-paths-id $o | get data.0
             if ($o | length) == ($i | length) {
                 $i | last | get id
             }

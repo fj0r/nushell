@@ -74,24 +74,6 @@ export def tag-tree [name?: string='tags' --where: string='parent_id in (-1)'] {
     \)"
 }
 
-export def scratch-tag-path-id [tag_path: list<string>] {
-    let ts = $tag_path | each { $"\((Q $in)\)" } | str join ', '
-    sqlx $"with recursive input\(name\) as \(
-            values ($ts)
-        \), v as \(
-            select row_number\(\) over \(\) as lv, name from input
-        \), g as \(
-            select 1 as lv, parent_id, id, tag.name from tag
-            join v on lv = v.lv
-            where v.lv = 1 and tag.name = v.name
-            union all
-            select g.lv + 1 as lv, t.parent_id, t.id, t.name from tag as t
-            join v on \(g.lv + 1\) = v.lv
-            join g on g.id = t.parent_id
-            where t.name = v.name
-        \) select * from g;"
-}
-
 export def scratch-tag-paths-id [...tag_path: list<string>] {
     let a = $tag_path | enumerate
     let ts = $a
@@ -116,7 +98,8 @@ export def scratch-tag-paths-id [...tag_path: list<string>] {
 
     mut r = []
     for i in $a {
-        $r ++= [($q | where gr == $i.index | reject gr)]
+        let d = $q | where gr == $i.index | reject gr
+        $r ++= [{path: $i.item, data: $d}]
     }
     $r
 }
@@ -124,9 +107,10 @@ export def scratch-tag-paths-id [...tag_path: list<string>] {
 # add tag
 export def scratch-ensure-tags [tags] {
     mut ids = []
+    let tags = scratch-tag-paths-id ...($tags | each { $in | split row ':' })
     for tag in $tags {
-        let ts = $tag | split row ':'
-        let r = scratch-tag-path-id $ts
+        let ts = $tag.path
+        let r = $tag.data
 
         mut idx = 0
         mut pid = -1

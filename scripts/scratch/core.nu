@@ -76,8 +76,8 @@ export def scratch-list [
     }
 
     if ($xtags | is-not-empty) {
-        let tags_id = $tags.or
-        | each { scratch-tag-path-id ($in | split row ':') | last | get id }
+        let tags_id = scratch-tag-paths-id ...($tags.or | each { $in | split row ':' })
+        | each { $in.data | last | get id }
         | str join ', '
         let tags_id = $"with recursive g as \(
             select id, parent_id from tag where id in \(($tags_id)\)
@@ -336,11 +336,10 @@ export def scratch-attrs [
             }
         }
         if ($tags.not | is-not-empty) {
-            let tids = $tags.not | each {
-                let o = $in | split row ':'
-                let i = scratch-tag-path-id $o
-                if ($o | length) == ($i | length) {
-                    $i | last | get id
+            let tids = scratch-tag-paths-id ...($tags.not | each { $in | split row ':' })
+            | each {|y|
+                if ($y.data | length) == ($y.path | length) {
+                    $y.data | last | get id
                 }
             }
             for id in $ids {
@@ -407,8 +406,8 @@ export def scratch-data [...xargs: any@cmpl-tag-3] {
 
     let tags_id = $xtags | tag-group | get or
     let t = if ($tags_id | is-not-empty) {
-        let tags_id = $tags_id
-        | each { scratch-tag-path-id ($in | split row ':') | last | get id }
+        let tags_id = scratch-tag-paths-id ...($tags_id | each { $in | split row ':'})
+        | each { $in.data | last | get id }
         | str join ', '
 
         sqlx $"with recursive g as \(
