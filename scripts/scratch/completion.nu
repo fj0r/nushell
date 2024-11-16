@@ -1,4 +1,5 @@
 use common.nu *
+use libs/db.nu *
 
 export def cmpl-scratch-id [] {
     sqlx "select id, title,
@@ -7,8 +8,17 @@ export def cmpl-scratch-id [] {
     | each { $"($in.id) #($in.root) ($in.title)" }
 }
 
-export def cmpl-untagged-root-scratch [] {
-    let rw = (term size).columns - 8
+export def cmpl-untagged-root-scratch [ctx] {
+    let ts = term size
+    let rw = $ts.columns - 8
+    let ch = $ts.rows - 5
+    let cond = if (scope commands | where name == 'argx parse' | is-not-empty) {
+        let c = $ctx | argx parse | get opt
+        mut r = []
+        if ($c.kind? | is-not-empty) { $r ++= $"s.kind = (Q $c.kind)" }
+        if ($c.preset? | is-not-empty) { $r ++= $"p.preset = (Q $c.preset)" }
+        if ($r | is-empty) { "" } else { $"and ($r | str join ' and ')" }
+    }
     let q = $"select s.id as value,
         substr\(
             updated || '│' ||
@@ -20,8 +30,8 @@ export def cmpl-untagged-root-scratch [] {
     from scratch as s
     left outer join scratch_tag as t on s.id = t.scratch_id
     left outer join scratch_preset as p on s.id = p.scratch_id
-    where t.tag_id is null and s.parent_id = -1 and s.deleted = ''
-    order by updated desc limit 20;"
+    where t.tag_id is null and s.parent_id = -1 and s.deleted = '' ($cond)
+    order by updated desc limit ($ch);"
     sqlx $q
 }
 
