@@ -7,7 +7,7 @@ export def std [
     mut r = [$begin]
     loop {
         do $action
-        let now = date now 
+        let now = date now
         if ($now - $begin) > $total and ($r | length) > $count { break }
         # TODO: optimize
         $r ++= $now
