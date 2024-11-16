@@ -1,30 +1,6 @@
-def fold-command [] {
-    let i = $in | split row -r '\s+'
-    (($i | length) - 1)..0 | each {|t|
-        $i | range ..$t | str join ' '
-    }
-}
-
-def query-sign [] {
-    let o = $in
-    let cs = $o | fold-command
-    let a = scope aliases
-    let a = $a | filter {|x| $x.name in $cs }
-    let cs = if ($a | is-empty) { $cs } else {
-        $o | str replace $a.0.name $a.0.expansion | fold-command
-    }
-    let c = scope commands
-    mut r = {}
-    for x in $c {
-        if $x.name in $cs {
-            return ($x | insert expansion $cs.0)
-        }
-    }
-}
-
 def get-sign [] {
-    let o = $in
-    let cmd = $o | get name
+    let expr = $in
+    let o = scope commands | where decl_id == $expr.decl_id | first
     let x = $o | get -i signatures?.any?
     mut s = []
     mut n = {}
@@ -58,8 +34,6 @@ def get-sign [] {
         }
     }
     {
-        expansion: $o.expansion
-        cmd: $cmd
         switch: $s
         named: $n
         positional: ($p ++ $pr)
@@ -67,95 +41,88 @@ def get-sign [] {
     }
 }
 
-# "test -h [123 (3213 3)] 123 `a sdf` --cd --ef sadf -g" | argx token 'test'
-def token [cmd] {
-    let s = $in
-    | str substring ($cmd | str length)..
-    | str trim
-    | split row ''
-    mut par = []
-    mut res = []
-    mut cur = ''
-    mut esc = false
-    for c in $s {
-        if $c == '\' {
-            $esc = true
-        } else {
-            if $esc {
-                $cur ++= $c
-                $esc = false
-            } else {
-                if $c == ' ' and ($par | length) == 0 {
-                    $res ++= [$cur]
-                    $cur = ''
-                } else {
-                    if $c in ['{' '[' '('] {
-                        $par ++= $c
-                    }
-                    if $c in ['}' ']' ')'] {
-                        $par = ($par | range ..-2)
-                    }
-                    if $c in ['"' "'" '`'] {
-                        if ($par | length) > 0 and ($par | last) == $c {
-                            $par = ($par | range ..-2)
-                        } else {
-                            $par ++= $c
-                        }
-                    }
-                    $cur ++= $c
-                }
-
-            }
-        }
-    }
-    $res ++= $cur
-    return $res
+export def get-ast [] {
+    let d = ast $in -j -m | get block | from json
+    let cur = $d | get -i pipelines | last | get elements | last
+    $cur.expr.expr.Call
 }
 
-export def parse [--plain(-p)] {
-    let cmd = $in
-    let sign = $cmd | query-sign | get-sign
-    let token = $sign.expansion | token $sign.cmd
-    mut sw = ''
-    mut args = []
-    mut opt = {}
-    for c in $token {
-        if ($sw | is-empty) {
-            if ($c | str starts-with '-') {
-                let c = if ($c | str substring 1..<2) != '-' {
-                    let k = ($c | str substring 1..)
-                    if $k in $sign.named {
-                        $'($sign.named | get $k)'
-                    } else {
-                        $k
+def expr-to-value [expr] {
+    if ($expr | describe -d).type == record {
+        $expr
+        | items {|k, v|
+            match $k {
+                List => {
+                    $v | each { expr-to-value $in.Item.expr }
+                }
+                FullCellPath => {
+                    $v.head.expr.Record | reduce -f {} {|i,a|
+                        let p = $i.Pair | get expr
+                        $a | insert (expr-to-value $p.0) (expr-to-value $p.1)
                     }
-                } else {
-                    $c | str substring 2..
                 }
-                if $c in $sign.switch {
-                    $opt = ($opt | upsert $c true)
-                } else {
-                    $sw = $c
+                Closure => {
+                    # TODO:
+                    null
                 }
-            } else {
-                $args ++= [$c]
+                String | Int | Bool => { $v }
+                _ => { $"($k):($v)" }
             }
-        } else {
-            $opt = ($opt | upsert $sw $c)
-            $sw = ''
+        }
+        | first
+    } else {
+        null
+    }
+}
+
+def get-args [] {
+    let o = $in
+    let a = $o.arguments
+    let s = $o.head.start
+    mut r = {
+        args: []
+        opt: {}
+    }
+    for i in $a {
+        if ('Named' in $i) {
+            mut name = ''
+            mut expr = {Bool: true}
+            for j in $i.Named {
+                if ($j | is-not-empty) {
+                    if ($j.item? | is-not-empty) {
+                        $name = $j.item
+                    }
+                    if ($j.expr? | is-not-empty) {
+                        $expr = $j.expr
+                    }
+                }
+            }
+            $r.opt = $r.opt | upsert $name (expr-to-value $expr)
+        }
+        if ('Positional' in $i) {
+            $r.args ++= [(expr-to-value $i.Positional.expr)]
         }
     }
-    let args = $args
+
+    $r
+}
+
+export def parse [
+    --pos(-p)
+] {
+    let cmd = $in
+    let ast = $cmd | get-ast
+    let x = $ast | get-args
+    if not $pos {
+        return $x
+    }
+    let sign = $ast | get-sign
+
     mut pos = $sign.positional
     | enumerate
-    | reduce -f {} {|it, acc| $acc | insert $it.item ($args | get -i $it.index) }
+    | reduce -f {} {|it, acc| $acc | insert $it.item ($x.args | get -i $it.index) }
     if ($sign.rest | is-not-empty) {
-        $pos = $pos | insert $sign.rest.0 ($args | range ($sign.positional | length).. )
+        $pos = $pos | insert $sign.rest.0 ($x.args | range ($sign.positional | length).. )
     }
-    {
-        args: $args
-        pos: $pos
-        opt: $opt
-        cmd: $sign.cmd
-    }
+    $x | insert pos $pos
 }
