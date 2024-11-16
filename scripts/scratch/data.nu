@@ -355,7 +355,6 @@ export def --env theme [] {
             urgent: {|x| '' | fill -c '🔥' -w $x }
             challenge: {|x| '' | fill -c '⚡' -w $x }
         }
-
     }
     $env.SCRATCH_ACCUMULATOR = {
         sum: {

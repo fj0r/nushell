@@ -112,7 +112,7 @@ def token [cmd] {
     return $res
 }
 
-export def parse [--plain(-p)] {
+export def parse-legacy [--plain(-p)] {
     let cmd = $in
     let sign = $cmd | query-sign | get-sign
     let token = $sign.expansion | token $sign.cmd

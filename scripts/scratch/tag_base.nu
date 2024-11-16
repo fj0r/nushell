@@ -33,7 +33,7 @@ export def cmpl-tag-id [] {
 }
 
 export def cmpl-id-tag [ctx] {
-    if (scope commands | where name == 'argx parse' | is-empty) {
+    if NU_ARGX_EXISTS not-in $env {
         cmpl-tags ':'
     } else {
         $ctx | argx parse -p | get -i pos.id | id-tag

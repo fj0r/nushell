@@ -126,3 +126,7 @@ export def parse [
     }
     $x | insert pos $pos
 }
+
+export-env {
+    $env.NU_ARGX_EXISTS = true
+}

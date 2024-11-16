@@ -152,7 +152,7 @@ export def cmpl-kind [] {
 }
 
 export def cmpl-kind-preset [ctx] {
-    if (scope commands | where name == 'argx parse' | is-empty) {
+    if NU_ARGX_EXISTS not-in $env {
         sqlx $"select name as value, kind as description from kind_preset"
     } else {
         let k = $ctx | argx parse -p

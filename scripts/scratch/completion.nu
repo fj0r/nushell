@@ -12,7 +12,7 @@ export def cmpl-untagged-root-scratch [ctx] {
     let ts = term size
     let rw = $ts.columns - 8
     let ch = $ts.rows - 5
-    let cond = if (scope commands | where name == 'argx parse' | is-not-empty) {
+    let cond = if NU_ARGX_EXISTS in $env {
         let c = $ctx | argx parse | get opt
         mut r = []
         if ($c.kind? | is-not-empty) { $r ++= $"s.kind = (Q $c.kind)" }
