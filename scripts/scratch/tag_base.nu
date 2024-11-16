@@ -36,7 +36,7 @@ export def cmpl-id-tag [ctx] {
     if (scope commands | where name == 'argx parse' | is-empty) {
         cmpl-tags ':'
     } else {
-        $ctx | argx parse | get -i pos.id | id-tag
+        $ctx | argx parse -p | get -i pos.id | id-tag
     }
 }
 
