@@ -26,6 +26,7 @@ def --wrapped pa [
 
 test-parse 'pa -l adf m 123 {a: b, c: 1} { ls }  --query 23 -a  1 2 3' -p
 test-parse 'pa asdf 123 -l asdf b b  --query 23 -a'
+test-parse 'pa asdf 11 {a: {b: {c: {d: 1}}}}'
 
 def xx [
     a: string
