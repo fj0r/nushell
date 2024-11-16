@@ -299,17 +299,22 @@ def 'fmt leaves' [
         }
     }
 
-    let header = [...$title $value ...$tags ...$meta]
-    | filter { $in | is-not-empty }
-    | str join ' '
-    |  if $verbose { $"($in)(ansi reset)" } else { $in }
 
+    mut body_len = 0
     let body = if $verbose and ($o.body? | is-not-empty) {
-        $o.body
-        | lines
+        let l = $o.body | lines
+        $body_len = ($l | length)
+        $l
         | range ..<$body_lines
         | each {$"($indent)  (ansi $color.body)($in)(ansi reset)"}
     } else { [] }
+
+    let body_info = if $body_len > 0 { $"(ansi grey)($o.kind):($body_len)" }
+
+    let header = [...$title $value ...$tags ...$meta $body_info]
+    | filter { $in | is-not-empty }
+    | str join ' '
+    |  if $verbose { $"($in)(ansi reset)" } else { $in }
 
     [$header ...$body]
 }
