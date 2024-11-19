@@ -88,6 +88,39 @@ export-env {
             '8090': 8090
           command: []
           options: []
+        - name: redpanda
+          image: docker.redpanda.com/redpandadata/redpanda:v24.2.10
+          container_name: redpanda
+          daemon: true
+          environment: {}
+          volumns:
+            ~/.redpanda_data: /var/lib/redpanda/data
+          ports:
+            '18081': 18081
+            '18082': 18082
+            '19092': 19092
+          command:
+            - redpanda
+            - start
+            - --kafka-addr
+            - internal://0.0.0.0:9092,external://0.0.0.0:19092
+            - --advertise-kafka-addr
+            - internal://127.0.0.1:9092,external://172.178.5.123:19092
+            - --pandaproxy-addr
+            - internal://0.0.0.0:8082,external://0.0.0.0:18082
+            - --advertise-pandaproxy-addr
+            - internal://redpanda:8082,external://172.178.5.123:18082
+            - --schema-registry-addr
+            - internal://0.0.0.0:8081,external://0.0.0.0:18081
+            #- --rpc-addr redpanda:33145
+            #- --advertise-rpc-addr redpanda:33145
+            - --overprovisioned
+            - --smp 1
+            - --memory 1G
+            - --reserve-memory 0M
+            - --node-id 0
+            - --check=false
+          options: []
         "
         | from yaml | get _
         | save -f $env.CONTCONFIG
