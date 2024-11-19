@@ -75,6 +75,19 @@ export-env {
             '8000': 8000
           command: []
           options: []
+        - name: iggy
+          image: iggyrs/iggy
+          container_name: iggy
+          daemon: true
+          environment: {}
+          volumns:
+            ~/.iggy_data: /local_data
+          ports:
+            '3000': 3000
+            '8080': 8080
+            '8090': 8090
+          command: []
+          options: []
         "
         | from yaml | get _
         | save -f $env.CONTCONFIG
