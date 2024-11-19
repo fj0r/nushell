@@ -44,7 +44,7 @@ export def opwd [] {
     nvim-lua 'OppositePwd()'
 }
 
-def --wrapped nve [action ...file] {
+def nve [...file:path --action(-a):string='vsplit'] {
     if ($env.NVIM? | is-empty) {
         nvim ...$file
     } else {
@@ -62,10 +62,10 @@ def --wrapped nve [action ...file] {
     }
 }
 
-export alias e = nve vsplit
-export alias v = nve vsplit
-export alias c = nve split
-export alias x = nve tabnew
+export def e [...file:path] { nve ...$file -a vsplit }
+export def v [...file:path] { nve ...$file -a vsplit }
+export def c [...file:path] { nve ...$file -a split }
+export def x [...file:path] { nve ...$file -a tabnew }
 
 export def nvs [port: int=9999] {
     nvim --headless --listen $"0.0.0.0:($port)"
