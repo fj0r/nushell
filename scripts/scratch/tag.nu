@@ -4,7 +4,7 @@ use completion.nu *
 
 # delete scratch in tag
 export def scratch-tag-clean [
-    ...tags: string@cmpl-tag-1
+    tags: string@cmpl-tag-1
     --with-tag(-T)
 ] {
     let tags_id = $tags | tag-group | get or
@@ -17,18 +17,22 @@ export def scratch-tag-clean [
         select t.id, t.parent_id from tag as t join g on g.id = t.parent_id
     \) select id from g"
     | get id | each { $in | into string } | str join ', '
-    let id = sqlx $"delete from scratch where id in \(
-        select scratch_id from scratch_tag where tag_id in \(($tags_id)\)
-        \) returning id" | get id
-    let tid = sqlx $"delete from scratch_tag where scratch_id in \(($id | str join ', ')\)
-        returning scratch_id, tag_id"
+    let $scratch = sqlx $"select scratch_id from scratch_tag where tag_id in \(($tags_id)\)"
+    | get scratch_id
+    let sid = $scratch | each { $in | into string } | str join ', '
+    sqlx $"delete from scratch_tag where scratch_id in \(($sid)\) and tag_id in \(($tags_id)\)"
+
+    let other_tag = sqlx $"select scratch_id, count\(1\) as c from scratch_tag where scratch_id in \(($sid)\) group by scratch_id having c > 0" | get scratch_id
+    let scratch = $scratch | filter {|x| $x not-in $other_tag }
+    for i in $scratch {
+        sqlx $"delete from scratch where id in \(($i)\)"
+    }
     let tags = if $with_tag {
         sqlx $"delete from tag where id in \(($tags_id)\)"
         $tags_id
     }
     {
-        scratch: $id
-        scratch_tags: $tid
+        scratch: $scratch
         tags: $tags
     }
 }
