@@ -32,6 +32,7 @@ to = "lg"
 [[manifest]]
 from = "legacy/todo"
 to = "todo"
+disable = true
 
 [[manifest]]
 from = "scratch"
