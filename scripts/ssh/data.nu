@@ -1,18 +1,30 @@
 use common.nu *
 use parse.nu *
 
+export def Q [...t --sep:string=''] {
+    let s = $t | str join $sep | str replace -a "'" "''"
+    $"'($s)'"
+}
+
+export def sqlx [s] {
+    open $env.SSH_STATE | query db $s
+}
+
+export def --env init-db [env_name:string, file:string, hook: closure] {
+    let begin = date now
+    if $env_name not-in $env {
+        {$env_name: $file} | load-env
+    }
+    if ($file | path exists) { return }
+    {_: '.'} | into sqlite -t _ $file
+    open $file | query db "DROP TABLE _;"
+    do $hook {|s| open $file | query db $s } {|...t| Q ...$t }
+    print $"(ansi grey)created database: $env.($env_name), takes ((date now) - $begin)(ansi reset)"
+}
+
 export def --env start [] {
-    if 'SSH_DB' not-in $env {
-        $env.SSH_DB = [$nu.data-dir 'ssh.db'] | path join
-    }
-    if 'SSH_ENV' not-in $env {
-        $env.SSH_ENV = 'default'
-    }
-    if ($env.SSH_DB | path exists) { return }
-    {_: '.'} | into sqlite -t _ $env.SSH_DB
-    print $"(ansi grey)created database: $env.SSH_DB(ansi reset)"
+    init-db SSH_STATE ([$nu.data-dir 'ssh.db'] | path join) {|run, Q|
     for s in [
-        "DROP TABLE _;"
         "CREATE TABLE IF NOT EXISTS env (
             name TEXT PRIMARY KEY,
             description TEXT DEFAULT ''
@@ -84,7 +96,8 @@ export def --env start [] {
             PRIMARY KEY (ssh_name, tag_id)
         );"
     ] {
-        run $s
+        do $run $s
+    }
     }
 }
 

@@ -18,5 +18,5 @@ export def Q [...t] {
 }
 
 export def run [stmt] {
-    open $env.SSH_DB | query db $stmt
+    open $env.SSH_STATE | query db $stmt
 }
