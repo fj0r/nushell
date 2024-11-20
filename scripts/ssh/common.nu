@@ -17,6 +17,6 @@ export def Q [...t] {
     $"'($s)'"
 }
 
-export def run [stmt] {
+export def sqlx [stmt] {
     open $env.SSH_STATE | query db $stmt
 }

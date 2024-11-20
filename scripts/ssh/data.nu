@@ -23,7 +23,7 @@ export def --env init-db [env_name:string, file:string, hook: closure] {
 }
 
 export def --env start [] {
-    init-db SSH_STATE ([$nu.data-dir 'ssh.db'] | path join) {|run, Q|
+    init-db SSH_STATE ([$nu.data-dir 'ssh.db'] | path join) {|sqlx, Q|
     for s in [
         "CREATE TABLE IF NOT EXISTS env (
             name TEXT PRIMARY KEY,
@@ -96,7 +96,7 @@ export def --env start [] {
             PRIMARY KEY (ssh_name, tag_id)
         );"
     ] {
-        do $run $s
+        do $sqlx $s
     }
     }
 }
@@ -105,9 +105,9 @@ export def load [] {
     for s in (ssh-list) {
         print $s
         let tag = $s.Group | split row '/' | last
-        let tag_id = run $"select id from tag where name = (Q $tag)"
+        let tag_id = sqlx $"select id from tag where name = (Q $tag)"
         let tag_id = if ($tag_id | is-empty) {
-            run $"insert into tag \(name\) values \((Q $tag)\) returning id"
+            sqlx $"insert into tag \(name\) values \((Q $tag)\) returning id"
         } else {
             $tag_id
         } | get 0.id
@@ -118,15 +118,15 @@ export def load [] {
         let keyname = $s.IdentityFile | split row '/' | last
         let pubkey = if ($"($s.IdentityFile).pub" | path exists) { open $"($s.IdentityFile).pub" }
         let prikey = open $s.IdentityFile
-        run $"insert into key \(name, type, public_key, private_key\) values \((Q $keyname), 'ed25519', ($pubkey), ($prikey)\)"
-        run $"insert into host \(name, address, port\) values \(($name), ($addr), ($port)\)"
-        run $"insert into ssh \(
+        sqlx $"insert into key \(name, type, public_key, private_key\) values \((Q $keyname), 'ed25519', ($pubkey), ($prikey)\)"
+        sqlx $"insert into host \(name, address, port\) values \(($name), ($addr), ($port)\)"
+        sqlx $"insert into ssh \(
             name
         \) values \(
             ($name)
         \);"
-        run $"insert into ssh_host \(env_name, ssh_name, host_name\) values \('default', ($name), ($name)\)"
-        run $"insert into ssh_key \(env_name, user, ssh_name, key_name\) values \('default', ($user), ($name), ($name)\)"
-        run $"insert into ssh_tag \(ssh_name, tag_id\) values \(($name), ($tag_id)\)"
+        sqlx $"insert into ssh_host \(env_name, ssh_name, host_name\) values \('default', ($name), ($name)\)"
+        sqlx $"insert into ssh_key \(env_name, user, ssh_name, key_name\) values \('default', ($user), ($name), ($name)\)"
+        sqlx $"insert into ssh_tag \(ssh_name, tag_id\) values \(($name), ($tag_id)\)"
     }
 }

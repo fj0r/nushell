@@ -4,7 +4,7 @@ use libs/files.nu *
 
 
 export def --env init [] {
-    init-db SCRATCH_STATE ([$nu.data-dir 'scratch.db'] | path join) {|run, Q|
+    init-db SCRATCH_STATE ([$nu.data-dir 'scratch.db'] | path join) {|sqlx, Q|
     for s in [
         "CREATE TABLE IF NOT EXISTS person (
             id INTEGER PRIMARY KEY,
@@ -76,7 +76,7 @@ export def --env init [] {
             body TEXT NOT NULL DEFAULT ''
         );"
     ] {
-        do $run $s
+        do $sqlx $s
     }
     let _ = "
     - name: txt

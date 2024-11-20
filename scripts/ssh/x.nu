@@ -2,7 +2,7 @@ use common.nu *
 use complete.nu *
 
 def get-context [$cond] {
-    run $"select s.name, s.options, sk.user,
+    sqlx $"select s.name, s.options, sk.user,
             k.type as key_type, k.public_key, k.private_key,
             h.type as host_type, h.address, h.port
         from ssh as s
