@@ -16,7 +16,7 @@ export def --env init-db [env_name:string, file:string, hook: closure] {
 }
 
 export def sqlx [stmt] {
-    open $env.SCRATCH_DB | query db $stmt
+    open $env.SCRATCH_STATE | query db $stmt
 }
 
 export def db-upsert [table pk --do-nothing] {

@@ -4,7 +4,7 @@ use libs/files.nu *
 
 
 export def --env init [] {
-    init-db SCRATCH_DB ([$nu.data-dir 'scratch.db'] | path join) {|run, Q|
+    init-db SCRATCH_STATE ([$nu.data-dir 'scratch.db'] | path join) {|run, Q|
     for s in [
         "CREATE TABLE IF NOT EXISTS person (
             id INTEGER PRIMARY KEY,
