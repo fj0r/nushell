@@ -64,8 +64,29 @@ export def kube-kustomize [file: path] {
 
 
 # kubectl change context
-export def kube-change-context [context: string@cmpl-kube-ctx] {
-    kubectl config use-context $context
+export def --env kube-change-context [
+    context: string@cmpl-kube-ctx
+    --session(-s)
+    --cluster(-c)
+    --new(-n)
+] {
+    if $cluster {
+        let dist = $"($env.HOME)/.kube/config.d"
+        if not ($dist | path exists) {
+            mkdir $dist
+        }
+        let dist = $"($dist)/($context)"
+        if not ($dist | path exists) or $new {
+            kube-conf-export $context | save -fr $dist
+        }
+        $env.KUBECONFIG = $dist
+    } else if $session {
+        let dist = mktemp -t $"kube.(history session).XXX"
+        kube-conf-export $context | save -fr $dist
+        $env.KUBECONFIG = $dist
+    } else {
+        kubectl config use-context $context
+    }
 }
 
 # kubectl change namespace
@@ -78,14 +99,6 @@ export def kube-change-namespace [namespace: string@cmpl-kube-ns] {
         }
     }
     kubectl config set-context --current $"--namespace=($namespace)"
-}
-
-# kubectl change context clone
-export def --env kube-change-context-clone [name: string@cmpl-kube-ctx] {
-    let dist = $"($env.HOME)/.kube/config.d"
-    mkdir $dist
-    kube-conf-export $name | save -fr $"($dist)/($name)"
-    $env.KUBECONFIG = $"($dist)/($name)"
 }
 
 
