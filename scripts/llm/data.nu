@@ -245,9 +245,6 @@ export def --env init [] {
       description: Analyze JSON content, converting it into
     - name: git-diff-summary
       system: |-
-        ## Role
-        You are a git diff summary assistant.
-
         ## Goals
         Extract commit messages from the `git diff` output
 
@@ -332,9 +329,6 @@ export def --env init [] {
       description: Programming language experts help you debug.
     - name: trans-to
       system: |-
-        ## Role
-        You are a translation assisant
-
         ## Goals
         Translate the following text into {lang}
 
@@ -435,7 +429,6 @@ export def --env init [] {
       description: ''
     - name: name-helper
       system: |
-        # Role: name helper
         ## Attention:
         include elements in description as much as possible
         ## Constraints:
@@ -494,7 +487,6 @@ export def --env init [] {
       description: ''
     - name: sql-pre-aggregation
       system: |-
-        # Role: 你是一名数据库优化专家
         ## Goals:
         - 接受维度、指标和sql查询
         - 根据查询创建物化视图
