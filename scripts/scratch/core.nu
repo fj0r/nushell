@@ -47,7 +47,7 @@ export def scratch-list [
     | each { $"scratch.($in)" }
     | str join ', '
 
-    mut cond = ['parent_id = -1']
+    mut cond = ['parent_id = -1' 'tags.id is not null']
 
     # (not $trash) hide deleted
     let exclude_deleted = ["scratch.deleted = ''", "scratch.deleted != ''"]
@@ -75,7 +75,7 @@ export def scratch-list [
         | str join ' and '
     }
 
-    if ($xtags | is-not-empty) {
+    if ($tags.or | is-not-empty) {
         let tags_id = scratch-tag-paths-id ...($tags.or | each { $in | split row ':' })
         | each { $in.data | last | get id }
         | str join ', '
