@@ -1,80 +1,70 @@
-- [ ] Scratch.nu #190
-    - [x] Edit or Output #192
-    - [x] If no id is provided, get the latest #195
-    - [x] New table `scratch`, `scratch_tag` #199
-        - [x] Meta tag `:scratch` #197
-        - [x] Add column `type` into table `todo` #198
-    - [x] Scratch new/edit/out #200
-    - [x] The default type is `md` #208
-    - [x] Adjust return value of sa/se #209
-        - [x] Return `content` #218
-    - [x] Content ignore leading empty lines #221
-    - [x] Set Default Title #225
-        - [x] Open the editor and location to the second line. #226
-        - [x] Variants-edit #238
-    - [x] `scratch-add` can read content from stdin. #229
-    - [x] scratch.nu as an independent project #364
-    - [x] Filter empty #366
-    - [ ] Code Runner #427
-        - [ ] Prepair sandbox #448
-            - [x] Internal block-edit --line follow type #452
-            - [ ] File hash #454
-        - [ ] Exec #449
-            - [ ] pipe output #446
-            - [x] File runner #450
-                - [x] Preset options #502
-            - [ ] Dir runner #451
-            - [ ] Remote runner #453
-            - [x] Pipe input to script #455
-            - [x] kind: decouple name and ext #504
-        - [x] Config in db #456
-            - [x] Type #457
-            - [x] Exec #458
-    - [x] Search #431
-        - [x] SQLite fts #434
-        - [x] Format output #435
-        - [x] Shortcut `scratch-find` #436
-    - [x] Clean #438
-        - [x] --untitled #439
-    - [x] Logical/strict command combinations #441
-    - [x] If there is no title, truncate the first 20 characters of the content #445
-    - [x] File type #447
-- [ ] Merge Todo #459
-    - [ ] Plain scratch #460
-        - [ ] Child scratch no tag #493
-        - [ ] When viewing, child and main are considered as a group #494
-    - [ ] Treeview with tag #461
-        - [ ] Main tag as branch #462
-        - [ ] Compute done status #488
-        - [ ] Other tags display in header #489
-        - [ ] First tag as main #491
-    - [ ] Dynamic create tag in path #463
-        - [ ] Segmented cmpl-tag #490
-    - [ ] Untagged as old scratch #464
-    - [x] Template str replace #465
-    - [ ] Core #470
-        - [x] add #471
-            - [x] Noninteractive (sa --batch) #492
-            - [x] tags #497
-        - [x] attrs #472
-        - [x] done #474
-            - [ ] ~uplevel done~ #473
-        - [x] delete #475
-        - [ ] clean #476
-        - [x] edit #477
-            - [x] --returing-body #495
-        - [x] move #478
-        - [x] list #479
-            - [x] select root and then subnode #505
-            - [x] split tags #506
-            - [x] tags tree #507
-        - [ ] title #484
-        - [ ] export #486
-    - [ ] Tag Ops #487
-        - [x] tag-clean #480
-        - [x] tag-add #481
-        - [x] tag-rename #482
-        - [x] tag-hidden #483
-        - [ ] Optimize scratch-ensure-tags #496
-        - [x] Improve the cohesion of the tag.nu #498
-        - [x] cmpl-untagged-scratch-id #499
+- [ ] Filter
+  - [x] Completion of +tag and ^tag #2
+  - [x] List unfinished tasks, sorted by deadline #3
+  - [x] combo :tags and title #98
+  - [x] Change the condition for displaying hidden tags #107
+    - [x] Show hidden tags present in the parameters #269
+  - [ ] sort tags for main tags #121
+  - [x] cmpl of id's tags #123
+    - [x] scratch-tag-move #124
+  - [x] deadline filter before (reverse) #160
+  - [x] refactor scratch-list with scratch-tag-path-id #202
+    - [x] scratch-tag-paths-id #210
+    - [x] scratch-ensure-tags #245
+    - [x] scratch-tag-clean #246
+    - [x] scratch-tag-move #247
+    - [x] scratch-tag-toggle #248
+    - [x] scratch-list #249
+    - [x] scratch-attrs #250
+    - [x] scratch-data #251
+- [x] Actions
+  - [x] When `scratch-tag-clean`, if there are additional tags, only the tags will be cleared #4
+  - [x] get-bodys with kind #191
+- [x] Display
+  - [x] branch node #116
+  - [x] truncate tags branch #127
+  - [x] Siblings' leaf come before branch #128
+  - [x] distinct tags tree node leader #147
+  - [x] overdue deadlines should be highlighted #158
+  - [x] multiple tags format #193
+  - [x] body's kind and line nums #207
+  - [x] tag-tree
+    - [x] ~Segmented completion cmpl-tag~ #7
+    - [x] Group tags #10
+- [x] Data
+  - [x] Tag cannot contain spaces #8
+  - [x] Optimize scratch-ensure-tags #73
+  - [x] scratch-clean --untagged #104
+  - [x] scratch-upsert-kind/preset --batch #228
+  - [x] scratch-upsert #229
+- [ ] Integration
+  - [ ] Import/Export #11
+    - [x] Export #12
+    - [ ] restore tags #161
+  - [ ] Push/Pull #254
+    - [ ] temporary table from merge #255
+    - [ ] Rearrange id #256
+    - [ ] Markdown dir #257
+  - [x] refactor: snew --rewrite #270
+  - [x] scratch_title_autocomplete_adjustment #271
+- [x] Runner
+  - [x] exec #31
+  - [x] docker-runner #101
+    - [ ] daemon mode #137
+  - [x] bind preset #102
+  - [x] edit preset #126
+  - [x] si/so --transform(-t): closure #141
+  - [x] Inject $env.SCRATCH_EXEC during editing #143
+  - [x] cmpl kind's preset #144
+  - [x] scratch-in: runner reuses files created during the editing process #165
+  - [x] data-runner #188
+    - [x] jsonl #189
+    - [x] lines #190
+- [x] Accumelator
+  - [x] Only count leaf node #34
+  - [x] attrs --value #148
+  - [x] calc done #153
+  - [x] remove $monitor #154
+  - [x] default accumelator #155
+  - [x] value colors for positive and negative #156
+  - [x] Display progress (by calculating the done rate of todos) #252

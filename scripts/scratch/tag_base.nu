@@ -40,37 +40,43 @@ export def cmpl-id-tag [ctx] {
     }
 }
 
-export def tag-group [] {
+export def tags-group [] {
     let x = $in
     mut $r = { not: [], and: [], or: [], other: [] }
     for i in $x {
-        match ($i | str substring ..<1) {
-            '^' => { $r.not ++= $i | str substring 1.. }
-            '+' => { $r.and ++= $i | str substring 1.. }
-            ':' => { $r.or ++= $i | str substring 1.. }
-            _ => { $r.other ++= $i }
+        let h = $i | str substring ..<1
+        if $h in ['^' '+' ':'] {
+            let v = $i | str substring 1.. | split row ':'
+            match $h {
+                '^' => {$r.not ++= [$v]}
+                '+' => {$r.and ++= [$v]}
+                ':' => {$r.or ++= [$v]}
+            }
+        } else {
+            $r.other ++= $i
         }
     }
     $r
 }
 
-export def tag-branch [table: string, --where: string] {
-    let n = $"($table)_(random chars -l 3)"
-    $"($table) as \(
-        select id, parent_id, hidden, name from tag where ($where)
-        union all
-        select ($n).id, ($n).parent_id, ($n).hidden, ($table).name || ':' || ($n).name as name from tag as ($n)
-        join ($table) on ($n).parent_id = ($table).id
-    \)"
+export def group-to-tags [] {
+    let o = $in
+    $o.other
+    | append ($o.not | each { $"^($in | str join ':')" })
+    | append ($o.and | each { $"+($in | str join ':')" })
+    | append ($o.or | each { $":($in | str join ':')" })
 }
 
 export def tag-tree [name?: string='tags' --where: string='parent_id in (-1)'] {
-    let n = $"_(random chars -l 3)"
-    let b = tag-branch $n --where $where
-    $"recursive ($b), ($n)_1 as \(
-        select id, parent_id, hidden, name from ($n) order by length\(name\) desc
+    let t = $"_(random chars -l 3)"
+    let n = $"_($t)"
+    $"recursive ($t) as \(
+        select id, parent_id, hidden, name from tag where ($where)
+        union all
+        select ($n).id, ($n).parent_id, ($n).hidden, ($t).name || ':' || ($n).name as name from tag as ($n)
+        join ($t) on ($t).id = ($n).parent_id
     \), ($name) as \(
-        select id, hidden, name from ($n)_1 group by id
+        select id, hidden, name from ($t)
     \)"
 }
 
@@ -104,10 +110,21 @@ export def scratch-tag-paths-id [...tag_path: list<string>] {
     $r
 }
 
+export def scratch-tags-children [...ids] {
+    let tags_id = $ids | str join ', '
+    let tags_id = $"with recursive g as \(
+        select id, parent_id from tag where id in \(($tags_id)\)
+        union all
+        select t.id, t.parent_id from tag as t join g on g.id = t.parent_id
+    \) select id from g
+    "
+    sqlx $tags_id | get id
+}
+
 # add tag
 export def scratch-ensure-tags [tags] {
     mut ids = []
-    let tags = scratch-tag-paths-id ...($tags | each { $in | split row ':' })
+    let tags = scratch-tag-paths-id ...$tags
     for tag in $tags {
         let ts = $tag.path
         let r = $tag.data

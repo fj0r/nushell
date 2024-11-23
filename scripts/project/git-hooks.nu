@@ -36,13 +36,17 @@ def git-cdup [] {
     }
 }
 
-export def git-commit [] {
+def git-commit [] {
     let c = git log --reverse -n 1 --pretty=%h»¦«%s
     | split row '»¦«'
     {
         hash: $c.0
         message: $c.1
     }
+}
+
+def git-current-branch [] {
+    git rev-parse --abbrev-ref HEAD
 }
 
 export def git-list-hooks [] {
@@ -90,6 +94,7 @@ export def git-hooks-context [] {
         ...(git-commit)
         remote: $argv.0?
         repo: $argv.1?
+        branch: (git-current-branch)
     }
 }
 
