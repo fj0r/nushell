@@ -11,6 +11,7 @@ export def scratch-list [
     ...xtags:string@cmpl-tag-3
     --search(-s): string
     --trash(-T) # show trash
+    --hidden(-H)
     --important(-i): int
     --urgent(-u): int
     --challenge(-c): int
@@ -20,7 +21,6 @@ export def scratch-list [
     --relevant(-r): int@cmpl-relevant-id
     --sort: list<string@cmpl-sort>
     --done(-x):int
-    --untagged(-U)
     --raw
     --md(-m)
     --md-list(-l)
@@ -30,7 +30,7 @@ export def scratch-list [
     --debug
     --accumulator(-a): any
 ] {
-    let tags = $xtags | tag-group
+    let tags = $xtags | tags-group
 
     let sortable = [
         value, done, kind,
@@ -47,50 +47,51 @@ export def scratch-list [
     | each { $"scratch.($in)" }
     | str join ', '
 
-    mut cond = ['parent_id = -1']
+    mut cond = ['parent_id = -1' 'tags.id is not null']
+    mut exist_tagsid = []
 
-    # (not $trash) hide deleted
-    let exclude_deleted = ["scratch.deleted = ''", "scratch.deleted != ''"]
-    let exclude_tags_hidden = "tags.hidden = 0"
-    let a_exclude_tags_hidden = $"scratch.id not in \(
-        select scratch_id from scratch_tag where tag_id in \(
-            select id from tag where hidden = 1\)\)
-        "
-    # ($untagged)
-    let include_untagged = "tags.name is null"
-    dbg $debug {trash: $trash, notags: ($xtags | is-empty), untagged: $untagged} -t cond
-    $cond ++= match [($xtags | is-empty) $untagged] {
-        # --untagged
-        [true true] => $include_untagged
-        #
-        [true false] => $exclude_tags_hidden
-        # [ --untagged tag ]
-        [false true] => $include_untagged
-        # tag
-        [false false] => ""
-    }
-    | do { let x = $in
-        [($exclude_deleted | get ($trash | into int)) $x]
-        | filter { $in | is-not-empty}
-        | str join ' and '
-    }
+    $cond ++= if $trash { "scratch.deleted != ''" } else { "scratch.deleted = ''" }
 
-    if ($xtags | is-not-empty) {
-        let tags_id = scratch-tag-paths-id ...($tags.or | each { $in | split row ':' })
+    if ($tags.or | is-not-empty) {
+        let tags_id = scratch-tag-paths-id ...$tags.or
         | each { $in.data | last | get id }
-        | str join ', '
-        let tags_id = $"with recursive g as \(
-            select id, parent_id from tag where id in \(($tags_id)\)
-            union all
-            select t.id, t.parent_id from tag as t join g on g.id = t.parent_id
-        \) select id from g
-        "
-        let tags_id = sqlx $tags_id | get id | each { $in | into string } | str join ', '
+        | scratch-tags-children ...$in
+        $exist_tagsid ++= $tags_id
+        let tags_id = $tags_id | each { $in | into string } | str join ', '
         $cond ++= $"scratch.id in \(select scratch_id from scratch_tag where tag_id in \(($tags_id)\)\)"
     }
 
+    if ($tags.and | is-not-empty) {
+        let tags_id = scratch-tag-paths-id ...$tags.and
+        | each { $in.data | last | get id }
+        | scratch-tags-children ...$in
+        $exist_tagsid ++= $tags_id
+        let tags_id = $tags_id | each { $in | into string } | str join ', '
+        $cond ++= $"scratch.id in \(select scratch_id from scratch_tag where tag_id in \(($tags_id)\)\)"
+    }
+
+    if ($tags.not | is-not-empty) {
+        let tags_id = scratch-tag-paths-id ...$tags.not
+        | each { $in.data | last | get id }
+        | scratch-tags-children ...$in
+        | each { $in | into string } | str join ', '
+        $cond ++= $"scratch.id not in \(select scratch_id from scratch_tag where tag_id in \(($tags_id)\)\)"
+    }
+
+    if not $hidden {
+        let tags_id = sqlx "select id from tag where hidden = 1"
+        | get id
+        | scratch-tags-children ...$in
+        let exist_tagsid = $exist_tagsid
+        let tags_id = $tags_id
+        | filter {|x| $x not-in $exist_tagsid }
+        | each { $in | into string } | str join ', '
+        $cond ++= $"scratch.id not in \(select scratch_id from scratch_tag where tag_id in \(($tags_id)\)\)"
+    }
+
+
     let now = date now
-    if ($search | is-not-empty) { $cond ++= $"title like '%($search)%'" }
+    if ($search | is-not-empty) { $cond ++= $"lower\(title\) glob lower\('*($search)*'\)" }
     if ($challenge | is-not-empty) { $cond ++= $"challenge >= ($challenge)"}
     if ($important | is-not-empty) { $cond ++= $"important >= ($important)"}
     if ($urgent | is-not-empty) { $cond ++= $"urgent >= ($urgent)"}
@@ -133,17 +134,6 @@ export def scratch-list [
         $x | first | reject tag | insert tags $t
     }
 
-    let r = if ($tags.and | is-not-empty) or ($tags.not | is-not-empty) {
-        $r
-        | filter {|x|
-            let dt = $x.tags | each { $in | str join ':' }
-            let n = not ($tags.not | any {|i| $dt | any {|j| $j | str starts-with $i } })
-            let a = $tags.and | all {|i| $dt | any {|j| $j | str starts-with $i } }
-            $n and $a
-        }
-    } else {
-        $r
-    }
 
     if $raw {
         $r
@@ -187,7 +177,7 @@ export def scratch-add [
     let body = $in
     let cfg = if ($config | is-empty) { get-config $kind --preset $preset } else { $config }
 
-    let xargs = $xargs | tag-group
+    let xargs = $xargs | tags-group
     let tags = $xargs.or
     let title = $xargs.other | str join ' '
     let x = $body | entity --batch=$batch $cfg --title $title --created --locate-body=$locate_body --perf-ctx $perf_ctx
@@ -328,7 +318,7 @@ export def scratch-attrs [
     }
 
     if ($xtags | is-not-empty) {
-        let tags = $xtags | tag-group
+        let tags = $xtags | tags-group
         if ($tags.and | is-not-empty) {
             let tids = scratch-ensure-tags $tags.and
             for id in $ids {
@@ -336,7 +326,7 @@ export def scratch-attrs [
             }
         }
         if ($tags.not | is-not-empty) {
-            let tids = scratch-tag-paths-id ...($tags.not | each { $in | split row ':' })
+            let tids = scratch-tag-paths-id ...$tags.not
             | each {|y|
                 if ($y.data | length) == ($y.path | length) {
                     $y.data | last | get id
@@ -400,13 +390,20 @@ export def scratch-clean [
     }
 }
 
+export def scratch-title [
+    id:int@cmpl-scratch-id
+] {
+    sqlx $"select title from scratch where id = ($id)"
+    | get 0.title
+}
+
 export def scratch-data [...xargs: any@cmpl-tag-3] {
     let ids = $xargs | filter { ($in | describe) == 'int' }
     let xtags = $xargs | filter { ($in | describe) != 'int' }
 
-    let tags_id = $xtags | tag-group | get or
+    let tags_id = $xtags | tags-group | get or
     let t = if ($tags_id | is-not-empty) {
-        let tags_id = scratch-tag-paths-id ...($tags_id | each { $in | split row ':'})
+        let tags_id = scratch-tag-paths-id ...$tags_id
         | each { $in.data | last | get id }
         | str join ', '
 
@@ -441,9 +438,9 @@ export def scratch-search [
     --num(-n):int = 20
     --untagged
 ] {
-    let k = Q $"%($keyword)%"
-    mut i = [$"title like ($k)"]
-    mut r = [$"body like ($k)"]
+    let k = Q $"*($keyword)*"
+    mut i = [$"lower\(title\) glob lower\(($k)\)"]
+    mut r = [$"lower\(body\) glob lower\(($k)\)"]
     if $untagged {
         $i ++= 'tag_id is null'
         $r ++= 'tag_id is null'

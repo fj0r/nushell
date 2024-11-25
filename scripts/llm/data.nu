@@ -101,6 +101,37 @@ export def seed [] {
           jp: Janpanese
           ko: Korean
       description: ''
+    - name: polish
+      system: |-
+        #### Goals
+        - To revise, edit, and polish the provided text without altering its original meaning.
+        - To ensure the text is clear, concise, and well-organized.
+        - To eliminate any redundant or verbose sections.
+
+        #### Constraints
+        - Maintain the original intent and key information.
+        - Ensure the revised text is coherent and easy to read.
+        - Remove unnecessary words and phrases.
+
+        #### Attention
+        - Focus on clarity and conciseness.
+        - Pay attention to sentence structure and flow.
+        - Ensure the text remains true to its original message.
+
+        #### OutputFormat
+        - Use Markdown format for the output to enhance readability.
+        - Output in {lang}
+      template: '{}'
+      placeholder: |-
+        lang:
+          en: English
+          fr: French
+          es: Spanish
+          de: German
+          zh: Chinese
+          jp: Janpanese
+          ko: Korean
+      description: ''
     - name: text-summary
       system: |-
         ### Text Summarization
@@ -347,19 +378,56 @@ export def seed [] {
       template: '{}'
       placeholder: '{}'
       description: ''
-    - name: name-helper
+    - name: generating-names
       system: |
-        ## Attention:
-        include elements in description as much as possible
-        ## Constraints:
-        keep names short clear and unambiguous
-        ## Goals:
-        provide a suitable name based on user description
-        ## OutputFormat:
-        output only the name
-        use lowercase letters and underscores to separate words
+        #### Goals
+        Generate appropriate names based on the provided text. The names should be clear, concise, and unambiguous.
+
+        #### Constraints
+        - Only output names.
+        - Each name should be on a separate line.
+        - Use {format:} format.
+        - Provide names in both English and {lang}.
+        - Output multiple candidates if possible.
+
+        #### Attention
+        - Ensure the names are relevant to the input text.
+        - Avoid any ambiguous or misleading names.
+        - Use proper {format:} formatting ({format}).
+
+        #### OutputFormat
+        Lines
+
+        ---
+
+        ### Example Input
+        Input Text: "快速发展的科技公司"
+
+        ### Example Output
+        fast growing tech company
+        rapidly developing technology firm
+        快速发展科技公司
+        快速成长科技企业
       template: '{}'
-      placeholder: '{}'
+      placeholder: |-
+        lang:
+          en: English
+          fr: French
+          es: Spanish
+          de: German
+          ru: Russian
+          ar: Arabic
+          zh: Chinese
+          ja: Janpanese
+          ko: Korean
+        format:
+          camel-case: The first word is in lowercase, and each subsequent word starts with an uppercase letter, with no spaces or hyphens between words.
+          kebab-case: All letters are in lowercase, and words are separated by hyphens (`-`).
+          pascal-case: Each word starts with an uppercase letter, including the first word, with no spaces or hyphens between words.
+          screaming-snake-case: All letters are in uppercase, and words are separated by underscores (`_`).
+          snake-case: All letters are in lowercase, and words are separated by underscores (`_`).
+          title-case: The first letter of each word is capitalized, except for certain small words like articles, conjunctions, and prepositions (unless they are the first or last word in the title).
+          usual: words with spaces.
       description: Naming suggestions
     - name: sql-query-analysis
       system: |-

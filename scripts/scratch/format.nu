@@ -38,23 +38,20 @@ def 'list starts-with' [b] {
 
 def 'tagsplit' [tags] {
     let o = $in
-    let tag = if ($tags | is-not-empty) {
-        $tags | each { $in | split row ':' }
-    }
     let x = $o | default [] | each {|i|
         let t = $i.tags
-        let s = if ($tag | is-empty) {
+        let s = if ($tags | is-empty) {
             [
-                [$i.tags.0]
+                [$i.tags.0?]
                 ($i.tags | range 1..)
             ]
         } else {
-            let l = $tag.0 | length
+            let l = $tags.0 | length
             let multi_tags = ($tags | length) > 1
             mut m = []
             mut n = []
             for x in $i.tags {
-                if ($tag | any {|y| $x | list starts-with $y }) {
+                if ($tags | any {|y| $x | list starts-with $y }) {
                     if $multi_tags {
                         $m ++= [$x]
                     } else {
