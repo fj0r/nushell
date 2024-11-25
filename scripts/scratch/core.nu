@@ -44,7 +44,13 @@ export def scratch-list [
     ] | str join ', '
 
     let sort = if ($sort | is-empty) { ['created'] } else { $sort }
-    | each { $"scratch.($in)" }
+    | each {|x|
+        if $x in [value done kind deadline] {
+            $x
+        } else {
+            $"($x) desc"
+        }
+    }
     | str join ', '
 
     mut cond = ['parent_id = -1' 'tags.id is not null']
@@ -113,7 +119,7 @@ export def scratch-list [
         select ($fields) from scratch
         left outer join scratch_tag on scratch.id = scratch_tag.scratch_id
         left outer join tags on scratch_tag.tag_id = tags.id
-        ($cond) order by ($sort)
+        ($cond)
     \), r as \(
         select * from root
         union all
@@ -121,7 +127,7 @@ export def scratch-list [
             ($sortable | each { $"s.($in)" } | str join ', '),
             s.relevant, null as tag
         from scratch as s join r on r.id = s.parent_id
-    \) select * from r;"
+    \) select * from r order by ($sort);"
 
     dbg $debug $stmt -t stmt
     let r = sqlx $stmt
