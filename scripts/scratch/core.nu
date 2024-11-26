@@ -110,8 +110,10 @@ export def scratch-list [
     if ($time_cond | is-not-empty) { $cond ++= $time_cond }
 
     if ($relevant | is-not-empty) { $cond ++= $"relevant = ($relevant)"}
-    if ($done == 0) { $cond ++= $"done = 0" }
-    if ($done == 1) { $cond ++= $"done = 1" }
+    match $done {
+        0 => { $cond ++= $"done == 0" }
+        1 => { $cond ++= $"done > 0" }
+    }
 
     let $cond = if ($cond | is-empty) { '' } else { $cond | str join ' and ' | $"where ($in)" }
 
@@ -171,7 +173,7 @@ export def scratch-add [
     --urgent(-u): int
     --challenge(-c): int
     --deadline(-d): duration
-    --done(-x)
+    --done(-x): int = 0
     --value(-v): number
     --relevant(-r): int@cmpl-relevant-id
     --batch
@@ -198,7 +200,7 @@ export def scratch-add [
         relevant: $relevant
         deadline: (if ($deadline | is-not-empty) {(date now) + $deadline | fmt-date})
         value: $value
-        done: (if $done { 1 } else { 0 })
+        done: $done
     } | filter-empty
 
     let d = {...$d, ...$attrs}
@@ -216,7 +218,7 @@ export def scratch-add [
             VALUES \(($id), (Q $preset)\)"
     }
 
-    scratch-done $id --reverse=(not $done)
+    scratch-done $id --done $done
 
     if $complete {
         $x
@@ -275,7 +277,7 @@ export def scratch-delete [
     let pid = sqlx $"update scratch set deleted = ($d) where id in \(($ids)\) returning parent_id;" | get parent_id
     # update parents status
     for i in $pid {
-        uplevel done $i $now (not $reverse)
+        uplevel done $i $now (not $reverse | into int)
     }
 }
 
@@ -319,7 +321,7 @@ export def scratch-attrs [
 
     if ($done | is-not-empty) {
         for id in $ids {
-            scratch-done $id --reverse=($done == 0)
+            scratch-done $id --done $done
         }
     }
 
@@ -347,15 +349,15 @@ export def scratch-attrs [
 
 export def scratch-done [
     ...id: int@cmpl-scratch-id
-    --reverse(-r)
+    --done(-x):int = 1
 ] {
-    let d = if $reverse { 0 } else { 1 }
+    let d = $done
     let now = date now | fmt-date | Q $in
     let ids = $id | str join ','
     let pid = sqlx $"update scratch set done = ($d), updated = ($now) where id in \(($ids)\) returning parent_id;" | get parent_id
     # update parents status
     for i in $pid {
-        uplevel done $i $now (not $reverse)
+        uplevel done $i $now $done
     }
 }
 
@@ -366,8 +368,8 @@ export def scratch-move [
     let now = date now | fmt-date | Q $in
     let pid = sqlx $"select parent_id from scratch where id = ($id);" | get 0.parent_id
     sqlx $"update scratch set parent_id = ($to) where id = ($id);"
-    uplevel done $pid $now true
-    uplevel done $to $now true
+    uplevel done $pid $now 1
+    uplevel done $to $now 1
 }
 
 export def scratch-clean [

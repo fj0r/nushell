@@ -273,7 +273,7 @@ export def --env init [] {
                 urgent INTEGER DEFAULT -1,
                 challenge INTEGER DEFAULT -1,
                 value REAL DEFAULT 0,
-                done BOOLEAN DEFAULT -1,
+                done BOOLEAN DEFAULT 0,
                 relevant INTEGER -- REFERENCES person(id)
             );"
             "CREATE TABLE IF NOT EXISTS scratch_tag (
@@ -343,7 +343,7 @@ export def --env theme [] {
             branch: xterm_wheat1
         }
         symbol: {
-            box: [['☐' '🗹' '*'],['[ ]' '[x]' '']]
+            box: [['☐' '🗹' '☒' '*'],['[ ]' '[x]' '[-]' '']]
             md_list: '-'
         }
         formatter: {
