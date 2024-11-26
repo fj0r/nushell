@@ -1,10 +1,10 @@
-- [ ] Filter
+- [x] Filter
   - [x] Completion of +tag and ^tag #2
   - [x] List unfinished tasks, sorted by deadline #3
   - [x] combo :tags and title #98
   - [x] Change the condition for displaying hidden tags #107
     - [x] Show hidden tags present in the parameters #269
-  - [ ] sort tags for main tags #121
+  - [x] sort tags for main tags #121
   - [x] cmpl of id's tags #123
     - [x] scratch-tag-move #124
   - [x] deadline filter before (reverse) #160
@@ -37,6 +37,7 @@
   - [x] scratch-clean --untagged #104
   - [x] scratch-upsert-kind/preset --batch #228
   - [x] scratch-upsert #229
+  - [x] new state of done 2 #278
 - [ ] Integration
   - [ ] Import/Export #11
     - [x] Export #12

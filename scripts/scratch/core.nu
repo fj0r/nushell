@@ -48,7 +48,11 @@ export def scratch-list [
         if $x in [value done kind deadline] {
             $x
         } else {
-            $"($x) desc"
+            if ($x | str starts-with '^') {
+                $x | str substring 1..
+            } else {
+                $"($x) desc"
+            }
         }
     }
     | str join ', '
