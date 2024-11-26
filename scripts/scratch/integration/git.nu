@@ -39,7 +39,7 @@ export def scommit [
 ] {
     scratch-done $scratch
     scratch-edit $scratch
-    scratch-list -m ...$xtags | save -f $file
+    scratch-list --sort [^created] -m ...$xtags | save -f $file
     git add .
     mut a = []
     if $amend { $a ++= [ --amend ] }

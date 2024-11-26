@@ -242,7 +242,7 @@ def 'fmt tree' [
     {
         txt: ($out | flatten | str join (char newline))
         acc: $acc
-        done: ($done | all { $in == 1 })
+        done: ($done | all { $in > 0 })
     }
 }
 
