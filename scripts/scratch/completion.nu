@@ -37,6 +37,8 @@ export def cmpl-untagged-root-scratch [ctx] {
 
 export def cmpl-sort [] {
     [created, updated, deadline, done, important, urgent]
+    | each {[$"!(in)" $in]}
+    | flatten
 }
 
 

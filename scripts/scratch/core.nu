@@ -45,14 +45,10 @@ export def scratch-list [
 
     let sort = if ($sort | is-empty) { ['updated'] } else { $sort }
     | each {|x|
-        if $x in [value done kind deadline] {
-            $x
+        if ($x | str starts-with '!') {
+            $"($x | str substring 1..) desc"
         } else {
-            if ($x | str starts-with '^') {
-                $x | str substring 1..
-            } else {
-                $"($x) desc"
-            }
+            $x
         }
     }
     | str join ', '

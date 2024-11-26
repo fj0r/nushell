@@ -17,6 +17,7 @@
     - [x] scratch-list #249
     - [x] scratch-attrs #250
     - [x] scratch-data #251
+  - [x] sorting direction #279
 - [x] Actions
   - [x] When `scratch-tag-clean`, if there are additional tags, only the tags will be cleared #4
   - [x] get-bodys with kind #191
