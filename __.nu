@@ -42,7 +42,7 @@ export def 'dump nu_scripts' [...mod:string@cmpl-mod --reverse(-r)] {
 }
 
 export def git-hooks [act ctx] {
-    if $act == 'pre-push' and $ctx.branch == 'dev' {
+    if $act == 'pre-push' and $ctx.branch == 'main' {
         if $ctx.repo == 'git@github-fjord:fj0r/nushell.git' {
             dump nu_scripts
         }
