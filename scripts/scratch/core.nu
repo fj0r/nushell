@@ -43,7 +43,7 @@ export def scratch-list [
         "tags.name as tag"
     ] | str join ', '
 
-    let sort = if ($sort | is-empty) { ['created'] } else { $sort }
+    let sort = if ($sort | is-empty) { ['updated'] } else { $sort }
     | each {|x|
         if $x in [value done kind deadline] {
             $x
