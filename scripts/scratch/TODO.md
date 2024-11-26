@@ -48,6 +48,7 @@
     - [ ] Rearrange id #256
     - [ ] Markdown dir #257
   - [x] refactor: snew --rewrite #270
+    - [x] snew auto-complete with quotes #280
   - [x] scratch_title_autocomplete_adjustment #271
 - [x] Runner
   - [x] exec #31
