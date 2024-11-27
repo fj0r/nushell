@@ -24,7 +24,7 @@ export def cmpl-untagged-root-scratch [ctx] {
             updated || '│' ||
             printf\('%-10s', s.kind\) || '│' ||
             printf\('%-10s', p.preset\) || '│' ||
-            ltrim\(s.title || ' '\) || '│' || ltrim\(s.body\),
+            ltrim\(s.title || ' '\) || '⯒' || ltrim\(s.body\),
             0 , ($rw)
         \) as description
     from scratch as s
@@ -33,6 +33,7 @@ export def cmpl-untagged-root-scratch [ctx] {
     where t.tag_id is null and s.parent_id = -1 and s.deleted = '' ($cond)
     order by updated desc limit ($ch);"
     sqlx $q
+    | update description {|x| $x.description | str replace '⯒' (ansi grey)}
 }
 
 export def cmpl-sort [] {
