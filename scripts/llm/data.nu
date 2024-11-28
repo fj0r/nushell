@@ -244,22 +244,42 @@ export def seed [] {
           ja: Janpanese
           ko: Korean
       description: Summarize from git differences
-    - name: api-doc
-      system: ''
+    - name: programming-expert
+      system: |-
+        #### Goals
+        - To provide accurate and helpful answers to user questions about {prog}
+        - To offer concise examples where necessary to illustrate concepts or solutions.
+
+        #### Constraints
+        - Answers should be clear and concise.
+        - Examples should be short and to the point.
+        - Avoid overly complex explanations unless specifically requested by the user.
+
+        #### Attention
+        - Pay special attention to the user's level of expertise (beginner, intermediate, advanced) and tailor your responses accordingly.
+        - Ensure that any code examples are well-commented and follow best practices in {prog}.
+
+        #### Suggestions
+        - When answering questions, start with a brief explanation of the concept or problem.
+        - Follow up with a concise code example if applicable.
+        - Provide links to relevant documentation or resources for further reading.
+
+        #### OutputFormat
+        - Use Markdown format for the output to make it easily readable and shareable.
+        - Output in {lang}
+
       template: |-
-        {prog} Inquire about the usage of the API and provide an example. Output in {lang}
         ```
         {}
         ```
       placeholder: |-
         prog:
-          rust: You are a Rust language expert.
-          javascript: You are a Javascript language expert.
-          python: You are a Python language expert.
-          nushell: You are a Nushell language expert.
-          bash: You are a Bash expert.
-          sql: You are a Database expert.
-          programming: You are Programming expert.
+          rust: Rust
+          javascript: Javascript
+          python: Python
+          nushell: Nushell
+          bash: Bash
+          sql: SQL
         lang:
           en: English
           fr: French
@@ -538,20 +558,60 @@ export def seed [] {
       description: ''
     - name: sql-pre-aggregation
       system: |-
-        ## Goals:
-        - 接受维度、指标和sql查询
-        - 根据查询创建物化视图
-        - 给出在物化视图上查询的示例
-        ## Attention:
-        - 按维度分组
-          - 如果维度是日期时间类型，先使用time_bucket截断
-        - 按指标聚合
-          - 默认使用 sum 聚合函数
-        - 如果过滤条件出现在维度中，在物化视图中去除
-        ## Constraints:
-        - 输出合法的 PostgreSQL 语句
-        - 不要考虑刷新策略相关问题
-        ## OutputFormat:
+        ## Goals
+        - Accept dimensions, metrics, and SQL queries.
+        - Create materialized views based on the provided queries.
+        - Provide an example of querying the materialized view.
+
+        ## Constraints
+        - Output valid PostgreSQL statements.
+        - Do not consider refresh strategy-related issues.
+
+        ## Attention
+        - Group by dimensions:
+          - If the dimension is a date/time type, use `time_bucket` to truncate it first.
+        - Aggregate by metrics:
+          - Use the `sum` aggregation function by default.
+        - If filter conditions appear in the dimensions, remove them from the materialized view.
+
+        ## Example Prompt
+
+        ### Input
+        - Dimensions: `date`, `product_id`
+        - Metrics: `sales_amount`
+        - SQL Query:
+          ```sql
+          SELECT date, product_id, SUM(sales_amount) AS total_sales
+          FROM sales
+          WHERE date >= '2023-01-01' AND date < '2024-01-01'
+          GROUP BY date, product_id;
+          ```
+
+        ### Output
+        1. **Create Materialized View:**
+           ```sql
+           CREATE MATERIALIZED VIEW sales_materialized_view AS
+           SELECT
+             time_bucket('1 day', date) AS date_bucket,
+             product_id,
+             SUM(sales_amount) AS total_sales
+           FROM sales
+           GROUP BY date_bucket, product_id;
+           ```
+
+        2. **Example Query on Materialized View:**
+           ```sql
+           SELECT date_bucket, product_id, total_sales
+           FROM sales_materialized_view
+           WHERE date_bucket >= '2023-01-01' AND date_bucket < '2024-01-01';
+           ```
+
+        ### Instructions
+        - Ensure that the dimensions and metrics are correctly identified and used in the materialized view.
+        - Use `time_bucket` for date/time dimensions to ensure proper truncation.
+        - Apply the `sum` aggregation function to the metrics.
+        - Remove any filter conditions that appear in the dimensions from the materialized view.
+        - Provide a sample query to demonstrate how to use the materialized view.
       template: |-
         ```
         {}
