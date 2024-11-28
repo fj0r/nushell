@@ -167,10 +167,31 @@ export def seed [] {
       description: ''
     - name: json-to
       system: |-
-        ## Goals
-        - Analyze the following JSON data to convert it into a {lang} {object}.
-        ## Constraints
-        - Do not explain.
+        ### Prompt for Analyzing JSON Data and Generating Corresponding {lang} {object}
+
+        #### Goals
+        - Analyze the provided JSON data.
+        - Generate a corresponding {lang} `{object}` that accurately represents the JSON structure.
+        - Ensure the {lang} `{object}` is properly formatted and includes appropriate data types.
+
+        #### Constraints
+        - The JSON data will be provided as a string.
+        - The generated {lang} `{object}` should use standard {lang} data types.
+        - Handle nested structures and arrays appropriately.
+        - Use `serde` for serialization and deserialization if necessary.
+
+        #### Attention
+        - Pay special attention to the data types in the JSON, such as strings, numbers, booleans, arrays, and nested objects.
+        - Ensure that optional fields are represented using `Option<T>`.
+
+        #### OutputFormat
+        Use Markdown format for the output to make it easily readable and shareable.
+
+        ### Instructions
+        1. Analyze the provided JSON data.
+        2. Identify the data types and structure.
+        3. Generate the corresponding {lang} `{object}`.
+        4. Ensure the struct is properly formatted and includes appropriate data types.
       template: |-
         ```
         {}
@@ -362,19 +383,61 @@ export def seed [] {
           ja: Janpanese
           ko: Korean
       description: dictionary
-    - name: journal
+    - name: report
       system: |
-        ## Role: 工作助手
+        ## Prompt: Summarize Your Daily Logs into a Work Progress Report
 
-        ## Goals
-        将下面的内容整理为工作日志
+        ### Goals
+        - Create a structured work progress report from your daily logs.
+        - Organize tasks by different sections or categories.
+        - Indicate the status of each task using the provided symbols.
 
-        ## Constraints
-        要有感悟
+        ### Constraints
+        - Use `- [ ]` or `☐` to indicate uncompleted tasks.
+        - Use `- [x]` or `🗹` to indicate completed tasks.
+        - Ensure the report is clear and easy to follow.
 
-        ## Attention
-        - ☐ 是未完成的
-        - 🗹 是已完成的
+        ### Attention
+        - Pay attention to the logical structure of your report.
+        - Group tasks under relevant headings to maintain clarity.
+        - Use the symbols consistently to avoid confusion.
+
+        ### Example Format
+
+        ```markdown
+        # Work Progress Report
+
+        ## Date: [Insert Date]
+
+        ### Project A
+        - [x] Task 1: Description of the task
+        - [ ] Task 2: Description of the task
+        - [x] Task 3: Description of the task
+
+        ### Project B
+        - [ ] Task 1: Description of the task
+        - [x] Task 2: Description of the task
+        - [ ] Task 3: Description of the task
+
+        ### Administrative Tasks
+        - [x] Task 1: Description of the task
+        - [ ] Task 2: Description of the task
+
+        ### Notes
+        - Any additional notes or comments about the day's work.
+        ```
+
+        ### Steps to Follow
+        1. **Identify Projects and Tasks**: List all the projects and tasks you worked on today.
+        2. **Organize by Sections**: Group tasks under relevant project headings.
+        3. **Indicate Task Status**: Use `- [x]` or `🗹` for completed tasks and `- [ ]` or `☐` for uncom
+        pleted tasks.
+        4. **Add Notes**: Include any additional notes or comments at the end of the report.
+
+        ### Tips
+        - Keep your report concise and to the point.
+        - Review your log entries to ensure accuracy.
+        - Regularly update your report to track progress over time.
       template: '{}'
       placeholder: '{}'
       description: ''
