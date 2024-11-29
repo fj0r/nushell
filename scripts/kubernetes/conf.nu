@@ -1,20 +1,44 @@
 use complete.nu *
 
-export def kube-conf-import [name: string, path: string] {
+def upsert-list [field key value] {
+    let i = $in
+    mut ix = -1
+    for x in ($i | enumerate) {
+        if ($x.item | get $field) == $key {
+            $ix = $x.index
+        }
+    }
+    if $ix < 0 {
+        $i | append $value
+    } else {
+        $i | upsert $ix $value
+    }
+}
+
+export def kube-conf-import [
+    name: string@cmpl-kube-ctx
+    --cluster: string
+    --user: string
+    --file(-f): path
+] {
     let k = kube-config
     mut d = $k.data
-    let i = cat $path | from yaml
+    let i = open -r $file | from yaml
+    let ns = $d.contexts | where name == $name
+    let ns = if ($ns | is-empty) { 'default' } else { $ns.0.context.namespace }
+    let cluster = if ($cluster | is-empty) { $name } else { $cluster }
+    let user = if ($user | is-empty) { $name } else { $user }
     let c = {
         context: {
-            cluster: $name,
-            namespace: default,
-            user: $name
+            cluster: $cluster,
+            namespace: $ns,
+            user: $user
         }
         name: $name,
     }
-    $d.clusters = (upsert_row $d.clusters name [] $name ($i.clusters.0 | upsert name $name))
-    $d.users = (upsert_row $d.users name [] $name ($i.users.0 | upsert name $name))
-    $d.contexts = (upsert_row $d.contexts name [] $name $c)
+    $d.clusters = $d.clusters | upsert-list name $cluster ($i.clusters.0 | upsert name $cluster)
+    $d.users = $d.users | upsert-list name $user ($i.users.0 | upsert name $user)
+    $d.contexts = $d.contexts | upsert-list name $name $c
     $d | to yaml
 }
 

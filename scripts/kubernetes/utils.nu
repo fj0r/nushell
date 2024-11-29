@@ -69,21 +69,3 @@ export def set_cellpath [record path value] {
     }
 }
 
-export def upsert_row [table col mask id value] {
-    # let value = ($mask | reduce -f $value {|it, acc|
-    #     let path = (parse_cellpath $it)
-    #     set_cellpath $value $path (get_cellpath $table $path)
-    # })
-    if $id in ($table | get $col) {
-        $table | each {|x|
-            if ($x | get $col) == $id {
-                $value
-            } else {
-                $x
-            }
-        }
-    } else {
-        $table | append $value
-    }
-}
-

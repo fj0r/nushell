@@ -3,8 +3,8 @@ use utils.nu *
 
 ### ctx
 export def kube-config [] {
-    let file = if ($env.KUBECONFIG? | is-empty) { $"($env.HOME)/.kube/config" } else { $env.KUBECONFIG }
-    { path: $file, data: (cat $file | from yaml) }
+    let file = if ($env.KUBECONFIG? | is-empty) { $"($env.HOME)/.kube/config" } else { $env.KUBECONFIG | path expand }
+    { path: $file, data: (open -r $file | from yaml) }
 }
 
 export def cmpl-kube-ctx [] {
