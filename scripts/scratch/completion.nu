@@ -8,23 +8,26 @@ export def cmpl-scratch-id [] {
     | each { $"($in.id) #($in.root) ($in.title)" }
 }
 
-export def cmpl-untagged-root-scratch [ctx] {
+export def list-untagged-root [type, ctx] {
     let ts = term size
     let rw = $ts.columns - 8
     let ch = $ts.rows - 5
-    let cond = if NU_ARGX_EXISTS in $env {
-        let c = $ctx | argx parse | get opt
+    let cond = if ($ctx | is-not-empty) {
         mut r = []
-        if ($c.kind? | is-not-empty) { $r ++= $"s.kind = (Q $c.kind)" }
-        if ($c.preset? | is-not-empty) { $r ++= $"p.preset = (Q $c.preset)" }
+        if ($ctx.kind? | is-not-empty) { $r ++= $"s.kind = (Q $ctx.kind)" }
+        if ($ctx.preset? | is-not-empty) { $r ++= $"p.preset = (Q $ctx.preset)" }
         if ($r | is-empty) { "" } else { $"and ($r | str join ' and ')" }
     }
-    let q = $"select s.id as value,
+    let pr = match $type {
+        id => ['s.id as value', "ltrim(s.title || ' ')"]
+        title => ['s.title as value', "s.id || ' '"]
+    }
+    let q = $"select ($pr.0),
         substr\(
             updated || '│' ||
             printf\('%-10s', s.kind\) || '│' ||
             printf\('%-10s', p.preset\) || '│' ||
-            ltrim\(s.title || ' '\) || '⯒' || ltrim\(s.body\),
+            ($pr.1) || '⯒' || ltrim\(s.body\),
             0 , ($rw)
         \) as description
     from scratch as s
@@ -34,6 +37,20 @@ export def cmpl-untagged-root-scratch [ctx] {
     order by updated desc limit ($ch);"
     sqlx $q
     | update description {|x| $x.description | str replace '⯒' (ansi grey)}
+}
+
+export def cmpl-untagged-root-scratch [ctx] {
+    let cond = if NU_ARGX_EXISTS in $env {
+        $ctx | argx parse | get opt
+    }
+    list-untagged-root id $cond
+}
+
+export def cmpl-untagged-root-title [ctx] {
+    let cond = if NU_ARGX_EXISTS in $env {
+        $ctx | argx parse | get opt
+    }
+    list-untagged-root title $cond
 }
 
 export def cmpl-sort [] {
