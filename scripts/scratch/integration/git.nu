@@ -17,7 +17,7 @@ export def snew [
     ...xtags:string@cmpl-tag-3
     --rewrite(-r):string@cmpl-namer
     --parent(-f):int=-1
-    --scratch(-t): int@cmpl-scratch-id
+    --scratch(-s): int@cmpl-scratch-id
 ] {
     let xtags = if ($rewrite | is-not-empty) {
         let xtags = $xtags | tags-group
@@ -35,7 +35,7 @@ export def cmpl-todo-md [] {
 
 export def scommit [
     ...xtags:string@cmpl-tag-3
-    --scratch(-t): int@cmpl-scratch-id
+    --scratch(-s): int@cmpl-scratch-id
     --file(-f): string@cmpl-todo-md
     --amend(-a)
 ] {

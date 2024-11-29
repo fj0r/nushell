@@ -125,3 +125,7 @@ export def 'update todo' [] {
         tl $"proj:($i.to)" -m | save -f $f
     }
 }
+
+export def 'git commit scratch' [scratch_id] {
+    scommit -f scripts/scratch/TODO.md :proj:scratch -s $scratch_id
+}
