@@ -33,6 +33,7 @@ export def scratch-today [
     --md
     --md-list
     --raw
+    --debug
     --done(-x): int
     --untagged(-U)
     --deadline
@@ -42,7 +43,8 @@ export def scratch-today [
     (scratch-list
         ...$xtags --trash=$trash
         --created $t --updated $t --deadline $t
-        --md-list=$md_list --md=$md --raw=$raw
+        --md-list=$md_list --md=$md
+        --raw=$raw --debug=$debug
         --done $done
         )
 }

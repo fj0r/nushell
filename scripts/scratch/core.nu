@@ -105,7 +105,7 @@ export def scratch-list [
     mut $time_cond = []
     if ($updated | is-not-empty) { $time_cond ++= $"updated >= ($now - $updated | fmt-date | Q $in)"}
     if ($created | is-not-empty) { $time_cond ++= $"created >= ($now - $created | fmt-date | Q $in)"}
-    if ($deadline | is-not-empty) { $time_cond ++= $"deadline <= ($now + $deadline | fmt-date | Q $in)"}
+    if ($deadline | is-not-empty) { $time_cond ++= $"\(deadline <= ($now + $deadline | fmt-date | Q $in) and done = 0\)"}
     let time_cond = $time_cond | str join ' or ' | if ($in | is-not-empty) { $"\(($in)\)" }
     if ($time_cond | is-not-empty) { $cond ++= $time_cond }
 
