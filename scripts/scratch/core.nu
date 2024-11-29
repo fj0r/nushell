@@ -472,23 +472,26 @@ export def scratch-search [
 
 export def scratch-in [
     id?:int@cmpl-untagged-root-scratch
+    --title(-t):string@cmpl-untagged-root-title
     --kind(-k):string@cmpl-kind
     --preset(-p):string@cmpl-kind-preset
     --args(-a):list<string>
 ] {
     let body = $in
-    if ($id | is-empty) {
+    if ($id | is-empty) and ($title | is-empty) {
         let kind = if ($kind | is-empty) { 'md' } else { $kind }
         let cfg = get-config $kind --preset $preset
         let x = $body
         | scratch-add --config $cfg --preset $preset --complete --locate-body --ignore-empty-body --perf-ctx { retain: true, args: $args }
         $x.value.body | performance $cfg --preset $preset --context $x.context --args $args
     } else {
-        let x = sqlx $"select s.kind, p.preset from scratch as s
+        let c = if ($title | is-empty) { $"s.id = ($id)" } else { $"s.title = (Q $title)" }
+        let x = sqlx $"select s.id, s.kind, p.preset from scratch as s
             left join scratch_preset as p on s.id = p.scratch_id
-            where s.id = ($id);" | get -i 0
+            where ($c);" | get -i 0
         let kind = if ($kind | is-empty) { $x.kind } else { $kind }
         let preset = if ($preset | is-empty) { $x.preset } else { $preset }
+        let id = if ($id | is-empty) { $x.id } else { $id }
         let cfg = get-config $kind --preset $preset
         let x = $body
         | scratch-edit $id --config $cfg --preset $preset --complete --locate-body --perf-ctx { retain: true, args: $args }
@@ -498,6 +501,7 @@ export def scratch-in [
 
 export def scratch-out [
     id?:int@cmpl-untagged-root-scratch
+    --title(-t):string@cmpl-untagged-root-title
     --kind(-k):string@cmpl-kind
     --preset(-p):string@cmpl-kind-preset
     --args(-a):list<string>
@@ -508,11 +512,14 @@ export def scratch-out [
     if ($search | is-not-empty) {
         scratch-search --untagged --num=$num $search
     } else {
-        let id = if ($id | is-empty) {
+        let id = if ($title | is-not-empty) {
+            sqlx $"select id, title from scratch where title = (Q $title);"
+            | get 0.id
+        } else if ($id | is-not-empty) {
+            $id
+        } else {
             sqlx $"select id from scratch order by updated desc limit 1;"
             | get 0.id
-        } else {
-            $id
         }
         let x = sqlx $"select s.body, s.kind, p.preset from scratch as s
             left join scratch_preset as p on s.id = p.scratch_id
@@ -527,20 +534,25 @@ export def scratch-out [
 
 export def scratch-flush [
     id?:int@cmpl-untagged-root-scratch
+    --title(-t):string@cmpl-untagged-root-title
     --kind(-k):string@cmpl-kind
     --preset(-p):string@cmpl-kind-preset
 ] {
     let o = $in
+    mut sid = $id
     let kind = if ($kind | is-empty) {
-        if ($id | is-empty) {
-            error make -u { msg: 'id and kind cannot both be empty' }
+        if ($id | is-empty) and  ($title | is-empty) {
+            error make -u { msg: 'id, title and kind cannot both be empty' }
         }
-        sqlx $"select kind from scratch where id = ($id);" | get -i 0.kind
+        let c = if ($title | is-empty) { $"id = ($id)" } else { $"title = (Q $title)" }
+        let r = sqlx $"select id, kind from scratch where ($c);"
+        $sid = $r | get -i 0.id
+        $r | get -i 0.kind
     } else {
         $kind
     }
     {
-        id: $id
+        id: $sid
         body: ($o | to-all $kind)
         kind: $kind
         preset: $preset

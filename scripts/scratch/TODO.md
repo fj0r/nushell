@@ -64,7 +64,7 @@
   - [x] data-runner #188
     - [x] jsonl #189
     - [x] lines #190
-  - [x] cmpl-by-name #290
+  - [x] si/so/sf --title(-t) #290
     - [x] cmpl-untagged-root-title #291
 - [x] Accumelator
   - [x] Only count leaf node #34

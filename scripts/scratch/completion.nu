@@ -16,12 +16,14 @@ export def list-untagged-root [type, ctx] {
         mut r = []
         if ($ctx.kind? | is-not-empty) { $r ++= $"s.kind = (Q $ctx.kind)" }
         if ($ctx.preset? | is-not-empty) { $r ++= $"p.preset = (Q $ctx.preset)" }
-        if ($r | is-empty) { "" } else { $"and ($r | str join ' and ')" }
+        $r
     }
     let pr = match $type {
         id => ['s.id as value', "ltrim(s.title || ' ')"]
         title => ['s.title as value', "s.id || ' '"]
     }
+    let cond = if $type == 'title' { $cond | append $"length\(s.title\) > 0" } else { $cond }
+    let cond = if ($cond | is-empty) { "" } else { $"and ($cond | str join ' and ')" }
     let q = $"select ($pr.0),
         substr\(
             updated || '│' ||
