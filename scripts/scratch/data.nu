@@ -170,7 +170,7 @@ export def seed [] {
         | enumerate
         | reduce -f $o {|i,a|
           let x = if ($i.item | describe -d).type == 'string' {$\"\\"($i.item)\\"\"} else { $i.item }
-          $a | str replace -a $\"%($i.index + 1)\" $x
+          $a | str replace -a $\"%($i.index + 1)\" $\"($x)\"
         }
         | python3 query.py
         | from yaml
