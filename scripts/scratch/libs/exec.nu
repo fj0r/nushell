@@ -59,19 +59,15 @@ export def run-cmd [
                 $cmd
             ] | filter {|x| $x | is-not-empty }
 
-            do -i { ^$env.CONTCTL run ...$args }
+            ^$env.CONTCTL run ...$args
         }
         raw => {
             let cmd = $cmd | render {_: $entry, stdin: $i, args: $args, ...$opt}
-            do -i {
-                nu -c $"($cmd)"
-            }
+            nu -c $"($cmd)"
         }
         _ => {
             let cmd = $cmd | render {_: $entry, stdin: $i, args: $args, ...$opt}
-            do -i {
-                nu -c $"($cmd) | to json" | from json
-            }
+            nu -c $"($cmd) | to json" | from json
         }
     }
 }

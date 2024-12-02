@@ -145,7 +145,7 @@ export def seed [] {
           data = sys.stdin.readlines()
           data = \"\\n\".join(data)
 
-          exts = {\"ssl\": {\"any_non_empty_dict\": True}} if {ssl} else { }
+          exts = {\"ssl\": {\"verify_mode\": None}} if {ssl} else { }
 
           connection = pymysql.connect(
             host=\"{host}\",
