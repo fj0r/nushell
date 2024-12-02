@@ -130,6 +130,27 @@ export def seed [] {
         open -r {}
         | curl -sSL -X POST ...$auth $url --data-binary @-
         | from json
+    - name: myduck
+      entry: scratch.sql
+      comment: '-- '
+      runner: file
+      cmd: |-
+        let o = open {}
+        let q = $\"
+          INSTALL mysql;
+          LOAD mysql;
+          ATTACH 'host={host} user={username} port={port} password={password}' AS mysql \\\(TYPE MYSQL\\\);
+          USE mysql;
+          \(\$o\)
+        \"
+
+        [{args}]
+        | enumerate
+        | reduce -f $q {|i,a|
+          let x = if ($i.item | describe -d).type == 'string' {$\"\\"($i.item)\\"\"} else { $i.item }
+          $a | str replace -a $\"%($i.index + 1)\" $\"($x)\"
+        }
+        | duckdb -json | from json
     - name: mysql
       entry: scratch.sql
       comment: '-- '
