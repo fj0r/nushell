@@ -2,6 +2,17 @@ export-env {
     $env.HISTORY_BACKUP_DIR = $'($env.HOME)/.cache/nu-history-backup'
 }
 
+# (Destroy the results of `history top`)
+export def 'history deduplicate' [] {
+    "with b as (
+        select id from history group by command_line order by start_timestamp desc
+    ), x as (
+        select a.id from history as a left join b on a.id = b.id where b.id is null
+    ) delete from history where id in x;
+    "
+    | sqlite3 $nu.history-path
+}
+
 # backup history
 export def 'history backup' [tag?] {
     if (which sqlite3 | is-empty) {
