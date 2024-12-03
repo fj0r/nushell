@@ -19,7 +19,7 @@ def host_abbr [] {
         let theme = $env.NU_POWER_THEME.host
         let n = (sys host).hostname
         let ucl = if ($env.SSH_CONNECTION? | is-not-empty) {
-                $theme.is_admin
+                $theme.is_remote
             } else {
                 $theme.default
             }
@@ -529,7 +529,7 @@ export-env {
                 on: (ansi yellow)
             }
             host: {
-                is_admin: (ansi yellow)
+                is_remote: (ansi xterm_red)
                 default: (ansi blue)
             }
             time: {
