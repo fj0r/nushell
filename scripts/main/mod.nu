@@ -20,19 +20,15 @@ if not ($nu.cache-dir | path exists) { mkdir $nu.cache-dir }
 
 source plugin.nu
 
-# const plugin_msgpackz = (
-#     [($nu.config-path | path dirname), 'plugin.msgpackz'] | path join
-# )
-#
-# const plugin_query = (
-#     $nu.current-exe | path dirname
-#     | path join $"nu_plugin_query(if $nu.os-info.family == 'windows' {'.exe'})"
-# )
-# plugin add $plugin_query
-# plugin use --plugin-config $plugin_msgpackz $plugin_query
-
 const __dyn_load = if ('~/.nu' | path exists) { '~/.nu' } else { 'dummy.nu' }
 source $__dyn_load
 
 source keymaps.nu
+
+const plugin_query = (
+    $nu.current-exe | path dirname
+    | path join $"nu_plugin_query(if $nu.os-info.family == 'windows' {'.exe'})"
+)
+plugin add $plugin_query
+plugin use $plugin_query
 
