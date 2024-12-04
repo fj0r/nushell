@@ -1,3 +1,4 @@
+use stat.nu *
 
 export def git-init [remote] {
     git init --initial-branch main
