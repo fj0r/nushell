@@ -112,7 +112,7 @@ export def scratch-list [
     if ($relevant | is-not-empty) { $cond ++= $"relevant = ($relevant)"}
     match $done {
         0 => { $cond ++= $"done == 0" }
-        1 => { $cond ++= $"done > 0" }
+        1 | 2 => { $cond ++= $"done >= ($done)" }
     }
 
     let $cond = if ($cond | is-empty) { '' } else { $cond | str join ' and ' | $"where ($in)" }

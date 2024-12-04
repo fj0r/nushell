@@ -25,10 +25,3 @@ source $__dyn_load
 
 source keymaps.nu
 
-const plugin_query = (
-    $nu.current-exe | path dirname
-    | path join $"nu_plugin_query(if $nu.os-info.family == 'windows' {'.exe'})"
-)
-plugin add $plugin_query
-plugin use $plugin_query
-
