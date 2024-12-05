@@ -1,6 +1,6 @@
 use complete.nu *
 
-def upsert-list [field key value] {
+def upsert-list [field key value --exclude: list<any>] {
     let i = $in
     mut ix = -1
     for x in ($i | enumerate) {
@@ -11,12 +11,23 @@ def upsert-list [field key value] {
     if $ix < 0 {
         $i | append $value
     } else {
-        $i | upsert $ix $value
+        let v = if ($exclude | is-empty) {
+            $value
+        } else {
+            let o = $i | get $ix
+            $exclude
+            | reduce -f $value {|i,a|
+                let i = $i | into cell-path
+                $a | upsert $i ($o | get $i)
+            }
+        }
+        $i | upsert $ix $v
     }
 }
 
 export def kube-conf-import [
     name: string@cmpl-kube-ctx
+    --update-server
     --cluster: string
     --user: string
     --file(-f): path
@@ -36,7 +47,8 @@ export def kube-conf-import [
         }
         name: $name,
     }
-    $d.clusters = $d.clusters | upsert-list name $cluster ($i.clusters.0 | upsert name $cluster)
+    let ex = if not $update_server { [[cluster server]] }
+    $d.clusters = $d.clusters | upsert-list name $cluster ($i.clusters.0 | upsert name $cluster) --exclude $ex
     $d.users = $d.users | upsert-list name $user ($i.users.0 | upsert name $user)
     $d.contexts = $d.contexts | upsert-list name $name $c
     $d | to yaml
