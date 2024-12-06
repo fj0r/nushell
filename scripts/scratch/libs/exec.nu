@@ -30,7 +30,7 @@ export def run-cmd [
 
     if $ctx.kind? == nushell {
         # TODO:
-        let r = open $i | nu -c $"(open -r $ctx.entry) | to json" | from json
+        let r = open $i | nu --stdin -c $"(open -r $ctx.entry) | to json" | from json
         return $r
     }
     match $runner {
