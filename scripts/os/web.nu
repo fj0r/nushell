@@ -1,10 +1,24 @@
-export def --wrapped 'mdurl' [...args --transform(-t): closure] {
-    curl -sSL ...$args
+export def --wrapped 'mdurl' [
+    ...args
+    --transform(-t): closure
+    --summary(-s)
+    --raw(-r)
+] {
+    let md = curl -sSL ...$args
     | ^($env.HTML_TO_MARKDOWN? | default 'html2markdown')
-    | if ($transform | is-empty) { $in } else { $in | do $transform }
-    | ^($env.MARKDOWN_RENDER? | default 'glow')
+
+    let content = if ($transform | is-not-empty) {
+        $md | do $transform
+    } else if 'MARKDOWN_TRANSFORM' in $env {
+        $md | do $env.MARKDOWN_TRANSFORM
+    } else {
+        $md
+    }
+
+    if $raw {
+        $content
+    } else {
+        $content | ^($env.MARKDOWN_RENDER? | default 'glow')
+    }
 }
 
-export def --wrapped 'mdurl-summary' [...args] {
-    mdurl -t { $in | ad text-summary zh -o } ...$args
-}
