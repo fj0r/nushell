@@ -13,6 +13,7 @@ use scratch/shortcut.nu *
 use scratch/integration/git.nu *
 use llm *
 use llm/shortcut.nu *
+use llm/integration/web.nu *
 use project *
 use ssh *
 use cwdhist *
