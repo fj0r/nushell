@@ -1,15 +1,27 @@
 export def cmpl-git-log [] {
-    git log -n 32 --pretty=%h»¦«%s
+    let d = git log -n 32 --pretty=%h»¦«%s
     | lines
     | split column "»¦«" value description
     | each { $"($in.value) # ($in.description)"}
+    {
+        completions: $d
+        options: {
+            sort: false
+        }
+    }
 }
 
 export def cmpl-git-log-all [] {
-    git log --all -n 32 --pretty=%h»¦«%d»¦«%s
+    let d = git log --all -n 32 --pretty=%h»¦«%d»¦«%s
     | lines
     | split column "»¦«" value branch description
     | each {|x| $x | update description $"($x.branch) ($x.description)" }
+    {
+        completions: $d
+        options: {
+            sort: false
+        }
+    }
 }
 
 export def cmpl-git-branch-files [context: string, offset:int] {
