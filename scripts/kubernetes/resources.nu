@@ -38,7 +38,7 @@ export def kube-refine [
                 lg level 1 {kind: $p.k, name: $r} collect
                 let obj = kubectl get $p.k $r --output=json | from json
                 let pyl = refine $p.v $obj
-                $data ++= $pyl
+                $data ++= [$pyl]
             }
         }
     }
@@ -52,7 +52,7 @@ export def kube-refine [
                 lg level 0 {kind: $p.k, ns: $ns, name: $r} collect
                 let obj = kubectl get $p.k --namespace $ns $r --output=json | from json
                 let pyl = refine $p.v $obj
-                $data ++= $pyl
+                $data ++= [$pyl]
             }
         }
     }

@@ -17,7 +17,7 @@ export def std [
     let average = $total / $times
     mut n = []
     for i in ..<(($r | length) - 1) {
-        $n ++= ($r | get ($i + 1)) - ($r | get $i) | into int | $in / 1000
+        $n ++= [(($r | get ($i + 1)) - ($r | get $i) | into int | $in / 1000)]
     }
     {
         QPS: (1sec / $average)

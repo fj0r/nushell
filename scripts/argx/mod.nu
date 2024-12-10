@@ -10,10 +10,10 @@ def get-sign [] {
     for it in $x {
         if $it.parameter_type == 'switch' {
             if ($it.short_flag | is-not-empty) {
-                $s ++= $it.short_flag
+                $s ++= [$it.short_flag]
             }
             if ($it.parameter_name | is-not-empty) {
-                $s ++= $it.parameter_name
+                $s ++= [$it.parameter_name]
             }
         } else if $it.parameter_type == 'named' {
             if ($it.parameter_name | is-empty) {
@@ -25,12 +25,12 @@ def get-sign [] {
             }
         } else if $it.parameter_type == 'positional' {
             if $it.is_optional == false {
-                $p ++= $it.parameter_name
+                $p ++= [$it.parameter_name]
             } else {
-                $pr ++= $it.parameter_name
+                $pr ++= [$it.parameter_name]
             }
         } else if $it.parameter_type == 'rest' {
-            $r ++= $it.parameter_name
+            $r ++= [$it.parameter_name]
         }
     }
     {

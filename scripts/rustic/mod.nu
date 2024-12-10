@@ -58,7 +58,7 @@ def 'parse args' [] {
                 let n = $i | parse -r '-+(?<n>.+)' | get 0.n | str replace '-' '_' -a
                 $ra = $n
             } else {
-                $rest ++= $i
+                $rest ++= [$i]
             }
         }
     }

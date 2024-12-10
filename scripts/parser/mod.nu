@@ -231,7 +231,7 @@ def _more [t: string, s, --zero(-z), --one(-o)] {
             } else {
                 $p += $x.len
             }
-            $r ++= $x
+            $r ++= [$x]
         }
         if (not $zero) and ($r | is-empty)  {
             {
@@ -286,7 +286,7 @@ export def one-by-one [t: string, s] {
             } else {
                 $p += $x.len
             }
-            $r ++= $x
+            $r ++= [$x]
         }
         {
             typ: seq

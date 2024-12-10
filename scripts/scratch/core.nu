@@ -56,13 +56,13 @@ export def scratch-list [
     mut cond = ['parent_id = -1' 'tags.id is not null']
     mut exist_tagsid = []
 
-    $cond ++= [(if $trash { "scratch.deleted != ''" } else { "scratch.deleted = ''" })]
+    $cond ++= if $trash { ["scratch.deleted != ''"] } else { ["scratch.deleted = ''"] }
 
     if ($tags.or | is-not-empty) {
         let tags_id = scratch-tag-paths-id ...$tags.or
         | each { $in.data | last | get id }
         | scratch-tags-children ...$in
-        $exist_tagsid ++= $tags_id
+        $exist_tagsid ++= [$tags_id]
         let tags_id = $tags_id | each { $in | into string } | str join ', '
         $cond ++= [$"scratch.id in \(select scratch_id from scratch_tag where tag_id in \(($tags_id)\)\)"]
     }
@@ -71,7 +71,7 @@ export def scratch-list [
         let tags_id = scratch-tag-paths-id ...$tags.and
         | each { $in.data | last | get id }
         | scratch-tags-children ...$in
-        $exist_tagsid ++= $tags_id
+        $exist_tagsid ++= [$tags_id]
         let tags_id = $tags_id | each { $in | into string } | str join ', '
         $cond ++= [$"scratch.id in \(select scratch_id from scratch_tag where tag_id in \(($tags_id)\)\)"]
     }
@@ -107,7 +107,7 @@ export def scratch-list [
     if ($created | is-not-empty) { $time_cond ++= [$"created >= ($now - $created | fmt-date | Q $in)"] }
     if ($deadline | is-not-empty) { $time_cond ++= [$"\(deadline <= ($now + $deadline | fmt-date | Q $in) and done = 0\)"] }
     let time_cond = $time_cond | str join ' or ' | if ($in | is-not-empty) { $"\(($in)\)" }
-    if ($time_cond | is-not-empty) { $cond ++= $time_cond }
+    if ($time_cond | is-not-empty) { $cond ++= [$time_cond] }
 
     if ($relevant | is-not-empty) { $cond ++= [$"relevant = ($relevant)"] }
     match $done {

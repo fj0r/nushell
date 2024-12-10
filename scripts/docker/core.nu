@@ -432,10 +432,10 @@ export def container-create [
             [ -e $"DISPLAY=($env.DISPLAY?)" -v /tmp/.X11-unix:/tmp/.X11-unix ]]
     ] {
         if ($b.0) {
-            $args ++= $b.1
+            $args ++= [$b.1]
         } else {
             if ($b.2? | is-not-empty) {
-                $args ++= $b.2
+                $args ++= [$b.2]
             }
         }
     }
@@ -468,7 +468,7 @@ export def container-create [
             [-e $"http_proxy=($proxy)" -e $"https_proxy=($proxy)"]]
     ] {
         if ($i.0 | is-not-empty) {
-            $args ++= $i.1
+            $args ++= [$i.1]
         }
     }
 

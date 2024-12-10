@@ -53,7 +53,7 @@ export def tags-group [] {
                 ':' => {$r.or ++= [$v]}
             }
         } else {
-            $r.other ++= $i
+            $r.other ++= [$i]
         }
     }
     $r

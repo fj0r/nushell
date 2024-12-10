@@ -34,13 +34,13 @@ export def --wrapped dry [...x --prefix='    ' --strip] {
         for t in $a.it {
             let line = if ($nl | str replace -a ' ' '' | is-empty) { $"($nl)($t)" } else { $"($nl) ($t)" }
             if ($line | str length) > $w {
-                $lines ++= $nl
+                $lines ++= [$nl]
                 $nl = $"('' | fill -c $prefix -w $a.lv)($t)"
             } else {
                 $nl = $line
             }
         }
-        $lines ++= $nl
+        $lines ++= [$nl]
     }
     $lines | str join $" \\(char newline)"
 }
