@@ -6,6 +6,9 @@ export-env {
     if 'config' in $env {
         let load_msg = $"print '(ansi default_italic)(ansi grey)`__.nu` as overlay (ansi default_bold)__(ansi reset)'"
 
+        $env.config.hooks.env_change = $env.config.hooks.env_change
+        | upsert 'PWD' {|x| $x.PWD? | default [] }
+
         $env.config.hooks.env_change.PWD ++= [
             {
                 condition: {|_, after| '__' in (overlay list) }
@@ -43,7 +46,7 @@ export-env {
             }
         ]
     } else {
-        # nu -c
+        # nu -c 'batch mode'
     }
 }
 

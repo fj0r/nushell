@@ -89,7 +89,7 @@ export def screens [] {
                 let v = if $i.k == 'port' { $i.v } else { $i.v | into int }
                 $a | insert $i.k $v
             }
-            $monitor ++= $r
+            $monitor ++= [$r]
         }
     }
     $monitor
