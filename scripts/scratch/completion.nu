@@ -6,6 +6,7 @@ export def cmpl-scratch-id [] {
         case parent_id when -1 then '#' else '' end as root
         from scratch order by updated desc;"
     | each { $"($in.id) #($in.root) ($in.title)" }
+    | { completions: $in, options: { sort: false } }
 }
 
 export def list-untagged-root [type, ctx] {
@@ -39,6 +40,7 @@ export def list-untagged-root [type, ctx] {
     order by updated desc limit ($ch);"
     sqlx $q
     | update description {|x| $x.description | str replace '⯒' (ansi grey)}
+    | { completions: $in, options: { sort: false } }
 }
 
 export def cmpl-untagged-root-scratch [ctx] {
