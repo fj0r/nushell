@@ -27,10 +27,10 @@ def parse_pkg_list [] {
                 | str replace -ra  '[\[ \]]' ''
             let x = if ($x | is-empty) { "" } else { $"($char.c)/($x)" }
             let d = $"(char newline)($char.c)($d | get $i)"
-           $r ++= {
+           $r ++= [{
                 value: $cur.n
                 description: $"($t)($x)($char.t)($v)($char.t)($c)($char._)"
-           }
+           }]
         }
     }
     $r

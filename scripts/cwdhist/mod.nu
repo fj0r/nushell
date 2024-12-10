@@ -22,7 +22,7 @@ export-env {
         );"
     }
 
-    $env.config.hooks.env_change.PWD ++= {|_, dir|
+    $env.config.hooks.env_change.PWD ++= [{|_, dir|
         if $dir == $nu.home-path { return }
         let suffix = (do --ignore-errors { $dir | path relative-to  $nu.home-path })
         let path = if ($suffix | is-empty) {
@@ -38,9 +38,9 @@ export-env {
             do update set
                 count = count + 1,
                 recent = datetime\('now', 'localtime');"
-    }
+    }]
 
-    $env.config.menus ++= {
+    $env.config.menus ++= [{
         name: cwdhist_menu
         only_buffer_difference: true
         marker: "| "
@@ -75,7 +75,7 @@ export-env {
                     ;"
             }
         }
-    }
+    }]
     $env.config.keybindings ++= [
         {
             name: cwdhist_menu

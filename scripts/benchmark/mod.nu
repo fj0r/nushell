@@ -10,7 +10,7 @@ export def std [
         let now = date now
         if ($now - $begin) > $total and ($r | length) > $count { break }
         # TODO: optimize
-        $r ++= $now
+        $r ++= [$now]
     }
     let total = ($r | last) - $begin
     let times = ($r | length) - 1

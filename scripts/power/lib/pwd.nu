@@ -2,7 +2,7 @@ def 'path parents' [] {
     let p = $in | path expand | path split
     mut r = []
     for i in ($p | length | $in - 1)..0 {
-        $r ++= { a: ($p | range 0..$i), b: ($p | range ($i + 1)..) }
+        $r ++= [{ a: ($p | range 0..$i), b: ($p | range ($i + 1)..) }]
     }
     $r
 }

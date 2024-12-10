@@ -14,8 +14,8 @@ export def list-untagged-root [type, ctx] {
     let ch = $ts.rows - 5
     let cond = if ($ctx | is-not-empty) {
         mut r = []
-        if ($ctx.kind? | is-not-empty) { $r ++= $"s.kind = (Q $ctx.kind)" }
-        if ($ctx.preset? | is-not-empty) { $r ++= $"p.preset = (Q $ctx.preset)" }
+        if ($ctx.kind? | is-not-empty) { $r ++= [$"s.kind = (Q $ctx.kind)"] }
+        if ($ctx.preset? | is-not-empty) { $r ++= [$"p.preset = (Q $ctx.preset)"] }
         $r
     }
     let pr = match $type {

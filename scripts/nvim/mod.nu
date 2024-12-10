@@ -12,11 +12,11 @@ export def tcd [path?: string] {
 }
 
 export-env {
-    $env.config.hooks.env_change.PWD ++= {|before, after|
+    $env.config.hooks.env_change.PWD ++= [{|before, after|
         if ($env.NVIM? | is-not-empty) {
             nvim --headless --noplugin --server $env.NVIM --remote-send $"<cmd>lua HookPwdChanged\('($after)', '($before)')<cr>"
         }
-    }
+    }]
 }
 
 # drop stdout to nvim buf

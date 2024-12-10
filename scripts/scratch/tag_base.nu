@@ -153,7 +153,7 @@ export def scratch-ensure-tags [tags] {
                 print $"(ansi grey)Tag has been created: (ansi yellow)($t)(ansi reset)"
             }
         }
-        $ids ++= $pid
+        $ids ++= [$pid]
     }
 
     return $ids

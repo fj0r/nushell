@@ -86,18 +86,18 @@ def 'fmt tag-tree' [
     # Siblings' leaf come before branch
     if ':' in $o {
         let j = $o | get ':' | fmt tree ($level) --indent $indent --body-lines $body_lines --md=$md --md-list=$md_list --accumulator $accumulator
-        $out ++= $j.txt
-        $acc ++= $j.acc
-        $done ++= $j.done
+        $out ++= [$j.txt]
+        $acc ++= [$j.acc]
+        $done ++= [$j.done]
     }
     for i in ($o | transpose k v | filter {|x| $x.k != ':' }) {
         let instr = '' | fill -c ' ' -w ($padding + $level * $indent)
         # TODO:
         let x = $i.v | fmt tag-tree ($level + 1) --indent $indent --body-lines $body_lines --md=$md --md-list=$md_list --accumulator $accumulator
-        $out ++= {k: $i.k, v: $x.acc, d: $x.done} | fmt tag $instr --md=$md --md-list=$md_list
-        $out ++= $x.txt
-        $acc ++= $x.acc
-        $done ++= $x.done
+        $out ++= [({k: $i.k, v: $x.acc, d: $x.done} | fmt tag $instr --md=$md --md-list=$md_list)]
+        $out ++= [$x.txt]
+        $acc ++= [$x.acc]
+        $done ++= [$x.done]
     }
     let acc = if ($accumulator | is-empty) {
         {}
@@ -219,18 +219,18 @@ def 'fmt tree' [
     mut acc = {}
     mut done = []
     for i in $in {
-        $col ++= $i
-        $done ++= $i.done
+        $col ++= [$i]
+        $done ++= [$i.done]
         let prefix = '' | fill -c ' ' -w ($padding + $level * $indent)
         let l = $i
         | reject children
         | fmt leaves $prefix --body-lines $body_lines --md=$md --md-list=$md_list --show-value=($accumulator | is-not-empty)
         for j in $l {
-            $out ++= $j
+            $out ++= [$j]
         }
         if ($i.children | is-not-empty) {
             let x = $i.children | fmt tree ($level + 1) --indent $indent --body-lines $body_lines --md=$md --md-list=$md_list --accumulator $accumulator
-            $out ++= $x.txt
+            $out ++= [$x.txt]
             $acc = $x.acc
         }
     }
