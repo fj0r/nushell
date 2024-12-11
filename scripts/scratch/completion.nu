@@ -2,10 +2,9 @@ use common.nu *
 use libs/db.nu *
 
 export def cmpl-scratch-id [] {
-    sqlx "select id, title,
-        case parent_id when -1 then '#' else '' end as root
+    sqlx "select id as value,
+        case parent_id when -1 then title else '    ' || title end as description
         from scratch order by updated desc;"
-    | each { $"($in.id) #($in.root) ($in.title)" }
     | { completions: $in, options: { sort: false } }
 }
 

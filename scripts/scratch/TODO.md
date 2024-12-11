@@ -1,4 +1,6 @@
 - [x] Display
+  - [x] Fix completion #343
+    - [x] cmpl-scratch-id #344
   - [x] body's kind and line nums #207
   - [x] multiple tags format #193
   - [x] overdue deadlines should be highlighted #158
