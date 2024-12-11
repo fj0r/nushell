@@ -62,7 +62,7 @@ export def scratch-list [
         let tags_id = scratch-tag-paths-id ...$tags.or
         | each { $in.data | last | get id }
         | scratch-tags-children ...$in
-        $exist_tagsid ++= [$tags_id]
+        $exist_tagsid ++= $tags_id
         let tags_id = $tags_id | each { $in | into string } | str join ', '
         $cond ++= [$"scratch.id in \(select scratch_id from scratch_tag where tag_id in \(($tags_id)\)\)"]
     }
@@ -71,7 +71,7 @@ export def scratch-list [
         let tags_id = scratch-tag-paths-id ...$tags.and
         | each { $in.data | last | get id }
         | scratch-tags-children ...$in
-        $exist_tagsid ++= [$tags_id]
+        $exist_tagsid ++= $tags_id
         let tags_id = $tags_id | each { $in | into string } | str join ', '
         $cond ++= [$"scratch.id in \(select scratch_id from scratch_tag where tag_id in \(($tags_id)\)\)"]
     }
