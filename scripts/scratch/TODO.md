@@ -1,13 +1,47 @@
+- [x] Display
+  - [x] body's kind and line nums #207
+  - [x] multiple tags format #193
+  - [x] overdue deadlines should be highlighted #158
+  - [x] distinct tags tree node leader #147
+  - [x] Siblings' leaf come before branch #128
+  - [x] truncate tags branch #127
+  - [x] branch node #116
+  - [x] tag-tree
+    - [x] sort tag tree #342
+    - [x] Group tags #10
+    - [x] ~Segmented completion cmpl-tag~ #7
+- [ ] Integration
+  - [ ] DeltaLake #327
+    - [ ] import (polars.py) #328
+    - [ ] export (duckdb) #329
+  - [x] scratch_title_autocomplete_adjustment #271
+  - [x] refactor: snew --rewrite #270
+    - [x] snew auto-complete with quotes #280
+  - [ ] Push/Pull #254
+    - [ ] temporary table from merge #255
+    - [ ] Rearrange id #256
+    - [ ] Markdown dir #257
+  - [ ] Import/Export #11
+    - [x] Export #12
+    - [ ] restore tags #161
+- [x] Runner
+  - [x] si/so/sf --title(-t) #290
+    - [x] cmpl-untagged-root-title #291
+  - [x] data-runner #188
+    - [x] jsonl #189
+    - [x] lines #190
+  - [x] scratch-in: runner reuses files created during the editing process #165
+  - [x] cmpl kind's preset #144
+  - [x] Inject $env.SCRATCH_EXEC during editing #143
+  - [x] si/so --transform(-t): closure #141
+  - [x] edit preset #126
+  - [x] bind preset #102
+  - [x] docker-runner #101
+    - [ ] daemon mode #137
+  - [x] exec #31
 - [x] Filter
-  - [x] Completion of +tag and ^tag #2
-  - [x] List unfinished tasks, sorted by deadline #3
-  - [x] combo :tags and title #98
-  - [x] Change the condition for displaying hidden tags #107
-    - [x] Show hidden tags present in the parameters #269
-  - [x] sort tags for main tags #121
-  - [x] cmpl of id's tags #123
-    - [x] scratch-tag-move #124
-  - [x] deadline filter before (reverse) #160
+  - [x] sto time mismatch #287
+  - [x] sorting direction #279
   - [x] refactor scratch-list with scratch-tag-path-id #202
     - [x] scratch-tag-paths-id #210
     - [x] scratch-ensure-tags #245
@@ -17,60 +51,30 @@
     - [x] scratch-list #249
     - [x] scratch-attrs #250
     - [x] scratch-data #251
-  - [x] sorting direction #279
-  - [x] sto time mismatch #287
-- [x] Actions
-  - [x] When `scratch-tag-clean`, if there are additional tags, only the tags will be cleared #4
-  - [x] get-bodys with kind #191
-- [x] Display
-  - [x] branch node #116
-  - [x] truncate tags branch #127
-  - [x] Siblings' leaf come before branch #128
-  - [x] distinct tags tree node leader #147
-  - [x] overdue deadlines should be highlighted #158
-  - [x] multiple tags format #193
-  - [x] body's kind and line nums #207
-  - [x] tag-tree
-    - [x] ~Segmented completion cmpl-tag~ #7
-    - [x] Group tags #10
+  - [x] deadline filter before (reverse) #160
+  - [x] cmpl of id's tags #123
+    - [x] scratch-tag-move #124
+  - [x] sort tags for main tags #121
+  - [x] Change the condition for displaying hidden tags #107
+    - [x] Show hidden tags present in the parameters #269
+  - [x] combo :tags and title #98
+  - [x] List unfinished tasks, sorted by deadline #3
+  - [x] Completion of +tag and ^tag #2
 - [x] Data
-  - [x] Tag cannot contain spaces #8
-  - [x] Optimize scratch-ensure-tags #73
-  - [x] scratch-clean --untagged #104
-  - [x] scratch-upsert-kind/preset --batch #228
-  - [x] scratch-upsert #229
   - [x] new state of done 2 #278
-- [ ] Integration
-  - [ ] Import/Export #11
-    - [x] Export #12
-    - [ ] restore tags #161
-  - [ ] Push/Pull #254
-    - [ ] temporary table from merge #255
-    - [ ] Rearrange id #256
-    - [ ] Markdown dir #257
-  - [x] refactor: snew --rewrite #270
-    - [x] snew auto-complete with quotes #280
-  - [x] scratch_title_autocomplete_adjustment #271
-- [x] Runner
-  - [x] exec #31
-  - [x] docker-runner #101
-    - [ ] daemon mode #137
-  - [x] bind preset #102
-  - [x] edit preset #126
-  - [x] si/so --transform(-t): closure #141
-  - [x] Inject $env.SCRATCH_EXEC during editing #143
-  - [x] cmpl kind's preset #144
-  - [x] scratch-in: runner reuses files created during the editing process #165
-  - [x] data-runner #188
-    - [x] jsonl #189
-    - [x] lines #190
-  - [x] si/so/sf --title(-t) #290
-    - [x] cmpl-untagged-root-title #291
+  - [x] scratch-upsert #229
+  - [x] scratch-upsert-kind/preset --batch #228
+  - [x] scratch-clean --untagged #104
+  - [x] Optimize scratch-ensure-tags #73
+  - [x] Tag cannot contain spaces #8
 - [x] Accumelator
-  - [x] Only count leaf node #34
-  - [x] attrs --value #148
-  - [x] calc done #153
-  - [x] remove $monitor #154
-  - [x] default accumelator #155
-  - [x] value colors for positive and negative #156
   - [x] Display progress (by calculating the done rate of todos) #252
+  - [x] value colors for positive and negative #156
+  - [x] default accumelator #155
+  - [x] remove $monitor #154
+  - [x] calc done #153
+  - [x] attrs --value #148
+  - [x] Only count leaf node #34
+- [x] Actions
+  - [x] get-bodys with kind #191
+  - [x] When `scratch-tag-clean`, if there are additional tags, only the tags will be cleared #4

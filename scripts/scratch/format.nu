@@ -38,7 +38,7 @@ def 'list starts-with' [b] {
 
 def 'tagsplit' [tags] {
     let o = $in
-    let x = $o | default [] | each {|i|
+    let x = $o | default [] | reverse | each {|i|
         let t = $i.tags
         let s = if ($tags | is-empty) {
             [
