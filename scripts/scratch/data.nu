@@ -130,6 +130,36 @@ export def seed [] {
         open -r {}
         | curl -sSL -X POST ...$auth $url --data-binary @-
         | from json
+    - name: delta-lake
+      entry: scratch.sql
+      comment: '-- '
+      runner: file
+      cmd: |-
+        let o = open {}
+        let q = $\"
+          INSTALL delta;
+          LOAD delta;
+
+          CREATE OR REPLACE SECRET \\\(
+              TYPE S3,
+              KEY_ID '{key_id}',
+              SECRET '{secret}',
+              REGION '{region}',
+              ENDPOINT '{endpoint}',
+              URL_STYLE '{url_style}',
+              USE_SSL '{use_ssl}'
+          \\\);
+
+          \(\$o\)
+        \"
+
+        [{args}]
+        | enumerate
+        | reduce -f $q {|i,a|
+          let x = if ($i.item | describe -d).type == 'string' {$\"\\"($i.item)\\"\"} else { $i.item }
+          $a | str replace -a $\"%($i.index + 1)\" $\"($x)\"
+        }
+        | duckdb -json | lines | range 1.. | str join (char newline) | from json
     - name: myduck
       entry: scratch.sql
       comment: '-- '
