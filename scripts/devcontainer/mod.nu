@@ -40,7 +40,8 @@ export-env {
                 TIMEZONE: Asia/Shanghai
             }
             scripts: [
-                "npm config set registry http://nexus.s/repository/npm/"
+                "npm config set registry https://registry.npmjs.org"
+                #"npm config set registry http://nexus.s/repository/npm/"
                 "npm i"
                 "mv node_modules /opt"
                 "ln -s /opt/node_modules node_modules"
@@ -107,11 +108,8 @@ def gen-line [] {
 }
 
 def 'plan base' [
-    reg: string
-    repo: string
-    tag: string
-    ctx: string
     conf: record
+    context: record
 ] {
     let f = [
         $"FROM ($conf.base)"
@@ -120,15 +118,20 @@ def 'plan base' [
         $"WORKDIR ($conf.workdir)"
         $"COPY ($conf.manifest) ."
         $"RUN set -eux \\"
-        ...(if ($conf.setup? | is-empty) {[]} else { $conf.setup | gen-line | append '  \' })
+        ...(if ($context.proxy? | is-empty) {
+            []
+        } else {
+            $context.proxy | each {|x| [$"export http_proxy=($x)" $"export https_proxy=($x)"] } | flatten | gen-line
+        })
+        ...(if ($conf.setup? | is-empty) {[]} else { $conf.setup | gen-line })
         ...($conf.scripts | gen-line)
         $"  ;"
         ...(if ($conf.cmd? | is-empty) {[]} else {[$"" $"CMD ($conf.cmd | to json -r)"]})
     ] | str join (char newline)
     {
         dockerfile: $f
-        ctx: $ctx
-        tag: $"($reg)/($repo):($tag)"
+        ctx: $context.ctx
+        tag: $"($context.reg)/($context.repo):($context.tag)"
     }
 }
 
@@ -262,6 +265,7 @@ export def 'main' [type? --dry-run --example] {
         tag: $i.1
         ctx: $o.context
         args: $o.args
+        proxy: $o.proxy?
     }
 
     let conf = merge config $type
@@ -283,8 +287,8 @@ export def 'main' [type? --dry-run --example] {
         print $"($manifest): ($manifest_date), baseimage: ($baseimg_date)"
         print $"($manifest) newer than baseimage: ($manifest_date - $baseimg_date)"
     }
-    if ($baseimg_date | is-empty) or ($baseimg_date < $manifest_date) {
-        let planb = plan base $o.reg $o.repo $base_tag $o.ctx $conf
+    if ($baseimg_date | is-empty) or ($baseimg_date < $manifest_date) or $dry_run {
+        let planb = plan base $conf ($o | upsert tag $base_tag)
         print ($planb | table -e)
         if not $dry_run {
             $planb | build plan
