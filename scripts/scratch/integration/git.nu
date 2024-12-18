@@ -29,7 +29,7 @@ export def snew [
 }
 
 
-export def cmpl-todo-md [] {
+def cmpl-todo-md [] {
     ls **/TODO.md | get name
 }
 
