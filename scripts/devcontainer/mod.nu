@@ -104,6 +104,20 @@ export def "file modified" [file] {
     git log -1 --pretty="format:%ci" $file | into datetime
 }
 
+export def git-commit-changes [commit:string] {
+    git diff-tree --no-commit-id --name-only -r $commit | lines
+}
+
+export def git-last-changes [] {
+    let d = git log -n 9 --pretty=%h»¦«%s | lines | split column '»¦«' hash message
+    for i in $d {
+        let r = git-commit-changes $i.hash
+        if ($r | is-not-empty) {
+            return $r
+        }
+    }
+}
+
 def gen-line [] {
     $in
     | each {|x|
@@ -214,7 +228,7 @@ def 'inject env' [] {
     }
 }
 
-def 'build plan' [--rm --latest] {
+def 'exec plan' [--rm --latest] {
     let plan = $in
     let args = $plan.args?
     | default {}
@@ -271,7 +285,12 @@ def 'merge config' [type] {
     $c | merge $p | merge $x
 }
 
-export def 'main' [type? --dry-run --example] {
+export def 'main' [
+    type?
+    --dry-run
+    --by-date
+    --example
+] {
     let o = $in
     if $example {
         [
@@ -316,27 +335,36 @@ export def 'main' [type? --dry-run --example] {
         return
     }
 
-
-    let baseimg_date = image created $"http://($o.reg)" $o.repo $base_tag
-    let manifest_date = file modified $manifest
     $env.config.table.mode = 'compact'
     $env.config.table.padding = 0
     $env.config.datetime_format.normal = '%m/%d/%y %H:%M:%S'
-    if ($baseimg_date | is-not-empty) {
-        print $"($manifest): ($manifest_date), baseimage: ($baseimg_date)"
-        print $"($manifest) newer than baseimage: ($manifest_date - $baseimg_date)"
+
+    let changed = if $by_date {
+        let baseimg_date = image created $"http://($o.reg)" $o.repo $base_tag
+        let manifest_date = file modified $manifest
+        if ($baseimg_date | is-not-empty) {
+            print $"($manifest): ($manifest_date), baseimage: ($baseimg_date)"
+            print $"($manifest) newer than baseimage: ($manifest_date - $baseimg_date)"
+        }
+        ($baseimg_date | is-empty) or ($baseimg_date < $manifest_date)
+    } else {
+        let c = (git-last-changes)
+        let r = $manifest in $c
+        print $"git: ($manifest) (if $r {'has'} else {'not'}) changed"
+        $r
     }
-    if ($baseimg_date | is-empty) or ($baseimg_date < $manifest_date) or $dry_run {
+
+    if $changed or $dry_run {
         let planb = plan base $conf ($o | upsert tag $base_tag)
         print ($planb | table -e)
         if not $dry_run {
-            $planb | build plan
+            $planb | exec plan
         }
     }
     let baseimg = $"($o.reg)/($o.repo):($base_tag)"
     let planp = plan proj $o.reg $o.repo $o.tag $baseimg ($o.dockerfile? | default 'Dockerfile') $o.ctx $o.args
     print ($planp | table -e)
     if not $dry_run {
-        $planp | build plan --latest --rm
+        $planp | exec plan --latest --rm
     }
 }
