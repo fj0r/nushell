@@ -39,13 +39,18 @@ export-env {
                 LC_ALL: "C.UTF-8"
                 TIMEZONE: Asia/Shanghai
             }
-            scripts: [
-                "npm config set registry https://registry.npmjs.org"
-                #"npm config set registry http://nexus.s/repository/npm/"
-                "npm i"
-                "mv node_modules /opt"
-                "ln -s /opt/node_modules node_modules"
-            ]
+            scripts: {|context, conf|
+                [
+                    (if ($context.proxy? | is-empty) {
+                        "npm config set registry http://nexus.s/repository/npm/"
+                    } else {
+                        "npm config set registry https://registry.npmjs.org"
+                    })
+                    "npm i"
+                    "mv node_modules /opt"
+                    "ln -s /opt/node_modules node_modules"
+                ]
+            }
         }
         {
             type: npm-lock
@@ -111,22 +116,49 @@ def 'plan base' [
     conf: record
     context: record
 ] {
+    let envs = if ($conf.env? | is-empty) { [] } else {
+        $conf.env | items {|k, v| $"ENV ($k)=($v)" }
+    }
+
+    let cmds = if ($conf.cmd? | is-empty) { [] } else {
+        [$"" $"CMD ($conf.cmd | to json -r)"]
+    }
+
+    let setup = if ($conf.setup? |describe -d).type == closure {
+        do $conf.setup $context $conf
+    } else {
+        $conf.setup?
+    }
+    let setup = if ($setup | is-empty) { [] } else { $setup | gen-line }
+
+    let scripts = if ($conf.scripts? | describe -d).type == closure {
+        do $conf.scripts $context $conf
+    } else {
+        $conf.scripts
+    }
+    let scripts = if ($scripts | is-empty) { [] } else { $scripts | gen-line }
+
+    let proxy = if ($context.proxy? | is-empty) { [] } else {
+        $context.proxy
+        | each {|x|
+            [$"export http_proxy=($x)" $"export https_proxy=($x)"]
+        }
+        | flatten
+        | gen-line
+    }
+
     let f = [
         $"FROM ($conf.base)"
-        ...(if ($conf.env? | is-empty) {[]} else { $conf.env | items {|k, v| $"ENV ($k)=($v)" } })
+        ...$envs
         $""
         $"WORKDIR ($conf.workdir)"
         $"COPY ($conf.manifest) ."
         $"RUN set -eux \\"
-        ...(if ($context.proxy? | is-empty) {
-            []
-        } else {
-            $context.proxy | each {|x| [$"export http_proxy=($x)" $"export https_proxy=($x)"] } | flatten | gen-line
-        })
-        ...(if ($conf.setup? | is-empty) {[]} else { $conf.setup | gen-line })
-        ...($conf.scripts | gen-line)
+        ...$proxy
+        ...$setup
+        ...$scripts
         $"  ;"
-        ...(if ($conf.cmd? | is-empty) {[]} else {[$"" $"CMD ($conf.cmd | to json -r)"]})
+        ...$cmds
     ] | str join (char newline)
     {
         dockerfile: $f
@@ -225,9 +257,16 @@ def 'merge config' [type] {
     | where type == if ($p.type? | is-not-empty) { $p.type } else { $type }
     | first
 
+    let scripts = if ($c.scripts? | describe -d).type == closure {
+        {|...x|
+            [...(do $c.scripts ...$x | default []), ...($p.scripts? | default [])]
+        }
+    } else {
+        [...($c.scripts? | default []), ...($p.scripts? | default [])]
+    }
     let x = {
         env: {...($c.env? | default {}), ...($p.env? | default {})}
-        scripts: [...($c.scripts? | default []), ...($p.scripts? | default [])]
+        scripts: $scripts
     }
     $c | merge $p | merge $x
 }
