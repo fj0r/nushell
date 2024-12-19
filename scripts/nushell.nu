@@ -64,6 +64,14 @@ export-env {
                 [$env.HOME '.config' 'nvim']
             ]
         }
+        {
+            name: zellij
+            bin: zellij
+            cfg: [
+                ['etc' 'zellij']
+                [$env.HOME '.config' 'zellij']
+            ]
+        }
     ]
 }
 
