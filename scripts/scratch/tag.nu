@@ -69,6 +69,22 @@ export def scratch-tag-move [
     sqlx $q
 }
 
+export def scratch-move-tag [
+    from:string@cmpl-tag-1
+    to:string@cmpl-tag-1
+] {
+    let f1 = $from | tags-group | get or.0
+    let f2 = scratch-tag-paths-id $f1 | get data.0
+    let f = if ($f1 | length) == ($f2 | length) { $f2 | last | get id }
+    if ($f | is-empty) { error make {msg: $"`tag ($from)` not exists" }}
+    let t1 = $to | tags-group | get or.0
+    let t2 = scratch-tag-paths-id $t1 | get data.0
+    let t = if ($t1 | length) == ($t2 | length) { $t2 | last | get id }
+    if ($t | is-empty) { error make {msg: $"`tag ($to)` not exists" }}
+    let q = $"update tag set parent_id = ($t) where id = ($f)"
+    sqlx $q
+}
+
 export def scratch-tag-toggle [
     id: int@cmpl-scratch-id
     ...tags: string@cmpl-tag-2
