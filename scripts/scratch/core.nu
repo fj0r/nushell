@@ -336,7 +336,7 @@ export def scratch-attrs [
         if ($tags.not | is-not-empty) {
             let tids = scratch-tag-paths-id ...$tags.not
             | each {|y|
-                if ($y.data | length) == ($y.path | length) {
+                if $y.present {
                     $y.data | last | get id
                 }
             }

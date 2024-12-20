@@ -59,13 +59,12 @@ export def scratch-tag-move [
     --from(-f):string@cmpl-id-tag
     --to(-t):string@cmpl-tag-1
 ] {
-    let fr = $from | tags-group | get or.0
-    let fo = scratch-tag-paths-id $fr | get data.0
-    let fo = if ($fr | length) == ($fo | length) { $fo | last | get id }
-    if ($fo | is-empty) { error make {msg: $"`tag ($from)` not exists" }}
+    let f = $from | tags-group | get or.0 | scratch-tag-paths-id $in | first
+    if not $f.present { error make {msg: $"`tag ($from)` not exists" }}
+    let f = if $f.present { $f.data | last | get id }
     let to = $to | tags-group | get or.0
     let to = scratch-ensure-tags [$to] | last
-    let q = $"update scratch_tag set tag_id = ($to) where scratch_id = ($id) and tag_id = ($fo)"
+    let q = $"update scratch_tag set tag_id = ($to) where scratch_id = ($id) and tag_id = ($f)"
     sqlx $q
 }
 
@@ -73,14 +72,12 @@ export def scratch-move-tag [
     from:string@cmpl-tag-1
     to:string@cmpl-tag-1
 ] {
-    let f1 = $from | tags-group | get or.0
-    let f2 = scratch-tag-paths-id $f1 | get data.0
-    let f = if ($f1 | length) == ($f2 | length) { $f2 | last | get id }
-    if ($f | is-empty) { error make {msg: $"`tag ($from)` not exists" }}
-    let t1 = $to | tags-group | get or.0
-    let t2 = scratch-tag-paths-id $t1 | get data.0
-    let t = if ($t1 | length) == ($t2 | length) { $t2 | last | get id }
-    if ($t | is-empty) { error make {msg: $"`tag ($to)` not exists" }}
+    let f = $from | tags-group | get or.0 | scratch-tag-paths-id $in | first
+    if not $f.present { error make {msg: $"`tag ($from)` not exists" } }
+    let f = $f.data | last | get id
+    let t = $to | tags-group | get or.0 | scratch-tag-paths-id $in | first
+    if not $t.present { error make {msg: $"`tag ($to)` not exists" }}
+    let t = $t.data | last | get id
     let q = $"update tag set parent_id = ($t) where id = ($f)"
     sqlx $q
 }
@@ -96,9 +93,9 @@ export def scratch-tag-toggle [
     }
     if ($tags.not | is-not-empty) {
         $tags.not | each {|o|
-            let i = scratch-tag-paths-id $o | get data.0
-            if ($o | length) == ($i | length) {
-                $i | last | get id
+            let i = scratch-tag-paths-id $o | first
+            if $i.present {
+                $i.data | last | get id
             }
         } | scratch-untagged $id
     }
