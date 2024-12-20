@@ -36,6 +36,7 @@ export def scratch-today [
     --debug
     --done(-x): int
     --untagged(-U)
+    --hidden(-h)
     --deadline
 ] {
     let t = (date now) - (date now | format date '%FT00:00:00' | into datetime)
@@ -45,7 +46,7 @@ export def scratch-today [
         --created $t --updated $t --deadline $t
         --md-list=$md_list --md=$md
         --raw=$raw --debug=$debug
-        --done $done
+        --done $done --hidden=$hidden
         )
 }
 
