@@ -105,7 +105,8 @@ export def scratch-tag-paths-id [...tag_path: list<string>] {
     mut r = []
     for i in $a {
         let d = $q | where gr == $i.index | reject gr
-        $r ++= [{path: $i.item, data: $d}]
+        let p = ($i.item | length) == ($d | length)
+        $r ++= [{path: $i.item, data: $d, present: $p}]
     }
     $r
 }
