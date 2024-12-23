@@ -36,7 +36,17 @@ export def nonstdout [--view(-v) --flush(-f)] {
 }
 
 export-env {
+    $env.alternative_display_output_hook = {|| table -e }
+
     $env.config.keybindings ++= [
+        {
+            modifier: control_alt
+            keycode: char_e
+            mode: [emacs, vi_normal, vi_insert]
+            event: [
+                { send: ExecuteHostCommand, cmd: 'switch display output' }
+            ]
+        }
         {
             modifier: control_alt
             keycode: char_r
@@ -115,6 +125,12 @@ def cmpl-config-table-modes [] {
 export def --env 'config table mode' [mode: string@cmpl-config-table-modes] {
     $env.config.table.padding = 1
     $env.config.table.mode = $mode
+}
+
+export def --env 'switch display output' [] {
+    let t = $env.config.hooks.display_output
+    $env.config.hooks.display_output = $env.alternative_display_output_hook
+    $env.alternative_display_output_hook = $t
 }
 
 export def 'config reset' [] {

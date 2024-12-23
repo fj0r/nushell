@@ -1,79 +1,132 @@
-def override_key [bindings] {
-    let y = $in
-    let a = $bindings | where modifier == $y.modifier? and keycode == $y.keycode
-    if ($a | is-not-empty) {
-        $y | merge ($a | first)
-    } else {
-        $y
-    }
-}
-
-def --env prefer_alt_env [] {
-    let prefer_alt = $env.PREFER_ALT? | default '0' | into int
-    let include_chars = $env.PREFER_ALT_EXCLUED? | default (
-        [a e f b n p w u] | each { $"char_($in)" }
-    )
-    let modifieries = {
-        control: 'alt'
-        control_shift: 'shift_alt'
-        alt: 'control'
-        shift_alt: 'control_shift'
-    }
-    let bindings = [
-        {
-            modifier: alt
-            keycode: char_f
-            event: {
+if ($env.PREFER_ALT? | default '0' | into int) > 0 {
+    $env.config.keybindings ++= [
+        [name, modifier, keycode, event, mode];
+        [
+            move_one_word_left,
+            control,
+            left,
+            { edit: movewordleft },
+            [ emacs, vi_normal, vi_insert ]
+        ],
+        [
+            move_one_word_right_or_take_history_hint,
+            control,
+            right,
+            {
                 until: [
-                    { send: historyhintcomplete }
-                    { send: menuright }
+                    { send: historyhintwordcomplete },
                     { edit: movewordright }
                 ]
-            }
-        }
-        {
-            modifier: control
-            keycode: char_f
-            event: {
+            },
+            [ emacs, vi_normal, vi_insert ]
+        ],
+        [
+            move_to_line_start,
+            alt,
+            char_a,
+            { edit: movetolinestart },
+            [ emacs, vi_normal, vi_insert ]
+        ],
+        [
+            move_to_line_end_or_take_history_hint,
+            alt,
+            char_e,
+            {
+                until: [
+                    { send: historyhintcomplete },
+                    { edit: movetolineend }
+                ]
+            },
+            [ emacs, vi_normal, vi_insert ]
+        ],
+        [
+            move_down,
+            alt,
+            char_n,
+            {
+                until: [
+                    { send: menudown }
+                    { send: down }
+                ]
+            },
+            [ emacs, vi_normal, vi_insert ]
+        ],
+        [
+            move_up,
+            alt,
+            char_p,
+            {
+                until: [
+                    { send: menuup }
+                    { send: up }
+                ]
+            },
+            [ emacs, vi_normal, vi_insert ]
+        ],
+        [
+            delete_one_word_backward,
+            alt,
+            char_w,
+            { edit: backspaceword },
+            [ emacs, vi_insert ]
+        ],
+        [
+            move_left,
+            alt,
+            char_b,
+            {
+                until: [
+                    { send: menuleft },
+                    { edit: movewordleft }
+                ]
+            },
+            emacs
+        ],
+        [
+            move_right_or_take_history_hint,
+            alt,
+            char_f,
+            {
+                until: [
+                    { send: historyhintcomplete },
+                    { send: menuright },
+                    { edit: movewordright }
+                ]
+            },
+            emacs
+        ],
+        [
+            cut_word_left,
+            alt,
+            char_w,
+            { edit: cutwordleft },
+            emacs
+        ],
+        [
+            cut_line_to_end,
+            control,
+            char_k,
+            { edit: cuttolineend },
+            emacs
+        ],
+        [
+            move_one_word_left,
+            control,
+            char_b,
+            { send: left },
+            emacs
+        ],
+        [
+            move_one_word_right_or_take_history_hint,
+            control,
+            char_f,
+            {
                 until: [
                     { send: historyhintwordcomplete }
                     { send: right }
                 ]
-            }
-        }
-        {
-            modifier: alt
-            keycode: char_b
-            event: {
-                until: [
-                    { send: menuleft }
-                    { edit: movewordleft }
-                ]
-            }
-        }
-        {
-            modifier: control
-            keycode: char_b
-            event: { send: left }
-        }
+            },
+            emacs
+        ],
     ]
-    if $prefer_alt > 0 {
-        let new_ks = $env.config.keybindings
-        | each {|x|
-            if $x.modifier? in $modifieries and $x.keycode in $include_chars  {
-                $x | update modifier ($modifieries | get $x.modifier)
-            } else {
-                $x
-            }
-            | override_key $bindings
-        }
-        if ($new_ks | describe) == list<error> {
-            print $"(ansi red)__prefer_alt failed(ansi reset)"
-            print ($new_ks | table -e)
-        } else {
-            $env.config.keybindings = $new_ks
-        }
-    }
 }
-
-prefer_alt_env
