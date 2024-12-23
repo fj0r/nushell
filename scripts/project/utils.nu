@@ -67,6 +67,7 @@ export def --env direnv [
     | load-env
 }
 
+
 export def find-project [dir] {
     for d in (
         $dir

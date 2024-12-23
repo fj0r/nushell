@@ -24,6 +24,7 @@ export-env {
                     $"overlay use -r __.nu as __ -p"
                     $"cd $after"
                     $"direnv __"
+                    #$"project register $after --mod __"
                 ] | str join (char newline))
             }
         ]
