@@ -242,6 +242,16 @@ export def container-remove [
     }
 }
 
+# commit container
+export def container-commit [
+    container: string@cmpl-docker-containers
+    --namespace(-n): string@cmpl-docker-ns
+    name: string
+] {
+    let ns = if ($namespace | is-empty) {[]} else {[-n $namespace]}
+    let cs = ^$env.CONTCTL ...$ns ps -a | from ssv -a | get NAMES
+    ^$env.CONTCTL ...$ns commit $container $name
+}
 
 # history
 export def container-history [image: string@cmpl-docker-images -n: string@cmpl-docker-ns] {

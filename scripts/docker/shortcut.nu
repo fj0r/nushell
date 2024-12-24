@@ -2,6 +2,7 @@ export alias d = container
 export alias dp = container-list
 export alias dr = container-create
 export alias dx = container-preset
+export alias dc = container-commit
 export alias dcr = container-remove
 export alias da = container-attach
 export alias dl = container-log
