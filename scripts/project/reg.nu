@@ -20,25 +20,34 @@ def cmpl-cmd [ctx] {
     sqlx $"select command from dirs join commands on id = dir_id where dir = (Q $dir)" | get command
 }
 
+# project exec <div> <act> -m [lg [history-utils/backup.nu *]]
 export def 'project exec' [
     dir:string@cmpl-dir
     ...cmd:string@cmpl-cmd
     --prefix:string='__'
-    --mods(-m): list<string>
+    --mods(-m): list<any>
 ] {
     cd $dir
     let mods = if ($mods | is-empty) {
-        sqlx $"select mod from mods join dirs on id = dir_id where dir = (Q $dir)"
-        | get mod
+        sqlx $"select mod, members from mods join dirs on id = dir_id where dir = (Q $dir)"
+        | each {|x| [$x.mod ($x.members | split row ',')] }
     } else {
-        let ms = $mods | each { $"\((Q $in)\)" } | str join ','
-        let stmt = $"with x\(mod\) as \(VALUES ($ms)\)
-            , r as \(select id as dir_id, mod from dirs, x where dir = (Q $dir)\)
+        let ms = $mods
+        | each {|x|
+            if ($x | describe -d).type == string {
+                [$x, []]
+            } else {
+                [$x.0, ($x | range 1..)]
+            }
+        }
+        let qs = $ms | each {|x| $"\((Q $x.0), (Q ($x.1 | str join ','))\)" } | str join ','
+        let stmt = $"with x\(mod, members\) as \(VALUES ($qs)\)
+            , r as \(select id as dir_id, mod, members from dirs, x where dir = (Q $dir)\)
             insert or replace into mods select * from r"
         sqlx $stmt
-        $mods
+        $ms
     }
-    | each { $"use ($in)" }
+    | each { $"use ($in.0) ($in.1 | str join ' ')" }
 
     let cmd = [
         'use project'
@@ -82,6 +91,7 @@ export def --env 'project register' [
             "CREATE TABLE IF NOT EXISTS mods (
                 dir_id INTEGER NOT NULL,
                 mod TEXT NOT NULL,
+                members TEXT,
                 PRIMARY KEY (dir_id, mod)
             );"
         ] {
@@ -102,6 +112,6 @@ export def 'project unregister' [
     --dir:string
 ] {
     let dir = if ($dir | is-empty) { $env.PWD } else { $dir }
-    sqlx $"delete from commands where dir_id in \(select id from dirs where dir = (Q $dir)\);"
+    sqlx $"delete from commands where dir_id in \(select id from dirs where dir = (Q $dir)\) returning dir_id;"
 }
 

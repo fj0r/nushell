@@ -15,7 +15,6 @@ use llm *
 use llm/shortcut.nu *
 use llm/integration/web.nu *
 use project *
-use project/reg.nu *
 use ssh *
 use cwdhist *
 use parser
