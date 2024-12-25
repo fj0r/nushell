@@ -1,10 +1,3 @@
-def get_settings [] {
-    {
-        level: ($env.LG.level? | default 2)
-        file: ($env.LG.file?)
-    }
-}
-
 export-env {
     $env.LG = {
         prefix: ['TRC' 'DBG' 'INF' 'WRN' 'ERR' 'CRT']
@@ -36,7 +29,12 @@ export-env {
             let k = if $align { $y.k | fill -a r -w $max_key_len } else { $y.k }
             $"    ($theme.bg)($k) = ($theme.fg)($y.v | to json -r)"
         } }
+        level: 2
     }
+}
+
+def --env get_settings [] {
+    $env.LG
 }
 
 def parse_msg [args] {
@@ -61,7 +59,7 @@ export def --wrapped level [
 ] {
     let setting = if ($setting | is-empty) { get_settings } else { $setting }
     let target = if ($setting.file? | is-empty) { 'console' } else { 'file' }
-    let theme = $env.LG.theme | get $target
+    let theme = $setting.theme | get $target
     let output = if ($setting.file? | is-empty) {{ print -e $in }} else {{ $in | save -af $setting.file }}
     let msg = parse_msg $args
 
@@ -74,7 +72,7 @@ export def --wrapped level [
         let align = $target == 'console'
         let mkl = if $align { $tag | get k | each { $in | str length } | math max }
         let body = $tag
-        | each (do $env.LG.line_formatter $theme $align $mkl)
+        | each (do $setting.line_formatter $theme $align $mkl)
         | str join (char newline)
         let head = [$time $label $txt]
         | filter {|x| $x | is-not-empty }
@@ -92,7 +90,7 @@ export def --wrapped level [
 }
 
 def cmpl-log-prefix [] {
-    $env.LG.index | columns
+    (get_settings).index | columns
 }
 
 export def --wrapped main [
@@ -101,10 +99,10 @@ export def --wrapped main [
     ...args
 ] {
     let setting = get_settings
-    let lv = $env.LG.index | get $level
+    let lv = $setting.index | get $level
     if $lv < $setting.level {
         return
     }
-    let label = $env.LG.prefix | get $lv
+    let label = $setting.prefix | get $lv
     level $lv ...$args --label $label --setting $setting --multiline=$multiline
 }
