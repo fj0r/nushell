@@ -33,7 +33,7 @@ export def seed [] {
       runner: 'data'
     - name: jsonl
       entry: 'scratch.jsonl'
-      cmd: 'open {} | from json -o'
+      cmd: 'open {{}} | from json -o'
       comment: '# '
       runner: 'data'
     - name: toml
@@ -59,7 +59,7 @@ export def seed [] {
     - name: lines
       entry: 'scratch'
       comment: '# '
-      cmd: 'open {} | lines'
+      cmd: 'open {{}} | lines'
       runner: 'data'
     - name: nushell
       entry: scratch.nu
@@ -70,18 +70,18 @@ export def seed [] {
       entry: scratch.bash
       comment: '# '
       runner: file
-      cmd: 'open {stdin} | bash {} {args}'
+      cmd: 'open {{stdin}} | bash {{}} {{args}}'
     - name: python
       entry: scratch.py
       comment: '# '
       runner: file
-      cmd: 'open {stdin} | python3 {} {args}'
+      cmd: 'open {{stdin}} | python3 {{}} {{args}}'
       pos: 9
     - name: javascript
       entry: index.js
       comment: '// '
       runner: file
-      cmd: node {} {args}
+      cmd: node {{}} {{args}}
     - name: typescript
       entry: index.ts
       comment: '// '
@@ -90,7 +90,7 @@ export def seed [] {
       entry: src/main.rs
       comment: '// '
       runner: dir
-      cmd: 'cargo run {args}'
+      cmd: 'cargo run {{args}}'
       pos: 2
     - name: haskell
       entry: app/Main.hs
@@ -102,32 +102,32 @@ export def seed [] {
       entry: init.lua
       comment: '-- '
       runner: file
-      cmd: lua {}
+      cmd: lua {{}}
     - name: postgresql
       entry: scratch.sql
       comment: '-- '
       runner: file
       cmd: |-
-        $env.PGPASSWORD = '{password}'
-        psql -U {username} -d {database} -h {host} -p {port} -f {} --csv | from csv
+        $env.PGPASSWORD = '{{password}}'
+        psql -U {{username}} -d {{database}} -h {{host}} -p {{port}} -f {{}} --csv | from csv
     - name: sqlite
       entry: scratch.sql
       comment: '-- '
       runner: file
-      cmd: open {file} | query db (open {})
+      cmd: open {{file}} | query db (open {{}})
     - name: surreal
       entry: scratch.surql
       comment: '-- '
       runner: file
       cmd: |-
         let auth = [
-            -u '{username}:{password}'
-            -H 'surreal-ns: {ns}'
-            -H 'surreal-db: {db}'
+            -u '{{username}}:{{password}}'
+            -H 'surreal-ns: {{ns}}'
+            -H 'surreal-db: {{db}}'
             -H 'Accept: application/json'
         ]
-        let url = '{protocol}://{host}:{port}/sql'
-        open -r {}
+        let url = '{{protocol}}://{{host}}:{{port}}/sql'
+        open -r {{}}
         | curl -sSL -X POST ...$auth $url --data-binary @-
         | from json
     - name: delta-lake
@@ -135,25 +135,25 @@ export def seed [] {
       comment: '-- '
       runner: file
       cmd: |-
-        let o = open {}
+        let o = open {{}}
         let q = $\"
           INSTALL delta;
           LOAD delta;
 
           CREATE OR REPLACE SECRET \\\(
               TYPE S3,
-              KEY_ID '{key_id}',
-              SECRET '{secret}',
-              REGION '{region}',
-              ENDPOINT '{endpoint}',
-              URL_STYLE '{url_style}',
-              USE_SSL '{use_ssl}'
+              KEY_ID '{{key_id}}',
+              SECRET '{{secret}}',
+              REGION '{{region}}',
+              ENDPOINT '{{endpoint}}',
+              URL_STYLE '{{url_style}}',
+              USE_SSL '{{use_ssl}}'
           \\\);
 
           \(\$o\)
         \"
 
-        [{args}]
+        [{{args}}]
         | enumerate
         | reduce -f $q {|i,a|
           let x = if ($i.item | describe -d).type == 'string' {$\"\\"($i.item)\\"\"} else { $i.item }
@@ -165,16 +165,16 @@ export def seed [] {
       comment: '-- '
       runner: file
       cmd: |-
-        let o = open {}
+        let o = open {{}}
         let q = $\"
           INSTALL mysql;
           LOAD mysql;
-          ATTACH 'host={host} user={username} port={port} password={password}' AS mysql \\\(TYPE MYSQL\\\);
+          ATTACH 'host={{host}} user={{username}} port={{port}} password={{password}}' AS mysql \\\(TYPE MYSQL\\\);
           USE mysql;
           \(\$o\)
         \"
 
-        [{args}]
+        [{{args}}]
         | enumerate
         | reduce -f $q {|i,a|
           let x = if ($i.item | describe -d).type == 'string' {$\"\\"($i.item)\\"\"} else { $i.item }
@@ -187,7 +187,7 @@ export def seed [] {
       runner: file
       cmd: |-
         # pip install pymysql
-        let o = open {}
+        let o = open {{}}
         '_: |-
           import sys
           import yaml
@@ -196,13 +196,13 @@ export def seed [] {
           data = sys.stdin.readlines()
           data = \"\\n\".join(data)
 
-          exts = {\"ssl\": {\"verify_mode\": None}} if {ssl} else { }
+          exts = {\"ssl\": {\"verify_mode\": None}} if {{ssl}} else { }
 
           connection = pymysql.connect(
-            host=\"{host}\",
-            port={port},
-            user=\"{username}\",
-            password=\"{password}\",
+            host=\"{{host}}\",
+            port={{port}},
+            user=\"{{username}}\",
+            password=\"{{password}}\",
             charset=\"utf8mb4\",
             cursorclass=pymysql.cursors.DictCursor,
             **exts
@@ -217,7 +217,7 @@ export def seed [] {
         | from yaml | get _
         | save -f query.py
 
-        [{args}]
+        [{{args}}]
         | enumerate
         | reduce -f $o {|i,a|
           let x = if ($i.item | describe -d).type == 'string' {$\"\\"($i.item)\\"\"} else { $i.item }
