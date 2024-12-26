@@ -3,8 +3,10 @@ export use git-hooks.nu *
 export use reg.nu *
 
 export-env {
-    use git-hooks.nu *
+    project init-git-hooks
     if 'config' in $env {
+        project init-registry
+
         let load_msg = $"print '(ansi default_italic)(ansi grey)`__.nu` as overlay (ansi default_bold)__(ansi reset)'"
 
         $env.config.hooks.env_change = $env.config.hooks.env_change
@@ -51,4 +53,3 @@ export-env {
         # nu -c 'batch mode'
     }
 }
-

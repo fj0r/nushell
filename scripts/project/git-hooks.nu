@@ -1,4 +1,4 @@
-export-env {
+export def --env 'project init-git-hooks' [] {
     $env.GIT_HOOKS = {
         # commit
         pre-commit: {type: commit, default: true}

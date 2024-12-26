@@ -20,6 +20,31 @@ def cmpl-cmd [ctx] {
     sqlx $"select command from dirs join commands on id = dir_id where dir = (Q $dir)" | get command
 }
 
+export def --env 'project init-registry' [] {
+    init-db PROJECT_STATE ([$nu.data-dir 'project.db'] | path join) {|sqlx|
+        for s in [
+            "CREATE TABLE IF NOT EXISTS dirs (
+                id INTEGER PRIMARY KEY,
+                dir TEXT NOT NULL UNIQUE
+            );"
+            "CREATE TABLE IF NOT EXISTS commands (
+                dir_id INTEGER NOT NULL,
+                command TEXT NOT NULL,
+                created TEXT DEFAULT (strftime('%Y-%m-%dT%H:%M:%S','now')),
+                PRIMARY KEY (dir_id, command)
+            );"
+            "CREATE TABLE IF NOT EXISTS mods (
+                dir_id INTEGER NOT NULL,
+                mod TEXT NOT NULL,
+                members TEXT,
+                PRIMARY KEY (dir_id, mod)
+            );"
+        ] {
+            do $sqlx $s
+        }
+    }
+}
+
 # project exec <div> <act> -m [lg [history-utils/backup.nu *]]
 export def 'project exec' [
     dir:string@cmpl-dir
@@ -75,29 +100,6 @@ export def --env 'project register' [
     dir?:string
 ] {
     let dir = if ($dir | is-empty) { $env.PWD } else { $dir }
-
-    init-db PROJECT_STATE ([$nu.data-dir 'project.db'] | path join) {|sqlx|
-        for s in [
-            "CREATE TABLE IF NOT EXISTS dirs (
-                id INTEGER PRIMARY KEY,
-                dir TEXT NOT NULL UNIQUE
-            );"
-            "CREATE TABLE IF NOT EXISTS commands (
-                dir_id INTEGER NOT NULL,
-                command TEXT NOT NULL,
-                created TEXT DEFAULT (strftime('%Y-%m-%dT%H:%M:%S','now')),
-                PRIMARY KEY (dir_id, command)
-            );"
-            "CREATE TABLE IF NOT EXISTS mods (
-                dir_id INTEGER NOT NULL,
-                mod TEXT NOT NULL,
-                members TEXT,
-                PRIMARY KEY (dir_id, mod)
-            );"
-        ] {
-            do $sqlx $s
-        }
-    }
 
     let dir_id = sqlx $"insert into dirs \(dir\) values \((Q $dir)\)
         on conflict \(dir\) do update set dir = EXCLUDED.dir returning id;
