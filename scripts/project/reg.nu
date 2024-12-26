@@ -100,6 +100,7 @@ export def --env 'project register' [
     dir?:string
 ] {
     let dir = if ($dir | is-empty) { $env.PWD } else { $dir }
+    | str replace $env.HOME '~'
 
     let dir_id = sqlx $"insert into dirs \(dir\) values \((Q $dir)\)
         on conflict \(dir\) do update set dir = EXCLUDED.dir returning id;
