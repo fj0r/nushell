@@ -13,8 +13,8 @@ def 'cmd exists' [] {
 }
 
 # overlay use -r __.nu as __ -p
-export def --wrapped 'watch __' [...cmd:string@cmpl-cmd] {
-    watch-modify -c -g '__.nu' {
+export def --wrapped 'project watch' [...cmd:string@cmpl-cmd] {
+    run-and-watch -c -g '__.nu' {
         [
             'use project'
             'project direnv __'
