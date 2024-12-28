@@ -35,6 +35,16 @@ export def nonstdout [--view(-v) --flush(-f)] {
     }
 }
 
+export def block-edit [] {
+    let content = $in
+    let tf = mktemp -t temp-XXXX
+    $content | default '' | save -f $tf
+    ^$env.EDITOR $tf
+    let c = open $tf --raw
+    rm -f $tf
+    $c
+}
+
 export-env {
     $env.alternative_display_output_hook = {|| table -e }
 
