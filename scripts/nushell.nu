@@ -46,7 +46,15 @@ export def block-edit [] {
 }
 
 export-env {
-    $env.alternative_display_output_hook = {|| table -e }
+    $env.config.hooks.display_output =  {||
+        let o = $in
+        if (term size).columns >= 100 or not ($o | describe | str starts-with 'table') {
+            $o | table -e
+        } else {
+            $o | table
+        }
+    }
+    $env.alternative_display_output_hook = {|| $in | table -e }
 
     $env.config.keybindings ++= [
         {
