@@ -539,26 +539,37 @@ export def scratch-flush [
     --preset(-p):string@cmpl-kind-preset
 ] {
     let o = $in
-    mut sid = $id
+    if ($id | is-empty) and ($title | is-empty) {
+        error make -u { msg: 'id and title cannot both be empty' }
+    }
+
+    let c = if ($title | is-empty) { $"id = ($id)" } else { $"title = (Q $title)" }
+    let r = sqlx $"select id, title, kind from scratch where ($c);"
+
+    let sid = $r | get -i 0.id
+
     let kind = if ($kind | is-empty) {
-        if ($id | is-empty) and  ($title | is-empty) {
-            error make -u { msg: 'id, title and kind cannot both be empty' }
-        }
-        let c = if ($title | is-empty) { $"id = ($id)" } else { $"title = (Q $title)" }
-        let r = sqlx $"select id, kind from scratch where ($c);"
-        $sid = $r | get -i 0.id
         $r | get -i 0.kind | default 'md'
     } else {
         $kind
     }
+
+    let title = if ($title | is-empty) {
+        $r | get -i 0.title
+    } else {
+        $title
+    }
+
     {
         id: $sid
         body: ($o | to-all $kind)
         kind: $kind
+        title: $title
         preset: $preset
     }
     | filter-empty
     | db-upsert scratch id
+    $sid
 }
 
 export def scratch-upsert-kind [
