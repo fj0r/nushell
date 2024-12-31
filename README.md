@@ -1,5 +1,5 @@
 - [OpenAI and Ollama clients](scripts/llm/README.md)
-- [TODO](scripts/todo/README.md)
+- [Scratch](scripts/scratch/README.md)
 - [Kubernetes](scripts/kubernetes/)
 - [Docker](scripts/docker/)
 - [git](scripts/git/README.md)
