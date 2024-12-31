@@ -118,6 +118,13 @@ export def performance [
                 yaml | nuon | json | toml | csv | tsv | xml | lines | jsonl => {
                     open -r $f.file | from-all $config.name
                 }
+                md | markdown => {
+                    if 'MARKDOWN_RENDER' in $env {
+                        $o | ^$env.MARKDOWN_RENDER
+                    } else {
+                        $o
+                    }
+                }
                 _ => {
                     $o
                 }

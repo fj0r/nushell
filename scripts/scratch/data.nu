@@ -11,11 +11,11 @@ export def seed [] {
     - name: md
       entry: scratch.md
       comment: '# '
-      runner: ''
+      runner: 'data'
     - name: markdown
       entry: scratch.md
       comment: '# '
-      runner: ''
+      runner: 'data'
     - name: nuon
       entry: 'scratch.nuon'
       comment: '# '

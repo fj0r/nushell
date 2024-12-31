@@ -547,7 +547,7 @@ export def scratch-flush [
         let c = if ($title | is-empty) { $"id = ($id)" } else { $"title = (Q $title)" }
         let r = sqlx $"select id, kind from scratch where ($c);"
         $sid = $r | get -i 0.id
-        $r | get -i 0.kind
+        $r | get -i 0.kind | default 'md'
     } else {
         $kind
     }
