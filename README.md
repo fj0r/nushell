@@ -1,10 +1,10 @@
-- [Scratch](https://github.com/fj0r/scratch.nu)
-- [OpenAI and Ollama clients](https://github.com/fj0r/ai.nu)
-- [Docker](https://github.com/fj0r/docker.nu)
-- [Kubernetes](https://github.com/fj0r/kubernetes.nu)
-- [Git](https://github.com/fj0r/git.nu)
-- [Powerline prompt](https://github.com/fj0r/powerline.nu)
-- [Project](https://github.com/fj0r/project.nu)
+- [Scratch](https://github.com/fj0r/scratch.nu) Scratch, Todo, Code executor, Counter
+- [AI](https://github.com/fj0r/ai.nu) OpenAI and Ollama Clients
+- [Docker](https://github.com/fj0r/docker.nu) Docker, Nerdctl, Podman
+- [Kubernetes](https://github.com/fj0r/kubernetes.nu) Kubernetes
+- [Git](https://github.com/fj0r/git.nu) Git, Workflow, Activities
+- [Powerline prompt](https://github.com/fj0r/powerline.nu) NU_POWERLINE
+- [Project](https://github.com/fj0r/project.nu) Commands based on dir, git hook, parse-env, registry
 - [Argx](https://github.com/fj0r/argx.nu)
 - [dev-container](https://github.com/fj0r/devcontainer.nu) work with ci
 - [nvim](scripts/nvim)

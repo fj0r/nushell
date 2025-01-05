@@ -28,7 +28,6 @@ from = "devcontainer"
 to = "devcontainer"
 rank = 3
 title = "dev-container"
-desc = "work with ci"
 
 [[manifest]]
 from = "kubernetes"
@@ -62,7 +61,7 @@ title = "Git"
 from = "llm"
 to = "ai"
 rank = 1
-title = "OpenAI and Ollama clients"
+title = "AI"
 
 [[manifest]]
 from = "nvim"

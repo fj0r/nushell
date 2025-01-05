@@ -138,13 +138,18 @@ export def 'gen README' [] {
     | each {|x|
         let dist = [scripts $x.from] | path join
         let readme = [$dist README.md] | path join
+        let desc = if ($readme | path exists) {
+            let t = open $readme | lines | first | parse -r '# (?<title>.*)'
+            if ($t | is-empty) { [] } else { $t.title }
+        } else {
+            []
+        }
         let dist = if ($readme | path exists) { $readme } else { $dist }
         let url = if ($x.to? | is-empty) or ($x.disable? | default false) {
             $dist
         } else {
             $"https://github.com/fj0r/($x.to).nu"
         }
-        let desc = if ($x.desc? | is-empty) { [] } else { [$x.desc] }
         let title = $"- [($x.title)]\(($url)\)"
         [$title ...$desc] | str join ' '
     }
