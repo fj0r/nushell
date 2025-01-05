@@ -10,4 +10,5 @@
 - [nvim](scripts/nvim)
 - [Cwdhist](https://github.com/fj0r/cwdhist.nu)
 - [history-utils](https://github.com/fj0r/history-utils.nu)
+- [Os-utils](scripts/os)
 - [ssh](https://github.com/fj0r/ssh.nu)

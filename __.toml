@@ -100,3 +100,18 @@ from = "project"
 to = "project"
 rank = 2
 title = "Project"
+
+
+[[manifest]]
+from = "os"
+to = "os"
+rank = 3
+disable = true
+title = "Os-utils"
+
+[[manifest]]
+from = "lg"
+to = "lg"
+rank = 3
+disable = true
+title = "log"
