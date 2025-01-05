@@ -7,3 +7,6 @@
     - `kube-conf-import`/`kube-conf-export`
     - `kube-refine` export cluster's resources
     - `kube-compose` kubernetes to docker-compose
+
+---
+[Others](https://github.com/fj0r/nushell/blob/main/README.md)

@@ -84,3 +84,6 @@ power analyze
 - [x] support color theme
 - [x] refactor: theme/decorator/frame/schema
 
+
+---
+[Others](https://github.com/fj0r/nushell/blob/main/README.md)

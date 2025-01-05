@@ -21,3 +21,7 @@
 - scratch-in
     - -k <kind>
 - scratch-out
+
+
+---
+[Others](https://github.com/fj0r/nushell/blob/main/README.md)
