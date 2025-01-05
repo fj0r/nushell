@@ -129,3 +129,25 @@ export def 'update todo' [] {
 export def 'git commit scratch' [scratch_id] {
     scommit -f scripts/scratch/TODO.md :proj:scratch -s $scratch_id
 }
+
+export def 'gen README' [] {
+    open __.toml
+    | get manifest
+    | where { $in.title? | is-not-empty }
+    | sort-by rank
+    | each {|x|
+        let dist = [scripts $x.from] | path join
+        let readme = [$dist README.md] | path join
+        let dist = if ($readme | path exists) { $readme } else { $dist }
+        let url = if ($x.to? | is-empty) or ($x.disable? | default false) {
+            $dist
+        } else {
+            $"https://github.com/fj0r/($x.to).nu"
+        }
+        let desc = if ($x.desc? | is-empty) { [] } else { [$x.desc] }
+        let title = $"- [($x.title)]\(($url)\)"
+        [$title ...$desc] | str join ' '
+    }
+    | str join (char newline)
+    | save -f README.md
+}

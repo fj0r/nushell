@@ -8,26 +8,38 @@ disable = true
 [[manifest]]
 from = "argx"
 to = "argx"
+rank = 3
+title = "Argx"
 
 [[manifest]]
 from = "ssh"
 to = "ssh"
+rank = 4
+title = "ssh"
 
 [[manifest]]
 from = "docker"
 to = "docker"
+rank = 2
+title = 'Docker'
 
 [[manifest]]
 from = "devcontainer"
 to = "devcontainer"
+rank = 3
+title = "dev-container"
+desc = "work with ci"
 
 [[manifest]]
 from = "kubernetes"
 to = "kubernetes"
+rank = 2
+title = "Kubernetes"
 
 [[manifest]]
 from = "lg"
 to = "lg"
+rank = 3
 
 [[manifest]]
 from = "legacy/todo"
@@ -37,33 +49,47 @@ disable = true
 [[manifest]]
 from = "scratch"
 to = "scratch"
+rank = 1
+title = "Scratch"
 
 [[manifest]]
 from = "git"
 to = "git"
+rank = 2
+title = "Git"
 
 [[manifest]]
 from = "llm"
 to = "ai"
+rank = 1
+title = "OpenAI and Ollama clients"
 
 [[manifest]]
 from = "nvim"
 to = "nvim"
 disable = true
+rank = 3
+title = "nvim"
 
 [[manifest]]
 from = "power"
 to = "powerline"
 disable = false
+rank = 2
+title = "Powerline prompt"
 
 [[manifest]]
 from = "cwdhist"
 to = "cwdhist"
+rank = 3
+title = "Cwdhist"
 
 [[manifest]]
 from = "history-utils"
 to = "history-utils"
 disable = false
+rank = 3
+title = "history-utils"
 
 [[manifest]]
 from = "resolvenv"
@@ -73,3 +99,5 @@ disable = true
 [[manifest]]
 from = "project"
 to = "project"
+rank = 2
+title = "Project"
