@@ -11,4 +11,5 @@
 - [Cwdhist](https://github.com/fj0r/cwdhist.nu)
 - [history-utils](https://github.com/fj0r/history-utils.nu)
 - [Os-utils](scripts/os)
+- [log](scripts/lg)
 - [ssh](https://github.com/fj0r/ssh.nu)
