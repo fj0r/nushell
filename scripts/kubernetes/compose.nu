@@ -48,7 +48,7 @@ export def kube-compose [--without-service(-s)] {
         let p = ['.kcmp', 'Secret', $i.metadata.name] | path join
         mkdir $p
         for f in ($i.data | transpose k v) {
-            $f.v | decode new-base64 | save -f ([$p $f.k] | path join)
+            $f.v | decode base64 | save -f ([$p $f.k] | path join)
         }
         $a | insert $i.metadata.name $p
     }
