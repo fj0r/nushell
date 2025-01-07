@@ -111,19 +111,24 @@ export def parse [
     --pos(-p)
 ] {
     let cmd = $in
+
     let ast = $cmd | get-ast
     let x = $ast | get-args
+
     if not $pos {
-        return $x
+        return $x # early exit
     }
+
     let sign = $ast | get-sign
 
     mut pos = $sign.positional
     | enumerate
     | reduce -f {} {|it, acc| $acc | insert $it.item ($x.args | get -i $it.index) }
+
     if ($sign.rest | is-not-empty) {
         $pos = $pos | insert $sign.rest.0 ($x.args | range ($sign.positional | length).. )
     }
+
     $x | insert pos $pos
 }
 
