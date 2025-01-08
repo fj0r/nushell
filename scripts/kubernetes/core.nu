@@ -123,23 +123,24 @@ export def kube-get [
     }
     if ($resource | is-empty) {
         let l = $selector | with-flag -l
-        if ($jsonpath | is-empty) {
-            let wide = if $wide {[-o wide]} else {[]}
-            if $verbose {
-                kubectl get -o json ...$ns $kind ...$l | from json
-                | get items
-                | krefine $kind
-            } else if $watch {
-                kubectl get ...$ns $kind ...$l ...$wide --watch
-            } else {
-                kubectl get ...$ns $kind ...$l ...$wide | from ssv -a | normalize-column-names
-            }
+
+        let wide = if $wide {[-o wide]} else {[]}
+        if $verbose {
+            kubectl get -o json ...$ns $kind ...$l | from json
+            | get items
+            | krefine $kind
+        } else if $watch {
+            kubectl get ...$ns $kind ...$l ...$wide --watch
         } else {
-            kubectl get ...$ns $kind $"--output=jsonpath={($jsonpath)}" | from json
+            kubectl get ...$ns $kind ...$l ...$wide | from ssv -a | normalize-column-names
         }
     } else {
-        let o = kubectl get ...$ns $kind $resource -o json | from json
-        if $verbose { $o } else { $o | krefine $kind }
+        if ($jsonpath | is-empty) {
+            let o = kubectl get ...$ns $kind $resource -o json | from json
+            if $verbose { $o } else { $o | krefine $kind }
+        } else {
+            kubectl get ...$ns $kind $resource $"--output=jsonpath={($jsonpath)}" | from json
+        }
     }
 }
 
