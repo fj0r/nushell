@@ -827,6 +827,12 @@ export def --env init [] {
                 description TEXT
             );"
             "CREATE INDEX idx_prompt ON prompt (name);"
+            "CREATE TABLE IF NOT EXISTS prompt_tools (
+                prompt TEXT,
+                tool TEXT,
+                type TEXT DEFAULT 'function',
+                PRIMARY KEY (prompt, tool)
+            );"
             "CREATE TABLE IF NOT EXISTS messages (
                 session_id TEXT,
                 provider TEXT,
