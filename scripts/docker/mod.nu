@@ -27,6 +27,20 @@ export-env {
           - --cap-add=SYS_PTRACE
           - --security-opt
           - seccomp=unconfined
+        - name: mitmporxy
+          image: mitmproxy/mitmproxy
+          daemon: false
+          container_name: mitmproxy
+          environment: {}
+          ports: {}
+          volumns:
+            ~/.mitmproxy: /home/mitmproxy/.mitmproxy
+          command:
+          - mitmproxy
+          - -p
+          - 8989
+          options:
+          - --network=host
         - name: ollama-gpu
           image: ollama
           container_name: ollama
