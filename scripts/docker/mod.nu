@@ -41,6 +41,22 @@ export-env {
           - 8989
           options:
           - --network=host
+        - name: mitmweb
+          image: mitmproxy/mitmproxy
+          daemon: false
+          container_name: mitmproxy
+          environment: {}
+          ports: {}
+          volumns:
+            ~/.mitmproxy: /home/mitmproxy/.mitmproxy
+          command:
+          - mitmweb
+          - --web-host
+          - 0.0.0.0
+          - -p
+          - 8989
+          options:
+          - --network=host
         - name: ollama-gpu
           image: ollama
           container_name: ollama
