@@ -41,26 +41,6 @@ export def upsert-prompt [--delete --action: closure] {
     }
 }
 
-export def upsert-function [--delete --action: closure] {
-    $in | table-upsert --action $action --delete=$delete {
-        table: function
-        pk: [name]
-        default: {
-            name: ''
-            description: ''
-            parameters: {}
-        }
-        filter: {
-            out: {
-                parameters: { $in | to yaml }
-            }
-            in: {
-                parameters: { $in | from yaml }
-            }
-        }
-    }
-}
-
 export def seed [] {
     "
     - name: general
@@ -798,24 +778,6 @@ export def seed [] {
       description: matrialized view
     "
     | from yaml | each { $in | upsert-prompt }
-    "
-    - name: get_current_weather
-      description: 'Get the current weather in a given location'
-      parameters: |-
-        type: object
-        properties:
-          location:
-            type: string
-            description: The city and state, e.g. San Francisco, CA
-          unit:
-            type: string
-            enum:
-            - celsius
-            - fahrenheit
-        required:
-        - location
-    "
-    | from yaml | each { $in | upsert-function }
 }
 
 export def --env init [] {
@@ -876,13 +838,6 @@ export def --env init [] {
                 tag TEXT
             );"
             "CREATE INDEX idx_messages ON messages (session_id);"
-            "CREATE TABLE IF NOT EXISTS function (
-                name TEXT PRIMARY KEY,
-                description TEXT,
-                parameters TEXT,
-                tag TEXT
-            );"
-            "CREATE INDEX idx_function ON function (name);"
 
             "CREATE TABLE IF NOT EXISTS scratch (
                 id INTEGER PRIMARY KEY,
