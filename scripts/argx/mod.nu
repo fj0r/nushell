@@ -65,6 +65,7 @@ def expr-to-value [expr] {
                     # TODO:
                     null
                 }
+                Filepath => { $v.0 }
                 String | Int | Bool => { $v }
                 _ => { $"($k):($v)" }
             }

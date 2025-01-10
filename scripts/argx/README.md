@@ -3,5 +3,10 @@ new version that is implemented by `ast`, which is slightly faster. It is mainly
 
 In the new version, the `ast` directly provides the relevant information. There is also a `--pos` parameter for parsing **name** of positional arguments (which is often unnecessary, making it faster).
 
+# TODO
+- [ ] parse `parameter_default` (get-sign)
+- [ ] select the corresponding item in the `pipelines` based on the `offset` (get-ast)
+- [x] parse filepath type
+
 ---
 [Others](https://github.com/fj0r/nushell/blob/main/README.md)
