@@ -1,4 +1,4 @@
-# run-and-watch -g scripts/argx/mod.nu { nu -c "use argx; source scripts/argx/test.nu" }
+# run-and-watch -g scripts/argx/mod.nu { nu -c "use argx; source scripts/argx/test/a.nu" }
 def test-parse [$s -p] {
     print $"(ansi yellow)($s)(ansi reset)"
     let r = $s | argx parse --pos=$p | to yaml

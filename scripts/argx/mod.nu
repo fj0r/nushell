@@ -7,6 +7,7 @@ def get-sign [] {
     mut p = []
     mut pr = []
     mut r = []
+    mut df = {}
     for it in $x {
         if $it.parameter_type == 'switch' {
             if ($it.short_flag | is-not-empty) {
@@ -38,6 +39,7 @@ def get-sign [] {
         named: $n
         positional: ($p ++ $pr)
         rest: $r
+        default: $df
     }
 }
 
