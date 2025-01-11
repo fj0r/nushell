@@ -5,7 +5,7 @@ In the new version, the `ast` directly provides the relevant information. There 
 
 # TODO
 - [x] parse `parameter_default` (get-sign)
-- [ ] select the corresponding item in the `pipelines` based on the `offset` (get-ast)
+- [x] select the corresponding item in the `pipelines` based on the `offset` (get-ast)
 - [x] parse filepath type
 
 ---

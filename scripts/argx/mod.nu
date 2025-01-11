@@ -1,7 +1,29 @@
-export def get-ast [] {
+export def get-ast [offset?: int] {
     let d = ast $in -j -m | get block | from json
-    let cur = $d | get -i pipelines | last | get elements | last
-    $cur.expr.expr.Call
+    let cur = if ($offset | is-empty) {
+        $d
+        | get -i pipelines | last
+        | get elements | last
+    } else {
+        let p = $d | get -i pipelines
+        let o = $d.span.start + $offset
+        mut r = null
+        for i in $p {
+            for j in $i.elements {
+                let s = $j.expr.span
+                if ($s.start <= $o) and ($o <= $s.end) {
+                    $r = $j
+                    break
+                }
+            }
+        }
+        $r
+    }
+    if ($cur | is-not-empty) {
+        $cur.expr.expr.Call
+    } else {
+        null
+    }
 }
 
 def expr-to-value [expr] {
@@ -65,10 +87,11 @@ def get-args [] {
     $r
 }
 
-export def parse [] {
+export def parse [offset?: int] {
     let cmd = $in
 
-    let ast = $cmd | get-ast
+    let ast = $cmd | get-ast $offset
+    if ($ast | is-empty) { return }
     let x = $ast | get-args
 
     let sign = scope commands
