@@ -95,18 +95,32 @@ export def parse [
 
     let sign = $sign | group-by parameter_type
 
+    let opt = $sign.named? | get -i name | reduce -f $x.opt {|i, a|
+        if ($i in $defaults) and ($i not-in $a) {
+            $a | insert $i ($defaults | get $i)
+        } else {
+            $a
+        }
+    }
+
     mut pos = $sign.positional?
     | get name
     | enumerate
-    | reduce -f {} {|it, acc| $acc | insert $it.item ($x.args | get -i $it.index) }
-
-    if ($sign.rest? | is-not-empty) {
-        $pos = $pos | insert $sign.rest.0.name (
-            $x.args | range ($sign.positional | length)..
-        )
+    | reduce -f {} {|it, acc|
+        let v = $x.args | get -i $it.index
+        let v = if ($v | is-empty) { $defaults | get -i $it.item } else { $v }
+        $acc | insert $it.item $v
     }
 
-    $x | insert pos $pos
+    if ($sign.rest? | is-not-empty) {
+        # HACK: If the name of the rest parameter is `rest`, then the name is empty.
+        let name = $sign.rest.0.name | default 'rest'
+        $pos = $pos | insert $name ($x.args | range ($sign.positional | length)..)
+    }
+
+    $x
+    | insert pos $pos
+    | update opt $opt
 }
 
 export-env {
