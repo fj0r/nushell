@@ -158,7 +158,7 @@ export def cmpl-kind-preset [ctx] {
     if NU_ARGX_EXISTS not-in $env {
         sqlx $"select name as value, kind as description from kind_preset"
     } else {
-        let k = $ctx | argx parse -p
+        let k = $ctx | argx parse
         let k1 = $k | get -i opt.kind
         let k2 = $k | get -i pos.kind
         let k = ($k1 | default $k2)

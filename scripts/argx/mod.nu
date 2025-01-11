@@ -65,9 +65,7 @@ def get-args [] {
     $r
 }
 
-export def parse [
-    --pos(-p)
-] {
+export def parse [] {
     let cmd = $in
 
     let ast = $cmd | get-ast
@@ -129,6 +127,6 @@ export-env {
 
 export def test [$s -p] {
     print $"(ansi yellow)($s)(ansi reset)"
-    let r = $s | parse --pos=$p | to yaml
+    let r = $s | parse | to yaml
     print $"(ansi grey)($r)(ansi reset)"
 }

@@ -117,7 +117,7 @@ export def cmpl-kube-deploys [context: string, offset: int] {
 }
 
 export def cmpl-kube-deploys-and-pods [context: string, offset: int] {
-    let ctx = $context | argx parse -p
+    let ctx = $context | argx parse
     let ns = $ctx.opt.namespace? | with-flag -n
     let all_pods = ($ctx.opt.a? | default false) or ($ctx.opt.all-pods? | default false)
     if $all_pods or ($ctx.pos.pod? | default '' | str ends-with '-') {

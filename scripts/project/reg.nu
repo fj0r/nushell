@@ -16,7 +16,7 @@ def cmpl-dir [] {
 }
 
 def cmpl-cmd [ctx] {
-    let dir = $ctx | argx parse --pos | get pos.dir
+    let dir = $ctx | argx parse | get pos.dir
     sqlx $"select command from dirs join commands on id = dir_id where dir = (Q $dir)" | get command
 }
 

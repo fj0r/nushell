@@ -14,7 +14,7 @@ def cmpl-helm-list [context: string, offset: int] {
 }
 
 def cmpl-helm-charts [context: string, offset: int] {
-    let ctx = $context | argx parse -p
+    let ctx = $context | argx parse
     let path = $ctx | get pos.chart?
     let paths = do -i { ls ($"($path)*/**/Chart.yaml" | into glob) | each { $in.name | path dirname } }
     helm repo list | from ssv -a | rename value description
