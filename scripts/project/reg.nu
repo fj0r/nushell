@@ -86,12 +86,12 @@ export def 'project global' [
     nu -c $cmd
 }
 
-export def Q [...t --sep:string=''] {
+def Q [...t --sep:string=''] {
     let s = $t | str join $sep | str replace -a "'" "''"
     $"'($s)'"
 }
 
-export def sqlx [s] {
+def sqlx [s] {
     open $env.PROJECT_STATE | query db $s
 }
 
