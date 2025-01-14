@@ -124,7 +124,7 @@ export def parse [offset?: int] {
         }
     }
 
-    mut pos = $sign.positional?
+    mut pos = $sign.positional? | default []
     | get name
     | enumerate
     | reduce -f {} {|it, acc|
@@ -136,7 +136,7 @@ export def parse [offset?: int] {
     if ($sign.rest? | is-not-empty) {
         # HACK: If the name of the rest parameter is `rest`, then the name is empty.
         let name = $sign.rest.0.name | default 'rest'
-        $pos = $pos | insert $name ($x.args | range ($sign.positional | length)..)
+        $pos = $pos | insert $name ($x.args | range ($sign.positional? | length)..)
     }
 
     $x
