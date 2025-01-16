@@ -3,8 +3,8 @@ export def --env 'project init-git-hooks' [] {
         # commit
         pre-commit: {type: commit, default: true}
         pre-merge-commit: {type: commit, default: true}
-        prepare-commit-msg: {type: commit}
-        commit-msg: {type: commit}
+        prepare-commit-msg: {type: commit, default: true}
+        commit-msg: {type: commit, default: true}
         post-commit: {type: commit, default: true}
         # email
         applypatch-msg: {type: email}
