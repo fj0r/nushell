@@ -168,9 +168,17 @@ export def image-layer [
     image: string@cmpl-docker-images
 ] {
     let ns = if ($n | is-empty) {[]} else {[-n $n]}
-    ^$env.CONTCTL ...$ns inspect $image
-    | from json
-    | get 0.RootFS.Layers
+    let i = ^$env.CONTCTL ...$ns inspect $image | from json
+    match $env.CONTCTL {
+        'nerdctl' => {
+            #let root = containerd config dump | from toml | get root
+            $i | get 0.RootFS.Layers
+        }
+        _ => {
+            let d = $i | get 0.GraphDriver.Data
+            $d | items {|k,v| $v | split row ':'} | flatten
+        }
+    }
 }
 
 
