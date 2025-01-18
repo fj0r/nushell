@@ -413,16 +413,16 @@ export def --wrapped container-create [
     --netadmin
     --proxy: string@cmpl-docker-run-proxy      # proxy
     --ssh(-s): string@cmpl-docker-run-sshkey   # specify ssh key
-    --sshuser: string=root                              # default root
+    --sshuser: string=root                     # default root
     --mnt(-m): string@cmpl-docker-run-vol      # mnt
-    --vols(-v): any                                     # { host: container }
-    --ports(-p): any                                    # { 8080: 80 }
-    --envs(-e): any                                     # { FOO: BAR }
+    --vols(-v): record                         # { host: container }
+    --ports(-p): record                        # { 8080: 80 }
+    --envs(-e): record                         # { FOO: BAR }
     --daemon(-d)
     --join(-j): string@cmpl-docker-containers  # join
     --network: string@cmpl-docker-network      # network
-    --workdir(-w): string                               # workdir
-    --entrypoint: string                                # entrypoint
+    --workdir(-w): string                      # workdir
+    --entrypoint: string                       # entrypoint
     --dry-run
     --with-x
     --nvidia:int
@@ -430,32 +430,29 @@ export def --wrapped container-create [
     --namespace(-n): string@cmpl-docker-ns
     --options: list<string>
     image: string@cmpl-docker-images           # image
-    ...cmd                                              # command args
+    ...cmd                                     # command args
 ] {
     mut args = []
 
-    for b in [
-        [$daemon
-            [-d]
-            [--rm -it]]
-        [$debug
-            [--cap-add=SYS_ADMIN --cap-add=SYS_PTRACE --security-opt seccomp=unconfined]]
-        [$appimage
-            [--device /dev/fuse --security-opt apparmor:unconfined]]
-        [$privileged
-            [--privileged]]
-        [$netadmin
-            [--cap-add=NET_ADMIN --device /dev/net/tun]]
-        [$with_x
-            [ -e $"DISPLAY=($env.DISPLAY?)" -v /tmp/.X11-unix:/tmp/.X11-unix ]]
-    ] {
-        if ($b.0) {
-            $args ++= $b.1
-        } else {
-            if ($b.2? | is-not-empty) {
-                $args ++= $b.2
-            }
-        }
+    if $daemon {
+        $args ++= [-d]
+    } else {
+        $args ++= [--rm -it]
+    }
+    if $debug {
+        $args ++= [--cap-add=SYS_ADMIN --cap-add=SYS_PTRACE --security-opt seccomp=unconfined]
+    }
+    if $appimage {
+        $args ++= [--device /dev/fuse --security-opt apparmor:unconfined]
+    }
+    if $privileged {
+        $args ++= [--privileged]
+    }
+    if $netadmin {
+        $args ++= [--cap-add=NET_ADMIN --device /dev/net/tun]
+    }
+    if $with_x {
+        $args ++= [-e $"DISPLAY=($env.DISPLAY?)" -v /tmp/.X11-unix:/tmp/.X11-unix]
     }
 
     let ports = $ports
@@ -467,27 +464,29 @@ export def --wrapped container-create [
         $a | merge {$k: $i.v}
     }
 
-    for i in [
-        [$namespace
-            [--namespace $namespace]]
-        [$entrypoint
-            [--entrypoint $entrypoint]]
-        [$mnt
-            [-v $mnt]]
-        [$workdir
-            [-w $workdir -v $"($env.PWD):($workdir)"]]
-        [$vols
-            ($vols | transpose k v | each {|x| [-v $"(host-path $x.k):($x.v)"]} | flatten)]
-        [$envs
-            ($envs | transpose k v | each {|x| [-e $"($x.k)=($x.v)"]} | flatten)]
-        [$ports
-            ($ports | transpose k v | each {|x| [-p $"($x.k):($x.v)"] } | flatten)]
-        [$proxy
-            [-e $"http_proxy=($proxy)" -e $"https_proxy=($proxy)"]]
-    ] {
-        if ($i.0 | is-not-empty) {
-            $args ++= $i.1
-        }
+    if ($namespace | is-not-empty) {
+        $args ++= [--namespace $namespace]
+    }
+    if ($entrypoint | is-not-empty) {
+        $args ++= [--entrypoint $entrypoint]
+    }
+    if ($mnt | is-not-empty) {
+        $args ++= [-v $mnt]
+    }
+    if ($workdir | is-not-empty) {
+        $args ++= [-w $workdir -v $"($env.PWD):($workdir)"]
+    }
+    if ($vols | is-not-empty) {
+        $args ++= $vols | items {|k, v| [-v $"(host-path $k):($v)"]} | flatten
+    }
+    if ($envs | is-not-empty) {
+        $args ++= $envs | items {|k, v| [-e $"($k)=($v)"] } | flatten
+    }
+    if ($ports | is-not-empty) {
+        $args ++= $ports | items {|k, v| [-p $"($k):($v)"] } | flatten
+    }
+    if ($proxy | is-not-empty) {
+        $args ++= [-e $"http_proxy=($proxy)" -e $"https_proxy=($proxy)"]
     }
 
     if ($ssh | is-not-empty) {
