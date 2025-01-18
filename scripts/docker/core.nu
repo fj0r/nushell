@@ -406,7 +406,7 @@ def host-path [path] {
 }
 
 # run
-export def container-create [
+export def --wrapped container-create [
     --name: string
     --debug(-x)
     --appimage
@@ -533,12 +533,12 @@ export def container-create [
     if $dry_run {
         echo ([docker run --name $name $options $args $image $cmd] | flatten | str join ' ')
     } else {
-        ^$env.CONTCTL run --name $name ...$options ...$args $image ...($cmd | flatten)
+        ^$env.CONTCTL run --name $name ...$options ...$args $image ...$cmd
     }
 }
 
 
-export def container-preset [
+export def --wrapped container-preset [
     preset:string@cmpl-preset
     ...cmd
     --namespace(-n): string@cmpl-docker-ns
