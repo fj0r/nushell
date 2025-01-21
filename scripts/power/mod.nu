@@ -24,7 +24,7 @@ def host_abbr [] {
                 $theme.default
             }
         let p = if 'ASCIINEMA_REC' in $env {
-            ''
+            $"(ansi xterm_red)⏺ ($env.ASCIINEMA_ID?)"
         } else {
             $"($ucl)($n)"
         }
