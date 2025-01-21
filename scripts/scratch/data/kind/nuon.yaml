@@ -1,0 +1,5 @@
+name: nuon
+entry: scratch.nuon
+comment: '# '
+cmd: ''
+runner: data

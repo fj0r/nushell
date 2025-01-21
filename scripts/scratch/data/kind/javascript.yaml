@@ -1,0 +1,5 @@
+name: javascript
+entry: index.js
+comment: '// '
+runner: file
+cmd: node {{}} {{args}}

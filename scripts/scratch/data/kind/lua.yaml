@@ -1,0 +1,5 @@
+name: lua
+entry: init.lua
+comment: '-- '
+runner: file
+cmd: lua {{}}

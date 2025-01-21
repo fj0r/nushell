@@ -1,0 +1,4 @@
+name: typescript
+entry: index.ts
+comment: '// '
+runner: file

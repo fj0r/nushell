@@ -1,0 +1,10 @@
+kind: surreal
+name: localhost
+data: |-
+  protocol: http
+  host: localhost
+  port: 8000
+  db: foo
+  ns: foo
+  username: foo
+  password: foo

@@ -1,0 +1,5 @@
+name: jsonl
+entry: scratch.jsonl
+cmd: open {{}} | from json -o
+comment: '# '
+runner: data

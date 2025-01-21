@@ -1,0 +1,5 @@
+name: tsv
+entry: scratch.tsv
+comment: '# '
+cmd: ''
+runner: data

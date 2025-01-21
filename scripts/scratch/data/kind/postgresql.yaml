@@ -1,0 +1,7 @@
+name: postgresql
+entry: scratch.sql
+comment: '-- '
+runner: file
+cmd: |-
+  $env.PGPASSWORD = '{{password}}'
+  psql -U {{username}} -d {{database}} -h {{host}} -p {{port}} -f {{}} --csv | from csv

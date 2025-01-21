@@ -1,0 +1,5 @@
+name: sqlite
+entry: scratch.sql
+comment: '-- '
+runner: file
+cmd: open {{file}} | query db (open {{}})

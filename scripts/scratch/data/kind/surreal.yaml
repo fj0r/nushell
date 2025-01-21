@@ -1,0 +1,15 @@
+name: surreal
+entry: scratch.surql
+comment: '-- '
+runner: file
+cmd: |-
+  let auth = [
+      -u '{{username}}:{{password}}'
+      -H 'surreal-ns: {{ns}}'
+      -H 'surreal-db: {{db}}'
+      -H 'Accept: application/json'
+  ]
+  let url = '{{protocol}}://{{host}}:{{port}}/sql'
+  open -r {{}}
+  | curl -sSL -X POST ...$auth $url --data-binary @-
+  | from json

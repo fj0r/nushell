@@ -1,0 +1,5 @@
+name: json
+entry: scratch.json
+comment: '# '
+cmd: ''
+runner: data

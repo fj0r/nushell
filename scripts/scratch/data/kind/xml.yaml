@@ -1,0 +1,5 @@
+name: xml
+entry: scratch.xml
+comment: '# '
+cmd: ''
+runner: data

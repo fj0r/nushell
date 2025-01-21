@@ -1,0 +1,4 @@
+kind: sqlite
+name: scratch
+data: |-
+  file: ~/.local/share/nushell/scratch.db

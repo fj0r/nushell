@@ -1,0 +1,44 @@
+name: mysql
+entry: scratch.sql
+comment: '-- '
+runner: file
+cmd: |-
+  # pip install pymysql
+  let o = open {{}}
+  '_: |-
+    import sys
+    import yaml
+    import pymysql.cursors
+
+    data = sys.stdin.readlines()
+    data = "\n".join(data)
+
+    exts = {"ssl": {"verify_mode": None}} if {{ssl}} else { }
+
+    connection = pymysql.connect(
+      host="{{host}}",
+      port={{port}},
+      user="{{username}}",
+      password="{{password}}",
+      charset="utf8mb4",
+      cursorclass=pymysql.cursors.DictCursor,
+      **exts
+    )
+
+    with connection:
+        with connection.cursor() as cursor:
+            cursor.execute(data, { })
+            r = cursor.fetchall()
+            print(yaml.dump(r))
+  '
+  | from yaml | get _
+  | save -f query.py
+
+  [{{args}}]
+  | enumerate
+  | reduce -f $o {|i,a|
+    let x = if ($i.item | describe -d).type == 'string' {$"\"($i.item)\""} else { $i.item }
+    $a | str replace -a $"%($i.index + 1)" $"($x)"
+  }
+  | python3 query.py
+  | from yaml

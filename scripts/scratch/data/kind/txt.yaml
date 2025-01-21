@@ -1,0 +1,4 @@
+name: txt
+entry: scratch.txt
+comment: '# '
+runner: ''

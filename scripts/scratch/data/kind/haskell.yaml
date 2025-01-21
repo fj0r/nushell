@@ -1,0 +1,6 @@
+name: haskell
+entry: app/Main.hs
+comment: '-- '
+runner: dir
+pos: 6
+cmd: stack run

@@ -1,0 +1,5 @@
+name: toml
+entry: scratch.toml
+comment: '# '
+cmd: ''
+runner: data

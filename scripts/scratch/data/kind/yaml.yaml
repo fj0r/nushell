@@ -1,0 +1,5 @@
+name: yaml
+entry: scratch.yaml
+comment: '# '
+cmd: ''
+runner: data

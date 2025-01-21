@@ -1,0 +1,5 @@
+name: csv
+entry: scratch.csv
+comment: '# '
+cmd: ''
+runner: data

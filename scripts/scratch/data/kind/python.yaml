@@ -1,0 +1,6 @@
+name: python
+entry: scratch.py
+comment: '# '
+runner: file
+cmd: open {{stdin}} | python3 {{}} {{args}}
+pos: 9

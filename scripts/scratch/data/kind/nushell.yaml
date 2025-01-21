@@ -1,0 +1,5 @@
+name: nushell
+entry: scratch.nu
+comment: '# '
+runner: file
+cmd: ''

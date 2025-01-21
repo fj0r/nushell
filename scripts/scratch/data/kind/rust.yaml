@@ -1,0 +1,6 @@
+name: rust
+entry: src/main.rs
+comment: '// '
+runner: dir
+cmd: cargo run {{args}}
+pos: 2

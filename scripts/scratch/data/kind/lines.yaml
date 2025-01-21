@@ -1,0 +1,5 @@
+name: lines
+entry: scratch
+comment: '# '
+cmd: open {{}} | lines
+runner: data

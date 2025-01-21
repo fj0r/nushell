@@ -1,0 +1,12 @@
+- kind: rust
+  hash: +AY8hpE2ROFEO6c6THhiJzLAG6/ZwP3lriL3FDPOaf4=
+  parent: ''
+  stem: Cargo
+  extension: toml
+  body: BycAAMDaZv+SnqeL2g1xIYnheY9NxpyoLKS+kqiloMZ/5KF264lCXR9wYlk2ddsl9GGu9nZOLN4F54VQ265FH4MQ5YqBXtGtYRUDAw==
+- kind: rust
+  hash: BZbFgAMTiFwaSIbitF9jibxXPJSH2JLwIRnX8fDd9Xk=
+  parent: src
+  stem: main
+  extension: rs
+  body: hxaA2SxmbiBtYWluKCkgewogICAgcHJpbnRsbiEoIkhlbGxvLCB3b3JsZCEiKTsKfQM=
