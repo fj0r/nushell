@@ -23,7 +23,12 @@ def host_abbr [] {
             } else {
                 $theme.default
             }
-        [$bg $"($ucl)($n)"]
+        let p = if 'ASCIINEMA_REC' in $env {
+            ''
+        } else {
+            $"($ucl)($n)"
+        }
+        [$bg $p]
     }
 }
 
