@@ -4,7 +4,7 @@ use lib/pwd.nu *
 ### proxy
 export def proxy_stat [] {
     {|bg|
-        let theme = $env.NU_POWER_THEME.proxy
+        let c = $env.NU_POWER_CONFIG.proxy
         if ($env.https_proxy? | is-not-empty) or ($env.http_proxy? | is-not-empty) {
             [$bg '']
         } else {
@@ -16,12 +16,12 @@ export def proxy_stat [] {
 ### host
 def host_abbr [] {
     {|bg|
-        let theme = $env.NU_POWER_THEME.host
+        let c = $env.NU_POWER_CONFIG.host
         let n = (sys host).hostname
         let ucl = if ($env.SSH_CONNECTION? | is-not-empty) {
-                $theme.is_remote
+                $c.is_remote
             } else {
-                $theme.default
+                $c.default
             }
         let p = if 'ASCIINEMA_REC' in $env {
             $"(ansi xterm_red)⏺ ($env.ASCIINEMA_ID?)"
@@ -35,10 +35,9 @@ def host_abbr [] {
 ### time
 def time_segment [] {
     {|bg|
-        let config = $env.NU_POWER_CONFIG.time
-        let theme = $env.NU_POWER_THEME.time
-        let format = match $config.style {
-            "compact" => { $'($theme.fst)%y%m%d($theme.snd)%w($theme.fst)%H%M%S' }
+        let c = $env.NU_POWER_CONFIG.time
+        let format = match $c.style {
+            "compact" => { $'($c.fst)%y%m%d($c.snd)%w($c.fst)%H%M%S' }
             "rainbow" => {
                 let fmt = [w y m d H M S]
                 let color = ['1;93m' '1;35m' '1;34m' '1;36m' '1;32m' '1;33m' '1;91m']
@@ -47,7 +46,7 @@ def time_segment [] {
                 | each { |x| $"(ansi -e ($color | get $x.index))%($x.item)" }
                 | str join
             }
-            _  => { $'($theme.fst)%y-%m-%d[%w]%H:%M:%S' }
+            _  => { $'($c.fst)%y-%m-%d[%w]%H:%M:%S' }
         }
         [$bg $"(date now | format date $format)"]
     }
@@ -77,7 +76,7 @@ def decorator [ ] {
     match $env.NU_POWER_DECORATOR {
         'plain' => {
             {|s, direction?: string, color?: string = 'light_yellow', next_color?: string|
-                let dlm = $env.NU_POWER_CONFIG.delimitor
+                let dlm = $env.NU_POWER_CONFIG.theme.delimitor
                 let dlm = $"(ansi $dlm.color)($dlm.char)"
                 match $direction {
                     '|>'|'>' => {
@@ -186,7 +185,7 @@ def right_prompt [segment] {
 def 'str len unicode' [--width(-w):int=2] {
     let o = $in
     let a = $o | str length -g
-    let u = $o | str replace -a -r $'[^\x00-\x7F($env.NU_POWER_CONFIG.single_width_char)]+' '' | str length -g
+    let u = $o | str replace -a -r $'[^\x00-\x7F($env.NU_POWER_CONFIG.theme.single_width_char)]+' '' | str length -g
     $u + ($a - $u) * $width
 }
 
@@ -200,10 +199,10 @@ def up_prompt [segment] {
     let thunk = $segment
     | each {|y| $y | each {|x| get_component $x } }
     { ||
-        let sep = $env.NU_POWER_CONFIG.separator_bar
-        let d = $env.NU_POWER_CONFIG.delimitor
+        let sep = $env.NU_POWER_CONFIG.theme.separator_bar
+        let d = $env.NU_POWER_CONFIG.theme.delimitor
         let dlm = $"(ansi $d.color)($d.char)"
-        let adc = $env.NU_POWER_CONFIG.admin.color
+        let color = $env.NU_POWER_CONFIG.theme.color
         let last_idx = ($thunk | length) - 1
         let ss = $thunk
         | enumerate
@@ -219,13 +218,13 @@ def up_prompt [segment] {
             }
             | str join $dlm
         }
-        if ($env.NU_POWER_CONFIG.frame_header? | is-empty) {
+        if ($env.NU_POWER_CONFIG.theme.frame_header? | is-empty) {
             let ss = [$"($ss.0)(ansi $sep.color)($d.right)" $"($d.left)(ansi reset)($ss.1)"]
             let fl = $ss | calc bar width
             $ss | str join $"('' | fill -c $sep.char -w $fl)" | $"($in)\n"
         } else {
-            let c = $env.NU_POWER_CONFIG.frame_header
-            let color = if (is-admin) { ansi $adc } else { ansi light_cyan }
+            let c = $env.NU_POWER_CONFIG.theme.frame_header
+            let color = if (is-admin) { ansi $color.admin } else { ansi $color.normal }
             let ss = [$"($color)($d.left)($ss.0)(ansi $sep.color)($d.right)" $"($d.left)(ansi reset)($ss.1)"]
             let fl = $ss | calc bar width -n $c.upperleft_size
             $ss
@@ -247,10 +246,10 @@ def up_center_prompt [segment] {
     let thunk = $segment
     | each {|y| $y | each {|x| get_component $x } }
     { ||
-        let sep = $env.NU_POWER_CONFIG.separator_bar
-        let d = $env.NU_POWER_CONFIG.delimitor
+        let sep = $env.NU_POWER_CONFIG.theme.separator_bar
+        let d = $env.NU_POWER_CONFIG.theme.delimitor
         let dlm = $"(ansi $d.color)($d.char)"
-        let adc = $env.NU_POWER_CONFIG.admin.color
+        let color = $env.NU_POWER_CONFIG.theme.color
         let ss = $thunk
         | each {|y|
             $y
@@ -265,7 +264,7 @@ def up_center_prompt [segment] {
         }
         | flatten
         | str join $dlm
-        if ($env.NU_POWER_CONFIG.frame_header? | is-empty) {
+        if ($env.NU_POWER_CONFIG.theme.frame_header? | is-empty) {
             let ss = $"($d.left)(ansi reset)($ss)(ansi $sep.color)($d.right)"
             let fl = $ss | calc sides width
             [
@@ -276,8 +275,8 @@ def up_center_prompt [segment] {
             | str join
             | $"($in)\n"
         } else {
-            let c = $env.NU_POWER_CONFIG.frame_header
-            let color = if (is-admin) { ansi $adc } else { ansi light_cyan }
+            let c = $env.NU_POWER_CONFIG.theme.frame_header
+            let color = if (is-admin) { ansi $color.admin } else { ansi $color.normal }
             let ss = $"($color)($d.left)($ss)($color)($d.right)"
             let fl = $ss | calc sides width -n $c.upperleft_size
             [
@@ -321,13 +320,13 @@ export def --env init [] {
     }
 
     $env.PROMPT_INDICATOR = {||
+        let color = $env.NU_POWER_CONFIG.theme.color
         match $env.NU_POWER_DECORATOR {
             'plain' => {
                 if (is-admin) {
-                    let adc = $env.NU_POWER_CONFIG.admin.color
-                    $"(ansi $adc)> (ansi reset)"
+                    $"(ansi $color.admin)> (ansi reset)"
                 } else {
-                    $"> "
+                    $"(ansi $color.normal)> (ansi reset)"
                 }
             }
             _ => { " " }
@@ -358,7 +357,7 @@ export def --env init [] {
             let marker = if $x.marker == '| ' { '┤ ' } else { $x.marker }
             $x | upsert marker (
                 if (is-admin) {
-                    let adc = $env.NU_POWER_CONFIG.admin.color
+                    let adc = $env.NU_POWER_CONFIG.theme.color.admin
                     $"(ansi $adc)($marker)(ansi reset)"
                 } else {
                     $marker
@@ -371,39 +370,8 @@ export def --env init [] {
 }
 
 export def --env set [name setup] {
-    $env.NU_POWER_THEME = (if ($setup.theme? | is-empty) {
-            $env.NU_POWER_THEME
-        } else {
-            let n = $setup.theme
-            | transpose k v
-            | reduce -f {} {|it, acc|
-                $acc | insert $it.k (ansi -e {fg: $it.v})
-            }
-            let o = if $name in $env.NU_POWER_THEME {
-                $env.NU_POWER_THEME | get $name
-            } else {
-                {}
-            }
-            $env.NU_POWER_THEME
-            | upsert $name ($o | merge $n)
-        })
-
-    $env.NU_POWER_CONFIG = (if ($setup.config? | is-empty) {
-            $env.NU_POWER_CONFIG
-        } else {
-            let n = $setup.config
-            | transpose k v
-            | reduce -f {} {|it, acc|
-                $acc | insert $it.k $it.v
-            }
-            let o = if $name in $env.NU_POWER_CONFIG {
-                $env.NU_POWER_CONFIG | get $name
-            } else {
-                {}
-            }
-            $env.NU_POWER_CONFIG
-            | upsert $name ($o | merge $n)
-        })
+    $env.NU_POWER_CONFIG = $env.NU_POWER_CONFIG
+    | upsert $name {|x| $x | get -i $name | default {} | merge deep $setup}
 }
 
 export def --env register [name source setup] {
@@ -433,20 +401,6 @@ export def --env inject [pos idx define setup?] {
 
     let kind = $define.source
 
-    if ($setup.theme? | is-not-empty) {
-        let prev_theme = $env.NU_POWER_THEME | get $kind
-        let prev_cols = $prev_theme | columns
-        let next_theme = $setup.theme | transpose k v
-        for n in $next_theme {
-            if $n.k in $prev_cols {
-                $env.NU_POWER_THEME = (
-                    $env.NU_POWER_THEME | update $kind {|conf|
-                      $conf | get $kind | update $n.k (ansi -e {fg: $n.v})
-                    }
-                )
-            }
-        }
-    }
 
     if ($setup.config? | is-not-empty) {
         let prev_cols = $env.NU_POWER_CONFIG | get $kind | columns
@@ -481,7 +435,6 @@ export def --env hook [] {
             }
         }]
 
-        # NU_POWER_THEME
     })
 }
 
@@ -504,7 +457,7 @@ export-env {
 
     $env.NU_POWER_FRAME = (default_env
         NU_POWER_FRAME
-        'default' # default | fill
+        'default' # default | fill | center
     )
 
     $env.NU_POWER_DECORATOR = (default_env
@@ -522,9 +475,39 @@ export-env {
         }
     )
 
-    $env.NU_POWER_THEME = (default_env
-        NU_POWER_THEME
+    $env.NU_POWER_CONFIG = (default_env
+        NU_POWER_CONFIG
         {
+            theme: {
+                color: {
+                    admin: light_red_bold
+                    normal: light_cyan
+                }
+                delimitor: {
+                    color: xterm_grey
+                    char: '│'
+                    left: '┤'
+                    right: '├'
+                }
+                separator_bar: {
+                    color: xterm_grey
+                    char: '─'
+                }
+                single_width_char: '↑↓│─├┤'
+                frame_header: {
+                    upperleft: '┌' # ┌╭
+                    upperleft_size: 1
+                    lowerleft: '└' # └╰
+                    upperright: '┐' # ┐╮
+                    upperright_size: 1
+                }
+            }
+
+            time: {
+                style: null
+                fst: (ansi xterm_tan)
+                snd: (ansi xterm_aqua)
+            }
             pwd: {
                 default: (ansi xterm_green)
                 out_home: (ansi xterm_gold3b)
@@ -536,40 +519,6 @@ export-env {
             host: {
                 is_remote: (ansi xterm_red)
                 default: (ansi blue)
-            }
-            time: {
-                fst: (ansi xterm_tan)
-                snd: (ansi xterm_aqua)
-            }
-        }
-    )
-
-    $env.NU_POWER_CONFIG = (default_env
-        NU_POWER_CONFIG
-        {
-            time: {
-                style: null
-            }
-            admin: {
-                color: light_red_bold
-            }
-            delimitor: {
-                color: xterm_grey
-                char: '│'
-                left: '┤'
-                right: '├'
-            }
-            separator_bar: {
-                color: xterm_grey
-                char: '─'
-            }
-            single_width_char: '↑↓│─├┤'
-            frame_header: {
-                upperleft: '┌' # ┌╭
-                upperleft_size: 1
-                lowerleft: '└' # └╰
-                upperright: '┐' # ┐╮
-                upperright_size: 1
             }
         }
     )

@@ -104,11 +104,11 @@ export def git_stat [] {
 
         if $status.branch == 'no_branch' { return [$bg ''] }
 
-        let theme = $env.NU_POWER_THEME.git
+        let c = $env.NU_POWER_CONFIG.git
         let branch = if ($status.remote | is-empty) {
-            $'($theme.no_upstream)($status.branch)'
+            $'($c.no_upstream)($status.branch)'
         } else {
-            $'($theme.default)($status.branch)'
+            $'($c.default)($status.branch)'
         }
 
         let summary = (
@@ -149,9 +149,7 @@ export-env {
     )
 
     power register git (git_stat) {
-        theme: {
-            default : blue
-            no_upstream: red
-        }
+        default : (ansi blue)
+        no_upstream: (ansi red)
     }
 }

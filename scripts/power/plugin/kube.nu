@@ -37,12 +37,11 @@ def kube_stat [] {
         if ($ctx | is-empty) {
             [$bg ""]
         } else {
-            let theme = $env.NU_POWER_THEME.kube
-            let config = $env.NU_POWER_CONFIG.kube
-            let p = if $config.reverse {
-                $"($theme.namespace)($ctx.NAMESPACE)($theme.separator)($config.separator)($theme.context)($ctx.NAME)"
+            let c = $env.NU_POWER_CONFIG.kube
+            let p = if $c.reverse {
+                $"($c.theme.namespace)($ctx.NAMESPACE)($c.theme.separator)($c.separator)($c.theme.context)($ctx.NAME)"
             } else {
-                $"($theme.context)($ctx.NAME)($theme.separator)($config.separator)($theme.namespace)($ctx.NAMESPACE)"
+                $"($c.theme.context)($ctx.NAME)($c.theme.separator)($c.separator)($c.theme.namespace)($ctx.NAMESPACE)"
             }
             [$bg $"($p)"]
         }
@@ -52,13 +51,11 @@ def kube_stat [] {
 export-env {
     power register kube (kube_stat) {
         theme: {
-            context: cyan
-            separator: purple
-            namespace: yellow
+            context: (ansi cyan)
+            separator: (ansi purple)
+            namespace: (ansi yellow)
         }
-        config: {
-            reverse: false
-            separator: ':'
-        }
+        reverse: false
+        separator: ':'
     }
 }

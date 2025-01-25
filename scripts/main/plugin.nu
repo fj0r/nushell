@@ -57,16 +57,14 @@ $env.NU_POWER_FRAME = 'fill'
 use power/plugin/git.nu *
 use power/plugin/kube.nu *
 power set time {
-    config: { style: compact }
+    style: compact
 }
 power set kube {
     theme: {
-        context: cyan
+        context: (ansi cyan)
     }
-    config: {
-        reverse: true
-        separator: '@'
-    }
+    reverse: true
+    separator: '@'
 }
 power init
 

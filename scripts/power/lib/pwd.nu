@@ -45,7 +45,7 @@ export def "pwd_abbr" [] {
         }
         let dir_comp = $dir_comp | path join
 
-        let theme = $env.NU_POWER_THEME.pwd
+        let theme = $env.NU_POWER_CONFIG.pwd
 
         let tm = if $in_home { $theme.default } else { $theme.out_home }
         let fg = if $no_vcs {
