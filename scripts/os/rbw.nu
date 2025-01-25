@@ -33,4 +33,5 @@ export def rbws [
     user:string@comp-user
 ] {
     rbw get $pattern $user
+    rbw code $pattern $user
 }
