@@ -47,7 +47,7 @@ export def "pwd_abbr" [] {
 
         let theme = $env.NU_POWER_CONFIG.pwd
 
-        let tm = if $in_home { $theme.default } else { $theme.out_home }
+        let tm = if $in_home { ansi $theme.default } else { ansi $theme.out_home }
         let fg = if $no_vcs {
             $"($tm)($dir_comp)"
         } else {

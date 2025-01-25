@@ -8,15 +8,13 @@ use power/power.nu
     use power/plugin/kube.nu *
     power inject 1 2 {source: kube,  color: '#504945'} {
         theme: {
-            context: cyan
+            context: (ansi cyan)
         }
-        config: {
-            reverse: true
-            separator: '@'
-        }
+        reverse: true
+        separator: '@'
     }
     power set time {
-        config: { style: compact }
+        style: compact
     }
 power init
 ```
@@ -42,19 +40,17 @@ $env.NU_POWER_SCHEMA = [
 ## {{{ Simplified style
 $env.NU_POWER_DECORATOR = 'plain'
 $env.NU_POWER_FRAME = 'fill'
-#$env.NU_POWER_CONFIG.separator_bar.char = "-"
+#$env.NU_POWER_CONFIG.theme.separator_bar.char = "-"
 ## }}}
 power set time {
-    config: { style: compact }
+    style: compact
 }
 power set kube {
     theme: {
-        context: cyan
+        context: (ansi cyan)
     }
-    config: {
-        reverse: true
-        separator: '@'
-    }
+    reverse: true
+    separator: '@'
 }
 power init
 ```
@@ -62,7 +58,7 @@ power init
 
 ## mode
 - `$env.NU_POWER_DECORATOR = '<power|plain>'` power mode and plain mode
-- `$env.NU_POWER_FRAME = '<default|fill>'` two line prompt (experimental)
+- `$env.NU_POWER_FRAME = '<default|fill|center>'` two line prompt (experimental)
 
 ### benchmark
 ```

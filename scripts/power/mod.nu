@@ -19,9 +19,9 @@ def host_abbr [] {
         let c = $env.NU_POWER_CONFIG.host
         let n = (sys host).hostname
         let ucl = if ($env.SSH_CONNECTION? | is-not-empty) {
-                $c.is_remote
+                ansi $c.is_remote
             } else {
-                $c.default
+                ansi $c.default
             }
         let p = if 'ASCIINEMA_REC' in $env {
             $"(ansi xterm_red)⏺ ($env.ASCIINEMA_ID?)"
@@ -37,7 +37,7 @@ def time_segment [] {
     {|bg|
         let c = $env.NU_POWER_CONFIG.time
         let format = match $c.style {
-            "compact" => { $'($c.fst)%y%m%d($c.snd)%w($c.fst)%H%M%S' }
+            "compact" => { $'(ansi $c.fst)%y%m%d(ansi $c.snd)%w(ansi $c.fst)%H%M%S' }
             "rainbow" => {
                 let fmt = [w y m d H M S]
                 let color = ['1;93m' '1;35m' '1;34m' '1;36m' '1;32m' '1;33m' '1;91m']
@@ -46,7 +46,7 @@ def time_segment [] {
                 | each { |x| $"(ansi -e ($color | get $x.index))%($x.item)" }
                 | str join
             }
-            _  => { $'($c.fst)%y-%m-%d[%w]%H:%M:%S' }
+            _  => { $'(ansi $c.fst)%y-%m-%d[%w]%H:%M:%S' }
         }
         [$bg $"(date now | format date $format)"]
     }
@@ -505,20 +505,20 @@ export-env {
 
             time: {
                 style: null
-                fst: (ansi xterm_tan)
-                snd: (ansi xterm_aqua)
+                fst: xterm_tan
+                snd: xterm_aqua
             }
             pwd: {
-                default: (ansi xterm_green)
-                out_home: (ansi xterm_gold3b)
-                vcs: (ansi xterm_teal)
+                default: xterm_green
+                out_home: xterm_gold3b
+                vcs: xterm_teal
             }
             proxy: {
-                on: (ansi yellow)
+                on: yellow
             }
             host: {
-                is_remote: (ansi xterm_red)
-                default: (ansi blue)
+                is_remote: xterm_red
+                default: blue
             }
         }
     )

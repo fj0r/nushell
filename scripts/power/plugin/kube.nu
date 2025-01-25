@@ -38,10 +38,11 @@ def kube_stat [] {
             [$bg ""]
         } else {
             let c = $env.NU_POWER_CONFIG.kube
+            let t = $c.theme
             let p = if $c.reverse {
-                $"($c.theme.namespace)($ctx.NAMESPACE)($c.theme.separator)($c.separator)($c.theme.context)($ctx.NAME)"
+                $"(ansi $t.namespace)($ctx.NAMESPACE)(ansi $t.separator)($c.separator)(ansi $t.context)($ctx.NAME)"
             } else {
-                $"($c.theme.context)($ctx.NAME)($c.theme.separator)($c.separator)($c.theme.namespace)($ctx.NAMESPACE)"
+                $"(ansi $t.context)($ctx.NAME)(ansi $t.separator)($c.separator)(ansi $t.namespace)($ctx.NAMESPACE)"
             }
             [$bg $"($p)"]
         }
@@ -51,9 +52,9 @@ def kube_stat [] {
 export-env {
     power register kube (kube_stat) {
         theme: {
-            context: (ansi cyan)
-            separator: (ansi purple)
-            namespace: (ansi yellow)
+            context: cyan
+            separator: purple
+            namespace: yellow
         }
         reverse: false
         separator: ':'
