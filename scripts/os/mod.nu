@@ -10,7 +10,11 @@ export use proxy.nu *
 export use sh.nu *
 export use web.nu *
 export use qutebrowser.nu *
-export use hyprland.nu *
+export use niri.nu *
 export use zellij.nu *
 export use asciinema.nu *
 export use rbw.nu *
+
+export-env {
+    use niri.nu *
+}
