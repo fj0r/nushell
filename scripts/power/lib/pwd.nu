@@ -54,7 +54,7 @@ export def "pwd_abbr" [] {
             if ($vcs.1 | is-empty) {
                 $"($tm)($dir_comp)"
             } else {
-                [$"($tm)($dir_comp)($theme.vcs)" $"($vcs.1)"]
+                [$"($tm)($dir_comp)(ansi $theme.vcs)" $"($vcs.1)"]
                 | path join
             }
         }
