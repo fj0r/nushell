@@ -98,7 +98,7 @@ export def entity [
         | get content
         | lines
         let title = $l | first | to title $cfg
-        let body = $l | range 1.. | skip-empty-lines | str join (char newline)
+        let body = $l | slice 1.. | skip-empty-lines | str join (char newline)
         {title: $title, body: $body}
     } else {
         {title: $title, body: $o}

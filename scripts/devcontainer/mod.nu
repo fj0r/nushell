@@ -242,7 +242,7 @@ def 'exec plan' [--rm --latest] {
     ^$env.CONTCTL push $plan.tag
 
     if $latest {
-        let latest = $plan.tag | split row ':' | range 0..<-1 | append 'latest' | str join ':'
+        let latest = $plan.tag | split row ':' | slice 0..<-1 | append 'latest' | str join ':'
         ^$env.CONTCTL tag $plan.tag $latest
         ^$env.CONTCTL push $latest
         if $rm {

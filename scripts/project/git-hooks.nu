@@ -82,7 +82,7 @@ export def git-hooks-dir [] {
     $env.CURRENT_FILE
     | path split
     | split list '.git'
-    | range ..<-1
+    | slice ..<-1
     | flatten
     | path join
 }

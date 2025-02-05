@@ -43,7 +43,7 @@ def 'tagsplit' [tags] {
         let s = if ($tags | is-empty) {
             [
                 [$i.tags.0?]
-                ($i.tags | range 1..)
+                ($i.tags | slice 1..)
             ]
         } else {
             let l = $tags.0 | length
@@ -55,7 +55,7 @@ def 'tagsplit' [tags] {
                     if $multi_tags {
                         $m ++= [$x]
                     } else {
-                        $m ++= [($x | range $l..)]
+                        $m ++= [($x | slice $l..)]
                     }
                 } else {
                     $n ++= [$x]
@@ -149,7 +149,7 @@ def tag-tree [x r={}] {
     let o = $r | get -i $t | default {}
     if ($x.tags | length) > 0 {
         $r | upsert $x.tags.0 (
-            tag-tree ($x | update tags ($x.tags | range 1..)) $o
+            tag-tree ($x | update tags ($x.tags | slice 1..)) $o
         )
     } else {
         let n = if ':' in $r {
@@ -302,7 +302,7 @@ def 'fmt leaves' [
         let l = $o.body | lines
         $body_len = ($l | length)
         $l
-        | range ..<$body_lines
+        | slice ..<$body_lines
         | each {$"($indent)  (ansi $color.body)($in)(ansi reset)"}
     } else { [] }
 

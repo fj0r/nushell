@@ -73,7 +73,7 @@ export def find-project [dir] {
         $dir
         | path expand
         | path split
-        | range 1..
+        | slice 1..
         | reduce -f ['/'] {|i, a| $a | append ([($a | last) $i] | path join) }
         | each { [$in '__.nu'] | path join }
         | reverse

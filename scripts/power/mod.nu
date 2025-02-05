@@ -136,7 +136,7 @@ def left_prompt [segment] {
                 }
             }
         let stop = ($segment | length) - 1
-        let cs = $segment | each {|x| $x.0 } | append $segment.0.0 | range 1..
+        let cs = $segment | each {|x| $x.0 } | append $segment.0.0 | slice 1..
         $segment
         | zip $cs
         | enumerate
@@ -388,9 +388,9 @@ export def --env inject [pos idx define setup?] {
         $prev | prepend $define
     } else {
         [
-            ($prev | range 0..($idx - 1))
+            ($prev | slice 0..($idx - 1))
             $define
-            ($prev | range $idx..)
+            ($prev | slice $idx..)
         ] | flatten
     }
 

@@ -2,7 +2,7 @@ def 'path parents' [] {
     let p = $in | path expand | path split
     mut r = []
     for i in ($p | length | $in - 1)..0 {
-        $r ++= [{ a: ($p | range 0..$i), b: ($p | range ($i + 1)..) }]
+        $r ++= [{ a: ($p | slice 0..$i), b: ($p | slice ($i + 1)..) }]
     }
     $r
 }
@@ -39,7 +39,7 @@ export def "pwd_abbr" [] {
             let first = $dir_comp | first
             let last = $dir_comp | last
             let body = $dir_comp
-            | range 1..-2
+            | slice 1..-2
             | each {|x| $x | str substring ..<$mpl }
             $dir_comp = ([$first $body $last] | flatten)
         }

@@ -8,7 +8,7 @@ export def skip-empty-lines [] {
             $s += 1
         }
     }
-    $o | range $s..
+    $o | slice $s..
 }
 
 export def render [vars: record] {

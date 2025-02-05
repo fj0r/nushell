@@ -45,7 +45,7 @@ def cmpl-rustic-commands [] {
 }
 
 def 'parse args' [] {
-    let c = $in | split row ' ' | range 1..
+    let c = $in | split row ' ' | slice 1..
     mut ra = ''
     mut opt = {}
     mut rest = []

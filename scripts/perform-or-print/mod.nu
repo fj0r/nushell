@@ -59,6 +59,6 @@ export def --wrapped pp [
             print -e $"(ansi light_gray)($r)(ansi reset)(char newline)"
         }
     } else {
-        ^$x.0 ...(spread ($x | range 1..))
+        ^$x.0 ...(spread ($x | slice 1..))
     }
 }

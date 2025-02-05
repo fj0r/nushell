@@ -145,7 +145,7 @@ export def scratch-ensure-tags [tags] {
         }
 
         if ($name != null) {
-            for t in ($ts | range $idx..) {
+            for t in ($ts | slice $idx..) {
                 $pid = sqlx $"insert into tag \(parent_id, name\) values
                 \(($pid), (Q $t)\)
                 on conflict \(parent_id, name\) do update set parent_id = EXCLUDED.parent_id

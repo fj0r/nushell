@@ -62,7 +62,7 @@ export def 'project global' [
             if ($x | describe -d).type == string {
                 [$x, []]
             } else {
-                [$x.0, ($x | range 1..)]
+                [$x.0, ($x | slice 1..)]
             }
         }
         let qs = $ms | each {|x| $"\((Q $x.0), (Q ($x.1 | str join ','))\)" } | str join ','
