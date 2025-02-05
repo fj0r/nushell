@@ -459,6 +459,7 @@ export def --wrapped container-create [
     }
 
     let ports = $ports
+    | default {}
     | transpose k v
     | reduce -f {} {|i,a|
         let p = $i.k | into int
