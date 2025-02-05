@@ -113,6 +113,8 @@ export def parse-img [] {
 export def image-list [
     -n: string@cmpl-docker-ns
     image?: string@cmpl-docker-images
+    --layer
+    --history
 ] {
     let ns = if ($n | is-empty) {[]} else {[-n $n]}
     if ($image | is-empty) {
@@ -147,12 +149,23 @@ export def image-list [
         } else {
             $r.Id | str substring 0..<12
         }
-        let layer = if $env.CONTCTL == 'nerdctl' {
-            #let root = containerd config dump | from toml | get root
-            $r | get RootFS.Layers
+        let layer = if $layer {
+            let l = if $env.CONTCTL == 'nerdctl' {
+                #let root = containerd config dump | from toml | get root
+                $r | get RootFS.Layers
+            } else {
+                $r | get GraphDriver.Data | items {|k,v| $v | split row ':'} | flatten
+            }
+            {layer: $l}
         } else {
-            $r | get GraphDriver.Data | items {|k,v| $v | split row ':'} | flatten
+            {}
         }
+        let history = if $history {
+            {history: $r.History?}
+        } else {
+            {}
+        }
+
         {
             id: $id
             created: ($r.Created | into datetime)
@@ -165,7 +178,8 @@ export def image-list [
             env: $e
             entrypoint: $r.Config.Entrypoint?
             cmd: $r.Config.Cmd?
-            layers: $layer
+            ...$layer
+            ...$history
         }
     }
 }
