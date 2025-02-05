@@ -116,7 +116,7 @@ export def image-list [
 ] {
     let ns = if ($n | is-empty) {[]} else {[-n $n]}
     if ($image | is-empty) {
-        let fmt = '{"id":"{{.ID}}", "repo": "{{.Repository}}", "tag":"{{.Tag}}", "size":"{{.Size}}" "created":"{{.CreatedAt}}"}'
+        let fmt = '{"id":"{{.ID}}", "repo": "{{.Repository}}", "tag":"{{.Tag}}", "size":"{{.Size}}", "created":"{{.CreatedAt}}"}'
         ^$env.CONTCTL ...$ns images --format $fmt
             | lines
             | each {|x|
@@ -147,6 +147,12 @@ export def image-list [
         } else {
             $r.Id | str substring 0..<12
         }
+        let layer = if $env.CONTCTL == 'nerdctl' {
+            #let root = containerd config dump | from toml | get root
+            $r | get RootFS.Layers
+        } else {
+            $r | get GraphDriver.Data | items {|k,v| $v | split row ':'} | flatten
+        }
         {
             id: $id
             created: ($r.Created | into datetime)
@@ -159,24 +165,7 @@ export def image-list [
             env: $e
             entrypoint: $r.Config.Entrypoint?
             cmd: $r.Config.Cmd?
-        }
-    }
-}
-
-export def image-layer [
-    -n: string@cmpl-docker-ns
-    image: string@cmpl-docker-images
-] {
-    let ns = if ($n | is-empty) {[]} else {[-n $n]}
-    let i = ^$env.CONTCTL ...$ns inspect $image | from json
-    match $env.CONTCTL {
-        'nerdctl' => {
-            #let root = containerd config dump | from toml | get root
-            $i | get 0.RootFS.Layers
-        }
-        _ => {
-            let d = $i | get 0.GraphDriver.Data
-            $d | items {|k,v| $v | split row ':'} | flatten
+            layers: $layer
         }
     }
 }

@@ -10,7 +10,6 @@ export alias dlt = container-log-trunc
 export alias dcp = container-copy-file
 export alias dh = container-history
 export alias di = image-list
-export alias dil = image-layer
 export alias dps = image-push
 export alias dpl = image-pull
 export alias dsv = image-save
