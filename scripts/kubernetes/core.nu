@@ -220,7 +220,7 @@ export def --wrapped kube-attach [
     --all-pods(-a) # for completion
     ...args
 ] {
-    let n = $namespace | with-flag -n
+    let n = if ($namespace | is-empty) { [] } else { [-n $namespace] }
     let pod = if ($selector | is-empty) {
         if ($pod | str ends-with '-') {
             $"deployment/($pod | str trim --char '-' --right)"
@@ -228,7 +228,7 @@ export def --wrapped kube-attach [
             $pod
         }
         } else {
-        let pods = kubectl get pods $n -o wide -l $selector
+        let pods = kubectl get pods ...$n -o wide -l $selector
             | from ssv -a
             | where STATUS == Running
             | select NAME IP NODE
@@ -243,7 +243,7 @@ export def --wrapped kube-attach [
     }
     let c = if ($container | is-empty) {
         if ($selector | is-empty)  { [] } else {
-            let cs = kube-get-pod -n $n $pod -p '.spec.containers[*].name' | split row ' '
+            let cs = kubectl get pods ...$n $pod --output=jsonpath={.spec.containers[*].name} | split row ' '
             let ctn = if ($cs | length) == 1 {
                 $cs.0
             } else {
