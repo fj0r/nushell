@@ -116,7 +116,9 @@ export def parse [offset?: int] {
 
     let sign = $sign | group-by parameter_type
 
-    let opt = $sign.named? | get -i name | reduce -f $x.opt {|i, a|
+    let opt = $sign.named? | default []
+    | get -i name
+    | reduce -f $x.opt {|i, a|
         if ($i in $defaults) and ($i not-in $a) {
             $a | insert $i ($defaults | get $i)
         } else {
