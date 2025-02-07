@@ -315,34 +315,21 @@ export def kube-copy [
 }
 
 
-def cmpl-num9 [] { [0 1 2 3] }
+def cmpl-num9 [] { 1..9 | each {$in} }
 # kubectl scale deployment
-export def ksd [
-    deployment: string@cmpl-kube-deploys
-    num: string@cmpl-num9
-    --namespace (-n): string@cmpl-kube-ns
-] {
-    if ($num | into int) > 9 {
-        "too large"
-    } else {
-        let ns = $namespace | with-flag -n
-        kubectl scale ...$ns deployments $deployment --replicas $num
-    }
-}
-
-# kubectl scale deployment with reset
 export def kube-scale-deployment [
     deployment: string@cmpl-kube-deploys
     num: int@cmpl-num9
     --namespace (-n): string@cmpl-kube-ns
+    --reset(-r)
 ] {
-    if $num > 9 {
-        "too large"
-    } else if $num < 0 {
+    if $num < 0 {
         "too small"
     } else {
         let ns = $namespace | with-flag -n
-        kubectl scale ...$ns deployments $deployment --replicas 0
+        if $reset {
+            kubectl scale ...$ns deployments $deployment --replicas 0
+        }
         kubectl scale ...$ns deployments $deployment --replicas $num
     }
 }
