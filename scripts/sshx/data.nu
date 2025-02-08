@@ -23,7 +23,7 @@ export def --env init-db [env_name:string, file:string, hook: closure] {
 }
 
 export def seed [] {
-
+    const dir = path self .
 }
 
 export def --env start [] {

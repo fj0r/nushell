@@ -2,16 +2,12 @@ use libs *
 use common.nu *
 use libs/files.nu *
 
-export def seed [dir?:path] {
-    let dir = if ($dir | is-empty) {
-        [$env.FILE_PWD data] | path join
-    } else {
-        $dir
-    }
+export def seed [] {
+    const dir = path self .
 
-    ls ([$dir kind] | path join) | get name | each { open $in | upsert-kind }
-    ls ([$dir preset] | path join) | get name | each { open $in | upsert-kind-preset }
-    ls ([$dir files] | path join) | get name | each {
+    ls ([$dir data kind] | path join) | get name | each { open $in | upsert-kind }
+    ls ([$dir data preset] | path join) | get name | each { open $in | upsert-kind-preset }
+    ls ([$dir data files] | path join) | get name | each {
         open $in | each { scratch-files-import $in }
     }
 }
