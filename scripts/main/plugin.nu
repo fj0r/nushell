@@ -46,6 +46,7 @@ $env.NU_POWER_SCHEMA = [
         [source, color];
         [proxy, xterm_grey39]
         [host, xterm_grey30]
+        [ai, xterm_grey30]
         [kube, xterm_grey23]
         [time, xterm_grey27]
     ]
@@ -54,10 +55,14 @@ $env.NU_POWER_DECORATOR = 'plain'
 $env.NU_POWER_FRAME = 'fill'
 #$env.NU_POWER_FRAME = 'center'
 #$env.NU_POWER_CONFIG.theme.separator_bar.char = "-"
+use power/plugin/ai.nu *
 use power/plugin/git.nu *
 use power/plugin/kube.nu *
 power set time {
     style: compact
+}
+power set ai {
+    info: null
 }
 power set kube {
     theme: {
