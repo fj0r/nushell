@@ -1,57 +1,6 @@
 ### pwd
 use lib/pwd.nu *
 
-### proxy
-export def proxy_stat [] {
-    {|bg|
-        let c = $env.NU_POWER_CONFIG.proxy
-        if ($env.https_proxy? | is-not-empty) or ($env.http_proxy? | is-not-empty) {
-            [$bg '']
-        } else {
-            [$bg null]
-        }
-    }
-}
-
-### host
-def host_abbr [] {
-    {|bg|
-        let c = $env.NU_POWER_CONFIG.host
-        let n = (sys host).hostname
-        let ucl = if ($env.SSH_CONNECTION? | is-not-empty) {
-                ansi $c.is_remote
-            } else {
-                ansi $c.default
-            }
-        let p = if 'ASCIINEMA_REC' in $env {
-            $"(ansi xterm_red)⏺ ($env.ASCIINEMA_ID?)"
-        } else {
-            $"($ucl)($n)"
-        }
-        [$bg $p]
-    }
-}
-
-### time
-def time_segment [] {
-    {|bg|
-        let c = $env.NU_POWER_CONFIG.time
-        let format = match $c.style {
-            "compact" => { $'(ansi $c.fst)%y%m%d(ansi $c.snd)%w(ansi $c.fst)%H%M%S' }
-            "rainbow" => {
-                let fmt = [w y m d H M S]
-                let color = ['1;93m' '1;35m' '1;34m' '1;36m' '1;32m' '1;33m' '1;91m']
-                $fmt
-                | enumerate
-                | each { |x| $"(ansi -e ($color | get $x.index))%($x.item)" }
-                | str join
-            }
-            _  => { $'(ansi $c.fst)%y-%m-%d[%w]%H:%M:%S' }
-        }
-        [$bg $"(date now | format date $format)"]
-    }
-}
-
 export use lib/profile.nu *
 
 export def wraptime [message action] {
@@ -524,10 +473,46 @@ export-env {
     )
 
     $env.NU_PROMPT_COMPONENTS = {
-        pwd: (pwd_abbr)
-        proxy: (proxy_stat)
-        host: (host_abbr)
-        time: (time_segment)
+        pwd: {|bg| pwd_abbr $bg}
+        proxy: {|bg|
+            let c = $env.NU_POWER_CONFIG.proxy
+            if ($env.https_proxy? | is-not-empty) or ($env.http_proxy? | is-not-empty) {
+                [$bg '']
+            } else {
+                [$bg null]
+            }
+        }
+        host: {|bg|
+            let c = $env.NU_POWER_CONFIG.host
+            let n = (sys host).hostname
+            let ucl = if ($env.SSH_CONNECTION? | is-not-empty) {
+                    ansi $c.is_remote
+                } else {
+                    ansi $c.default
+                }
+            let p = if 'ASCIINEMA_REC' in $env {
+                $"(ansi xterm_red)⏺ ($env.ASCIINEMA_ID?)"
+            } else {
+                $"($ucl)($n)"
+            }
+            [$bg $p]
+        }
+        time: {|bg|
+            let c = $env.NU_POWER_CONFIG.time
+            let format = match $c.style {
+                "compact" => { $'(ansi $c.fst)%y%m%d(ansi $c.snd)%w(ansi $c.fst)%H%M%S' }
+                "rainbow" => {
+                    let fmt = [w y m d H M S]
+                    let color = ['1;93m' '1;35m' '1;34m' '1;36m' '1;32m' '1;33m' '1;91m']
+                    $fmt
+                    | enumerate
+                    | each { |x| $"(ansi -e ($color | get $x.index))%($x.item)" }
+                    | str join
+                }
+                _  => { $'(ansi $c.fst)%y-%m-%d[%w]%H:%M:%S' }
+            }
+            [$bg $"(date now | format date $format)"]
+        }
     }
 }
 

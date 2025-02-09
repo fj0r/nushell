@@ -94,8 +94,29 @@ def _git_status [] {
     $status
 }
 
-export def git_stat [] {
-    {|bg|
+export-env {
+    $env.NU_PROMPT_GIT_FORMATTER = (power default_env
+        NU_PROMPT_GIT_FORMATTER
+        [
+            [behind              (char branch_behind) yellow]
+            [ahead               (char branch_ahead) yellow]
+            [conflicts           ! red]
+            [ignored             _ purple]
+            [idx_added_staged    + green]
+            [idx_modified_staged ~ green]
+            [idx_deleted_staged  - green]
+            [idx_renamed         % green]
+            [idx_type_changed    * green]
+            [wt_untracked        + red]
+            [wt_modified         ~ red]
+            [wt_deleted          - red]
+            [wt_renamed          % red]
+            [wt_type_changed     * red]
+            [stashes             = blue]
+        ]
+    )
+
+    power register git {|bg|
         if (git rev-parse --is-inside-work-tree | complete).exit_code > 0 {
             return [$bg '']
         }
@@ -123,32 +144,7 @@ export def git_stat [] {
             })
 
         [$bg $'($branch)($summary)']
-    }
-}
-
-export-env {
-    $env.NU_PROMPT_GIT_FORMATTER = (power default_env
-        NU_PROMPT_GIT_FORMATTER
-        [
-            [behind              (char branch_behind) yellow]
-            [ahead               (char branch_ahead) yellow]
-            [conflicts           ! red]
-            [ignored             _ purple]
-            [idx_added_staged    + green]
-            [idx_modified_staged ~ green]
-            [idx_deleted_staged  - green]
-            [idx_renamed         % green]
-            [idx_type_changed    * green]
-            [wt_untracked        + red]
-            [wt_modified         ~ red]
-            [wt_deleted          - red]
-            [wt_renamed          % red]
-            [wt_type_changed     * red]
-            [stashes             = blue]
-        ]
-    )
-
-    power register git (git_stat) {
+    } {
         default : (ansi blue)
         no_upstream: (ansi red)
     }

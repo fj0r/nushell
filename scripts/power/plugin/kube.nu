@@ -31,8 +31,8 @@ def "kube ctx" [] {
     }
 }
 
-def kube_stat [] {
-    {|bg|
+export-env {
+    power register kube {|bg|
         let ctx = kube ctx
         if ($ctx | is-empty) {
             [$bg ""]
@@ -46,11 +46,7 @@ def kube_stat [] {
             }
             [$bg $"($p)"]
         }
-    }
-}
-
-export-env {
-    power register kube (kube_stat) {
+    } {
         theme: {
             context: cyan
             separator: purple

@@ -1,5 +1,5 @@
-export def ai_stat [] {
-    {|bg|
+export-env {
+    power register ai {|bg|
         let c = $env.NU_POWER_CONFIG.ai
         let t = $c.theme
         if ($env.AI_SESSION? | is-not-empty) {
@@ -14,11 +14,7 @@ export def ai_stat [] {
         } else {
             ['#504945' null]
         }
-    }
-}
-
-export-env {
-    power register ai (ai_stat) {
+    } {
         width: 120
         theme: {
             info: xpurplea
