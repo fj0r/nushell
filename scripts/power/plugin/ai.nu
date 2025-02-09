@@ -1,13 +1,16 @@
 export def ai_stat [] {
     {|bg|
-        let info = $env.NU_POWER_CONFIG.ai.info
+        let c = $env.NU_POWER_CONFIG.ai
+        let t = $c.theme
         if ($env.AI_SESSION? | is-not-empty) {
-            let i = if ($info | is-not-empty) {
-                ai-session | get $info
+            let s = term size | get columns
+            let i = if $s >= $c.width {
+                let sn = ai-session
+                $"(ansi $t.info)($sn.model)@($sn.provider)"
             } else {
                 ''
             }
-            [$bg $'($i)✨($env.AI_SESSION)']
+            [$bg $'($i)(ansi $t.session)✨($env.AI_SESSION)']
         } else {
             ['#504945' null]
         }
@@ -16,6 +19,10 @@ export def ai_stat [] {
 
 export-env {
     power register ai (ai_stat) {
-        info: provider
+        width: 120
+        theme: {
+            info: xpurplea
+            session: grey
+        }
     }
 }

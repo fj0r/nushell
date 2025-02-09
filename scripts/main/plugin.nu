@@ -62,7 +62,7 @@ power set time {
     style: compact
 }
 power set ai {
-    info: null
+    width: 120
 }
 power set kube {
     theme: {
