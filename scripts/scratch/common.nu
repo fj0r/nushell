@@ -24,7 +24,6 @@ export def upsert-kind [--delete --action: closure] {
         }
         table: kind
         pk: [name]
-        filter: {}
     }
 }
 
@@ -37,14 +36,6 @@ export def upsert-kind-preset [--delete --action: closure] {
         }
         table: kind_preset
         pk: [kind, name]
-        filter: {
-            out: {
-                data: {|x| $x | to yaml }
-            }
-            in: {
-                data: {|x| $x | from yaml }
-            }
-        }
     }
 }
 
