@@ -55,8 +55,8 @@ export-env {
                             type: string,
                             description: "Each argument as a string"
                         }
-                    }
-                },
+                    },
+                }
                 required: [
                     args
                 ]
