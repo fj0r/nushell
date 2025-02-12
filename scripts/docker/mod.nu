@@ -99,7 +99,8 @@ export-env {
           image: surreal
           container_name: surrealdb
           daemon: true
-          environment: {}
+          environment:
+            SURREAL_STORE: rocksdb
           volumns: {}
           ports:
             '8000': 8000
