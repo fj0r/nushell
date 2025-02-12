@@ -1,8 +1,8 @@
 export def ascii-rec [
     name
-    --target(-t): path = '~/Downloads'
+    --target(-t): path = '~/Pictures'
 ] {
-    let file = [$target $name] | path join | path expand
+    let file = [$target asciinema $name] | path join | path expand
     $env.ASCIINEMA_ID = $name
     asciinema rec --overwrite $"($file).cast"
     if ([y n] | input list $'(ansi grey)convert ($file).cast to gif?(ansi reset)') == 'y' {
