@@ -33,6 +33,7 @@ export def --env --wrapped ai-assistant [
     --provider(-p): string@cmpl-provider
     --model(-m): string@cmpl-models
     --system: string@cmpl-system
+    --complete
     --out(-o)
     --quiet(-q)
     --debug
@@ -81,7 +82,7 @@ export def --env --wrapped ai-assistant [
         --prevent-func
     )
     mut $r = $r
-    while ($r.result.tools? | is-not-empty) {
+    while ($r.result.tools? | is-not-empty) and $complete {
         let a = $r | get -i result.tools.0.function.arguments | default '{}' | from json
         if ($a | is-empty) or ($a.instructions? | is-empty) or ($a.subordinate_name? | is-empty) {
             print $"(ansi $env.AI_CONFIG.template_calls)($env.AI_CONFIG.assistant.function.name) failed(ansi reset)"
