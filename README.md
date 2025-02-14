@@ -1,5 +1,5 @@
 - [Scratch](https://github.com/fj0r/scratch.nu) Scratch, Todo, Code executor, Counter
-- [AI](https://github.com/fj0r/ai.nu) OpenAI and Ollama Clients
+- [AI](https://github.com/fj0r/ai.nu) Use AI in Nushell
 - [Docker](https://github.com/fj0r/docker.nu) Docker, Nerdctl, Podman
 - [Kubernetes](https://github.com/fj0r/kubernetes.nu) Kubernetes
 - [Git](https://github.com/fj0r/git.nu) Git, Workflow, Activities
