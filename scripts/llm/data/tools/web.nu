@@ -79,8 +79,8 @@ export-env {
             }
         }
         handler: {|x, ctx|
-            let args = if ($x | describe -d).type == 'list' { $x } else { $x.args }
-            curl ...$args
+            let x = if ($x | describe -d).type == 'list' { {args: $x} } else { $x }
+            curl ...$x.args
         }
     }
     ai-config-env-tools web_search {
