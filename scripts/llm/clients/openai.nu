@@ -67,6 +67,23 @@ export def --wrapped req [
     $o
 }
 
+export def req-restore [s req] {
+    $in
+    | reduce -f $req {|i, a|
+        match $i.role {
+            assistant => {
+                $a | ai-req $s -r $i.role $i.content --tool-calls ($i.tool_calls | from yaml)
+            }
+            tool => {
+                $a | ai-req $s -r $i.role $i.content --tool-call-id $i.tool_calls
+            }
+            _ => {
+                $a | ai-req $s -r $i.role $i.content
+            }
+        }
+    }
+}
+
 export def call [
     session
     --quiet(-q)

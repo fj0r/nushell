@@ -56,6 +56,15 @@ export def ai-call [
     }
 }
 
+export def req-restore [session req] {
+    let o = $in
+    match $session.adapter? {
+        _ => {
+            $o | openai req-restore $session $req
+        }
+    }
+}
+
 
 export def ai-send [
     --session(-s): record
@@ -85,20 +94,7 @@ export def ai-send [
         if $oneshot {
             $req
         } else {
-            $req = data messages $limit
-            | reduce -f $req {|i, a|
-                match $i.role {
-                    assistant => {
-                        $a | ai-req $s -r $i.role $i.content --tool-calls ($i.tool_calls | from yaml)
-                    }
-                    tool => {
-                        $a | ai-req $s -r $i.role $i.content --tool-call-id $i.tool_calls
-                    }
-                    _ => {
-                        $a | ai-req $s -r $i.role $i.content
-                    }
-                }
-            }
+            $req = data messages $limit | req-restore $s $req
         }
         $req
     } else {
