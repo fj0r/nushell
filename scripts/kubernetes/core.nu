@@ -110,8 +110,8 @@ export def kube-get [
     --jsonpath (-p): string@cmpl-kube-jsonpath
     --selector (-l): string
     --verbose (-v)
-    --watch (-w)
-    --wide (-W)
+    --wide (-w)
+    --watch (-W)
     --all (-a)
 ] {
     let ns = if $all {
