@@ -10,7 +10,7 @@ export def cmpl-scratch-id [] {
 
 export def list-untagged-root [type, ctx] {
     let ts = term size
-    let rw = $ts.columns - 8
+    let rw = $ts.columns
     let ch = $ts.rows - 5
     let cond = if ($ctx | is-not-empty) {
         mut r = []
@@ -38,7 +38,9 @@ export def list-untagged-root [type, ctx] {
     where t.tag_id is null and s.parent_id = -1 and s.deleted = '' ($cond)
     order by updated desc limit ($ch);"
     sqlx $q
-    | update description {|x| $x.description | str replace '⯒' (ansi grey)}
+    | update description {|x|
+        $x.description | str substring 0..$rw | str replace '⯒' (ansi grey)
+    }
     | { completions: $in, options: { sort: false } }
 }
 
