@@ -1,5 +1,5 @@
 def parse_pkg_list [] {
-    let d = $in
+    let d = $in | lines
     mut r = []
     mut cur = {}
     let char = {
