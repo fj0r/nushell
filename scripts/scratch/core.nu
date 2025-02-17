@@ -471,8 +471,8 @@ export def scratch-search [
 }
 
 export def scratch-in [
-    id?:int@cmpl-untagged-root-scratch
-    --title(-t):string@cmpl-untagged-root-title
+    id?:int@cmpl-untagged-root-scratch          # retrieve by id
+    --title(-t):string@cmpl-untagged-root-title # retrieve by title
     --kind(-k):string@cmpl-kind
     --preset(-p):string@cmpl-kind-preset
     --args(-a):list<string>
