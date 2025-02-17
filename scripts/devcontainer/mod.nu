@@ -9,8 +9,8 @@ export-env {
                 PYTHONUNBUFFERED: x
             },
             scripts: [
-                "pip config --global set global.index-url http://nexus.s/repository/pypi/simple"
-                "pip config --global set global.trusted-host nexus.s"
+                #"pip config --global set global.index-url http://nexus.s/repository/pypi/simple"
+                #"pip config --global set global.trusted-host nexus.s"
                 "pip install --break-system-packages --no-cache-dir -r requirements.txt"
             ],
             cmd: [fastapi run main.py]
@@ -20,9 +20,9 @@ export-env {
             manifest: composer.json
             base: "ghcr.lizzie.fun/fj0r/0x:php7"
             scripts: [
-                "composer config -g repo.packagist composer http://nexus.s/repository/composer/"
-                "composer config -g disable-tls true"
-                "composer config -g secure-http false"
+                #"composer config -g repo.packagist composer http://nexus.s/repository/composer/"
+                #"composer config -g disable-tls true"
+                #"composer config -g secure-http false"
                 "composer install"
                 "mv vendor /opt"
                 "ln -s /opt/vendor vendor"
@@ -41,11 +41,11 @@ export-env {
             }
             scripts: {|context, conf|
                 [
-                    (if ($context.proxy? | is-empty) {
-                        "npm config set registry http://nexus.s/repository/npm/"
-                    } else {
-                        "npm config set registry https://registry.npmjs.org"
-                    })
+                    #(if ($context.proxy? | is-empty) {
+                    #    "npm config set registry http://nexus.s/repository/npm/"
+                    #} else {
+                    #    "npm config set registry https://registry.npmjs.org"
+                    #})
                     "npm i"
                     "mv node_modules /opt"
                     "ln -s /opt/node_modules node_modules"
@@ -63,7 +63,7 @@ export-env {
                 TIMEZONE: Asia/Shanghai
             }
             scripts: [
-                "npm config set registry http://nexus.s/repository/npm/"
+                #"npm config set registry http://nexus.s/repository/npm/"
                 "sed -i 's/^\\s*\"resolved\"\\s*:.*$//g' package-lock.json"
                 "npm i"
                 "mv node_modules /opt"
