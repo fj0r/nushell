@@ -116,6 +116,7 @@ export def git-last-changes [] {
             return $r
         }
     }
+    []
 }
 
 def gen-line [] {
