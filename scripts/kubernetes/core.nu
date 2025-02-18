@@ -67,21 +67,13 @@ export def kube-kustomize [file: path] {
 export def --env kube-change-context [
     context: string@cmpl-kube-ctx
     --session(-s)
-    --cluster(-c)
-    --new(-n)
 ] {
-    if $cluster {
-        let dist = $"($env.HOME)/.kube/config.d"
-        if not ($dist | path exists) {
-            mkdir $dist
+    if $session {
+        let td = '/tmp/kubeconfig'
+        if not ($td | path exists) {
+            mkdir $td
         }
-        let dist = $"($dist)/($context)"
-        if not ($dist | path exists) or $new {
-            kube-conf-export $context | save -fr $dist
-        }
-        $env.KUBECONFIG = $dist
-    } else if $session {
-        let dist = mktemp -t $"kube.(history session).XXX"
+        let dist = mktemp -p $td $"(history session).XXX"
         kube-conf-export $context | save -fr $dist
         $env.KUBECONFIG = $dist
     } else {
