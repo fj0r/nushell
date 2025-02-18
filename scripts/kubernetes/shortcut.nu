@@ -50,10 +50,3 @@ export alias kdh = kube-diff-helm
 export alias kdelh = kube-delete-helm
 export alias kh = kube-helm
 
-### cert-manager
-export def kgcert [] {
-    kubectl get certificates -o wide | from ssv | rename certificates
-    kubectl get certificaterequests -o wide | from ssv | rename certificaterequests
-    kubectl get order.acme -o wide | from ssv | rename order.acme
-    kubectl get challenges.acme -o wide | from ssv | rename challenges.acme
-}

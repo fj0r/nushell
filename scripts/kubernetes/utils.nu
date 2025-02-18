@@ -1,71 +1,53 @@
-export def ensure-cache-by-lines [cache path action] {
-    let ls = do -i { open $path | lines | length }
-    if ($ls | is-empty) { return false }
-    let lc = do -i { open $cache | get lines}
-    if not (($cache | path exists) and ($lc | is-not-empty) and ($ls == $lc)) {
-        mkdir ($cache | path dirname)
-        {
-            lines: $ls
-            payload: (do $action)
-        } | save -f $cache
+use complete.nu *
+### cert-manager
+export def kgcert [] {
+    kubectl get certificates -o wide | from ssv | rename certificates
+    kubectl get certificaterequests -o wide | from ssv | rename certificaterequests
+    kubectl get order.acme -o wide | from ssv | rename order.acme
+    kubectl get challenges.acme -o wide | from ssv | rename challenges.acme
+}
+
+
+# kubectl redistribution deployment
+export def kube-redistribution-deployment [
+    deployment: string@cmpl-kube-deploys
+    ...nodes: string@cmpl-kube-nodes
+    --namespace (-n): string@cmpl-kube-ns
+] {
+    let ns = $namespace | with-flag -n
+    let nums = kubectl get nodes | from ssv -a | length
+    kubectl scale ...$ns deployments $deployment --replicas $nums
+    let labels = kubectl get ...$ns deploy $deployment --output=json
+    | from json
+    | get spec.selector.matchLabels
+    | transpose k v
+    | each {|x| $"($x.k)=($x.v)"}
+    | str join ','
+    let pods = kubectl get ...$ns pods -l $labels -o wide | from ssv -a
+    for p in ($pods | where NODE not-in $nodes) {
+        kubectl delete ...$ns pod --grace-period=0 --force $p.NAME
     }
-    (open $cache).payload
+    kubectl scale ...$ns deployments $deployment --replicas ($pods | where NODE in $nodes | length)
 }
 
-export def normalize-column-names [ ] {
-    let i = $in
-    let cols = $i | columns
-    mut t = $i
-    for c in $cols {
-        $t = ($t | rename -c {$c: ($c | str downcase | str replace ' ' '_')})
-    }
-    $t
+
+###
+export def kube-clean-evicted [] {
+    kubectl get pods -A
+    | from ssv -a
+    | where STATUS == Evicted
+    | each { |x| kube-delete pod -n $x.NAMESPACE $x.NAME }
 }
 
-export def --wrapped with-flag [...flag] {
-    if ($in | is-empty) { [] } else { [...$flag $in] }
+### FIXME:
+export def kube-clean-stucked-ns [ns: string] {
+    kubectl get namespace $ns -o json \
+    | tr -d "\n"
+    | sed 's/\"finalizers\": \[[^]]\+\]/\"finalizers\": []/' \
+    | kubectl replace --raw /api/v1/namespaces/$1/finalize -f -
 }
 
-export def `kcache flush` [] {
-    rm -rf ($nu.cache-dir | path join 'k8s')
-    nu-complete kube ctx
-    rm -rf ($nu.cache-dir | path join 'k8s-api-resources')
-}
-
-export def kube-shortnames [] {
-    kubectl api-resources | from ssv -a
-    | where SHORTNAMES != ''
-    | reduce -f {} {|i,a|
-        $i.SHORTNAMES
-        | split row ','
-        | reduce -f {} {|j,b|
-            $b | insert $j $i.NAME
-        }
-        | merge $a
-    }
-}
-
-export def parse_cellpath [path] {
-    $path | split row '.' | each {|x|
-        if ($x | find --regex "^[0-9]+$" | is-empty) {
-            $x
-        } else {
-            $x | into int
-        }
-    }
-}
-
-export def get_cellpath [record path] {
-    $path | reduce -f $record {|it, acc| $acc | get $it }
-}
-
-export def set_cellpath [record path value] {
-    if ($path | length) > 1 {
-        $record | upsert ($path | first) {|it|
-            set_cellpath ($it | get ($path | first)) ($path | slice 1..) $value
-        }
-    } else {
-        $record | upsert ($path | last) $value
-    }
+export def kube-clean-finalizer [$r $n] {
+    kubectl patch -p '{\"metadata\":{\"finalizers\":null}}' $r $n
 }
 

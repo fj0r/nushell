@@ -1,4 +1,5 @@
-use utils.nu *
+use common.nu *
+use conf.nu *
 use complete.nu *
 
 def krefine [kind] {
@@ -351,28 +352,6 @@ export def kube-set-image [
     }
 }
 
-# kubectl redistribution deployment
-export def kube-redistribution-deployment [
-    deployment: string@cmpl-kube-deploys
-    ...nodes: string@cmpl-kube-nodes
-    --namespace (-n): string@cmpl-kube-ns
-] {
-    let ns = $namespace | with-flag -n
-    let nums = kubectl get nodes | from ssv -a | length
-    kubectl scale ...$ns deployments $deployment --replicas $nums
-    let labels = kubectl get ...$ns deploy $deployment --output=json
-    | from json
-    | get spec.selector.matchLabels
-    | transpose k v
-    | each {|x| $"($x.k)=($x.v)"}
-    | str join ','
-    let pods = kubectl get ...$ns pods -l $labels -o wide | from ssv -a
-    for p in ($pods | where NODE not-in $nodes) {
-        kubectl delete ...$ns pod --grace-period=0 --force $p.NAME
-    }
-    kubectl scale ...$ns deployments $deployment --replicas ($pods | where NODE in $nodes | length)
-}
-
 # kubectl rollout history
 export def kube-rollout-history [
     --namespace (-n): string@cmpl-kube-ns
@@ -433,25 +412,5 @@ export def kube-top-node [] {
         mem: ($x.mem | str substring ..<-2 | into float)
         mem%: (($x.pmem | str substring ..<-1 | into float) / 100)
     } }
-}
-
-###
-export def kube-clean-evicted [] {
-    kubectl get pods -A
-    | from ssv -a
-    | where STATUS == Evicted
-    | each { |x| kube-delete pod -n $x.NAMESPACE $x.NAME }
-}
-
-### FIXME:
-export def kube-clean-stucked-ns [ns: string] {
-    kubectl get namespace $ns -o json \
-    | tr -d "\n"
-    | sed 's/\"finalizers\": \[[^]]\+\]/\"finalizers\": []/' \
-    | kubectl replace --raw /api/v1/namespaces/$1/finalize -f -
-}
-
-export def kube-clean-finalizer [$r $n] {
-    kubectl patch -p '{\"metadata\":{\"finalizers\":null}}' $r $n
 }
 

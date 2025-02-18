@@ -1,5 +1,5 @@
 use argx
-use utils.nu *
+use common.nu *
 
 ### ctx
 export def kube-config [] {
