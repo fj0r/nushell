@@ -170,7 +170,7 @@ def up_prompt [segment] {
         if ($env.NU_POWER_CONFIG.theme.frame_header? | is-empty) {
             let ss = [$"($ss.0)(ansi $sep.color)($d.right)" $"($d.left)(ansi reset)($ss.1)"]
             let fl = $ss | calc bar width
-            $ss | str join $"('' | fill -c $sep.char -w $fl)" | $"($in)\n"
+            $ss | str join $"('' | fill -c $sep.char -w $fl)" | $"($in)(char newline)"
         } else {
             let c = $env.NU_POWER_CONFIG.theme.frame_header
             let color = if (is-admin) { ansi $color.admin } else { ansi $color.normal }
@@ -178,7 +178,7 @@ def up_prompt [segment] {
             let fl = $ss | calc bar width -n $c.upperleft_size
             $ss
             | str join $"('' | fill -c $sep.char -w $fl)"
-            | $"($color)($c.upperleft)(ansi reset)($in)\n($color)($c.lowerleft)(ansi reset)"
+            | $"($color)($c.upperleft)(ansi reset)($in)(char newline)($color)($c.lowerleft)(ansi reset)"
         }
     }
 }
@@ -222,7 +222,7 @@ def up_center_prompt [segment] {
                 $"('' | fill -c $sep.char -w ($fl.1))(ansi reset)"
             ]
             | str join
-            | $"($in)\n"
+            | $"($in)(char newline)"
         } else {
             let c = $env.NU_POWER_CONFIG.theme.frame_header
             let color = if (is-admin) { ansi $color.admin } else { ansi $color.normal }
@@ -233,7 +233,7 @@ def up_center_prompt [segment] {
                 $"($color)('' | fill -c $sep.char -w $fl.0)(ansi reset)"
                 $ss
                 $"($color)('' | fill -c $sep.char -w ($fl.1 - $c.upperright_size))(ansi reset)"
-                $"($color)(($c.upperright))\n($c.lowerleft)(ansi reset)"
+                $"($color)(($c.upperright))(char newline)($c.lowerleft)(ansi reset)"
             ]
             | str join
         }
