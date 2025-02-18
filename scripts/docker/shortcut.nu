@@ -1,4 +1,5 @@
 export alias d = container
+export alias dcns = container-change-namespace
 export alias dp = container-list
 export alias dr = container-create
 export alias dx = container-preset
@@ -25,5 +26,3 @@ export alias dvr = volume-remove
 export alias dn = containers-network-list
 export alias dnc = containers-network-create
 export alias dnr = containers-network-remove
-
-

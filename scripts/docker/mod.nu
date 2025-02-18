@@ -27,7 +27,7 @@ export-env {
           - --cap-add=SYS_PTRACE
           - --security-opt
           - seccomp=unconfined
-        - name: mitmporxy
+        - name: mitmproxy
           image: mitmproxy/mitmproxy
           daemon: false
           container_name: mitmproxy
@@ -159,6 +159,7 @@ export-env {
 }
 
 
+export use base.nu *
 export use core.nu *
 export use utils.nu *
 export use registry.nu *

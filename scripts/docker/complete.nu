@@ -1,12 +1,4 @@
-export def cmpl-docker-ns [] {
-    if $env.CONTCTL == 'nerdctl' {
-        ^$env.CONTCTL namespace list
-        | from ssv -a
-        | each {|x| { value: $x.NAMES }}
-    } else {
-        []
-    }
-}
+use base.nu *
 
 export def cmpl-docker-network [] {
     containers-network-list | get NAME
@@ -17,13 +9,13 @@ export def cmpl-docker-network-driver [] {
 }
 
 export def cmpl-docker-ps [] {
-    ^$env.CONTCTL ps
+    container ps
     | from ssv -a
     | each {|x| {description: $x.NAMES value: $x.'CONTAINER ID'}}
 }
 
 export def cmpl-docker-containers [] {
-    ^$env.CONTCTL ps -a
+    container ps -a
     | from ssv -a
     | each {|i|
         let st = if ($i.STATUS | str starts-with 'Up') { ' ' } else { '!' }
@@ -46,7 +38,7 @@ export def cmpl-docker-containers [] {
 
 # TODO: filter by description
 export def cmpl-docker-containers-b [] {
-    ^$env.CONTCTL ps -a
+    container ps -a
     | from ssv -a
     | each {|i|
         let s = if ($i.STATUS | str starts-with 'Up') { ' ' } else { '!' }
@@ -55,7 +47,7 @@ export def cmpl-docker-containers-b [] {
 }
 
 export def cmpl-docker-images [] {
-    ^$env.CONTCTL images
+    container images
     | from ssv
     | each {|x| $"($x.REPOSITORY):($x.TAG)"}
 }
@@ -63,12 +55,12 @@ export def cmpl-docker-images [] {
 export def cmpl-docker-cp [cmd: string, offset: int] {
     let argv = $cmd | str substring ..<$offset | split row ' '
     let p = if ($argv | length) > 2 { $argv | get 2 } else { $argv | get 1 }
-    let container = ^$env.CONTCTL ps
+    let container = container ps
         | from ssv -a
         | each {|x| {description: $x.'CONTAINER ID' value: $"($x.NAMES):" }}
     let n = $p | split row ':'
     if $"($n | get 0):" in ($container | get value) {
-        ^$env.CONTCTL exec ($n | get 0) sh -c $"ls -dp ($n | get 1)*"
+        container exec ($n | get 0) sh -c $"ls -dp ($n | get 1)*"
         | lines
         | each {|x| $"($n | get 0):($x)"}
     } else {
@@ -82,7 +74,7 @@ export def cmpl-docker-cp [cmd: string, offset: int] {
 
 
 export def cmpl-docker-volume [] {
-    ^$env.CONTCTL volume ls
+    container volume ls
     | from ssv -a
     | get 'VOLUME NAME'
 }

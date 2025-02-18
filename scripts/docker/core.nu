@@ -1,8 +1,5 @@
 use complete.nu *
-
-def --wrapped container [...flag] {
-    ^$env.CONTCTL ...$flag
-}
+use base.nu *
 
 # network
 export def containers-network-list [
@@ -10,9 +7,9 @@ export def containers-network-list [
     --subnet
 ] {
     if ($name | is-empty) {
-        ^$env.CONTCTL network ls | from ssv -a
+        container network ls | from ssv -a
     } else {
-        ^$env.CONTCTL network inspect $name
+        container network inspect $name
         | from json
         | do {
             if $subnet {
@@ -31,7 +28,7 @@ export def containers-network-create [
     name: string
     --driver(-d): string@cmpl-docker-network-driver
 ] {
-    ^$env.CONTCTL network create $name
+    container network create $name
 }
 
 export def containers-network-remove [
@@ -39,53 +36,52 @@ export def containers-network-remove [
     --force(-f)
 ] {
     if ($network | is-empty) {
-        ^$env.CONTCTL network prune
+        container network prune
     } else {
-        ^$env.CONTCTL network rm $network ...(if $force { [-f] } else { [] })
+        container network rm $network ...(if $force { [-f] } else { [] })
     }
 }
 
 # list containers
 export def container-list [
-    --namespace(-n): string@cmpl-docker-ns
     container?: string@cmpl-docker-containers
     --all(-a)
 ] {
-    let cli = $env.CONTCTL
     if ($container | is-empty) {
         let fmt = '{"id":"{{.ID}}", "image": "{{.Image}}", "name":"{{.Names}}", "cmd":{{.Command}}, "port":"{{.Ports}}", "status":"{{.Status}}", "created":"{{.CreatedAt}}"}'
-        let fmt = if $cli == 'podman' { $fmt | str replace '{{.Command}}' '"{{.Command}}"' | str replace '{{.CreatedAt}}' '{{.Created}}' } else { $fmt }
+        let fmt = if $env.CONTCTL == 'podman' { $fmt | str replace '{{.Command}}' '"{{.Command}}"' | str replace '{{.CreatedAt}}' '{{.Created}}' } else { $fmt }
         let all = if $all {[-a]} else {[]}
-        ^$cli ps ...$all --format $fmt
-            | lines
-            | each {|x|
-                let r = $x | from json
-                let t = $r.created | into datetime
-                $r | upsert created $t
-            }
+        container ps ...$all --format $fmt
+        | lines
+        | each {|x|
+            let r = $x | from json
+            let t = $r.created | into datetime
+            $r | upsert created $t
+        }
     } else {
-        let ns = if ($namespace | is-empty) {[]} else {[-n $namespace]}
-        let r = ^$cli ...$ns inspect $container
-            | from json
-            | get 0
+        let r = container inspect $container
+        | from json
+        | get 0
+
         let image = $r.Image
-        let img = ^$cli ...$ns inspect $image
-            | from json
-            | get 0
+        let img = container inspect $image
+        | from json
+        | get 0
         let imgCmd = $img.Config.Cmd?
         let imgEnv = $img.Config.Env?
-            | reduce -f {} {|i, a|
-                let x = $i | split row '='
-                $a | upsert $x.0 $x.1?
-            }
+        | reduce -f {} {|i, a|
+            let x = $i | split row '='
+            $a | upsert $x.0 $x.1?
+        }
         let m = $r.Mounts
-            | reduce -f {} {|i, a|
-                if $i.Type == 'bind' {
-                    $a | upsert $i.Source? $i.Destination?
-                } else { $a }
-            }
+        | reduce -f {} {|i, a|
+            if $i.Type == 'bind' {
+                $a | upsert $i.Source? $i.Destination?
+            } else { $a }
+        }
         let p = $r.NetworkSettings.Ports? | default {} | transpose k v
-            | reduce -f {} {|i, a| $a | upsert $i.k $"($i.v.HostIp?.0?):($i.v.HostPort?.0?)"}
+        | reduce -f {} {|i, a| $a | upsert $i.k $"($i.v.HostIp?.0?):($i.v.HostPort?.0?)"}
+
         {
             name: $r.Name?
             hostname: $r.Config.Hostname?
@@ -111,32 +107,30 @@ export def parse-img [] {
 
 # list images
 export def image-list [
-    -n: string@cmpl-docker-ns
     image?: string@cmpl-docker-images
     --layer
     --history
 ] {
-    let ns = if ($n | is-empty) {[]} else {[-n $n]}
     if ($image | is-empty) {
         let fmt = '{"id":"{{.ID}}", "repo": "{{.Repository}}", "tag":"{{.Tag}}", "size":"{{.Size}}", "created":"{{.CreatedAt}}"}'
-        ^$env.CONTCTL ...$ns images --format $fmt
-            | lines
-            | each {|x|
-                let x = $x | from json
-                let name = $"($x.repo):($x.tag)"
-                let img = $name | parse-img
-                {
-                    name: $name
-                    id: $x.id
-                    created: ($x.created | into datetime)
-                    size: ($x.size | into filesize)
-                    repo: $img.repo?
-                    image: $img.image?
-                    tag: $x.tag?
-                }
+        container images --format $fmt
+        | lines
+        | each {|x|
+            let x = $x | from json
+            let name = $"($x.repo):($x.tag)"
+            let img = $name | parse-img
+            {
+                name: $name
+                id: $x.id
+                created: ($x.created | into datetime)
+                size: ($x.size | into filesize)
+                repo: $img.repo?
+                image: $img.image?
+                tag: $x.tag?
             }
+        }
     } else {
-        let r = ^$env.CONTCTL ...$ns inspect $image
+        let r = container inspect $image
             | from json
             | get 0
         let e = $r.Config.Env?
@@ -189,22 +183,18 @@ export def image-list [
 export def container-log [
     container: string@cmpl-docker-containers
     -l: int = 100 # line
-    -n: string@cmpl-docker-ns # namespace
 ] {
     let l = if $l == 0 { [] } else { [--tail $l] }
-    let ns = if ($n | is-empty) {[]} else {[-n $n]}
-    ^$env.CONTCTL ...$ns logs -f ...$l $container
+    container logs -f ...$l $container
 }
 
 export def container-log-trunc [
     container: string@cmpl-docker-containers
-    -n: string@cmpl-docker-ns # namespace
 ] {
     if $env.CONTCTL == 'podman' {
         print -e $'(ansi yellow)podman(ansi dark_gray) isn’t supported(ansi reset)'
     } else {
-        let ns = if ($n | is-empty) {[]} else {[-n $n]}
-        let f = ^$env.CONTCTL ...$ns inspect --format='{{.LogPath}}' $container
+        let f = container inspect --format='{{.LogPath}}' $container
         truncate -s 0 $f
     }
 }
@@ -212,10 +202,8 @@ export def container-log-trunc [
 # attach container
 export def --wrapped container-attach [
     container: string@cmpl-docker-containers
-    -n: string@cmpl-docker-ns
     ...args
 ] {
-    let ns = if ($n | is-empty) {[]} else {[-n $n]}
     if ($args | is-empty) {
         let cmd = [
             '/usr/local/bin/nu'
@@ -225,9 +213,9 @@ export def --wrapped container-attach [
         ]
         | str join ' '
         | $"for sh in ($in); do if [ -e $sh ]; then exec $sh; fi; done"
-        ^$env.CONTCTL ...$ns exec -it $container /bin/sh -c $cmd
+        container exec -it $container /bin/sh -c $cmd
     } else {
-        ^$env.CONTCTL ...$ns exec -it $container ...$args
+        container exec -it $container ...$args
     }
 }
 
@@ -236,18 +224,16 @@ export def container-copy-file [
     lhs: string@cmpl-docker-cp
     rhs: string@cmpl-docker-cp
 ] {
-    ^$env.CONTCTL cp $lhs $rhs
+    container cp $lhs $rhs
 }
 
 # remove container
 export def container-remove [
     container: string@cmpl-docker-containers
-    --namespace(-n): string@cmpl-docker-ns
 ] {
-    let ns = if ($namespace | is-empty) {[]} else {[-n $namespace]}
-    let cs = ^$env.CONTCTL ...$ns ps -a | from ssv -a | get NAMES
+    let cs = container ps -a | from ssv -a | get NAMES
     if $container in $cs {
-        ^$env.CONTCTL ...$ns container rm -f $container
+        container container rm -f $container
     } else {
         print -e $"(ansi grey)container (ansi yellow)($container)(ansi grey) not exist(ansi reset)"
     }
@@ -256,121 +242,104 @@ export def container-remove [
 # commit container
 export def container-commit [
     container: string@cmpl-docker-containers
-    --namespace(-n): string@cmpl-docker-ns
     name: string
 ] {
-    let ns = if ($namespace | is-empty) {[]} else {[-n $namespace]}
-    let cs = ^$env.CONTCTL ...$ns ps -a | from ssv -a | get NAMES
-    ^$env.CONTCTL ...$ns commit $container $name
+    let cs = container ps -a | from ssv -a | get NAMES
+    container commit $container $name
 }
 
 # history
-export def container-history [image: string@cmpl-docker-images -n: string@cmpl-docker-ns] {
-    let ns = if ($n | is-empty) {[]} else {[-n $n]}
-    ^$env.CONTCTL ...$ns history --no-trunc $image | from ssv -a
+export def container-history [image: string@cmpl-docker-images] {
+    container history --no-trunc $image | from ssv -a
 }
 
 
 # save images
-export def image-save [-n: string@cmpl-docker-ns ...image: string@cmpl-docker-images] {
-    let ns = if ($n | is-empty) {[]} else {[-n $n]}
-    ^$env.CONTCTL ...$ns save ...$image
+export def image-save [...image: string@cmpl-docker-images] {
+    container save ...$image
 }
 
 # load images
-export def image-load [-n: string@cmpl-docker-ns] {
-    $in | ^$env.CONTCTL ...(if ($n | is-empty) {[]} else {[-n $n]}) load
+export def image-load [] {
+    $in | container load
 }
 
 # system prune
-export def system-prune [-n: string@cmpl-docker-ns] {
-    let ns = if ($n | is-empty) {[]} else {[-n $n]}
-    ^$env.CONTCTL ...$ns system prune -f
+export def system-prune [] {
+    container system prune -f
 }
 
 # system prune all
-export def system-prune-all [-n: string@cmpl-docker-ns] {
-    let ns = if ($n | is-empty) {[]} else {[-n $n]}
-    ^$env.CONTCTL ...$ns system prune --all --force --volumes
+export def system-prune-all [] {
+    container system prune --all --force --volumes
 }
 
 # remove image
 export def image-remove [
     image: string@cmpl-docker-images
-    -n: string@cmpl-docker-ns
     --force(-f)
 ] {
     mut args = []
-    if ($n | is-not-empty) { $args ++= [-n $n] }
     if $force { $args ++= [--force] }
-    ^$env.CONTCTL rmi ...$args $image
+    container rmi ...$args $image
 }
 
 # add new tag
-export def image-tag [from: string@cmpl-docker-images  to: string -n: string@cmpl-docker-ns] {
-    let ns = if ($n | is-empty) {[]} else {[-n $n]}
-    ^$env.CONTCTL ...$ns tag $from $to
+export def image-tag [from: string@cmpl-docker-images  to: string] {
+    container tag $from $to
 }
 
 # push image
 export def image-push [
     image: string@cmpl-docker-images
     --tag(-t): string
-    -n: string@cmpl-docker-ns -i
+    -i
 ] {
     let $insecure = if $i {[--insecure-registry]} else {[]}
-    let ns = if ($n | is-empty) {[]} else {[-n $n]}
     if ($tag | is-empty) {
-        ^$env.CONTCTL ...$ns ...$insecure push $image
+        container ...$insecure push $image
     } else {
-        ^$env.CONTCTL ...$ns tag $image $tag
+        container tag $image $tag
         do -i {
-            ^$env.CONTCTL ...$ns ...$insecure push $tag
+            container ...$insecure push $tag
         }
-        ^$env.CONTCTL ...$ns rmi $tag
+        container rmi $tag
     }
 }
 
 # pull image
-export def image-pull [image -n: string@cmpl-docker-ns -i] {
+export def image-pull [image -i] {
     let $insecure = if $i {[--insecure-registry]} else {[]}
-    let ns = if ($n | is-empty) {[]} else {[-n $n]}
-    ^$env.CONTCTL ...$ns ...$insecure pull $image
+    container ...$insecure pull $image
 }
 
 ### list volume
-export def volume-list [-n: string@cmpl-docker-ns] {
-    let ns = if ($n | is-empty) {[]} else {[-n $n]}
-    ^$env.CONTCTL ...$ns volume ls | from ssv -a
+export def volume-list [] {
+    container volume ls | from ssv -a
 }
 
 # create volume
-export def volume-create [name: string -n: string@cmpl-docker-ns] {
-    let ns = if ($n | is-empty) {[]} else {[-n $n]}
-    ^$env.CONTCTL ...$ns volume create $name
+export def volume-create [name: string] {
+    container volume create $name
 }
 
 # inspect volume
-export def volume-inspect [name: string@cmpl-docker-volume -n: string@cmpl-docker-ns] {
-    let ns = if ($n | is-empty) {[]} else {[-n $n]}
-    ^$env.CONTCTL ...$ns volume inspect $name
+export def volume-inspect [name: string@cmpl-docker-volume] {
+    container volume inspect $name
 }
 
 # remove volume
-export def volume-remove [...name: string@cmpl-docker-volume -n: string@cmpl-docker-ns] {
-    let ns = if ($n | is-empty) {[]} else {[-n $n]}
-    ^$env.CONTCTL ...$ns volume rm ...$name
+export def volume-remove [...name: string@cmpl-docker-volume] {
+    container volume rm ...$name
 }
 
 # dump volume
 export def volume-dump [
     name: string@cmpl-docker-volume
     --image(-i): string='debian'
-    -n: string@cmpl-docker-ns
 ] {
     let id = random chars -l 6
-    let ns = if ($n | is-empty) {[]} else {[-n $n]}
-    ^$env.CONTCTL ...$ns ...[
+    container ...[
         run --rm
         -v $"($name):/tmp/($id)"
         $image
@@ -383,12 +352,10 @@ export def volume-restore [
     name: string@cmpl-docker-volume
     --from(-f): string
     --image(-i): string='debian'
-    -n: string@cmpl-docker-ns
 ] {
     let id = random chars -l 6
     let src = random chars -l 6
-    let ns = if ($n | is-empty) {[]} else {[-n $n]}
-    ^$env.CONTCTL ...$ns ...[
+    container ...[
         run --rm
         -v $"($name):/tmp/($id)"
         -v $"(host-path $from):/tmp/($src)"
@@ -430,7 +397,6 @@ export def --wrapped container-create [
     --with-x
     --nvidia:int
     --privileged(-P)
-    --namespace(-n): string@cmpl-docker-ns
     --options: list<string>
     image: string@cmpl-docker-images           # image
     ...cmd                                     # command args
@@ -468,9 +434,6 @@ export def --wrapped container-create [
         $a | merge {$k: $i.v}
     }
 
-    if ($namespace | is-not-empty) {
-        $args ++= [--namespace $namespace]
-    }
     if ($entrypoint | is-not-empty) {
         $args ++= [--entrypoint $entrypoint]
     }
@@ -524,9 +487,9 @@ export def --wrapped container-create [
         let now = date now | format date %m%d%H%M
         $"($img)_($now)"
     } else {
-        let c = container-list --namespace=$namespace | where name == $name
+        let c = container-list | where name == $name
         if ($c | is-not-empty) {
-            container-remove --namespace=$namespace $name
+            container-remove $name
         }
         $name
     }
@@ -536,7 +499,7 @@ export def --wrapped container-create [
     if $dry_run {
         echo ([docker run --name $name $options $args $image $cmd] | flatten | str join ' ')
     } else {
-        ^$env.CONTCTL run --name $name ...$options ...$args $image ...$cmd
+        container run --name $name ...$options ...$args $image ...$cmd
     }
 }
 
@@ -544,7 +507,6 @@ export def --wrapped container-create [
 export def --wrapped container-preset [
     preset:string@cmpl-preset
     ...cmd
-    --namespace(-n): string@cmpl-docker-ns
     --vols(-v): any = {}
     --ports(-p): any = {}
     --envs(-e): any = {}
@@ -563,7 +525,7 @@ export def --wrapped container-preset [
         let c = $c.0
         let image = $c.image
         let cmd = if ($cmd | is-empty) { $c.command } else { $cmd }
-        (container-create --namespace=$namespace
+        (container-create
             --name=$c.container_name?
             --daemon=$c.daemon
             --envs {...$c.environment, ...$envs}
