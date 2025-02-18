@@ -1,4 +1,6 @@
 use complete.nu *
+use common.nu *
+
 ### cert-manager
 export def kgcert [] {
     kubectl get certificates -o wide | from ssv | rename certificates
