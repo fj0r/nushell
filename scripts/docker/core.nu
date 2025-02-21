@@ -244,7 +244,6 @@ export def container-commit [
     container: string@cmpl-docker-containers
     name: string
 ] {
-    let cs = container ps -a | from ssv -a | get NAMES
     container commit $container $name
 }
 
