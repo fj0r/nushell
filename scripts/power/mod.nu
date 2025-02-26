@@ -500,7 +500,7 @@ export-env {
         time: {|bg|
             let c = $env.NU_POWER_CONFIG.time
             let format = match $c.style {
-                "compact" => { $'(ansi $c.fst)%y%m%d(ansi $c.snd)%w(ansi $c.fst)%H%M%S' }
+                "compact" => { $'(ansi $c.fst)%m%d(ansi $c.snd)%w(ansi $c.fst)%H%M' }
                 "rainbow" => {
                     let fmt = [w y m d H M S]
                     let color = ['1;93m' '1;35m' '1;34m' '1;36m' '1;32m' '1;33m' '1;91m']
