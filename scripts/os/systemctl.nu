@@ -138,14 +138,17 @@ export def ssc [
     }
 }
 
-export def gen-systemd-service [
+export def generate-systemd-service [
     name
     --cmd: string
     --system
     --environment: record = {}
     --workdir: string
     --user: string
+    --exec
 ] {
+    let workdir = if ($workdir | is-empty) { $env.HOME } else { $workdir }
+    let user = if ($user | is-empty) { whoami } else { $user }
     let s = {
         Unit: {
             After: network.target
@@ -160,8 +163,7 @@ export def gen-systemd-service [
         }
     }
 
-    let workdir = if ($workdir | is-empty) { $env.HOME } else { $workdir }
-    {
+    let r = {
         Unit: {
             Description: $"Server Daemon for ($name)"
         }
@@ -198,4 +200,22 @@ export def gen-systemd-service [
         $r | str join "\n"
     }
     | str join $"\n\n"
+    if $exec {
+        let s = $"($name).service"
+        if $system {
+            let p = [/etc/systemd/system/ $s] | path join
+            $r | save -f $p
+            sudo systemctl disable --now $s
+            sudo systemctl daemon-reload
+            sudo systemctl enable --now $s
+        } else {
+            let p = [$env.HOME .config systemd user $s] | path join
+            $r | save -f $p
+            systemctl disable --user --now $s
+            systemctl enable --user --now $s
+        }
+
+    } else {
+        $r
+    }
 }

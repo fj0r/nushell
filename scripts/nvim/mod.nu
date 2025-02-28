@@ -71,6 +71,35 @@ export def nvs [port: int=9999] {
     nvim --headless --listen $"0.0.0.0:($port)"
 }
 
+export def nvim-gen-service [
+    name
+    --ev: record = {}
+    --port: int = 9999
+    --host: string = 'localhost'
+    --bin: string = '/usr/bin/nvim'
+    --sys
+    --exec
+] {
+    let user = whoami
+    let ev = {
+        HOSTNAME: (hostname)
+        NVIM_FONT: nar12
+        NEOVIDE_SCALE_FACTOR: 1
+        SHELL: nu
+        TERM: screen-256color
+    }
+    | merge $ev
+    let host = match $host {
+        local | localhost => '127.0.0.1'
+        all => '0.0.0.0'
+        _ => $host
+    }
+    let cmd = $"($bin) --listen ($host):($port) --headless +'set title titlestring=\\|($name)\\|'"
+    use os/systemctl.nu *
+    generate-systemd-service $"nvim:($name)" --cmd $cmd --system=$sys --environment $ev --user $user --exec=$exec
+    # ~/.config/systemd/user/
+}
+
 def cmpl-nvc [] {
     let opts = open $env.NVIM_REMOTE_HISTORY
     | query db 'select cmd, count from nvim_remote_history order by count desc limit 9;'
