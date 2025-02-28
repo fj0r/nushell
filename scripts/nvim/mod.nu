@@ -101,7 +101,8 @@ export def nvim-gen-service [
 }
 
 def cmpl-nvc [] {
-    let opts = open $env.NVIM_REMOTE_HISTORY
+    let history = [$nu.cache-dir nvim_history.sqlite] | path join
+    let opts = open $history
     | query db 'select cmd, count from nvim_remote_history order by count desc limit 9;'
     | rename value description
     if not ($env.HOME in ($opts | get value)) {[$env.HOME]} else {[]}
@@ -113,22 +114,19 @@ export def nvc [
     --gui(-g)
     --verbose(-v)
 ] {
-    if ($env.NVIM_REMOTE_HISTORY? | is-empty) {
-        print -e 'require `$env.NVIM_REMOTE_HISTORY`'
-        return
-    }
-    if not ($env.NVIM_REMOTE_HISTORY | path exists) {
+    let history = [$nu.cache-dir nvim_history.sqlite] | path join
+    if not ($history | path exists) {
         "create table if not exists nvim_remote_history (
             cmd text primary key,
             count int default 1,
             recent datetime default (datetime('now', 'localtime'))
-        );" | sqlite3 $env.NVIM_REMOTE_HISTORY
+        );" | sqlite3 $history
     }
     $"insert into nvim_remote_history\(cmd\) values \('($args)'\)
     on conflict\(cmd\) do
     update set count = count + 1,
                recent = datetime\('now', 'localtime'\);"
-    | sqlite3 $env.NVIM_REMOTE_HISTORY
+    | sqlite3 $history
     mut cmd = []
     if $args =~ ':[0-9]+$' {
         mut addr = ''
