@@ -137,3 +137,65 @@ export def ssc [
         sudo systemctl ...(if $user {[--user]} else {[]}) $cmd ...$args ...$x
     }
 }
+
+export def gen-systemd-service [
+    name
+    --cmd: string
+    --system
+    --environment: record = {}
+    --workdir: string
+    --user: string
+] {
+    let s = {
+        Unit: {
+            After: network.target
+            Wants: network.target
+        }
+        Service: {
+            ExecReload: '/bin/kill -HUP $MAINPID'
+            User: $user
+        }
+        Install: {
+            WantedBy: multi-user.target
+        }
+    }
+
+    let workdir = if ($workdir | is-empty) { $env.HOME } else { $workdir }
+    {
+        Unit: {
+            Description: $"Server Daemon for ($name)"
+        }
+        Service: {
+            Type: simple
+            SyslogIdentifier: ($name)
+            Restart: always
+            RestartSec: 0s
+            LimitNOFILE: 'infinity'
+            WorkingDirectory: $workdir
+            env: $environment
+            ExecStart: $cmd
+        }
+        Install: {
+            WantedBy: default.target
+        }
+    }
+    | merge deep (if $system { $s } else { {} })
+    | transpose k v
+    | each {|i|
+        mut r = [$"[($i.k)]"]
+        for j in ($i.v | transpose k v) {
+            match $j.k {
+                env => {
+                    for i in ($j.v | transpose k v) {
+                        $r ++= [$"Environment=\"($i.k)=($i.v)\""]
+                    }
+                }
+                _ => {
+                    $r ++= [$"($j.k)=($j.v)"]
+                }
+            }
+        }
+        $r | str join "\n"
+    }
+    | str join $"\n\n"
+}
