@@ -15,6 +15,7 @@ use llm *
 use llm/shortcut.nu *
 use llm/integration/web.nu *
 source llm/agents/kubernetes.nu
+source llm/agents/research.nu
 use project *
 use ssh *
 use cwdhist *
