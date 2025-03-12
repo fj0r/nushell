@@ -16,9 +16,15 @@ export def screen_record [file?: path] {
     }
     let r = slurp | split row ' '
     let s = $r.0 | split row ','
+    let inputfmt = match $nu.os-info.name {
+        linux => 'x11grab'
+        windows => 'gdigrab'
+        _ => 'avfoundation'
+    }
+    # FIXME:
     (
     ffmpeg -y -loglevel error
-        -f gdigrab -i desktop
+        -f $inputfmt -i desktop
         -show_mouse 1
         -offset_x $s.0 -offset_y $s.1 -video_size $r.1
         -c:v libx264
