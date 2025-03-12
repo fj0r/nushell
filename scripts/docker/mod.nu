@@ -106,6 +106,20 @@ export-env {
             '8000': 8000
           command: []
           options: []
+        - name: whisper
+          image: ghcr.io/fj0r/0x:whisper
+          container_name: whisper
+          daemon: true
+          environment:
+            ASR_MODEL: small
+          volumns:
+            ~/.cache/whisper: /root/.cache/whisper
+          ports:
+            '4010': 9000
+          command: []
+          options:
+          - --gpus
+          - all
         - name: iggy
           image: iggyrs/iggy
           container_name: iggy
