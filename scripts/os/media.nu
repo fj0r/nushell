@@ -14,7 +14,16 @@ export def screen_record [file?: path] {
     } else {
         $file
     }
-    ffmpeg -s 1920x1080 -i - -c:v libx264 -f webm -preset ultrafast output.webm
+    let r = slurp | split row ' '
+    let s = $r.0 | split row ','
+    (
+    ffmpeg -y -loglevel error
+        -f gdigrab -i desktop
+        -show_mouse 1
+        -offset_x $s.0 -offset_y $s.1 -video_size $r.1
+        -c:v libx264
+        $a
+    )
 }
 
 export def audio_record [file?: path] {
@@ -29,6 +38,13 @@ export def audio_record [file?: path] {
         windows => 'lavfi'
         _ => 'avfoundation'
     }
-    ffmpeg -f $inputfmt -y -loglevel error -i default -acodec libmp3lame -ar 44100 -ac 2 $a
+    (
+    ffmpeg -y -loglevel error
+        -f $inputfmt
+        -i default
+        -acodec libmp3lame
+        -ar 44100 -ac 2
+        $a
+    )
     $a
 }
