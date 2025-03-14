@@ -67,8 +67,11 @@ export def v [...file:path] { nve ...$file -a vsplit }
 export def c [...file:path] { nve ...$file -a split }
 export def x [...file:path] { nve ...$file -a tabnew }
 
-export def nvs [port: int=9999] {
-    nvim --headless --listen $"0.0.0.0:($port)"
+export def nvs [--port(-p): int=9999, --host(-h): string='0.0.0.0'] {
+    $env.NVIM_FONT = 'nar12'
+    $env.NEOVIDE_SCALE_FACTOR = 1
+    print $"(ansi grey)neovim listen on ($host):($port)(ansi reset)"
+    nvim --headless --listen $"($host):($port)"
 }
 
 export def nvim-gen-service [
