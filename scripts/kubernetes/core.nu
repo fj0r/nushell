@@ -213,6 +213,7 @@ export def --wrapped kube-attach [
     --all-pods(-a) # for completion
     ...args
 ] {
+    let stdin = $in
     let n = if ($namespace | is-empty) { [] } else { [-n $namespace] }
     let pod = if ($selector | is-empty) {
         if ($pod | str ends-with '-') {
@@ -260,7 +261,11 @@ export def --wrapped kube-attach [
     } else {
         $args
     }
-    kubectl exec ...$n -it $pod ...$c -- ...$args
+    if ($stdin | is-empty) {
+        kubectl exec ...$n -it $pod ...$c -- ...$args
+    } else {
+        $stdin | kubectl exec ...$n -i $pod ...$c -- ...$args
+    }
 }
 
 # kubectl logs
