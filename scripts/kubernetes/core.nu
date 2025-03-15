@@ -337,20 +337,23 @@ export def kube-set-image [
     kind: string@cmpl-kube-kind-with-image
     resource: string@cmpl-kube-res
     --namespace(-n): string@cmpl-kube-ns
+    --dry-run
     act?: any
 ] {
     let ns = $namespace | with-flag -n
-    let path = match $kind {
-        _ => '.spec.template.spec.containers[*]'
-    }
-    let name = kubectl get ...$ns $kind $resource -o $"jsonpath={($path).name}" | split row ' '
-    let image = kubectl get ...$ns $kind $resource -o $"jsonpath={($path).image}" | split row ' '
-    let list = $name | zip $image | reduce -f {} {|it,acc| $acc | insert $it.0 $it.1 }
+    let list = kubectl get ...$ns $kind $resource -o jsonpath="{.spec.template.spec}"
+    | from json
+    | get containers
     if ($act | describe -d).type == 'closure' {
-        let s = do $act $list
-        if ($s | describe -d).type == 'record' {
-            let s = $s | transpose k v | each {|x| $"($x.k)=($x.v)"}
-            kubectl ...$ns set image $"($kind)/($resource)" ...$s
+        let s = $list
+        | update image $act
+        | select name image
+        | each {|x| $"($x.name)=($x.image)" }
+        | str join ' '
+
+        print $"kubectl ($ns | str join ' ') set image \"($kind)/($resource)\" ($s)"
+        if not $dry_run {
+            kubectl ...$ns set image $"($kind)/($resource)" $s
         }
     } else {
         $list
@@ -361,7 +364,7 @@ export def kube-set-image [
 export def kube-rollout-history [
     --namespace (-n): string@cmpl-kube-ns
     --revision (-v): int
-    deployment: string@cmpl-kube-res-via-name
+    deployment: string@cmpl-kube-deploys
 ] {
     let ns = $namespace | with-flag -n
     let v = if ($revision|is-empty) { [] } else { [ $"--revision=($revision)" ] }
@@ -372,7 +375,7 @@ export def kube-rollout-history [
 export def kube-rollout-undo [
     --namespace (-n): string@cmpl-kube-ns
     --revision (-v): int
-    deployment: string@cmpl-kube-res-via-name
+    deployment: string@cmpl-kube-deploys
 ] {
     let ns = $namespace | with-flag -n
     let v = if ($revision|is-empty) { [] } else { [ $"--to-revision=($revision)" ] }
