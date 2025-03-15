@@ -101,6 +101,8 @@ export-env {
           daemon: true
           environment:
             SURREAL_STORE: rocksdb
+            SURREAL_EXPERIMENTAL_GRAPHQL: 'true'
+            SURREAL_ROCKSDB_BACKGROUND_FLUSH: 'true'
           volumns: {}
           ports:
             '8000': 8000
