@@ -6,6 +6,11 @@ $env.ENV_CONVERSIONS.LD_LIBRARY_PATH = {
     to_string: { |v| if ($v | is-empty) { "" } else { $v | path expand | str join (char esep) } }
 }
 
+$env.ENV_CONVERSIONS.PATH = {
+    from_string: { |s| if ($s | is-empty) { [] } else { $s | split row (char esep) } }
+    to_string: { |v| if ($v | is-empty) { "" } else { $v | path expand | str join (char esep) } }
+}
+
 def --env merge-path [path] {
     let p = $path
     | each { glob $in }
