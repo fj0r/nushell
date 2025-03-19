@@ -91,11 +91,20 @@ export def kube-diff-helm [
         }
 
         let values = if ($values | is-empty) { [] } else { [--set-json (record-to-set-json $values)] }
-        let target = $'/tmp/($chart | path basename).($name).out.yaml'
-        helm template --debug $name $chart -f $valuefile ...$values ...($namespace | with-flag -n) | save -f $target
-        if $ignore_image {
-            do -i { yq -i ea 'del(.spec.template.spec.containers.[].image)' $target }
+        let target = mktemp -t 'helm.XXX.out.yaml'
+        let tg = helm template --debug $name $chart -f $valuefile ...$values ...($namespace | with-flag -n)
+        | from yaml
+        let img_p = [spec template spec containers 0 image] | into cell-path
+        $tg | each {|x|
+            if $ignore_image and ($x | get -i $img_p | is-not-empty) {
+                $x | reject $img_p
+            } else {
+                $x
+            }
+            | to yaml
         }
+        | str join $"(char newline)---(char newline)"
+        | save -f $target
         kubectl diff -f $target
     }
 }
