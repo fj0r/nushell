@@ -293,6 +293,10 @@ export def 'main' [
     --example
 ] {
     let o = $in
+    print $"nushell version (version)"
+    print $"PWD: ($env.PWD)"
+    print $"git: (git status)"
+
     if $example {
         [
             $"$env.CONTCTL = 'podman'"
