@@ -258,7 +258,7 @@ def 'exec plan' [--rm --latest] {
 
 
 def 'merge config' [type] {
-    let preset = [$env.FILE_PWD preset.yml] | path join
+    const preset = [(path self .) preset.yml] | path join
     let g = $env.DEVCONTAINER_PRESET
     | append (if ($preset | path exists) { open $preset } else { [] })
 
