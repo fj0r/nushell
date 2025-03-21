@@ -13,11 +13,7 @@ def cmpl-zellij-session [] {
 }
 
 export def zellij-enter [name: string@cmpl-zellij-session] {
-    if $name in (zellij-session | get name) {
-        zellij attach $name
-    } else {
-        zellij -s $name
-    }
+    zellij attach --create $name
 }
 
 export def zellij-delete [name: string@cmpl-zellij-session] {
