@@ -27,6 +27,26 @@ export-env {
           - --cap-add=SYS_PTRACE
           - --security-opt
           - seccomp=unconfined
+        - name: qbittorrent
+          container_name: qbittorrent
+          image: linuxserver/qbittorrent
+          daemon: true
+          environment:
+            PUID: 1000
+            PGID: 1000
+            UMASK: 002
+            TZ: Etc/UTC
+            WEBUI_PORT: 8080
+            TORRENTING_PORT: 6881
+          ports:
+            '8080': 8080
+            '6881': 6881
+            '6881/udp': 6881
+          volumns:
+            ~/.config/qbittorrent: /config/qBittorrent
+            ~/Downloads/qbittorrent: /downloads
+          command: []
+          options: []
         - name: mitmproxy
           image: mitmproxy/mitmproxy
           daemon: false

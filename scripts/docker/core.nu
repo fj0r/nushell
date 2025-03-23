@@ -423,16 +423,6 @@ export def --wrapped container-create [
         $args ++= [-e $"DISPLAY=($env.DISPLAY?)" -v /tmp/.X11-unix:/tmp/.X11-unix]
     }
 
-    let ports = $ports
-    | default {}
-    | transpose k v
-    | reduce -f {} {|i,a|
-        let p = $i.k | into int
-        let k = port $p
-        print $"(ansi grey)port: ($k) (if $k == $p {'->'} else {'=>'}) ($i.v)"
-        $a | merge {$k: $i.v}
-    }
-
     if ($entrypoint | is-not-empty) {
         $args ++= [--entrypoint $entrypoint]
     }
@@ -449,7 +439,19 @@ export def --wrapped container-create [
         $args ++= $envs | items {|k, v| [-e $"($k)=($v)"] } | flatten
     }
     if ($ports | is-not-empty) {
-        $args ++= $ports | items {|k, v| [-p $"($k):($v)"] } | flatten
+        for i in ($ports | transpose k v) {
+            mut is_udp = false
+            let p = if ($i.k | str substring (-4).. | str downcase) == '/udp' {
+                $is_udp = true
+                $i.k | str substring 0..-5 | into int
+            } else {
+                $i.k | into int
+            }
+            let k = port $p
+            let v = if $is_udp { $"($i.v)/udp" } else { $"($i.v)" }
+            print $"(ansi grey)port: ($k) (if $k == $p {'->'} else {'=>'}) ($v)"
+            $args ++= [-p $"($k):($v)"]
+        }
     }
     if ($proxy | is-not-empty) {
         $args ++= [-e $"http_proxy=($proxy)" -e $"https_proxy=($proxy)"]
