@@ -41,16 +41,14 @@ export def ssh-index-init [] {
     } else {
         {
             default: {
-                StrictHostKeyChecking: no
-                UserKnownHostsFile: /dev/null
+                Compression: yes
             }
             host: {
                 *: {
-                    Compression: yes
                     ForwardAgent: yes
-                    StrictHostKeyChecking: no
                 }
                 localhost*: {
+                    StrictHostKeyChecking: no
                     UserKnownHostsFile: /dev/null
                 }
             }
