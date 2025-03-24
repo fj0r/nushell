@@ -24,10 +24,17 @@ def cmpl-group [] {
     | columns
 }
 
-export def ssh-switch [
-    --environ(-e): string@cmpl-env
+export def ssh-switch  [
+    environ?: string@cmpl-env
     --group(-g): string@cmpl-group
 ] {
+    {
+        environ: $environ
+        group: $group
+    }
+    | to json
+    | save -f ($nu.cache-dir | path join 'ssh.json')
+
     mut o = []
     let c = open ~/.ssh/index.toml
     for i in ($c.default? | transpose k v) {
@@ -52,7 +59,7 @@ export def ssh-switch [
             let v = if ($environ | is-empty) {
                 $v
             } else {
-                $v | merge ($j.v | get $environ)
+                $v | merge ($j.v | get -i $environ | default {})
             }
             for l in ($v | transpose k v) {
                 $o ++= [$"    ($l.k) ($l.v)"]
@@ -65,20 +72,34 @@ export def ssh-switch [
 }
 
 def cmpl-ssh [] {
+    let e = open ($nu.cache-dir | path join 'ssh.json')
     open ~/.ssh/index.toml
     | get groups
+    | do {
+        let x = $in
+        if ($e.group? | is-empty) {
+            $x
+        } else {
+            $x | select $e.group
+        }
+    }
     | transpose k v
     | get v
     | each {|x|
         $x | transpose k v | each {|y|
-            $y.v.default | insert name $y.k
+            if ($e.environ? | is-empty) {
+                $y.v.default
+            } else {
+                $y.v.default | merge ($y.v | get -i $e.environ | default {})
+            }
+            | insert name $y.k
         }
     }
     | flatten
     | each {|x|
         {
             value: $x.name
-            description: $"($x.name)@($x.host):($x.port)"
+            description: $"($x.name? | default 'root')@($x.host):($x.port? | default 22)"
         }
     }
 }
