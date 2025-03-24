@@ -14,7 +14,7 @@ def parse-ssh-file [group] {
     | where {|x| not (($x.Host | is-empty) or $x.Host =~ '\*')}
 }
 
-export def ssh-gen-index [] {
+export def ssh-index-init [] {
     let groups = rg -L -l 'Host' ~/.ssh
     | lines
     | reduce -f {} {|x,a|
