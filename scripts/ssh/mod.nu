@@ -33,7 +33,7 @@ export def ssh-switch  [
         group: $group
     }
     | to json
-    | save -f ($nu.cache-dir | path join 'ssh.json')
+    | save -f ~/.ssh/index.json
 
     mut o = []
     let c = open ~/.ssh/index.toml
@@ -62,17 +62,17 @@ export def ssh-switch  [
                 $v | merge ($j.v | get -i $environ | default {})
             }
             for l in ($v | transpose k v) {
-                $o ++= [$"    ($l.k) ($l.v)"]
+                if ($l.v | is-not-empty) {
+                    $o ++= [$"    ($l.k) ($l.v)"]
+                }
             }
         }
     }
-    for i in $o {
-        print $i
-    }
+    $o | save -f ~/.ssh/config
 }
 
 def cmpl-ssh [] {
-    let e = open ($nu.cache-dir | path join 'ssh.json')
+    let e = open ~/.ssh/index.json
     open ~/.ssh/index.toml
     | get groups
     | do {
@@ -99,7 +99,7 @@ def cmpl-ssh [] {
     | each {|x|
         {
             value: $x.name
-            description: $"($x.name? | default 'root')@($x.host):($x.port? | default 22)"
+            description: $"($x.User? | default 'root')@($x.HostName? | default localhost):($x.Port? | default 22)"
         }
     }
 }
