@@ -39,7 +39,22 @@ export def ssh-index-init [] {
     if ('~/.ssh/index.toml' | path exists) {
         open ~/.ssh/index.toml
     } else {
-        {}
+        {
+            default: {
+                StrictHostKeyChecking: no
+                UserKnownHostsFile: /dev/null
+            }
+            host: {
+                *: {
+                    Compression: yes
+                    ForwardAgent: yes
+                    StrictHostKeyChecking: no
+                }
+                localhost*: {
+                    UserKnownHostsFile: /dev/null
+                }
+            }
+        }
     }
     | merge deep $groups
     | collect

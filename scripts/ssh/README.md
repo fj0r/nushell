@@ -4,4 +4,11 @@ ssh-index-init
 ssh-switch <environment, default is default> -g <group, default is all>
 ```
 
-Environment configuration reference the generated index file `~/.ssh/index.toml`
+Environment configuration as follows:
+
+```toml
+[groups.default.local.default]
+HostName = "127.0.0.1"
+[groups.default.local.vpn]
+HostName = "10.0.0.1"
+```
