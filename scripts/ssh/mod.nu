@@ -7,7 +7,7 @@ export def 'str max-length' [] {
 }
 
 def cmpl-env [] {
-    open ~/.ssh/index.toml
+    open ([$env.HOME .ssh index.toml] | path join)
     | get groups
     | transpose k v
     | get v
@@ -19,7 +19,7 @@ def cmpl-env [] {
 }
 
 def cmpl-group [] {
-    open ~/.ssh/index.toml
+    open ([$env.HOME .ssh index.toml] | path join)
     | get groups
     | columns
 }
@@ -33,10 +33,10 @@ export def ssh-switch  [
         group: $group
     }
     | to json
-    | save -f ~/.ssh/index.json
+    | save -f ([$env.HOME .ssh index.json] | path join)
 
     mut o = []
-    let c = open ~/.ssh/index.toml
+    let c = open ([$env.HOME .ssh index.toml] | path join)
     for i in ($c.default? | transpose k v) {
         $o ++= [$"($i.k) ($i.v)"]
     }
@@ -68,12 +68,17 @@ export def ssh-switch  [
             }
         }
     }
-    $o | save -f ~/.ssh/config
+    $o | save -f ([$env.HOME .ssh config] | path join)
 }
 
 def cmpl-ssh [] {
-    let e = open ~/.ssh/index.json
-    open ~/.ssh/index.toml
+    let t = [$env.HOME .ssh index.toml] | path join
+    if not ($t | path exists) {
+        ssh-index-init
+        ssh-switch
+    }
+    let e = open ([$env.HOME .ssh index.json] | path join)
+    open $t
     | get groups
     | do {
         let x = $in

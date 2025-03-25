@@ -15,7 +15,7 @@ def parse-ssh-file [group] {
 }
 
 export def ssh-index-init [] {
-    let groups = rg -L -l 'Host' ~/.ssh
+    let groups = rg -L -l 'Host' ([$env.HOME .ssh] | path join)
     | lines
     | reduce -f {} {|x,a|
         let n = $x | path parse | get stem
@@ -36,8 +36,9 @@ export def ssh-index-init [] {
     }
     | wrap groups
 
-    if ('~/.ssh/index.toml' | path exists) {
-        open ~/.ssh/index.toml
+    let t = [$env.HOME .ssh index.toml] | path join
+    if ($t | path exists) {
+        open $t
     } else {
         {
             default: {
@@ -56,5 +57,5 @@ export def ssh-index-init [] {
     }
     | merge deep $groups
     | collect
-    | save -f ~/.ssh/index.toml
+    | save -f $t
 }
