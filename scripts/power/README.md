@@ -40,7 +40,14 @@ $env.NU_POWER_SCHEMA = [
 ## {{{ Simplified style
 $env.NU_POWER_DECORATOR = 'plain'
 $env.NU_POWER_FRAME = 'fill'
-#$env.NU_POWER_CONFIG.theme.separator_bar.char = "-"
+$env.NU_POWER_FRAME = 'center'
+$env.NU_POWER_CONFIG.theme.separator_bar.char = "-"
+$env.NU_POWER_CONFIG.theme.delimitor = {
+    color: xterm_grey
+    char: '│'
+    left: '┤'
+    right: '├'
+}
 ## }}}
 power set time {
     style: compact

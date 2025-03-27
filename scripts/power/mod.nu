@@ -434,15 +434,18 @@ export-env {
                 }
                 delimitor: {
                     color: xterm_grey
-                    char: '│'
-                    left: '┤'
-                    right: '├'
+                    char: '─'
+                    left: '─'
+                    right: '─'
+                    #char: '│'
+                    #left: '┤'
+                    #right: '├'
                 }
                 separator_bar: {
                     color: xterm_grey
                     char: '─'
                 }
-                single_width_char: '↑↓│─├┤'
+                single_width_char: '↑↓│─├┬┼┴┤┈┄╌'
                 frame_header: {
                     upperleft: '┌' # ┌╭
                     upperleft_size: 1
@@ -477,7 +480,7 @@ export-env {
         proxy: {|bg|
             let c = $env.NU_POWER_CONFIG.proxy
             if ($env.https_proxy? | is-not-empty) or ($env.http_proxy? | is-not-empty) {
-                [$bg '']
+                [$bg '🚇']
             } else {
                 [$bg null]
             }
