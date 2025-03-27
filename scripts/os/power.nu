@@ -1,4 +1,4 @@
-export def sleeping [] {
-    bash -c "echo mem | sudo tee /sys/power/state > /dev/null"
+export def suspend [] {
+    sudo bash -c 'echo "mem" > /sys/power/state'
 }
 

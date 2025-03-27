@@ -480,7 +480,7 @@ export-env {
         proxy: {|bg|
             let c = $env.NU_POWER_CONFIG.proxy
             if ($env.https_proxy? | is-not-empty) or ($env.http_proxy? | is-not-empty) {
-                [$bg '🚇']
+                [$bg '🛰']
             } else {
                 [$bg null]
             }
