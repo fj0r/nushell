@@ -42,12 +42,6 @@ $env.NU_POWER_DECORATOR = 'plain'
 $env.NU_POWER_FRAME = 'fill'
 $env.NU_POWER_FRAME = 'center'
 $env.NU_POWER_CONFIG.theme.separator_bar.char = "-"
-$env.NU_POWER_CONFIG.theme.delimitor = {
-    color: xterm_grey
-    char: '│'
-    left: '┤'
-    right: '├'
-}
 ## }}}
 power set time {
     style: compact
@@ -64,7 +58,7 @@ power init
 `$env.NU_POWER_SCHEMA` support configuring dynamically
 
 ## mode
-- `$env.NU_POWER_DECORATOR = '<power|plain>'` power mode and plain mode
+- `$env.NU_POWER_DECORATOR = '<power|plain|pipe>'` power mode and plain mode
 - `$env.NU_POWER_FRAME = '<default|fill|center>'` two line prompt (experimental)
 
 ### benchmark

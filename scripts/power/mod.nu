@@ -23,9 +23,9 @@ def get_component [schema] {
 ### prompt
 def decorator [ ] {
     match $env.NU_POWER_DECORATOR {
-        'plain' => {
+        'plain' | 'pipe' => {
             {|s, direction?: string, color?: string = 'light_yellow', next_color?: string|
-                let dlm = $env.NU_POWER_CONFIG.theme.delimitor
+                let dlm = $env.NU_POWER_CONFIG.theme.delimitor | get $env.NU_POWER_DECORATOR
                 let dlm = $"(ansi $dlm.color)($dlm.char)"
                 match $direction {
                     '|>'|'>' => {
@@ -44,22 +44,23 @@ def decorator [ ] {
         }
         'power' => {
             {|s, direction?: string, color?: string = 'light_yellow', next_color?: string|
+                let dlm = $env.NU_POWER_CONFIG.theme.delimitor.power
                 match $direction {
                     '|>' => {
                         let l = (ansi -e {bg: $color})
-                        let r = $'(ansi -e {fg: $color, bg: $next_color})(char nf_left_segment)'
+                        let r = $'(ansi -e {fg: $color, bg: $next_color})($dlm.left)'
                         $'($l)($s)($r)'
                     }
                     '>' => {
-                        let r = $'(ansi -e {fg: $color, bg: $next_color})(char nf_left_segment)'
+                        let r = $'(ansi -e {fg: $color, bg: $next_color})($dlm.left)'
                         $'($s)($r)'
                     }
                     '>>' => {
-                        let r = $'(ansi reset)(ansi -e {fg: $color})(char nf_left_segment)'
+                        let r = $'(ansi reset)(ansi -e {fg: $color})($dlm.left)'
                         $'($s)($r)'
                     }
                     '<'|'<<' => {
-                        let l = $'(ansi -e {fg: $color})(char nf_right_segment)(ansi -e {bg: $color})'
+                        let l = $'(ansi -e {fg: $color})($dlm.right)(ansi -e {bg: $color})'
                         $'($l)($s)'
                     }
                 }
@@ -149,7 +150,7 @@ def up_prompt [segment] {
     | each {|y| $y | each {|x| get_component $x } }
     { ||
         let sep = $env.NU_POWER_CONFIG.theme.separator_bar
-        let d = $env.NU_POWER_CONFIG.theme.delimitor
+        let d = $env.NU_POWER_CONFIG.theme.delimitor | get $env.NU_POWER_DECORATOR
         let dlm = $"(ansi $d.color)($d.char)"
         let color = $env.NU_POWER_CONFIG.theme.color
         let last_idx = ($thunk | length) - 1
@@ -196,7 +197,7 @@ def up_center_prompt [segment] {
     | each {|y| $y | each {|x| get_component $x } }
     { ||
         let sep = $env.NU_POWER_CONFIG.theme.separator_bar
-        let d = $env.NU_POWER_CONFIG.theme.delimitor
+        let d = $env.NU_POWER_CONFIG.theme.delimitor | get $env.NU_POWER_DECORATOR
         let dlm = $"(ansi $d.color)($d.char)"
         let color = $env.NU_POWER_CONFIG.theme.color
         let ss = $thunk
@@ -271,7 +272,7 @@ export def --env init [] {
     $env.PROMPT_INDICATOR = {||
         let color = $env.NU_POWER_CONFIG.theme.color
         match $env.NU_POWER_DECORATOR {
-            'plain' => {
+            'plain' | 'pipe' => {
                 if (is-admin) {
                     $"(ansi $color.admin)> (ansi reset)"
                 } else {
@@ -433,13 +434,24 @@ export-env {
                     normal: light_cyan
                 }
                 delimitor: {
-                    color: xterm_grey
-                    char: '─'
-                    left: '─'
-                    right: '─'
-                    #char: '│'
-                    #left: '┤'
-                    #right: '├'
+                    plain: {
+                        color: xterm_grey
+                        char: '─'
+                        left: '─'
+                        right: '─'
+                    }
+                    pipe: {
+                        color: xterm_grey
+                        char: '│'
+                        left: '┤'
+                        right: '├'
+                    }
+                    power: {
+                        color: xterm_grey
+                        char: '─'
+                        left: (char nf_left_segment)
+                        right: (char nf_right_segment)
+                    }
                 }
                 separator_bar: {
                     color: xterm_grey
