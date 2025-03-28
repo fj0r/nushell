@@ -120,6 +120,8 @@ export-env {
           container_name: surrealdb
           daemon: true
           environment:
+            SURREAL_USER: foo
+            SURREAL_PASS: foo
             SURREAL_STORE: rocksdb
             SURREAL_EXPERIMENTAL_GRAPHQL: 'true'
             SURREAL_ROCKSDB_BACKGROUND_FLUSH: 'true'
