@@ -60,7 +60,7 @@ export def ConfirmExec [msg cond act alt] {
     }
 }
 
-export def closure-run [list --fallback] {
+export def closure-run [list --fallback: string] {
     $list
     | par-each {|x|
         let name = $x.function.name
@@ -69,9 +69,10 @@ export def closure-run [list --fallback] {
         let c = if ($c | describe -d).type == 'closure' { do $c } else { $c } | default {}
         if ($f | is-empty) {
             mut e = $"function `($x.function.name)` not found."
-            if $fallback {
-                $e = $"($e) try calling ($env.AI_CONFIG.assistant.function.name)."
+            if ($fallback | is-not-empty) {
+                $e = $"($e) try calling `($fallback)`."
             }
+            print -e $"(ansi $env.AI_CONFIG.tool_calls)[(date now | format date '%F %H:%M:%S')] ($e)(ansi reset)"
             let r = $x | insert err $e
             return $r
         }

@@ -121,7 +121,7 @@ export def ai-send [
     --audio(-a): string
     --tool-calls: string
     --tool-call-id: string
-    --tool-fallback
+    --tool-fallback: string
     --oneshot
     --limit: int = 20
     --quiet(-q)
@@ -164,7 +164,7 @@ export def ai-send [
                 return {result: $r, req: $req}
             }
             $req = $req | ai-req $s -r assistant $r.content --tool-calls $r.tools
-            let rt = closure-run $r.tools --fallback=$tool_fallback
+            let rt = closure-run $r.tools --fallback $tool_fallback
             for x in $rt {
                 let msg = if err in $x {
                     $x.err
