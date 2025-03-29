@@ -107,32 +107,35 @@ export def kube-get [
     --watch (-W)
     --all (-a)
 ] {
-    let ns = if $all {
-        [-A]
-    } else if ($namespace | is-empty) {
-        []
-    } else {
-        [-n $namespace]
+    mut args = []
+    if $all {
+        $args ++= [-A]
+    } else if ($namespace | is-not-empty) {
+        $args ++= [-n $namespace]
     }
-    if ($resource | is-empty) {
-        let l = $selector | with-flag -l
 
-        let wide = if $wide {[-o wide]} else {[]}
+    if ($resource | is-empty) {
+        if ($selector | is-not-empty) {
+            $args ++= [-l $selector]
+        }
+        if $wide {
+            $args ++= [-o wide]
+        }
         if $verbose {
-            kubectl get -o json ...$ns $kind ...$l | from json
+            kubectl get -o json ...$args $kind | from json
             | get items
             | krefine $kind
         } else if $watch {
-            kubectl get ...$ns $kind ...$l ...$wide --watch
+            kubectl get ...$args $kind --watch
         } else {
-            kubectl get ...$ns $kind ...$l ...$wide | from ssv -a | normalize-column-names
+            kubectl get ...$args $kind | from ssv -a | normalize-column-names
         }
     } else {
         if ($jsonpath | is-empty) {
-            let o = kubectl get ...$ns $kind $resource -o json | from json
+            let o = kubectl get ...$args $kind $resource -o json | from json
             if $verbose { $o } else { $o | krefine $kind }
         } else {
-            kubectl get ...$ns $kind $resource $"--output=jsonpath={($jsonpath)}" | from json
+            kubectl get ...$args $kind $resource $"--output=jsonpath={($jsonpath)}" | from json
         }
     }
 }
@@ -143,7 +146,11 @@ export def kube-describe [
     resource: string@cmpl-kube-res
     --namespace (-n): string@cmpl-kube-ns
 ] {
-    kubectl describe ...($namespace | with-flag -n) $kind $resource
+    mut args = []
+    if ($namespace | is-not-empty) {
+        $args ++= [-n $namespace]
+    }
+    kubectl describe ...$args $kind $resource
 }
 
 # kubectl create
@@ -152,7 +159,11 @@ export def kube-create [
     --namespace (-n): string@cmpl-kube-ns
     name:string
 ] {
-    kubectl create ...($namespace | with-flag -n) $kind $name
+    mut args = []
+    if ($namespace | is-not-empty) {
+        $args ++= [-n $namespace]
+    }
+    kubectl create ...$args $kind $name
 }
 
 # kubectl get -o yaml
@@ -161,7 +172,11 @@ export def kube-get-as-yaml [
     resource: string@cmpl-kube-res
     --namespace (-n): string@cmpl-kube-ns
 ] {
-    kubectl get ...($namespace | with-flag -n) -o yaml $kind $resource
+    mut args = []
+    if ($namespace | is-not-empty) {
+        $args ++= [-n $namespace]
+    }
+    kubectl get ...$args -o yaml $kind $resource
 }
 
 # kubectl edit
@@ -171,9 +186,12 @@ export def kube-edit [
     --namespace (-n): string@cmpl-kube-ns
     --selector(-l): string
 ] {
-    let n = $namespace | with-flag -n
+    mut args = []
+    if ($namespace | is-not-empty) {
+        $args ++= [-n $namespace]
+    }
     let r = if ($selector | is-empty) { $resource } else {
-        let res = kubectl get $kind ...$n -l $selector | from ssv -a | each {|x| $x.NAME}
+        let res = kubectl get $kind ...$args -l $selector | from ssv -a | each {|x| $x.NAME}
         if ($res | length) == 1 {
             $res.0
         } else if ($res | length) == 0 {
@@ -182,7 +200,7 @@ export def kube-edit [
             $res | input list $'select ($kind) '
         }
     }
-    kubectl edit ...$n $kind $r
+    kubectl edit ...$args $kind $r
 }
 
 # kubectl delete
@@ -192,7 +210,14 @@ export def kube-delete [
     --namespace (-n): string@cmpl-kube-ns
     --force(-f)
 ] {
-    kubectl delete ...($namespace | with-flag -n) ...(if $force {[--grace-period=0 --force]} else {[]}) $kind $resource
+    mut args = []
+    if ($namespace | is-not-empty) {
+        $args ++= [-n $namespace]
+    }
+    if $force {
+        $args ++= [--grace-period=0 --force]
+    }
+    kubectl delete ...$args $kind $resource
 }
 
 
@@ -277,16 +302,25 @@ export def kube-log [
     --previous(-p)
     --all-pods(-a) # for completion
 ] {
-    let n = $namespace | with-flag -n
-    let c = $container | with-flag -c
-    let f = if $follow {[-f]} else {[]}
-    let p = if $previous {[-p]} else {[]}
-    let trg = if ($pod | str ends-with '-') {
-        $"deployment/($pod | str substring ..<-1)"
+    mut args = []
+    if ($namespace | is-not-empty) {
+        $args ++= [-n $namespace]
+    }
+    if ($container | is-not-empty) {
+        $args ++= [-c $container]
+    }
+    if $follow {
+        $args ++= [-f]
+    }
+    if $previous {
+        $args ++= [-p]
+    }
+    let tg = if ($pod | str ends-with '-') {
+            $"deployment/($pod | str substring ..<-1)"
         } else {
             $pod
         }
-    kubectl logs ...$n ...$f ...$p $trg ...$c
+    kubectl logs ...$args $tg
 }
 
 # kubectl port-forward
@@ -297,9 +331,12 @@ export def kube-port-forward [
     --local (-l): string
     --namespace (-n): string@cmpl-kube-ns
 ] {
-    let ns = $namespace | with-flag -n
+    mut args = []
+    if ($namespace | is-not-empty) {
+        $args ++= [-n $namespace]
+    }
     let port = if ($local | is-empty) { $port } else { $"($local):($port)" }
-    kubectl port-forward ...$ns $"($kind)/($target)" $port
+    kubectl port-forward ...$args $"($kind)/($target)" $port
 }
 
 # kubectl cp
@@ -309,7 +346,14 @@ export def kube-copy [
     --container (-c): string@cmpl-kube-ctns
     --namespace (-n): string@cmpl-kube-ns
 ] {
-    kubectl cp ...($namespace | with-flag -n) $lhs ...($container | with-flag -c) $rhs
+    mut args = []
+    if ($namespace | is-not-empty) {
+        $args ++= [-n $namespace]
+    }
+    if ($container | is-not-empty) {
+        $args ++= [-c $container]
+    }
+    kubectl cp ...$args $lhs $rhs
 }
 
 
@@ -324,11 +368,14 @@ export def kube-scale-deployment [
     if $num < 0 {
         "too small"
     } else {
-        let ns = $namespace | with-flag -n
-        if $reset {
-            kubectl scale ...$ns deployments $deployment --replicas 0
+        mut args = []
+        if ($namespace | is-not-empty) {
+            $args ++= [-n $namespace]
         }
-        kubectl scale ...$ns deployments $deployment --replicas $num
+        if $reset {
+            kubectl scale ...$args deployments $deployment --replicas 0
+        }
+        kubectl scale ...$args deployments $deployment --replicas $num
     }
 }
 
@@ -340,8 +387,11 @@ export def kube-set-image [
     --dry-run
     act?: any
 ] {
-    let ns = $namespace | with-flag -n
-    let list = kubectl get ...$ns $kind $resource -o jsonpath="{.spec.template.spec}"
+    mut args = []
+    if ($namespace | is-not-empty) {
+        $args ++= [-n $namespace]
+    }
+    let list = kubectl get ...$args $kind $resource -o jsonpath="{.spec.template.spec}"
     | from json
     | get containers
     if ($act | describe -d).type == 'closure' {
@@ -351,9 +401,9 @@ export def kube-set-image [
         | each {|x| $"($x.name)=($x.image)" }
         | str join ' '
 
-        print $"kubectl ($ns | str join ' ') set image \"($kind)/($resource)\" ($s)"
+        print $"kubectl ($args | str join ' ') set image \"($kind)/($resource)\" ($s)"
         if not $dry_run {
-            kubectl ...$ns set image $"($kind)/($resource)" $s
+            kubectl ...$args set image $"($kind)/($resource)" $s
         }
     } else {
         $list
@@ -366,9 +416,14 @@ export def kube-rollout-history [
     --revision (-v): int
     deployment: string@cmpl-kube-deploys
 ] {
-    let ns = $namespace | with-flag -n
-    let v = if ($revision|is-empty) { [] } else { [ $"--revision=($revision)" ] }
-    kubectl ...$ns rollout history $"deployment/($deployment)" ...$v
+    mut args = []
+    if ($namespace | is-not-empty) {
+        $args ++= [-n $namespace]
+    }
+    if ($revision | is-not-empty) {
+        $args ++= [ $"--revision=($revision)" ]
+    }
+    kubectl ...$args rollout history $"deployment/($deployment)"
 }
 
 # kubectl rollout undo
@@ -377,9 +432,14 @@ export def kube-rollout-undo [
     --revision (-v): int
     deployment: string@cmpl-kube-deploys
 ] {
-    let ns = $namespace | with-flag -n
-    let v = if ($revision|is-empty) { [] } else { [ $"--to-revision=($revision)" ] }
-    kubectl ...$ns rollout undo $"deployment/($deployment)" ...$v
+    mut args = []
+    if ($namespace | is-not-empty) {
+        $args ++= [-n $namespace]
+    }
+    if ($revision | is-not-empty) {
+        $args ++= [ $"--to-revision=($revision)" ]
+    }
+    kubectl ...$args rollout undo $"deployment/($deployment)"
 }
 
 # kubectl top pod
@@ -398,8 +458,11 @@ export def kube-top-pod [
             }
         }
     } else {
-        let ns = $namespace | with-flag -n
-        kubectl top pod ...$ns | from ssv -a | rename name cpu mem
+        mut args = []
+        if ($namespace | is-not-empty) {
+            $args ++= [-n $namespace]
+        }
+        kubectl top pod ...$args | from ssv -a | rename name cpu mem
         | each {|x|
             {
                 name: $x.name

@@ -112,26 +112,35 @@ export def cmpl-kube-nodes [context: string, offset: int] {
 
 export def cmpl-kube-deploys [context: string, offset: int] {
     let ctx = $context | argx parse
-    let ns = $ctx.opt.namespace? | with-flag -n
-    kubectl get ...$ns deployments | from ssv -a | get NAME
+    mut args = []
+    if ($ctx.opt.namespace? | is-not-empty) {
+        $args ++= [-n $ctx.opt.namespace]
+    }
+    kubectl get ...$args deployments | from ssv -a | get NAME
 }
 
 export def cmpl-kube-deploys-and-pods [context: string, offset: int] {
     let ctx = $context | argx parse
-    let ns = $ctx.opt.namespace? | with-flag -n
+    mut args = []
+    if ($ctx.opt.namespace? | is-not-empty) {
+        $args ++= [-n $ctx.opt.namespace]
+    }
     let all_pods = ($ctx.opt.a? | default false) or ($ctx.opt.all-pods? | default false)
     if $all_pods or ($ctx.pos.pod? | default '' | str ends-with '-') {
-        kubectl get ...$ns pods | from ssv -a | get NAME
+        kubectl get ...$args pods | from ssv -a | get NAME
     } else {
-        kubectl get ...$ns deployments | from ssv -a | get NAME | each {|x| $"($x)-"}
+        kubectl get ...$args deployments | from ssv -a | get NAME | each {|x| $"($x)-"}
     }
 }
 
 export def cmpl-kube-ctns [context: string, offset: int] {
     let ctx = $context | argx parse
-    let ns = $ctx.opt.namespace? | with-flag -n
+    mut args = []
+    if ($ctx.opt.namespace? | is-not-empty) {
+        $args ++= [-n $ctx.opt.namespace]
+    }
     let pod = $ctx.args.0
-    kubectl get ...$ns pod $pod -o jsonpath={.spec.containers[*].name} | split row ' '
+    kubectl get ...$args pod $pod -o jsonpath={.spec.containers[*].name} | split row ' '
 }
 
 export def cmpl-port-forward-type [] {
@@ -157,12 +166,17 @@ export def cmpl-kube-port [context: string, offset: int] {
 export def cmpl-kube-cp [cmd: string, offset: int] {
     let ctx = $cmd | str substring ..<$offset | argx parse
     let p = $ctx.args | last
-    let ns = $ctx.opt.namespace? | with-flag -n
-    let c = $ctx.opt.container? | with-flag -c
-    let ctn = kubectl get pod ...$ns | from ssv -a | each {|x| {description: $x.READY value: $"($x.NAME):" }}
+    mut args = []
+    if ($ctx.opt.namespace? | is-not-empty) {
+        $args ++= [-n $ctx.opt.namespace]
+    }
+    if ($ctx.opt.container? | is-not-empty) {
+        $args ++= [-c ctx.opt.container]
+    }
+    let ctn = kubectl get pod ...$args | from ssv -a | each {|x| {description: $x.READY value: $"($x.NAME):" }}
     let n = $p | split row ':'
     if $"($n | get 0):" in ($ctn | get value) {
-        kubectl exec ...$ns ($n | get 0) ...$c -- sh -c $"ls -dp ($n | get 1)*"
+        kubectl exec ...$args ($n | get 0) -- sh -c $"ls -dp ($n | get 1)*"
         | lines
         | each {|x| $"($n | get 0):($x)"}
     } else {

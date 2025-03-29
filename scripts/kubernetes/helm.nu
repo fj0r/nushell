@@ -30,9 +30,14 @@ export def kube-get-helm [
     --values(-v)
     --all (-a)
 ] {
+    mut args = []
     if ($name | is-empty) {
-        let ns = if $all { [--all] } else { $namespace | with-flag -n }
-        helm list ...$ns --output json
+        if $all {
+            $args ++= [--all]
+        } else if ($namespace | is-not-empty) {
+            $args ++= [-n $namespace]
+        }
+        helm list ...$args --output json
         | from json
         | update updated {|x|
             $x.updated
@@ -40,12 +45,15 @@ export def kube-get-helm [
             | into datetime -f '%Y-%m-%d %H:%M:%S.%f %z'
         }
     } else {
+        if ($namespace | is-not-empty) {
+            $args ++= [-n $namespace]
+        }
         if $manifest {
-            helm get manifest $name ...($namespace | with-flag -n)
+            helm get manifest $name ...$args
         } else if $values {
-            helm get values $name ...($namespace | with-flag -n)
+            helm get values $name ...$args
         } else {
-            helm get notes $name ...($namespace | with-flag -n)
+            helm get notes $name ...$args
         }
     }
 }
@@ -59,13 +67,19 @@ export def kube-apply-helm [
     --namespace (-n): string@cmpl-kube-ns
     --ignore-image (-i) # for kdh
 ] {
+    mut args = []
+    if ($namespace | is-not-empty) {
+        $args ++= [-n $namespace]
+    }
     let update = $name in (
-        helm list ...($namespace | with-flag -n) --output json
+        helm list ...$args --output json
         | from json | get name
     )
     let act = if $update { [upgrade] } else { [install] }
-    let values = if ($values | is-empty) { [] } else { [--set-json (record-to-set-json $values)] }
-    helm ...$act $name $chart -f $valuefile ...$values ...($namespace | with-flag -n)
+    if ($values | is-not-empty) {
+        $args ++= [--set-json (record-to-set-json $values)]
+    }
+    helm ...$act $name $chart -f $valuefile ...$args
 }
 
 # helm diff
@@ -78,11 +92,15 @@ export def kube-diff-helm [
     --ignore-image (-i)
     --has-plugin (-h)
 ] {
+    mut args = []
+    if ($namespace | is-not-empty) {
+        $args ++= [-n $namespace]
+    }
     if $has_plugin {
-        helm diff $name $chart -f $valuefile ...($namespace | with-flag -n)
+        helm diff $name $chart -f $valuefile ...$args
     } else {
         let update = $name in (
-            helm list ...($namespace | with-flag -n) --output json
+            helm list ...$args --output json
             | from json | get name
         )
         if not $update {
@@ -90,9 +108,15 @@ export def kube-diff-helm [
             return
         }
 
-        let values = if ($values | is-empty) { [] } else { [--set-json (record-to-set-json $values)] }
+        mut args = []
+        if ($values | is-not-empty) {
+            $args ++= [--set-json (record-to-set-json $values)]
+        }
+        if ($namespace | is-not-empty) {
+            $args ++= [-n $namespace]
+        }
         let target = mktemp -t 'helm.XXX.out.yaml'
-        let tg = helm template --debug $name $chart -f $valuefile ...$values ...($namespace | with-flag -n)
+        let tg = helm template --debug $name $chart -f $valuefile ...$args
         | from yaml
         let img_p = [spec template spec containers 0 image] | into cell-path
         $tg | each {|x|
@@ -114,7 +138,11 @@ export def kube-delete-helm [
     name: string@cmpl-helm-list
     --namespace (-n): string@cmpl-kube-ns
 ] {
-    helm uninstall $name ...($namespace | with-flag -n)
+    mut args = []
+    if ($namespace | is-not-empty) {
+        $args ++= [-n $namespace]
+    }
+    helm uninstall $name ...$args
 }
 
 # helm template
@@ -125,9 +153,15 @@ export def kube-helm [
     --namespace (-n): string@cmpl-kube-ns='test'
     --app (-a): string='test'
 ] {
-    let values = if ($values | is-empty) { [] } else { [--set-json (record-to-set-json $values)] }
+    mut args = []
+    if ($namespace | is-not-empty) {
+        $args ++= [-n $namespace]
+    }
+    if ($values | is-not-empty) {
+        $args ++= [--set-json (record-to-set-json $values)]
+    }
     let target = $valuefile | split row '.' | slice ..-2 | append [out yaml] | str join '.'
     if (not ($target | path exists)) and (([yes no] | input list $'create ($target)?') in [no]) { return }
-    helm template --debug $app $chart -f $valuefile ...$values ...($namespace | with-flag -n)
+    helm template --debug $app $chart -f $valuefile ...$values ...$args
     | save -f $target
 }

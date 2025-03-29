@@ -16,20 +16,23 @@ export def kube-redistribution-deployment [
     ...nodes: string@cmpl-kube-nodes
     --namespace (-n): string@cmpl-kube-ns
 ] {
-    let ns = $namespace | with-flag -n
+    mut args = []
+    if ($namespace | is-not-empty) {
+        $args ++= [-n $namespace]
+    }
     let nums = kubectl get nodes | from ssv -a | length
-    kubectl scale ...$ns deployments $deployment --replicas $nums
-    let labels = kubectl get ...$ns deploy $deployment --output=json
+    kubectl scale ...$args deployments $deployment --replicas $nums
+    let labels = kubectl get ...$args deploy $deployment --output=json
     | from json
     | get spec.selector.matchLabels
     | transpose k v
     | each {|x| $"($x.k)=($x.v)"}
     | str join ','
-    let pods = kubectl get ...$ns pods -l $labels -o wide | from ssv -a
+    let pods = kubectl get ...$args pods -l $labels -o wide | from ssv -a
     for p in ($pods | where NODE not-in $nodes) {
-        kubectl delete ...$ns pod --grace-period=0 --force $p.NAME
+        kubectl delete ...$args pod --grace-period=0 --force $p.NAME
     }
-    kubectl scale ...$ns deployments $deployment --replicas ($pods | where NODE in $nodes | length)
+    kubectl scale ...$args deployments $deployment --replicas ($pods | where NODE in $nodes | length)
 }
 
 
