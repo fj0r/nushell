@@ -284,8 +284,16 @@ export def image-remove [
 }
 
 # add new tag
-export def image-tag [from: string@cmpl-docker-images  to: string] {
+export def image-tag [
+    from: string@cmpl-docker-images
+    to: string
+    --rename(-r)
+] {
     container tag $from $to
+    print $"(ansi grey)Tagged: ($from) => ($to)(ansi reset)"
+    if $rename {
+        container rmi $from
+    }
 }
 
 # push image
@@ -307,9 +315,12 @@ export def image-push [
 }
 
 # pull image
-export def image-pull [image -i] {
+export def image-pull [image -i --rename(-r):string] {
     let $insecure = if $i {[--insecure-registry]} else {[]}
     container ...$insecure pull $image
+    if ($rename | is-not-empty) {
+        image-tag --rename $image $rename
+    }
 }
 
 ### list volume
