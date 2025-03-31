@@ -101,7 +101,7 @@ export def container-list [
 
 export def parse-img [] {
     $in
-    | parse --regex '(?<repo>[^/\<\>]*)/?(?<image>.+):(?<tag>.*)$'
+    | parse --regex '((?<repo>[^/\<\>]*)/)?(?<image>.+):(?<tag>.*)$'
     | get -i 0
 }
 
