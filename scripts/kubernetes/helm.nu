@@ -162,6 +162,6 @@ export def kube-helm [
     }
     let target = $valuefile | split row '.' | slice ..-2 | append [out yaml] | str join '.'
     if (not ($target | path exists)) and (([yes no] | input list $'create ($target)?') in [no]) { return }
-    helm template --debug $app $chart -f $valuefile ...$values ...$args
+    helm template --debug $app $chart -f $valuefile ...$args
     | save -f $target
 }
