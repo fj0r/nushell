@@ -125,7 +125,9 @@ export-env {
             SURREAL_STORE: rocksdb
             SURREAL_EXPERIMENTAL_GRAPHQL: 'true'
             SURREAL_ROCKSDB_BACKGROUND_FLUSH: 'true'
-          volumns: {}
+            SURREAL_ROCKSDB_KEEP_LOG_FILE_NUM: '10'
+          volumns:
+            ~/.surrealdb: /var/lib/surrealdb
           ports:
             '8000': 8000
           command: []
