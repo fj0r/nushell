@@ -10,9 +10,9 @@ $env.config.datetime_format.normal = '%m/%d/%y %H:%M:%S'
 $env.config.datetime_format.table = '%m/%d/%y %H:%M:%S'
 $env.config.history.file_format = "sqlite"
 $env.config.history.isolation = true
-$env.config.completions.algorithm = 'prefix' # 'fuzzy'
+$env.config.completions.algorithm = 'fuzzy' # prefix|fuzzy
 $env.config.table.header_on_separator = true
-$env.config.table.mode = 'compact' #light compact
+$env.config.table.mode = 'light' # light|compact
 $env.config.table.padding = 0
 
 if not ($nu.data-dir | path exists) { mkdir $nu.data-dir }
