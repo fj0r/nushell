@@ -133,7 +133,7 @@ export-env {
           command: []
           options: []
         - name: whisper
-          image: ghcr.io/fj0r/0x:whisper
+          image: onerahmet/openai-whisper-asr-webservice:latest
           container_name: whisper
           daemon: true
           environment:
