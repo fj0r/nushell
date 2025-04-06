@@ -47,7 +47,7 @@ export def 'history timing' [
     --all(-a)
 ] {
     open $nu.history-path | query db (sql {
-        from: history
+        from: [history]
         where: [
             "cmd not like 'history timing%'"
             (if ($pattern | is-not-empty) {[cmd like (quote '%' $pattern '%')]})
@@ -57,13 +57,13 @@ export def 'history timing' [
         ]
         orderBy: [[start desc]]
         select: [
-            [duration_ms duration]
-            [command_line cmd]
             [start_timestamp start]
+            [command_line cmd]
+            [duration_ms duration]
             (if $all {[$"replace\(cwd, '($env.HOME)', '~')" cwd]})
             [exit_status exit]
         ]
-        limit: $num
+        limit: [$num]
     })
     | update duration {|x| $x.duration | default 0 | do { $in * 1_000_000 } | into duration }
     | update start {|x| $x.start | into int | do { $in * 1_000_000 } | into datetime }
@@ -88,7 +88,7 @@ export def 'history top' [
     --path(-p): list<string@cmpl-history-dir>
 ] {
     open $nu.history-path | query db (sql {
-        from: history
+        from: [history]
         select: [
             (if $dir {[$"replace\(cwd, '($env.HOME)', '~')" cwd]} else {[command_line cmd]})
             ['count(1)' count]
@@ -105,7 +105,7 @@ export def 'history top' [
         ]
         groupBy: [(if $dir {'cwd'} else {'cmd'})]
         orderBy: [[count desc]]
-        limit: $num
+        limit: [$num]
     })
     | histogram-column count
 }
@@ -126,12 +126,12 @@ export def 'history activities' [
         _ => '%Y-%m-%d'
     }
     open $nu.history-path | query db (sql {
-        from: history
+        from: [history]
         select: [
             [$"strftime\('($dfs)', DATETIME\(ROUND\(start_timestamp / 1000\), 'unixepoch'\)\)" 'date']
             ['count(1)' count]
         ]
-        limit: $limit
+        limit: [$limit]
         groupBy: ['date']
         orderBy: [['date', desc]]
     })
