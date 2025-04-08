@@ -18,10 +18,18 @@ def cmpl-scp [cmd: string, offset: int] {
     }
 }
 
+def expand-exists [p] {
+    if ($p | path exists) {
+        $p | path expand
+    } else {
+        $p
+    }
+}
+
 export def --wrapped main [
     lhs: string@cmpl-scp,
     rhs: string@cmpl-scp
     ...opts
 ] {
-    ^scp -r ...$opts $lhs $rhs
+    ^scp -r ...$opts (expand-exists $lhs) (expand-exists $rhs)
 }

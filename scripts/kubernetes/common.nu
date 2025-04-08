@@ -69,3 +69,10 @@ export def set_cellpath [record path value] {
     }
 }
 
+export def expand-exists [p] {
+    if ($p | path exists) {
+        $p | path expand
+    } else {
+        $p
+    }
+}

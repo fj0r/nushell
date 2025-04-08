@@ -353,7 +353,7 @@ export def kube-copy [
     if ($container | is-not-empty) {
         $args ++= [-c $container]
     }
-    kubectl cp ...$args $lhs $rhs
+    kubectl cp ...$args (expand-exists $lhs) (expand-exists $rhs)
 }
 
 

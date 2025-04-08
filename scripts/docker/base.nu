@@ -29,3 +29,10 @@ export def --wrapped container [...args] {
     }
 }
 
+export def expand-exists [p] {
+    if ($p | path exists) {
+        $p | path expand
+    } else {
+        $p
+    }
+}
