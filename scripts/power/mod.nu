@@ -136,7 +136,7 @@ def 'str len unicode' [--width(-w):int=2] {
     let o = $in
     let a = $o | str length -g
     let u = $o | str replace -a -r $'[^\x00-\x7F($env.NU_POWER_CONFIG.theme.single_width_char)]+' '' | str length -g
-    $u + ($a - $u) * $width
+    $u + ($a - $u) * $width + 1
 }
 
 def 'calc bar width' [-n:int=0] {
