@@ -160,7 +160,7 @@ export-env {
           command: []
           options: []
         - name: redpanda
-          image: docker.redpanda.com/redpandadata/redpanda:v24.2.10
+          image: redpandadata/redpanda:latest
           container_name: redpanda
           daemon: true
           environment: {}
@@ -170,27 +170,28 @@ export-env {
             '18081': 18081
             '18082': 18082
             '19092': 19092
+            '19644': 9644
           command:
             - redpanda
             - start
             - --kafka-addr
             - internal://0.0.0.0:9092,external://0.0.0.0:19092
             - --advertise-kafka-addr
-            - internal://127.0.0.1:9092,external://172.178.5.123:19092
+            - internal://127.0.0.1:9092,external://localhost:19092
             - --pandaproxy-addr
             - internal://0.0.0.0:8082,external://0.0.0.0:18082
             - --advertise-pandaproxy-addr
-            - internal://redpanda:8082,external://172.178.5.123:18082
+            - internal://127.0.0.1:8082,external://localhost:18082
             - --schema-registry-addr
             - internal://0.0.0.0:8081,external://0.0.0.0:18081
-            #- --rpc-addr redpanda:33145
-            #- --advertise-rpc-addr redpanda:33145
-            - --overprovisioned
+            - --rpc-addr
+            - localhost:33145
+            - --advertise-rpc-addr
+            - localhost:33145
+            - --mode
+            - dev-container
             - --smp 1
-            - --memory 1G
-            - --reserve-memory 0M
-            - --node-id 0
-            - --check=false
+            - --default-log-level=info
           options: []
         "
         | from yaml | get _
