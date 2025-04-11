@@ -100,9 +100,20 @@ export def container-list [
 }
 
 export def parse-img [] {
-    $in
-    | parse --regex '((?<repo>[^/\<\>]*)/)?(?<image>.+):(?<tag>.*)$'
-    | get -i 0
+    let x = $in | split row '/'
+    match ($x | length) {
+        3 => { reg: $x.0, repo: $x.1, image: $x.2 }
+        2 => { repo: $x.0, image: $x.1 }
+        _ => { image: $x.0 }
+    }
+    | each {|x|
+        let i = $x.image | split row ':'
+        let i = match ($i | length) {
+            1 => { image: $i.0, tag: latest }
+            2 => { image: $i.0, tag: $i.1 }
+        }
+        $x | merge $i
+    }
 }
 
 # list images
@@ -124,6 +135,7 @@ export def image-list [
                 id: $x.id
                 created: ($x.created | into datetime)
                 size: ($x.size | into filesize)
+                reg: $img.reg?
                 repo: $img.repo?
                 image: $img.image?
                 tag: $x.tag?
@@ -316,11 +328,37 @@ export def image-push [
 }
 
 # pull image
-export def image-pull [image -i --rename(-r):string] {
-    let $insecure = if $i {[--insecure-registry]} else {[]}
+export def image-pull [
+    image
+    --insecure(-i)
+    --rename(-r):string
+    --strip:int=0
+    --dry-run
+] {
+    let $insecure = if $insecure {[--insecure-registry]} else {[]}
+
+    let name = if ($rename | is-not-empty) {
+        $rename
+    } else if $strip > 0 {
+        let n = $image | parse-img
+        match $strip {
+            1 => $"($n.repo)/($n.image):($n.tag)",
+            2 => $"($n.image):($n.tag)",
+            3 => $"($n.image)"
+            _ => $image
+        }
+    } else {
+        ""
+    }
+
+    if $dry_run {
+        print $name
+        return
+    }
+
     container ...$insecure pull $image
-    if ($rename | is-not-empty) {
-        image-tag --rename $image $rename
+    if ($name | is-not-empty) {
+        image-tag --rename $image $name
     }
 }
 
