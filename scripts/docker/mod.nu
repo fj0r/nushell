@@ -36,10 +36,10 @@ export-env {
             PGID: 1000
             UMASK: 002
             TZ: Etc/UTC
-            WEBUI_PORT: 8080
+            WEBUI_PORT: 8181
             TORRENTING_PORT: 6881
           ports:
-            '8080': 8080
+            '8181': 8181
             '6881': 6881
             '6881/udp': 6881
           volumns:
