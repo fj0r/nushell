@@ -580,7 +580,7 @@ export def --wrapped container-preset [
             --name=$c.container_name?
             --daemon=$c.daemon
             --envs {...$c.environment, ...$envs}
-            --vols {...$c.volumns, ...$vols}
+            --vols {...$c.volumes, ...$vols}
             --ports {...$c.ports, ...$ports}
             --workdir=$c.working_dir?
             --debug=$debug

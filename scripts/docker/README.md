@@ -12,7 +12,7 @@ preset:
   cmd: []
   env:
     CARGO_HOME: /opt/cargo
-  volumn:
+  volumes:
     .: /world
     ~/.cargo: /opt/cargo
   port:

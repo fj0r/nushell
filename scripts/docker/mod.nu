@@ -16,7 +16,7 @@ export-env {
           daemon: false
           environment:
             CARGO_HOME: /opt/cargo
-          volumns:
+          volumes:
             .: /world
             ~/.cargo: /opt/cargo
           ports:
@@ -42,7 +42,7 @@ export-env {
             '8181': 8181
             '6881': 6881
             '6881/udp': 6881
-          volumns:
+          volumes:
             ~/.config/qbittorrent: /config/qBittorrent
             ~/Downloads/qbittorrent: /downloads
           command: []
@@ -53,7 +53,7 @@ export-env {
           container_name: mitmproxy
           environment: {}
           ports: {}
-          volumns:
+          volumes:
             ~/.mitmproxy: /home/mitmproxy/.mitmproxy
           command:
           - mitmproxy
@@ -67,7 +67,7 @@ export-env {
           container_name: mitmproxy
           environment: {}
           ports: {}
-          volumns:
+          volumes:
             ~/.mitmproxy: /home/mitmproxy/.mitmproxy
           command:
           - mitmweb
@@ -82,7 +82,7 @@ export-env {
           container_name: ollama
           daemon: true
           environment: {}
-          volumns:
+          volumes:
             ~/.ollama: /root/.ollama
             ~/pub/Platform/llm: /world
           ports:
@@ -97,7 +97,7 @@ export-env {
           container_name: ollama
           daemon: true
           environment: {}
-          volumns:
+          volumes:
             ~/.ollama: /root/.ollama
             ~/pub/Platform/llm: /world
           ports:
@@ -110,7 +110,7 @@ export-env {
           container_name: postgres
           daemon: true
           environment: {}
-          volumns: {}
+          volumes: {}
           ports:
             '5432': 5432
           command: []
@@ -126,7 +126,7 @@ export-env {
             SURREAL_EXPERIMENTAL_GRAPHQL: 'true'
             SURREAL_ROCKSDB_BACKGROUND_FLUSH: 'true'
             SURREAL_ROCKSDB_KEEP_LOG_FILE_NUM: '10'
-          volumns:
+          volumes:
             ~/.surrealdb: /var/lib/surrealdb
           ports:
             '8000': 8000
@@ -138,7 +138,7 @@ export-env {
           daemon: true
           environment:
             ASR_MODEL: small
-          volumns:
+          volumes:
             ~/.cache/whisper: /root/.cache/whisper
           ports:
             '4010': 9000
@@ -151,7 +151,7 @@ export-env {
           container_name: iggy
           daemon: true
           environment: {}
-          volumns:
+          volumes:
             ~/.iggy_data: /local_data
           ports:
             '3000': 3000
@@ -164,7 +164,7 @@ export-env {
           container_name: redpanda
           daemon: true
           environment: {}
-          volumns:
+          volumes:
             ~/.redpanda_data: /var/lib/redpanda/data
           ports:
             '18081': 18081
