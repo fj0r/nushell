@@ -78,7 +78,7 @@ def cmpl-rustic-snapshots [context] {
         $x.1 | each {|y|
             let t = char tab
             let id = $y.id | str substring ..7
-            let d = $y.time | into datetime | date humanize
+            let d = $y.time | date from-human | date humanize
             let l = if ($y.label? | is-empty) { '' } else { $"<($y.label)>"}
             {
                 value: $id

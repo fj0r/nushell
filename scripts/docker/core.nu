@@ -55,7 +55,7 @@ export def container-list [
         | lines
         | each {|x|
             let r = $x | from json
-            let t = $r.created | into datetime
+            let t = $r.created | date from-human
             $r | upsert created $t
         }
     } else {
@@ -88,7 +88,7 @@ export def container-list [
             id: $r.Id
             status: $r.State.Status?
             image: $image
-            created: ($r.Created | into datetime)
+            created: ($r.Created | date from-human)
             ports: $p
             env: $imgEnv
             mounts: $m
@@ -133,7 +133,7 @@ export def image-list [
             {
                 name: $name
                 id: $x.id
-                created: ($x.created | into datetime)
+                created: ($x.created | date from-human)
                 size: ($x.size | into filesize)
                 reg: $img.reg?
                 repo: $img.repo?
@@ -174,7 +174,7 @@ export def image-list [
 
         {
             id: $id
-            created: ($r.Created | into datetime)
+            created: ($r.Created | date from-human)
             author: $r.Author
             arch: $r.Architecture
             os: $r.Os
