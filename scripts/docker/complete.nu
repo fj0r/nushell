@@ -101,5 +101,5 @@ export def cmpl-docker-run-proxy [] {
 }
 
 export def cmpl-preset [] {
-    open $env.CONTCONFIG | get preset.name
+    open $env.CNTRCONFIG | get preset.name
 }

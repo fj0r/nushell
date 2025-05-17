@@ -59,7 +59,7 @@ export def run-cmd [
                 $cmd
             ] | filter {|x| $x | is-not-empty }
 
-            ^$env.CONTCTL run ...$args
+            ^$env.CNTRCTL run ...$args
         }
         raw => {
             let cmd = $cmd | render {_: $entry, stdin: $i, args: $args, ...$opt}

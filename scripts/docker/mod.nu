@@ -1,14 +1,14 @@
 export-env {
     for c in [podman nerdctl docker] {
         if (which $c | is-not-empty) {
-            $env.CONTCTL = $c
+            $env.CNTRCTL = $c
             break
         }
     }
-    if 'CONTCONFIG' not-in $env {
-        $env.CONTCONFIG = [$nu.data-dir 'container-preset.yml'] | path join
+    if 'CNTRCONFIG' not-in $env {
+        $env.CNTRCONFIG = [$nu.data-dir 'container-preset.yml'] | path join
     }
-    if not ($env.CONTCONFIG | path exists) {
+    if not ($env.CNTRCONFIG | path exists) {
         "_: |-
         preset:
         - name: rust
@@ -195,7 +195,7 @@ export-env {
           options: []
         "
         | from yaml | get _
-        | save -f $env.CONTCONFIG
+        | save -f $env.CNTRCONFIG
     }
 }
 

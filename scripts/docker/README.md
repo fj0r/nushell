@@ -3,7 +3,7 @@
 ### dx
 Run a container with preset using `dx`
 
-Presets can be defined in the `$env.CONTCONFIG` file, with the content as follows:
+Presets can be defined in the `$env.CNTRCONFIG` file, with the content as follows:
 
 ```yaml
 preset:

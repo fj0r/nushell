@@ -13,7 +13,7 @@ export def containers-network-list [
         | from json
         | do {
             if $subnet {
-                match $env.CONTCTL {
+                match $env.CNTRCTL {
                     podman => ($in | get subnets.0 )
                     _ => ($in | get IPAM.Config.0)
                 }
@@ -49,7 +49,7 @@ export def container-list [
 ] {
     if ($container | is-empty) {
         let fmt = '{"id":"{{.ID}}", "image": "{{.Image}}", "name":"{{.Names}}", "cmd":{{.Command}}, "port":"{{.Ports}}", "status":"{{.Status}}", "created":"{{.CreatedAt}}"}'
-        let fmt = if $env.CONTCTL == 'podman' { $fmt | str replace '{{.Command}}' '"{{.Command}}"' | str replace '{{.CreatedAt}}' '{{.Created}}' } else { $fmt }
+        let fmt = if $env.CNTRCTL == 'podman' { $fmt | str replace '{{.Command}}' '"{{.Command}}"' | str replace '{{.CreatedAt}}' '{{.Created}}' } else { $fmt }
         let all = if $all {[-a]} else {[]}
         container ps ...$all --format $fmt
         | lines
@@ -150,13 +150,13 @@ export def image-list [
                 let x = $i | split row '='
                 $a | upsert $x.0 $x.1?
             }
-        let id = if $env.CONTCTL == 'nerdctl' {
+        let id = if $env.CNTRCTL == 'nerdctl' {
             $r.RepoDigests.0? | split row ':' | get 1 | str substring 0..<12
         } else {
             $r.Id | str substring 0..<12
         }
         let layer = if $layer {
-            let l = if $env.CONTCTL == 'nerdctl' {
+            let l = if $env.CNTRCTL == 'nerdctl' {
                 #let root = containerd config dump | from toml | get root
                 $r | get RootFS.Layers
             } else {
@@ -203,7 +203,7 @@ export def container-log [
 export def container-log-trunc [
     container: string@cmpl-docker-containers
 ] {
-    if $env.CONTCTL == 'podman' {
+    if $env.CNTRCTL == 'podman' {
         print -e $'(ansi yellow)podman(ansi dark_gray) isn’t supported(ansi reset)'
     } else {
         let f = container inspect --format='{{.LogPath}}' $container
@@ -513,7 +513,7 @@ export def --wrapped container-create [
     }
 
     if ($nvidia | is-not-empty) {
-        $args ++= if $env.CONTCTL in ['podman'] {
+        $args ++= if $env.CNTRCTL in ['podman'] {
             if $nvidia == 0 {
                 [--device nvidia.com/gpu=all --ipc=host]
             } else {
@@ -527,7 +527,7 @@ export def --wrapped container-create [
     if ($join | is-not-empty) {
         let c = $"container:($join)"
         $args ++= [--pid $c --network $c]
-        if $env.CONTCTL in ['podman'] { $args ++= [--uts $c --ipc $c] }
+        if $env.CNTRCTL in ['podman'] { $args ++= [--uts $c --ipc $c] }
     }
     if ($network | is-not-empty) and ($join | is-empty) {
         $args ++= [--network $network]
@@ -569,7 +569,7 @@ export def --wrapped container-preset [
     --with-x
     --dry-run
 ] {
-    let c = open $env.CONTCONFIG | get preset | where name == $preset
+    let c = open $env.CNTRCONFIG | get preset | where name == $preset
     if ($c | is-empty) {
         print $"(ansi grey)Oops!(ansi reset)"
     } else {

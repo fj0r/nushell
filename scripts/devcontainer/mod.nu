@@ -239,20 +239,20 @@ def 'exec plan' [--rm --latest] {
     }
     | flatten
 
-    $plan.dockerfile | ^$env.CONTCTL build ...$args -f - -t $plan.tag $plan.ctx
-    ^$env.CONTCTL push $plan.tag
+    $plan.dockerfile | ^$env.CNTRCTL build ...$args -f - -t $plan.tag $plan.ctx
+    ^$env.CNTRCTL push $plan.tag
 
     if $latest {
         let latest = $plan.tag | split row ':' | slice 0..<-1 | append 'latest' | str join ':'
-        ^$env.CONTCTL tag $plan.tag $latest
-        ^$env.CONTCTL push $latest
+        ^$env.CNTRCTL tag $plan.tag $latest
+        ^$env.CNTRCTL push $latest
         if $rm {
-            ^$env.CONTCTL rmi $latest
+            ^$env.CNTRCTL rmi $latest
         }
     }
 
     if $rm {
-        ^$env.CONTCTL rmi $plan.tag
+        ^$env.CNTRCTL rmi $plan.tag
     }
 }
 
@@ -299,7 +299,7 @@ export def 'main' [
 
     if $example {
         [
-            $"$env.CONTCTL = 'podman'"
+            $"$env.CNTRCTL = 'podman'"
             $"cd <project>"
             ({
                 registry: registry.s

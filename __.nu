@@ -61,7 +61,7 @@ export def git-hooks [act ctx] {
 }
 
 export def 'test in container' [] {
-    ^$env.CONTCTL run ...[
+    ^$env.CNTRCTL run ...[
         --name test-nu
         --rm -it
         -v $"($env.PWD):/etc/nushell"
