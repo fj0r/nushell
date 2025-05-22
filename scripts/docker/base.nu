@@ -10,15 +10,15 @@ export def cmpl-docker-ns [] {
 
 
 export def --env container-change-namespace [ns:string@cmpl-docker-ns] {
-    $env.CONTAINER_NAMESPACE = $ns
+    $env.CNTRNS = $ns
 }
 
 export def --wrapped container [...args] {
     let o = $in
     mut ns = []
     if $env.CNTRCTL in [nerdctl] {
-        if ($env.CONTAINER_NAMESPACE? | is-not-empty) {
-            $ns = [--namespace $env.CONTAINER_NAMESPACE]
+        if ($env.CNTRNS? | is-not-empty) {
+            $ns = [--namespace $env.CNTRNS]
         }
     }
     if ($o | is-empty) {
