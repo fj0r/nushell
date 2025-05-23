@@ -24,7 +24,6 @@ export def --wrapped container [...args] {
     if ($o | is-empty) {
         ^$env.CNTRCTL ...$ns ...$args
     } else {
-        # FIXME: load
         $o | ^$env.CNTRCTL ...$ns ...$args
     }
 }

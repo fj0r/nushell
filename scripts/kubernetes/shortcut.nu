@@ -6,7 +6,6 @@ export alias kdk = kube-diff-kustomize
 export alias kdelk = kube-delete-kustomize
 export alias kk = kube-kustomize
 export alias kcc = kube-change-context
-export alias kccc = kube-change-context-clone
 export alias kn = kube-change-namespace
 export alias kg = kube-get
 export alias kd = kube-describe
