@@ -79,14 +79,14 @@ export def nvim-gen-service [
     --ev: record = {}
     --port: int = 9999
     --host: string = 'localhost'
-    --bin: string = '/usr/bin/nvim'
+    --bin: string = '/usr/local/bin/nvim'
     --sys
     --exec
 ] {
     let user = whoami
     let ev = {
         HOSTNAME: (hostname)
-        NVIM_FONT: nar12
+        NVIM_FONT: nar11
         NEOVIDE_SCALE_FACTOR: 1
         SHELL: nu
         TERM: screen-256color
@@ -97,7 +97,7 @@ export def nvim-gen-service [
         all => '0.0.0.0'
         _ => $host
     }
-    let cmd = $"($bin) --listen ($host):($port) --headless +'set title titlestring=\\|($name)\\|'"
+    let cmd = $"($bin) --listen ($host):($port) --headless +'set title titlestring=\\|($name)\\|' +terminal"
     use os/systemctl.nu *
     generate-systemd-service $"nvim:($name)" --cmd $cmd --system=$sys --environment $ev --user $user --exec=$exec
     # ~/.config/systemd/user/
@@ -113,8 +113,10 @@ def cmpl-nvc [] {
 }
 
 export def nvc [
-    args: string@cmpl-nvc
+    pattern: string@cmpl-nvc
+    ...args: string
     --gui(-g)
+    --terminal(-t)
     --verbose(-v)
 ] {
     let history = [$nu.cache-dir nvim_history.sqlite] | path join
@@ -125,24 +127,27 @@ export def nvc [
             recent datetime default (datetime('now', 'localtime'))
         );" | sqlite3 $history
     }
-    $"insert into nvim_remote_history\(cmd\) values \('($args)'\)
+    $"insert into nvim_remote_history\(cmd\) values \('($pattern)'\)
     on conflict\(cmd\) do
     update set count = count + 1,
                recent = datetime\('now', 'localtime'\);"
     | sqlite3 $history
     mut cmd = []
-    if $args =~ ':[0-9]+$' {
+    if $terminal {
+        $cmd ++= ['+terminal']
+    }
+    if $pattern =~ ':[0-9]+$' {
         mut addr = ''
-        if ($args | str starts-with ':') {
-            $addr = $"localhost($args)"
+        if ($pattern | str starts-with ':') {
+            $addr = $"localhost($pattern)"
         } else {
-            $addr = $args
+            $addr = $pattern
         }
-        $cmd = [--server $addr -- $"+\"set title titlestring=($addr)\""]
-    } else if $args == ':' {
-        $cmd = [$"+\"set title titlestring=world\""]
+        $cmd ++= [--server $addr -- $"+\"set title titlestring=($addr)\""]
+    } else if $pattern == ':' {
+        $cmd ++= [$"+\"set title titlestring=world\""]
     } else {
-        $cmd = [$"+\"set title titlestring=($args)\"" -- $args]
+        $cmd ++= [$"+\"set title titlestring=($pattern)\"" $pattern -- ...$args]
     }
     if $verbose {
         print ($cmd | str join ' ')
