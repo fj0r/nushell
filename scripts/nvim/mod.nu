@@ -88,6 +88,7 @@ export def nvim-gen-service [
         HOSTNAME: (hostname)
         NVIM_FONT: nar11
         NEOVIDE_SCALE_FACTOR: 1
+        PREFER_ALT: 1
         SHELL: nu
         TERM: screen-256color
     }
