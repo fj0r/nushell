@@ -14,7 +14,7 @@ export def "kadm update sans" [] {
     }
     kubeadm init phase certs apiserver --config kubeadm.yaml
     let p = kgp -n kube-system
-    | filter { $in.name | str starts-with kube-apiserver }
+    | where { $in.name | str starts-with kube-apiserver }
     | first
     | get name
     let a = [yes no] | input list 'kill pod/kube-apiserver in kube-system'

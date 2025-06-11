@@ -133,7 +133,7 @@ export def --env theme [] {
             sum: [{ $in.value | math sum }, { $in | math sum }]
         }
         done: {
-            done: [{ $in.done | filter { $in == 1 } | length }, { $in | math sum }]
+            done: [{ $in.done | where { $in == 1 } | length }, { $in | math sum }]
         }
         count: {
             count: [{ $in | length }, { $in | math sum }]

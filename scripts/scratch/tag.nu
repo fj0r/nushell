@@ -18,7 +18,7 @@ export def scratch-tag-clean [
     sqlx $"delete from scratch_tag where scratch_id in \(($sid)\) and tag_id in \(($tags_id)\)"
 
     let other_tag = sqlx $"select scratch_id, count\(1\) as c from scratch_tag where scratch_id in \(($sid)\) group by scratch_id having c > 0" | get scratch_id
-    let scratch = $scratch | filter {|x| $x not-in $other_tag }
+    let scratch = $scratch | where {|x| $x not-in $other_tag }
     for i in $scratch {
         sqlx $"delete from scratch where id in \(($i)\)"
     }

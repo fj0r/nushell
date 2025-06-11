@@ -25,7 +25,7 @@ def "kube ctx" [] {
         do -i {
             kubectl config get-contexts
             | from ssv -a
-            | filter {|x| $x.CURRENT | is-not-empty }
+            | where {|x| $x.CURRENT | is-not-empty }
             | get 0
         }
     }

@@ -6,7 +6,7 @@ export def 'dump nu_scripts' [...mod:string@cmpl-mod --reverse(-r)] {
     use git *
     use git/shortcut.nu *
     use lg
-    let m = $env.manifest | filter {|x| not ($x.disable? | default false) }
+    let m = $env.manifest | where {|x| not ($x.disable? | default false) }
     let m = if ($mod | is-empty) { $m } else {
         $m | where to in $mod
     }

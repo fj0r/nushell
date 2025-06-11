@@ -90,7 +90,7 @@ export def scratch-list [
         | scratch-tags-children ...$in
         let exist_tagsid = $exist_tagsid
         let tags_id = $tags_id
-        | filter {|x| $x not-in $exist_tagsid }
+        | where {|x| $x not-in $exist_tagsid }
         | each { $in | into string } | str join ', '
         $cond ++= [$"scratch.id not in \(select scratch_id from scratch_tag where tag_id in \(($tags_id)\)\)"]
     }
@@ -137,7 +137,7 @@ export def scratch-list [
     | items {|k, x|
         let t = $x
         | get tag
-        | filter { $in | is-not-empty }
+        | where { $in | is-not-empty }
         | each {$in | default '' | split row ':'}
         $x | first | reject tag | insert tags $t
     }
@@ -293,8 +293,8 @@ export def scratch-attrs [
     --adder(-a): number
     --kind(-k):string@cmpl-kind
 ] {
-    let ids = $xargs | filter { ($in | describe) == 'int' }
-    let xtags = $xargs | filter { ($in | describe) != 'int' }
+    let ids = $xargs | where { ($in | describe) == 'int' }
+    let xtags = $xargs | where { ($in | describe) != 'int' }
 
     let args = {
         value: $value
@@ -406,8 +406,8 @@ export def scratch-title [
 }
 
 export def scratch-data [...xargs: any@cmpl-tag-3] {
-    let ids = $xargs | filter { ($in | describe) == 'int' }
-    let xtags = $xargs | filter { ($in | describe) != 'int' }
+    let ids = $xargs | where { ($in | describe) == 'int' }
+    let xtags = $xargs | where { ($in | describe) != 'int' }
 
     let tags_id = $xtags | tags-group | get or
     let t = if ($tags_id | is-not-empty) {
@@ -436,7 +436,7 @@ export def scratch-data [...xargs: any@cmpl-tag-3] {
         $i
     } else {
         let tids = $t | get id
-        $t | append ($i | filter {|x| $x.id not-in $tids })
+        $t | append ($i | where {|x| $x.id not-in $tids })
     }
     | update body {|x| $x.body | from-all $x.kind }
 }
@@ -631,7 +631,7 @@ export def scratch-editor-run [
     if ($ctx | is-empty) { error make -u { msg: "Must be run in the Scratch editor" } }
     let ctx = $ctx | from nuon
     let ctx = if ($args | is-empty) { $ctx } else { $ctx | upsert args $args }
-    let transform = $transform | default {|x| print $x }
+    let transform = $transform | default {{|x| print $x }}
     do $transform (run-cmd $ctx)
     if $watch {
         watch . -g $ctx.entry -q  {|op, path, new_path|

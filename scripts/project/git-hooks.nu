@@ -54,7 +54,7 @@ export def git-list-hooks [] {
     if ($c | describe) == nothing { return }
     let hp = [$c .git hooks] | path join
     ls $hp | get name | path parse
-    | filter {|x| ($x.extension | is-empty) and ($x.stem in $env.GIT_HOOKS) }
+    | where {|x| ($x.extension | is-empty) and ($x.stem in $env.GIT_HOOKS) }
     | get stem
 }
 
@@ -108,7 +108,7 @@ export def git-install-hooks [
     let hook_path = [$c .git hooks] | path join
     #let workdir = [$env.PWD $c] | path join | path expand
     let hs = $env.GIT_HOOKS | transpose k v
-    let hs = if ($hooks | is-empty) { $hs | filter {$in.v.default?} } else { $hs | where k in $hooks }
+    let hs = if ($hooks | is-empty) { $hs | where {$in.v.default?} } else { $hs | where k in $hooks }
     for h in $hs {
         let p = [$hook_path $h.k] | path join
         $"_: |-

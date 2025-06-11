@@ -90,7 +90,7 @@ def 'fmt tag-tree' [
         $acc ++= [$j.acc]
         $done ++= [$j.done]
     }
-    for i in ($o | transpose k v | filter {|x| $x.k != ':' }) {
+    for i in ($o | transpose k v | where {|x| $x.k != ':' }) {
         let instr = '' | fill -c ' ' -w ($padding + $level * $indent)
         # TODO:
         let x = $i.v | fmt tag-tree ($level + 1) --indent $indent --body-lines $body_lines --md=$md --md-list=$md_list --accumulator $accumulator
@@ -169,7 +169,7 @@ export def 'to tree' [] {
     let i = $in
     # dynamically determines the root node
     let all_ids = $i | get id | uniq
-    let root_ids = $i | get parent_id | uniq | filter { $in not-in $all_ids }
+    let root_ids = $i | get parent_id | uniq | where { $in not-in $all_ids }
     let root = $i | where parent_id in $root_ids
     if ($root | is-empty) { return }
     to-tree $root ($i | group-by parent_id)
@@ -309,7 +309,7 @@ def 'fmt leaves' [
     let body_info = if $body_len > 0 { $"(ansi grey)($o.kind):($body_len)" }
 
     let header = [...$title $value ...$tags ...$meta $body_info]
-    | filter { $in | is-not-empty }
+    | where { $in | is-not-empty }
     | str join ' '
     |  if $verbose { $"($in)(ansi reset)" } else { $in }
 

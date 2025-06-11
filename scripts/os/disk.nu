@@ -14,7 +14,7 @@ export def dfx [-x:list<string>] {
         sudo df -h
         | lines
         | slice 1..
-        | filter { $in | str starts-with '/' }
+        | where { $in | str starts-with '/' }
     } else {
         let x = $x
         | each { $"--exclude-type=($in)" }

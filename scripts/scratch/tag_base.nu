@@ -3,7 +3,7 @@ use libs/db.nu *
 def cmpl-tags [...prefix] {
     sqlx $"with (tag-tree) select * from tags"
     | get name
-    | filter { $in | is-not-empty }
+    | where { $in | is-not-empty }
     | each {|x| $prefix | each {|y| $"($y)($x)" } }
     | flatten
 }

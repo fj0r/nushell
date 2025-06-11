@@ -57,7 +57,7 @@ export def run-cmd [
                 ...$entrypoint
                 $opt.image
                 $cmd
-            ] | filter {|x| $x | is-not-empty }
+            ] | where {|x| $x | is-not-empty }
 
             ^$env.CNTRCTL run ...$args
         }

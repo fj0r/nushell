@@ -15,7 +15,7 @@ def --env merge-path [path] {
     let p = $path
     | each { glob $in }
     | flatten
-    | filter {|x| $x not-in $env.PATH }
+    | where {|x| $x not-in $env.PATH }
     for x in $p {
         $env.PATH = ($env.PATH | prepend $x)
     }
