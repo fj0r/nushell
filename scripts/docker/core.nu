@@ -430,6 +430,7 @@ export def --wrapped container-create [
     --debug(-x)
     --appimage
     --netadmin
+    --user(-u): string
     --proxy: string@cmpl-docker-run-proxy      # proxy
     --ssh(-s): string@cmpl-docker-run-sshkey   # specify ssh key
     --sshuser: string=root                     # default root
@@ -452,6 +453,9 @@ export def --wrapped container-create [
 ] {
     mut args = []
 
+    if ($user | is-not-empty) {
+        $args ++= [--user $user]
+    }
     if $daemon {
         $args ++= [-d]
     } else {
