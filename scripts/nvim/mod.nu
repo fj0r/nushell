@@ -25,7 +25,7 @@ export def drop [] {
         echo $in
     } else {
         let c = $in
-        let temp = (mktemp -t nuvim.XXXXXXXX|str trim)
+        let temp = mktemp -t nuvim.XXXXXXXX | str trim
         $c | save -f $temp
         nvim --headless --noplugin --server $env.NVIM --remote-send $"<cmd>lua ReadTempDrop\('($temp)')<cr>"
     }
@@ -35,8 +35,12 @@ export def nvim-lua [...expr: string] {
     if ($env.NVIM? | is-empty) {
         echo "not found nvim instance"
     } else {
-        nvim --headless --noplugin --server $env.NVIM --remote-send $'<cmd>lua vim.g.remote_expr_lua = ($expr|str join " ")<cr>'
-        do -i { nvim --headless --noplugin --server $env.NVIM --remote-expr 'g:remote_expr_lua' } | complete | get stderr
+        nvim --headless --noplugin --server $env.NVIM --remote-send $'<cmd>lua vim.g.remote_expr_lua = ($expr | str join " ")<cr>'
+        do -i {
+            nvim --headless --noplugin --server $env.NVIM --remote-expr 'g:remote_expr_lua'
+        }
+        | complete
+        | get stderr
     }
 }
 
@@ -50,7 +54,7 @@ def nve [...file:path --action(-a):string='vsplit'] {
     } else {
         let af = $file
         | each {|f|
-            if ($f|str substring ..<1) in ['/', '~'] {
+            if ($f | str substring ..<1) in ['/', '~'] {
                 $f
             } else {
                 $"($env.PWD)/($f)"
