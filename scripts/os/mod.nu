@@ -16,6 +16,7 @@ export use zellij.nu *
 export use asciinema.nu *
 export use rbw.nu *
 export use ssl.nu *
+export use cargo.nu *
 
 export-env {
     use niri.nu *
