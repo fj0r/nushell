@@ -16,6 +16,7 @@ export-env {
             {
                 condition: {|_, after| '__' in (overlay list) }
                 code: ([
+                    $"hide __" # HACK: clean
                     $"overlay hide __ --keep-env [ PWD OLDPWD ]"
                     $"print '(ansi default_italic)(ansi grey)unload overlay (ansi default_bold)__(ansi reset)'"
                 ] | str join (char newline))
@@ -24,8 +25,7 @@ export-env {
                 condition: {|_, after| $after | path join __.nu | path exists }
                 code: ([
                     $load_msg
-                    $"overlay use -r __.nu as __ -p"
-                    $"cd $after"
+                    $"overlay use -r -p __.nu as __"
                     $"direnv __"
                     #$"project register $after --mod __"
                 ] | str join (char newline))
