@@ -18,7 +18,6 @@ source llm/agents/kubernetes.nu
 source llm/agents/research.nu
 use project *
 use ssh *
-use cwdhist *
 use parser
 use devcontainer
 
@@ -28,6 +27,7 @@ use nvim *
 use netcat *
 use nushell.nu *
 use benchmark
+use cwdhist *
 use history-utils *
 use history-utils/backup.nu *
 use resolvenv
@@ -36,6 +36,13 @@ use rustic *
 use surrealdb
 #use just.nu *
 #use completion-generator.nu *
+
+export def 'clean-hist-all' [$keyword] {
+    print 'clean history'
+    history clean --cwd $keyword
+    print 'clean cwd history'
+    cwd history clean $keyword
+}
 
 use power
 $env.NU_POWER_SCHEMA = [
