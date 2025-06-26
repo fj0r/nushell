@@ -138,3 +138,20 @@ export def 'history activities' [
     | reverse
     | histogram-column count
 }
+
+export def 'history clean' [
+    keyword
+    --cwd
+] {
+    let tg = if $cwd { 'cwd' } else { 'command_line' }
+    let fr = $"from history where ($tg) like (quote '%' $keyword '%')"
+    let l = open $nu.history-path | query db  $"select * ($fr)"
+    if ($l | is-empty) {
+        print 'nothing to clean'
+    } else {
+        print $l
+        if ([y n] | input list 'continue? ') == 'y' {
+            open $nu.history-path | query db  $"delete ($fr)"
+        }
+    }
+}

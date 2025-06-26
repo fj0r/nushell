@@ -3,9 +3,17 @@ def quote [...t] {
     $"'($s)'"
 }
 
-export def 'cwd history delete' [cwd] {
-    open $env.CWD_HISTORY_FILE
-    | query db $"delete from cwd_history where cwd = (quote $cwd);"
+export def 'cwd history clean' [keyword] {
+    let fr = $"from cwd_history where cwd like (quote '%' $keyword '%');"
+    let l = open $env.CWD_HISTORY_FILE | query db $"select * ($fr)"
+    if ($l | is-empty) {
+        print 'nothing to clean'
+    } else {
+        print $l
+        if ([y n] | input list 'continue? ') == 'y' {
+            open $env.CWD_HISTORY_FILE | query db $"delete ($fr)"
+        }
+    }
 }
 
 export-env {
