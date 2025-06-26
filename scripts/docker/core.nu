@@ -364,7 +364,7 @@ export def image-pull [
 
 ### list volume
 export def volume-list [] {
-    container volume ls | from ssv -a
+    container volume ls | from ssv -a | rename name dir
 }
 
 # create volume
