@@ -12,6 +12,12 @@ rank = 3
 title = "Argx"
 
 [[manifest]]
+from = "minio"
+to = "minio-client"
+rank = 3
+title = "minio-client"
+
+[[manifest]]
 from = "ssh"
 to = "ssh"
 rank = 4
