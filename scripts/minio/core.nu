@@ -1,19 +1,27 @@
 use argx
 
 export def mc-alias [] {
-    ^mc alias ls --json | from json -o | get alias
+    ^mc alias ls --json
+    | from json -o
+    | each {|x|
+        {
+            value: $"($x.alias)/"
+            description: $x.URL
+        }
+    }
 }
 
 export def mc-subkey [] {
-    let key = $in
-    if ($key | is-empty) {
+    let key = $in | default '' | split row '/'
+    if ($key | length) < 2 {
         mc-alias
     } else {
-        mc-ls $key
+        let k = $key | slice 0..-2 | str join '/'
+        mc-ls $k
         | where {|x| $x.type == 'dir'}
         | get key
         | each {|x|
-            [$key $x] | path join
+            [$k $x] | path join
         }
     }
 }
