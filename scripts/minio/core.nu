@@ -35,11 +35,20 @@ export def mc-ls [
 ] {
     ^mc ls $src --json
     | from json -o
-    | update lastModified {|x| $x.lastModified | into datetime }
-    | update type {|x|
-        match $x.type {
+    | each {|x|
+        let t = match $x.type {
             folder => 'dir',
             _ => $x.type
+        }
+        let modified = $x.lastModified | into datetime
+        {
+            key: $x.key
+            type: $t
+            size: $x.size
+            modified: $modified
+            ver: $x.versionOrdinal
+            etag: $x.etag
+            url: $x.url
         }
     }
 }
