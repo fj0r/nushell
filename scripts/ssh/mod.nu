@@ -71,7 +71,7 @@ export def ssh-switch  [
     $o | save -f ([$env.HOME .ssh config] | path join)
 }
 
-def cmpl-ssh [] {
+export def cmpl-ssh [] {
     let t = [$env.HOME .ssh index.toml] | path join
     if not ($t | path exists) {
         ssh-index-init
@@ -125,3 +125,4 @@ export extern main [
 ]
 
 export use parse.nu *
+export use utils.nu *
