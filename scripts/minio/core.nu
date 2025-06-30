@@ -53,6 +53,24 @@ export def mc-ls [
     }
 }
 
+export def mc-rm [
+    src: string@'nu-cmp mc-src'
+] {
+    ^mc rm -r --force $src
+}
+
+export def mc-du [
+    src: string@'nu-cmp mc-src'
+] {
+    ^mc du $src
+}
+
+export def mc-tree [
+    src: string@'nu-cmp mc-src'
+] {
+    ^mc tree $src
+}
+
 export def mc-mv [
     src: string@'nu-cmp mc-src'
     dest: string@'nu-cmp mc-dest'
