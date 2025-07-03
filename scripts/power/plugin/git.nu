@@ -147,5 +147,5 @@ export-env {
     } {
         default : (ansi blue)
         no_upstream: (ansi red)
-    }
+    } --when { which git | is-not-empty }
 }

@@ -10,5 +10,5 @@ export-env {
         theme: {
             on: white
         }
-    }
+    } --when { which atuin | is-not-empty }
 }

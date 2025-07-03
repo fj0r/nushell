@@ -54,5 +54,5 @@ export-env {
         }
         reverse: false
         separator: ':'
-    }
+    } --when { which kubectl | is-not-empty }
 }
