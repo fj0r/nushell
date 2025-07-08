@@ -61,10 +61,11 @@ export def mc-ls [
     }
 }
 
-export def mc-rm [
+export def --wrapped mc-rm [
     src: string@'nu-cmp mc-src'
+    ...args
 ] {
-    ^mc rm -r --force $src
+    ^mc rm ...$args $src
 }
 
 export def mc-du [
@@ -79,23 +80,26 @@ export def mc-tree [
     ^mc tree $src
 }
 
-export def mc-mv [
+export def --wrapped mc-mv [
     src: string@'nu-cmp mc-src'
     dest: string@'nu-cmp mc-dest'
+    ...args
 ] {
-    ^mc mv $src $dest
+    ^mc mv ...args $src $dest
 }
 
-export def mc-cp [
+export def --wrapped  mc-cp [
     src: string@'nu-cmp mc-src'
     dest: string@'nu-cmp mc-dest'
+    ...args
 ] {
-    ^mc cp $src $dest
+    ^mc cp ...$args $src $dest
 }
 
-export def mc-put [
+export def --wrapped mc-put [
     src: string
     dest: string@'nu-cmp mc-dest'
+    ...args
 ] {
-    ^mc put $src $dest
+    ^mc put ...$args $src $dest
 }
