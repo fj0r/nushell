@@ -8,7 +8,6 @@ export def 'str max-length' [] {
 
 def cmpl-env [] {
     open ([$env.HOME .ssh index.toml] | path join)
-    | get groups
     | transpose k v
     | get v
     | each {|x|
@@ -16,17 +15,21 @@ def cmpl-env [] {
     }
     | flatten
     | uniq
+    | where {|x| $x != 'default' }
 }
 
 def cmpl-group [] {
     open ([$env.HOME .ssh index.toml] | path join)
-    | get groups
     | columns
 }
 
 export def ssh-switch  [
     environ?: string@cmpl-env
     --group(-g): string@cmpl-group
+    --no-compression
+    --forward
+    --no-hostkey-checking
+    --password-authentication
 ] {
     {
         environ: $environ
@@ -36,20 +39,29 @@ export def ssh-switch  [
     | save -f ([$env.HOME .ssh index.json] | path join)
 
     mut o = []
+    if $password_authentication {
+        $o ++= [
+            "PasswordAuthentication yes"
+            "PubkeyAuthentication no"
+        ]
+    }
+    if not $no_compression {
+        $o ++= ["Compression yes"]
+    }
+    if $forward {
+        $o ++= ["ForwardAgent yes"]
+    }
+    if $no_hostkey_checking {
+        $o ++= [
+            "StrictHostKeyChecking no"
+            "UserKnownHostsFile /dev/null"
+        ]
+    }
     let c = open ([$env.HOME .ssh index.toml] | path join)
-    for i in ($c.default? | transpose k v) {
-        $o ++= [$"($i.k) ($i.v)"]
-    }
-    for i in ($c.host? | transpose k v) {
-        $o ++= [$"Host ($i.k)"]
-        for j in ($i.v | transpose k v) {
-            $o ++= [$"    ($j.k) ($j.v)"]
-        }
-    }
     let gr = if ($group | is-empty) {
-        $c.groups?
+        $c
     } else {
-        $c.groups? | select $group
+        $c | select $group
     }
     for i in ($gr | transpose k v) {
         $o ++= [$"### ($i.k)"]
@@ -79,7 +91,6 @@ export def cmpl-ssh [] {
     }
     let e = open ([$env.HOME .ssh index.json] | path join)
     open $t
-    | get groups
     | do {
         let x = $in
         if ($e.group? | is-empty) {

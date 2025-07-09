@@ -14,8 +14,15 @@ def parse-ssh-file [group] {
     | where {|x| not (($x.Host | is-empty) or $x.Host =~ '\*')}
 }
 
-export def ssh-index-init [] {
-    let groups = rg -L -l 'Host' ([$env.HOME .ssh] | path join)
+def cmpl-ssh-config [] {
+    let p = [$env.HOME .ssh] | path join
+    ls ([$p **/*] | path join | into glob)
+    | get name
+    | path relative-to $p
+}
+
+export def ssh-index-init [file:string@cmpl-ssh-config] {
+    let group = rg -L -l 'Host' ([$env.HOME .ssh $file] | path join)
     | lines
     | reduce -f {} {|x,a|
         let n = $x | path parse | get stem
@@ -34,28 +41,14 @@ export def ssh-index-init [] {
         }
         $a | upsert $n $v
     }
-    | wrap groups
 
     let t = [$env.HOME .ssh index.toml] | path join
     if ($t | path exists) {
         open $t
     } else {
-        {
-            default: {
-                Compression: yes
-            }
-            host: {
-                *: {
-                    ForwardAgent: yes
-                }
-                localhost*: {
-                    StrictHostKeyChecking: no
-                    UserKnownHostsFile: /dev/null
-                }
-            }
-        }
+        {}
     }
-    | merge deep $groups
+    | merge deep $group
     | collect
     | save -f $t
 }
