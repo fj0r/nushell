@@ -33,7 +33,8 @@ export def 'history backup' [tag?] {
 }
 
 def cmpl-history_backup_file [] {
-    ls $env.HISTORY_BACKUP_DIR | each {|x| $x.name | path parse } | get stem | reverse
+    let c = ls $env.HISTORY_BACKUP_DIR | each {|x| $x.name | path parse } | get stem | reverse
+    { completions: $c, options: { sort: false } }
 }
 # restore history
 export def 'history restore' [name: string@cmpl-history_backup_file] {
