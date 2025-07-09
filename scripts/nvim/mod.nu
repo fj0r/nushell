@@ -94,6 +94,7 @@ export def nvim-gen-service [
         NEOVIDE_SCALE_FACTOR: 1
         PREFER_ALT: 1
         SHELL: nu
+        NVIM_FLAG_COLOR: '#C5E99B'
         TERM: screen-256color
     }
     | merge $ev
