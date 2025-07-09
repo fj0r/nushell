@@ -115,6 +115,20 @@ export-env {
             '5432': 5432
           command: []
           options: []
+        - name: rustfs
+          image: quay.io/rustfs/rustfs
+          container_name: rustfs
+          daemon: true
+          environment:
+            RUSTFS_ROOT_USER: admin
+            RUSTFS_ROOT_PASSWORD: admin
+          volumes:
+            ~/.cache/rustfs: /data
+          ports:
+            '9000': 9000
+            '9001': 9001
+          command: []
+          options: []
         - name: surreal
           image: surreal
           container_name: surrealdb
