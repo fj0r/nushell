@@ -67,16 +67,27 @@ export def --env direnv [
     | load-env
 }
 
-export def --env sandbox [dir --surrfix(-s)="--"] {
-    let dir = $"($surrfix)($dir)($surrfix)" | path expand
+# new dir and then cd
+export def --env nd [
+    dir
+    --surrfix(-s)="--"
+    --keep(-k)
+] {
+    let dir = if $keep {
+        $dir
+    } else {
+        $"($surrfix)($dir)($surrfix)" | path expand
+    }
     mkdir $dir
     cd $dir
-    $env.config.hooks.env_change.PWD ++= [
-        {
-            condition: {|before, after| $before == $dir }
-            code: $"rm -rf ($dir)"
-        }
-    ]
+    if not $keep {
+        $env.config.hooks.env_change.PWD ++= [
+            {
+                condition: {|before, after| $before == $dir }
+                code: $"rm -rf ($dir)"
+            }
+        ]
+    }
 }
 
 export def find-project [dir] {
