@@ -56,7 +56,10 @@ export def container-list [
         | each {|x|
             let r = $x | from json
             let t = $r.created | date from-human
-            $r | upsert created $t
+            let p = $r.port | split row -r '\, *'
+            $r
+            | upsert port $p
+            | upsert created $t
         }
     } else {
         let r = container inspect $container
