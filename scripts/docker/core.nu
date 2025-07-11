@@ -185,6 +185,7 @@ export def image-list [
             labels: $r.Labels?
             user: $r.Config.User?
             env: $e
+            volumes: $r.Config.Volumes?
             entrypoint: $r.Config.Entrypoint?
             cmd: $r.Config.Cmd?
             ...$layer
