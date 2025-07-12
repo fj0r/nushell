@@ -91,6 +91,7 @@ export def kube-diff-helm [
     --namespace (-n): string@cmpl-kube-ns
     --ignore-image (-i)
     --has-plugin (-h)
+    --concurrency: number=2
 ] {
     mut args = []
     if ($namespace | is-not-empty) {
@@ -118,10 +119,19 @@ export def kube-diff-helm [
         let target = mktemp -t 'helm.XXX.out.yaml'
         let tg = helm template --debug $name $chart -f $valuefile ...$args
         | from yaml
-        let img_p = [spec template spec containers 0 image] | into cell-path
+        let cntr = [spec template spec containers] | into cell-path
+
         $tg | each {|x|
-            if $ignore_image and ($x | get -i $img_p | is-not-empty) {
-                $x | reject $img_p
+            let c = $x | get -i $cntr
+            if ($c | is-not-empty) {
+                let c = $c | each {|y|
+                    if $ignore_image {
+                        $y | reject image
+                    } else {
+                        $y
+                    }
+                }
+                $x | update $cntr $c
             } else {
                 $x
             }
@@ -129,7 +139,8 @@ export def kube-diff-helm [
         }
         | str join $"(char newline)---(char newline)"
         | save -f $target
-        kubectl diff -f $target
+
+        kubectl diff -f $target $"--concurrency=($concurrency)"
     }
 }
 
