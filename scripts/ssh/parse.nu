@@ -21,11 +21,13 @@ def cmpl-ssh-config [] {
     | path relative-to $p
 }
 
-export def ssh-index-init [file:string@cmpl-ssh-config] {
-    let group = rg -L -l 'Host' ([$env.HOME .ssh $file] | path join)
-    | lines
+export def ssh-index-init [...files:string@cmpl-ssh-config] {
+    let group = $files
     | reduce -f {} {|x,a|
-        let n = $x | path parse | get stem
+        let n = $x
+        | path expand
+        | path relative-to ([$env.HOME .ssh] | path join)
+        | str replace -a '/' '_'
         let v = cat $x | parse-ssh-file $x
         let v = $v | reduce -f {} {|y,b|
             let o = $y | reject Host Group

@@ -1,3 +1,4 @@
+const cwd = path self .
 def cmpl-mod [] {
     $env.manifest | get to
 }
@@ -64,8 +65,8 @@ export def 'test in container' [] {
     ^$env.CNTRCTL run ...[
         --name test-nu
         --rm -it
-        -v $"($env.PWD):/etc/nushell"
-    ] io:x
+        -v $"($cwd)/scripts:/home/master/.config/nushell/scripts"
+    ] io
 }
 
 export def 'add nupm.nuon' [] {
