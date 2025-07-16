@@ -1,6 +1,21 @@
 ## neovim configurations in `nvim.lua`
 ## or https://github.com/fj0r/nvim-taberm
 
+export def nvim-send [message: string --expr] {
+    let msg = if $expr {
+        [--remote-expr $message]
+    } else {
+        [--remote-send $message]
+    }
+    nvim --headless --noplugin --server $env.NVIM ...$msg
+}
+
+export def nvim-lua [...expr: string] {
+    let var = 'remote_expr_lua_temp_var'
+    nvim-send $'<cmd>lua vim.g.($var) = nil; vim.g.($var) = ($expr | str join " ")<cr>'
+    nvim-send --expr $'g:($var)'
+}
+
 # nvim tcd
 export def tcd [path?: string] {
     let after = if ($path | is-empty) {
@@ -8,15 +23,23 @@ export def tcd [path?: string] {
     } else {
         $path
     }
-    nvim --headless --noplugin --server $env.NVIM --remote-send $"<cmd>lua HookPwdChanged\('($after)', '($env.PWD)')<cr>"
+    nvim-send $"<cmd>lua HookPwdChanged\('($after)', '($env.PWD)')<cr>"
 }
 
 export-env {
-    $env.config.hooks.env_change.PWD ++= [{|before, after|
-        if ($env.NVIM? | is-not-empty) {
-            nvim --headless --noplugin --server $env.NVIM --remote-send $"<cmd>lua HookPwdChanged\('($after)', '($before)')<cr>"
+    if ($env.NVIM? | is-not-empty) {
+        $env.config.hooks.env_change.PWD ++= [{|before, after|
+            nvim-send $"<cmd>lua HookPwdChanged\('($after)', '($before)')<cr>"
+        }]
+        if (nvim-lua 'vim.go.background') == 'light' {
+            let color = $env.config.color_config
+            | transpose k v
+            | reduce -f {} {|x,a|
+                if $x.v == 'white' { $a | insert $x.k 'black' } else { $a }
+            }
+            $env.config.color_config = $env.config.color_config | merge $color
         }
-    }]
+    }
 }
 
 # drop stdout to nvim buf
@@ -27,20 +50,7 @@ export def drop [] {
         let c = $in
         let temp = mktemp -t nuvim.XXXXXXXX | str trim
         $c | save -f $temp
-        nvim --headless --noplugin --server $env.NVIM --remote-send $"<cmd>lua ReadTempDrop\('($temp)')<cr>"
-    }
-}
-
-export def nvim-lua [...expr: string] {
-    if ($env.NVIM? | is-empty) {
-        echo "not found nvim instance"
-    } else {
-        nvim --headless --noplugin --server $env.NVIM --remote-send $'<cmd>lua vim.g.remote_expr_lua = ($expr | str join " ")<cr>'
-        do -i {
-            nvim --headless --noplugin --server $env.NVIM --remote-expr 'g:remote_expr_lua'
-        }
-        | complete
-        | get stderr
+        nvim-send $"<cmd>lua ReadTempDrop\('($temp)')<cr>"
     }
 }
 
@@ -62,7 +72,7 @@ def nve [...file:path --action(-a):string='vsplit'] {
         }
         let action = if ($file | is-empty) { $action | str replace -r 'sp.*$' 'new' } else { $action }
         let cmd = $"<cmd>($action) ($af|str join ' ')<cr>"
-        nvim --headless --noplugin --server $env.NVIM --remote-send $cmd
+        nvim-send $cmd
     }
 }
 
@@ -94,8 +104,8 @@ export def nvim-gen-service [
         NEOVIDE_SCALE_FACTOR: 1
         PREFER_ALT: 1
         SHELL: nu
-        NVIM_FLAG_COLOR: '#C5E99B'
         TERM: screen-256color
+        NVIM_LIGHT: 0
     }
     | merge $ev
     let host = match $host {

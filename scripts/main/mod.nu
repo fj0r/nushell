@@ -14,6 +14,7 @@ $env.config.completions.algorithm = 'substring' # prefix|substring|fuzzy
 $env.config.table.header_on_separator = true
 $env.config.table.mode = 'light' # light|compact
 $env.config.table.padding = 0
+$env.config.color_config.hints = 'gray'
 
 if not ($nu.data-dir | path exists) { mkdir $nu.data-dir }
 if not ($nu.cache-dir | path exists) { mkdir $nu.cache-dir }
