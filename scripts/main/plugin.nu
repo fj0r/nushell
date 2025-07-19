@@ -32,6 +32,7 @@ use history-utils *
 use history-utils/backup.nu *
 use resolvenv
 use git-cmp.nu *
+use aichat-cmp.nu *
 use rustic *
 use minio *
 use surrealdb
