@@ -116,7 +116,7 @@ export-env {
           command: []
           options: []
         - name: rustfs
-          image: quay.io/rustfs/rustfs
+          image: rustfs/rustfs
           container_name: rustfs
           daemon: true
           environment:
