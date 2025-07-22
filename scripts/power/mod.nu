@@ -12,7 +12,7 @@ export def wraptime [message action] {
 }
 
 def get_component [schema] {
-    let component = $env.NU_PROMPT_COMPONENTS | get -i $schema.source
+    let component = $env.NU_PROMPT_COMPONENTS | get -o $schema.source
     if $env.NU_POWER_BENCHMARK? == true {
         {|bg| logtime $'component ($schema.source)' {|| do $component $bg } }
     } else {
@@ -321,7 +321,7 @@ export def --env init [] {
 
 export def --env set [name setup] {
     $env.NU_POWER_CONFIG = $env.NU_POWER_CONFIG
-    | upsert $name {|x| $x | get -i $name | default {} | merge deep $setup}
+    | upsert $name {|x| $x | get -o $name | default {} | merge deep $setup}
 }
 
 export def --env register [

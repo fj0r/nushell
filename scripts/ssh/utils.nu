@@ -6,7 +6,7 @@ def cmpl-scp [cmd: string, offset: int] {
     let ssh = cmpl-ssh
     let n = $p | split row ':'
     if ($n | length) > 1 and ($n | get 0) in ($ssh | get value) {
-        ^ssh ($n | get 0) $"sh -c 'ls -dp ($n | get -i 1)*'"
+        ^ssh ($n | get 0) $"sh -c 'ls -dp ($n | get -o 1)*'"
         | lines
         | each {|x| $"($n | get 0):($x)"}
     } else {

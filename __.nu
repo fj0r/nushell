@@ -104,7 +104,7 @@ export def rename-cmpl-func [file --dry-run] {
     | lines
     | each {|x|
         let rx = "[\"'](?<x>nu-complete.*?)[\"']"
-        let rs = $x | parse -r $rx | get -i x
+        let rs = $x | parse -r $rx | get -o x
         if ($rs | is-empty) { $x } else {
             mut s = $x
             for r in $rs {

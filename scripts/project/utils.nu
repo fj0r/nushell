@@ -1,5 +1,5 @@
 export def 'scope project' [] {
-    scope modules | where name == '__' | get -i 0
+    scope modules | where name == '__' | get -o 0
 }
 
 def 'cmpl-cmd' [] {

@@ -237,7 +237,7 @@ export def scratch-edit [
     --perf-ctx: record
 ] {
     let body = $in
-    let old = sqlx $"select title, kind, body from scratch where id = ($id)" | get -i 0
+    let old = sqlx $"select title, kind, body from scratch where id = ($id)" | get -o 0
     let cfg = if ($config | is-empty) {
         let kind = if ($kind | is-empty) { $old.kind } else { $kind }
         get-config $kind --preset $preset
@@ -488,7 +488,7 @@ export def scratch-in [
         let c = if ($title | is-empty) { $"s.id = ($id)" } else { $"s.title = (Q $title)" }
         let x = sqlx $"select s.id, s.kind, p.preset from scratch as s
             left join scratch_preset as p on s.id = p.scratch_id
-            where ($c);" | get -i 0
+            where ($c);" | get -o 0
         let kind = if ($kind | is-empty) { $x.kind } else { $kind }
         let preset = if ($preset | is-empty) { $x.preset } else { $preset }
         let id = if ($id | is-empty) { $x.id } else { $id }
@@ -523,7 +523,7 @@ export def scratch-out [
         }
         let x = sqlx $"select s.body, s.kind, p.preset from scratch as s
             left join scratch_preset as p on s.id = p.scratch_id
-            where s.id = ($id);" | get -i 0
+            where s.id = ($id);" | get -o 0
         let kind = if ($kind | is-empty) { $x.kind } else { $kind }
         let cfg = get-config $kind --preset $preset
         let preset = if ($preset | is-empty) { $x.preset } else { $preset }
@@ -546,16 +546,16 @@ export def scratch-flush [
     let c = if ($title | is-empty) { $"id = ($id)" } else { $"title = (Q $title)" }
     let r = sqlx $"select id, title, kind from scratch where ($c);"
 
-    let sid = $r | get -i 0.id
+    let sid = $r | get -o 0.id
 
     let kind = if ($kind | is-empty) {
-        $r | get -i 0.kind | default 'md'
+        $r | get -o 0.kind | default 'md'
     } else {
         $kind
     }
 
     let title = if ($title | is-empty) {
-        $r | get -i 0.title
+        $r | get -o 0.title
     } else {
         $title
     }
@@ -580,7 +580,7 @@ export def scratch-upsert-kind [
     let x = if ($name | is-empty) {
         {}
     } else {
-        sqlx $"select * from kind where name = (Q $name)" | get -i 0
+        sqlx $"select * from kind where name = (Q $name)" | get -o 0
     }
     $x | upsert-kind --delete=$delete --action {|config|
         let o = $in
@@ -605,7 +605,7 @@ export def scratch-upsert-preset [
     let x = if ($kind | is-empty) {
         {}
     } else {
-        sqlx $"select * from kind_preset where kind = (Q $kind) and name = (Q $name)" | get -i 0
+        sqlx $"select * from kind_preset where kind = (Q $kind) and name = (Q $name)" | get -o 0
     }
     $x | upsert-kind-preset --delete=$delete --action {|config|
         let o = $in

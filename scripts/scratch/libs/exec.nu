@@ -84,7 +84,7 @@ export def performance [
     match $config.runner {
         'file' | 'dir' | 'docker' | 'container' | 'raw' => {
             let opt = sqlx $"select data from kind_preset where kind = (Q $config.name) and name = (Q $preset)"
-            | get -i 0.data | default '{}' | from yaml
+            | get -o 0.data | default '{}' | from yaml
 
             let f = if ($context | is-empty) {
                 $o | mktmpdir $'scratch-XXXXXX' $config.entry --kind $config.name
@@ -159,8 +159,8 @@ export def cmpl-kind-preset [ctx] {
         sqlx $"select name as value, kind as description from kind_preset"
     } else {
         let k = $ctx | argx parse
-        let k1 = $k | get -i opt.kind
-        let k2 = $k | get -i pos.kind
+        let k1 = $k | get -o opt.kind
+        let k2 = $k | get -o pos.kind
         let k = ($k1 | default $k2)
         sqlx $"select name as value, kind as description from kind_preset where kind = (Q $k)"
     }

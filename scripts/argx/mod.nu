@@ -2,10 +2,10 @@ export def get-ast [offset?: int] {
     let d = ast $in -j -m | get block | from json
     let cur = if ($offset | is-empty) {
         $d
-        | get -i pipelines | last
+        | get -o pipelines | last
         | get elements | last
     } else {
-        let p = $d | get -i pipelines
+        let p = $d | get -o pipelines
         let o = $d.span.start + $offset
         mut r = null
         for i in $p {
@@ -96,7 +96,7 @@ export def parse [offset?: int] {
 
     let sign = scope commands
     | where decl_id == $ast.decl_id | first
-    | get -i signatures?.any?
+    | get -o signatures?.any?
     | insert name {|y|
         if ($y.parameter_name | is-empty) {
             $y.short_flag
@@ -117,7 +117,7 @@ export def parse [offset?: int] {
     let sign = $sign | group-by parameter_type
 
     let opt = $sign.named? | default []
-    | get -i name
+    | get -o name
     | reduce -f $x.opt {|i, a|
         if ($i in $defaults) and ($i not-in $a) {
             $a | insert $i ($defaults | get $i)
@@ -130,8 +130,8 @@ export def parse [offset?: int] {
     | get name
     | enumerate
     | reduce -f {} {|it, acc|
-        let v = $x.args | get -i $it.index
-        let v = if ($v | is-empty) { $defaults | get -i $it.item } else { $v }
+        let v = $x.args | get -o $it.index
+        let v = if ($v | is-empty) { $defaults | get -o $it.item } else { $v }
         $acc | insert $it.item $v
     }
 

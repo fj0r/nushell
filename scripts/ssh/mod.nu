@@ -71,7 +71,7 @@ export def ssh-switch  [
             let v = if ($environ | is-empty) {
                 $v
             } else {
-                $v | merge ($j.v | get -i $environ | default {})
+                $v | merge ($j.v | get -o $environ | default {})
             }
             for l in ($v | transpose k v) {
                 if ($l.v | is-not-empty) {
@@ -106,7 +106,7 @@ export def cmpl-ssh [] {
             if ($e.environ? | is-empty) {
                 $y.v.default
             } else {
-                $y.v.default | merge ($y.v | get -i $e.environ | default {})
+                $y.v.default | merge ($y.v | get -o $e.environ | default {})
             }
             | insert name $y.k
         }

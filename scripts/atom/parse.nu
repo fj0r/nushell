@@ -19,7 +19,7 @@ def tomd [] {
 
 export def feed-parse-body [] {
     let x = $in
-    if ($x.attributes | get -i version) == '2.0' {
+    if ($x.attributes | get -o version) == '2.0' {
         let e = $x
         | get content.0.content
         | where tag == 'item'
@@ -28,8 +28,8 @@ export def feed-parse-body [] {
         $e
     } else {
         let x = $x.content
-        let u = $x | where tag == 'updated' | get -i 0.content.0.content
-        let t = $x | where tag == 'title' | get -i 0.content.0.content
+        let u = $x | where tag == 'updated' | get -o 0.content.0.content
+        let t = $x | where tag == 'title' | get -o 0.content.0.content
         let e = $x
         | where tag == 'entry'
         | get content
@@ -46,15 +46,15 @@ export def feed-parse-content [] {
             let d = match $y.tag {
                 link => [
                     link
-                    ($y.attributes | get -i href | default {$y| get -i content.0.content})
+                    ($y.attributes | get -o href | default {$y| get -o content.0.content})
                 ]
                 encoded | content => [
                     content
-                    ($y | get -i content.0.content | tomd)
+                    ($y | get -o content.0.content | tomd)
                 ]
                 description => [
                     description
-                    ($y | get -i content.0.content | tomd)
+                    ($y | get -o content.0.content | tomd)
                 ]
                 thumbnail => [
                     thumbnail
@@ -62,19 +62,19 @@ export def feed-parse-content [] {
                 ]
                 author => [
                     author
-                    ($y | get -i content.0.content)
+                    ($y | get -o content.0.content)
                 ]
                 updated | pubDate => [
                     updated
-                    ($y | get -i content.0.content | into datetime)
+                    ($y | get -o content.0.content | into datetime)
                 ]
                 id | guid => [
                     id
-                    ($y | get -i content.0.content)
+                    ($y | get -o content.0.content)
                 ]
                 _ => [
                     $y.tag
-                    ($y | get -i content.0.content)
+                    ($y | get -o content.0.content)
                 ]
             }
             $a | upsert $d.0 $d.1

@@ -146,7 +146,7 @@ def 'tag tree' [] {
 
 def tag-tree [x r={}] {
     let t = $x.tags.0? | default ''
-    let o = $r | get -i $t | default {}
+    let o = $r | get -o $t | default {}
     if ($x.tags | length) > 0 {
         $r | upsert $x.tags.0 (
             tag-tree ($x | update tags ($x.tags | slice 1..)) $o
@@ -195,7 +195,7 @@ def map-acc [acc:record merge?:record] {
         let v = if ($merge | describe) == 'nothing' {
             $o | do $v.0 $o
         } else {
-            let o = [$o $merge] | each { $in | get -i $k | default 0 }
+            let o = [$o $merge] | each { $in | get -o $k | default 0 }
             $o | do $v.1 $o
         }
         {k: $k, v: $v}
@@ -285,7 +285,7 @@ def 'fmt leaves' [
     let dd = if $o.done == 0 { [deadline] } else { [] }
     let meta = [important urgent challenge ...$dd created updated]
     | each {|x|
-        let y = $o | get -i $x
+        let y = $o | get -o $x
         let z = match ($y | describe) {
             int => $y
             string => {$y | str length}

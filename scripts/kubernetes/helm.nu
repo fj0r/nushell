@@ -122,7 +122,7 @@ export def kube-diff-helm [
         let cntr = [spec template spec containers] | into cell-path
 
         $tg | each {|x|
-            let c = $x | get -i $cntr
+            let c = $x | get -o $cntr
             if ($c | is-not-empty) {
                 let c = $c | each {|y|
                     if $ignore_image {

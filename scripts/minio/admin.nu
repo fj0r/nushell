@@ -44,7 +44,7 @@ export def 'mc-accesskey ls' [--target(-t): string@mc-alias] {
 }
 
 def 'nu-cmp mc-accesskey' [context: string] {
-    let target = $context | argx parse | get -i opt.target | mctg
+    let target = $context | argx parse | get -o opt.target | mctg
     mc-accesskey ls -t ($target | mctg)
     | each {|x|
         {
@@ -130,7 +130,7 @@ export def 'mc-policy ls' [--target(-t): string@mc-alias] {
 }
 
 def 'nu-cmp mc-policy' [context] {
-    let t = $context | argx parse | get -i opt.target | mctg
+    let t = $context | argx parse | get -o opt.target | mctg
     mc-policy ls -t $t
 }
 
@@ -206,7 +206,7 @@ export def 'mc-policy' [
 }
 
 def 'nu-cmp mc-users' [context] {
-    let t = $context | argx parse | get -i opt.target | mctg
+    let t = $context | argx parse | get -o opt.target | mctg
     [
         ...(mc-accesskey ls -t $t)
         ...(mc-users -t $t)
