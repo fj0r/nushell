@@ -17,7 +17,7 @@ def --env merge-path [path] {
     | flatten
     | where {|x| $x not-in $env.PATH }
     for x in $p {
-        $env.PATH = ($env.PATH | prepend $x)
+        $env.PATH = $env.PATH | prepend $x
     }
 }
 
@@ -26,23 +26,23 @@ if $nu.os-info.family == 'windows'  {
     $env.HOME = $env.HOMEPATH
 } else {
     merge-path [
-        $'($env.HOME)/.cargo/bin'
-        $'($env.HOME)/.ghcup/bin'
-        $'($env.HOME)/.local/bin'
-        '/opt/*/bin'
-        $'($env.LS_ROOT?)/*/bin'
+        ($env.HOME)/.cargo/bin
+        ($env.HOME)/.ghcup/bin
+        ($env.HOME)/.local/bin
+        /opt/*/bin
+        ($env.LS_ROOT?)/*/bin
     ]
 }
 
-$env.LD_LIBRARY_PATH = (if ($env.LD_LIBRARY_PATH? | is-empty) { [] } else { $env.LD_LIBRARY_PATH })
-$env.LD_LIBRARY_PATH = (do -i {
+$env.LD_LIBRARY_PATH = if ($env.LD_LIBRARY_PATH? | is-empty) { [] } else { $env.LD_LIBRARY_PATH }
+$env.LD_LIBRARY_PATH = do -i {
     $env.LD_LIBRARY_PATH
     | prepend (
         ls ((stack ghc -- --print-libdir) | str trim)
         | where type == dir
         | get name
         )
-})
+}
 
 for s in ['/usr/local/bin', '/usr/bin'] {
     let p = [$s, 'nu'] | path join
