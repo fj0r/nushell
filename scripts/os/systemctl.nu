@@ -193,13 +193,13 @@ export def generate-systemd-service [
                     }
                 }
                 _ => {
-                    $r ++= [$"($j.k)=($j.v)"]
+                    $r ++= [($j.k)=($j.v)]
                 }
             }
         }
         $r | str join "\n"
     }
-    | str join $"\n\n"
+    | str join "\n\n"
     if $exec {
         let s = $"($name).service"
         if $system {

@@ -420,7 +420,7 @@ export def volume-restore [
 }
 
 
-def host-path [path] {
+export def host-path [path] {
     match ($path | str substring ..<1) {
         '/' => { $path }
         '=' => { $path | str substring 1.. }
