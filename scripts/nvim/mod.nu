@@ -182,3 +182,9 @@ export def nvc [
         nvim --remote-ui ...$cmd
     }
 }
+
+export def nvide [...args] {
+    job spawn {
+        neovide --maximized --frame=none ...$args
+    }
+}
