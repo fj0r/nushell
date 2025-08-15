@@ -102,6 +102,7 @@ export def nvim-gen-service [
         HOSTNAME: (hostname)
         NVIM_FONT: nar11
         NEOVIDE_SCALE_FACTOR: 1
+        WAYLAND_DISPLAY: wayland-0
         PREFER_ALT: 1
         SHELL: nu
         TERM: screen-256color
@@ -113,7 +114,7 @@ export def nvim-gen-service [
         all => '0.0.0.0'
         _ => $host
     }
-    let cmd = $"($bin) --listen ($host):($port) --headless +'set title titlestring=\\|($name)\\|' +terminal"
+    let cmd = $"($bin) --listen ($host):($port) --headless +'set title titlestring=\\|($name)\\|'"
     use os/systemctl.nu *
     generate-systemd-service $"nvim:($name)" --cmd $cmd --system=$sys --environment $ev --user $user --exec=$exec
     # ~/.config/systemd/user/
@@ -185,6 +186,7 @@ export def nvc [
 
 export def nvide [...args] {
     job spawn {
+        $env.NVIM_LIGHT = '1'
         neovide --maximized --frame=none ...$args
     }
 }
