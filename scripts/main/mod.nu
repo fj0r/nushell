@@ -1,4 +1,4 @@
-const __dyn_load = if ('~/.env.nu' | path exists) { '~/.env.nu' } else { null }
+const __dyn_load = if ('~/.env.nu' | path exists) { '~/.env.nu' }
 source $__dyn_load
 source env.nu
 
@@ -22,7 +22,7 @@ if not ($nu.cache-dir | path exists) { mkdir $nu.cache-dir }
 
 source plugin.nu
 
-const __dyn_load = if ('~/.nu' | path exists) { '~/.nu' } else { null }
+const __dyn_load = if ('~/.nu' | path exists) { '~/.nu' }
 source $__dyn_load
 
 source keymaps.nu
