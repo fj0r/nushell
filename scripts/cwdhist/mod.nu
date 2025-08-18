@@ -16,7 +16,8 @@ export def 'cwd history clean' [keyword] {
     }
 }
 
-def list [keyword] {
+export def 'cwd history list' [keyword] {
+    let keyword = quote '%' ($keyword | split row ' ' | last) '%'
     if $env.CWD_HISTORY_FULL {
         open $nu.history-path | query db $"
             select cwd as value, count\(*\) as cnt
@@ -49,6 +50,17 @@ def init [] {
     }
 }
 
+def enter [path] {
+    open $env.CWD_HISTORY_FILE
+    | query db $"
+        insert into cwd_history\(cwd\)
+            values \((quote $path)\)
+        on conflict\(cwd\)
+        do update set
+            count = count + 1,
+            recent = datetime\('now', 'localtime');"
+}
+
 export-env {
     $env.CWD_HISTORY_FULL = false
     $env.CWD_HISTORY_FILE = $nu.data-dir | path join 'cwd_history.sqlite'
@@ -63,14 +75,7 @@ export-env {
         } else {
             ['~', $suffix] | path join
         }
-        open $env.CWD_HISTORY_FILE
-        | query db $"
-            insert into cwd_history\(cwd\)
-                values \((quote $path)\)
-            on conflict\(cwd\)
-            do update set
-                count = count + 1,
-                recent = datetime\('now', 'localtime');"
+        enter $path
     }]
 
     $env.config.menus ++= [{
@@ -88,8 +93,7 @@ export-env {
         }
         source: { |buffer, position|
             #$"[($position)]($buffer);(char newline)" | save -a ~/.cache/cwdhist.log
-            let t = quote '%' ($buffer | split row ' ' | last) '%'
-            list $t
+            cwd history list $buffer
         }
     }]
     $env.config.keybindings ++= [
