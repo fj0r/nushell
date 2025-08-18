@@ -82,7 +82,6 @@ export def c [...file:path] { nve ...$file -a split }
 export def x [...file:path] { nve ...$file -a tabnew }
 
 export def nvs [--port(-p): int=9999, --host(-h): string='0.0.0.0'] {
-    $env.NVIM_FONT = 'nar12'
     $env.NEOVIDE_SCALE_FACTOR = 1
     print $"(ansi grey)neovim listen on ($host):($port)(ansi reset)"
     nvim --headless --listen $"($host):($port)"
@@ -100,7 +99,6 @@ export def nvim-gen-service [
     let user = whoami
     let ev = {
         HOSTNAME: (hostname)
-        NVIM_FONT: nar11
         NEOVIDE_SCALE_FACTOR: 1
         WAYLAND_DISPLAY: wayland-0
         PREFER_ALT: 1
