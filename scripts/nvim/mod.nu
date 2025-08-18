@@ -184,9 +184,27 @@ export def nvc [
     }
 }
 
-export def nvide [...args] {
+export def cmpl-cwdhist [context] {
+    let kw = $context | split row ' ' | last
+    use cwdhist *
+    cwd history list $kw
+    | rename value description
+    | { completions: $in, options: { sort: false } }
+}
+
+export def cmpl-cwdhist-files [context] {
+    let p = $context | argx parse | get -o pos.path
+    cd $p
+    ls | get name
+}
+
+export def nvide [
+    path:string@cmpl-cwdhist
+    ...files:string@cmpl-cwdhist-files
+] {
     job spawn {
+        cd $path
         $env.NVIM_LIGHT = '1'
-        neovide --maximized --frame=none ...$args
+        neovide --maximized --frame=none ...$files
     }
 }

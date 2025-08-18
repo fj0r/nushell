@@ -16,8 +16,8 @@ export def 'cwd history clean' [keyword] {
     }
 }
 
-export def 'cwd history list' [keyword] {
-    let keyword = quote '%' ($keyword | split row ' ' | last) '%'
+export def 'cwd history list' [keyword --limit=20] {
+    let keyword = quote '%' $keyword '%'
     if $env.CWD_HISTORY_FULL {
         open $nu.history-path | query db $"
             select cwd as value, count\(*\) as cnt
@@ -25,7 +25,7 @@ export def 'cwd history list' [keyword] {
             where cwd like ($keyword)
             group by cwd
             order by cnt desc
-            limit 50
+            limit ($limit)
             ;"
     } else {
         open $env.CWD_HISTORY_FILE | query db $"
@@ -33,7 +33,7 @@ export def 'cwd history list' [keyword] {
             from cwd_history
             where cwd like ($keyword)
             order by count desc
-            limit 50
+            limit ($limit)
             ;"
     }
 }
@@ -93,7 +93,7 @@ export-env {
         }
         source: { |buffer, position|
             #$"[($position)]($buffer);(char newline)" | save -a ~/.cache/cwdhist.log
-            cwd history list $buffer
+            cwd history list ($buffer | split row ' ' | last)
         }
     }]
     $env.config.keybindings ++= [
