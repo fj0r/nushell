@@ -16,10 +16,28 @@ export def 'cwd history clean' [keyword] {
     }
 }
 
-export-env {
-    $env.CWD_HISTORY_FULL = false
-    $env.CWD_HISTORY_FILE = $nu.data-dir | path join 'cwd_history.sqlite'
+def list [keyword] {
+    if $env.CWD_HISTORY_FULL {
+        open $nu.history-path | query db $"
+            select cwd as value, count\(*\) as cnt
+            from history
+            where cwd like ($keyword)
+            group by cwd
+            order by cnt desc
+            limit 50
+            ;"
+    } else {
+        open $env.CWD_HISTORY_FILE | query db $"
+            select cwd as value, count
+            from cwd_history
+            where cwd like ($keyword)
+            order by count desc
+            limit 50
+            ;"
+    }
+}
 
+def init [] {
     if not ($env.CWD_HISTORY_FILE | path exists) {
         {_: '.'} | into sqlite -t _ $env.CWD_HISTORY_FILE
         print $"(ansi grey)created database: $env.CWD_HISTORY_FILE(ansi reset)"
@@ -29,6 +47,13 @@ export-env {
             recent datetime default (datetime('now', 'localtime'))
         );"
     }
+}
+
+export-env {
+    $env.CWD_HISTORY_FULL = false
+    $env.CWD_HISTORY_FILE = $nu.data-dir | path join 'cwd_history.sqlite'
+
+    init
 
     $env.config.hooks.env_change.PWD ++= [{|_, dir|
         if $dir == $nu.home-path { return }
@@ -64,24 +89,7 @@ export-env {
         source: { |buffer, position|
             #$"[($position)]($buffer);(char newline)" | save -a ~/.cache/cwdhist.log
             let t = quote '%' ($buffer | split row ' ' | last) '%'
-            if $env.CWD_HISTORY_FULL {
-                open $nu.history-path | query db $"
-                    select cwd as value, count\(*\) as cnt
-                    from history
-                    where cwd like ($t)
-                    group by cwd
-                    order by cnt desc
-                    limit 50
-                    ;"
-            } else {
-                open $env.CWD_HISTORY_FILE | query db $"
-                    select cwd as value, count
-                    from cwd_history
-                    where cwd like ($t)
-                    order by count desc
-                    limit 50
-                    ;"
-            }
+            list $t
         }
     }]
     $env.config.keybindings ++= [
