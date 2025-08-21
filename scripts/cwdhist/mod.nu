@@ -20,11 +20,11 @@ export def 'cwd history list' [keyword --limit=20] {
     let keyword = quote '%' $keyword '%'
     if $env.CWD_HISTORY_FULL {
         open $nu.history-path | query db $"
-            select cwd as value, count\(*\) as cnt
+            select cwd as value, count\(*\) as count
             from history
             where cwd like ($keyword)
-            group by cwd
-            order by cnt desc
+            group by value
+            order by count desc
             limit ($limit)
             ;"
     } else {
