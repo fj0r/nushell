@@ -509,7 +509,7 @@ export def --wrapped container-create [
             }
             let k = port $p
             let v = if $is_udp { $"($i.v)/udp" } else { $"($i.v)" }
-            print $"(ansi grey)port: ($k) (if $k == $p {'->'} else {'=>'}) ($v)"
+            print $"(ansi grey)port: ($k) (if $k == $p {'->'} else {'=>'}) ($v)(ansi reset)"
             $args ++= [-p $"($k):($v)"]
         }
     }
