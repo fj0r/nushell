@@ -85,7 +85,7 @@ export def 'history top' [
     num=10
     --before (-b): duration
     --dir (-d)
-    --path(-p): list<string@cmpl-history-dir>
+    --path(-p): list<string>@cmpl-history-dir
 ] {
     open $nu.history-path | query db (sql {
         from: [history]

@@ -14,7 +14,7 @@ export-env {
 
         $env.config.hooks.env_change.PWD ++= [
             {
-                condition: {|_, after| '__' in (overlay list) }
+                condition: {|_, after| '__' in (overlay list | get name) }
                 code: ([
                     $"hide __" # HACK: clean
                     $"overlay hide __ --keep-env [ PWD OLDPWD ]"

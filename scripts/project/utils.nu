@@ -33,12 +33,12 @@ export def 'run-and-watch' [
     action
 ] {
     do $action '' '' ''
-    watch $path -g $glob -q {|op, path, new_path|
-        if $op in ['Write'] {
-            if $clear { ansi cls }
-            do $action $op $path $new_path
-            if not $clear { print $"(char newline)(ansi grey)------(ansi reset)(char newline)" }
-        }
+    watch $path -g $glob -q
+    | where operation in ['Write']
+    | each {
+        if $clear { ansi cls }
+        do $action $in
+        if not $clear { print $"(char newline)(ansi grey)------(ansi reset)(char newline)" }
     }
 }
 

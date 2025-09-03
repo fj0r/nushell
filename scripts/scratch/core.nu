@@ -19,7 +19,7 @@ export def scratch-list [
     --created: duration
     --deadline: duration
     --relevant(-r): int@cmpl-relevant-id
-    --sort: list<string@cmpl-sort>
+    --sort: list<string>@cmpl-sort
     --done(-x):int
     --raw
     --md(-m)
@@ -634,12 +634,12 @@ export def scratch-editor-run [
     let transform = $transform | default {{|x| print $x }}
     do $transform (run-cmd $ctx)
     if $watch {
-        watch . -g $ctx.entry -q  {|op, path, new_path|
-            if $op in ['Write'] {
-                if $clear { ansi cls }
-                do $transform (run-cmd $ctx)
-                if not $clear { print $"(char newline)(ansi grey)------(ansi reset)(char newline)" }
-            }
+        watch . -g $ctx.entry -q
+        | where operation in ['Write']
+        | each {
+            if $clear { ansi cls }
+            do $transform (run-cmd $ctx)
+            if not $clear { print $"(char newline)(ansi grey)------(ansi reset)(char newline)" }
         }
     }
 }
