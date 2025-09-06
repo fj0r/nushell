@@ -14,9 +14,9 @@ export-env {
 
         $env.config.hooks.env_change.PWD ++= [
             {
-                condition: {|_, after| '__' in (overlay list | get name) }
+                condition: {|_, after| '__' in (overlay list | where active | get name) }
                 code: ([
-                    $"hide __" # HACK: clean
+                    #$"hide __" # HACK: clean
                     $"overlay hide __ --keep-env [ PWD OLDPWD ]"
                     $"print '(ansi default_italic)(ansi grey)unload overlay (ansi default_bold)__(ansi reset)'"
                 ] | str join (char newline))
@@ -25,7 +25,7 @@ export-env {
                 condition: {|_, after| $after | path join __.nu | path exists }
                 code: ([
                     $load_msg
-                    $"overlay use -r -p __.nu as __"
+                    $"overlay use --reload --prefix __.nu as __"
                     $"direnv __"
                     #$"project register $after --mod __"
                 ] | str join (char newline))
