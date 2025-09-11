@@ -203,6 +203,6 @@ export def nvide [
     job spawn {
         cd $path
         $env.NVIM_LIGHT = '1'
-        neovide --maximized --frame=none ...$files
+        neovide --maximized --frame=none --vsync --fork ...$files
     }
 }
