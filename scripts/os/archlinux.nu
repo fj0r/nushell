@@ -69,8 +69,6 @@ export def --wrapped pa [
         paru -Rcns $remove
     } else if ($args | is-empty) {
         paru -Syu
-    } else if ($args | all { not ($in | str starts-with '-') }) {
-        paru -S ...$args
     } else {
         paru ...$args
     }
