@@ -379,6 +379,24 @@ export def kube-scale-deployment [
     }
 }
 
+# kubectl list image
+export def kube-list-image [
+    --namespace(-n): string@cmpl-kube-ns
+] {
+    mut args = []
+    if ($namespace | is-not-empty) {
+        $args ++= [-n $namespace]
+    }
+    kubectl get deployment ...$args -o jsonpath='{range .items[*]}{"["}{.metadata.name}{"]"}{range .spec.template.spec.containers[*]}{.name}={.image},{end}{"|+|"}{end}' | split row '|+|'
+    | parse -r '\[(?<deployment>.+)\](?<images>.+)'
+    | update images {|x|
+        $x.images
+        | split row ','
+        | where { $in | is-not-empty }
+        | split column '=' name image
+    }
+}
+
 # kubectl set image
 export def kube-set-image [
     kind: string@cmpl-kube-kind-with-image

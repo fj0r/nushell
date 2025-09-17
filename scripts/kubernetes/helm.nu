@@ -97,6 +97,20 @@ export def kube-diff-helm [
     if ($namespace | is-not-empty) {
         $args ++= [-n $namespace]
     }
+    let images = if $ignore_image {
+        kubectl get deployment ...$args -o jsonpath='{range .items[*]}{"["}{.metadata.name}{"]"}{range .spec.template.spec.containers[*]}{.name}={.image},{end}{"|+|"}{end}' | split row '|+|'
+        | parse -r '\[(?<deploy>.+)\](?<images>.+)'
+        | update images {|x|
+            $x.images
+            | split row ','
+            | where { $in | is-not-empty }
+            | split column '=' name image
+            | reduce -f {} {|i, a| $a | upsert $i.name $i.image }
+        }
+        | reduce -f {} {|i, a| $a | upsert $i.deploy $i.images }
+    } else {
+        {}
+    }
     if $has_plugin {
         helm diff $name $chart -f $valuefile ...$args
     } else {
@@ -113,20 +127,19 @@ export def kube-diff-helm [
         if ($values | is-not-empty) {
             $args ++= [--set-json (record-to-set-json $values)]
         }
-        if ($namespace | is-not-empty) {
-            $args ++= [-n $namespace]
-        }
         let target = mktemp -t 'helm.XXX.out.yaml'
         let tg = helm template --debug $name $chart -f $valuefile ...$args
         | from yaml
         let cntr = [spec template spec containers] | into cell-path
 
         $tg | each {|x|
+            let n = $x | get -o metadata.name
             let c = $x | get -o $cntr
-            if ($c | is-not-empty) {
+            if ($x.kind == 'Deployment') and ($n in $images) {
+                let i = $images | get $n
                 let c = $c | each {|y|
-                    if $ignore_image {
-                        $y | reject image
+                    if $y.name in $i {
+                        $y | update image ($i | get $y.name)
                     } else {
                         $y
                     }
