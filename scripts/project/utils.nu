@@ -71,16 +71,16 @@ export def --env direnv [
 export def --env nd [
     dir
     --surrfix(-s)="--"
-    --keep(-k)
+    --temp(-t)
 ] {
-    let dir = if $keep {
+    let dir = if not $temp {
         $dir
     } else {
         $"($surrfix)($dir)($surrfix)" | path expand
     }
     mkdir $dir
     cd $dir
-    if not $keep {
+    if $temp {
         $env.config.hooks.env_change.PWD ++= [
             {
                 condition: {|before, after| $before == $dir }
