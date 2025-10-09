@@ -35,6 +35,7 @@ use git-cmp.nu *
 use aichat-cmp.nu *
 use rustic *
 use minio *
+use cdp *
 use surrealdb
 #use just.nu *
 #use completion-generator.nu *
