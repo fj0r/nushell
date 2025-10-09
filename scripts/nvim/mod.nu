@@ -197,12 +197,13 @@ export def cmpl-cwdhist-files [context] {
 }
 
 export def nvide [
-    path:string@cmpl-cwdhist
-    ...files:string@cmpl-cwdhist-files
+    path?:string@cmpl-cwdhist
 ] {
     job spawn {
-        cd $path
+        if ($path | is-not-empty) {
+            cd $path
+        }
         $env.NVIM_LIGHT = '1'
-        neovide --maximized --frame=none --vsync --fork ...$files
+        neovide --maximized --frame=none --vsync --fork
     }
 }
