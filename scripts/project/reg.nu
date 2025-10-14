@@ -49,7 +49,7 @@ export def --env 'project init-registry' [] {
 export def 'project global' [
     dir:string@cmpl-dir
     ...cmd:string@cmpl-cmd
-    --prefix:string='__'
+    --prefix:string='%'
     --mods(-m): list<any>
 ] {
     cd $dir
@@ -77,9 +77,9 @@ export def 'project global' [
     let cmd = [
         'use project'
         ...$mods
-        'project direnv __'
-        'overlay use -r __.nu as __ -p'
-        $'__ ($cmd | str join " ")'
+        'project direnv %'
+        'overlay use -r %.nu as % -p'
+        $'% ($cmd | str join " ")'
     ]
     | str join '; '
 
@@ -96,7 +96,7 @@ def sqlx [s] {
 }
 
 export def --env 'project register' [
-    --mod:string='__'
+    --mod:string='%'
     dir?:string
 ] {
     let dir = if ($dir | is-empty) { $env.PWD } else { $dir }

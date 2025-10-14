@@ -100,7 +100,7 @@ export def git-hooks-context [] {
 
 export def git-install-hooks [
     ...hooks:string@cmpl-hooks
-    --mod(-m)="__"
+    --mod(-m)="%"
     --fun(-f)="git-hooks"
 ] {
     let c = git-cdup

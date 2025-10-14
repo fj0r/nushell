@@ -7,34 +7,34 @@ export-env {
     if 'config' in $env {
         project init-registry
 
-        let load_msg = $"print '(ansi default_italic)(ansi grey)`__.nu` as overlay (ansi default_bold)__(ansi reset)'"
+        let load_msg = $"print '(ansi default_italic)(ansi grey)`%.nu` as overlay (ansi default_bold)%(ansi reset)'"
 
         $env.config.hooks.env_change = $env.config.hooks.env_change
         | upsert 'PWD' {|x| $x.PWD? | default [] }
 
         $env.config.hooks.env_change.PWD ++= [
             {
-                condition: {|_, after| '__' in (overlay list | where active | get name) }
+                condition: {|_, after| '%' in (overlay list | where active | get name) }
                 code: ([
-                    #$"hide __" # HACK: clean
-                    $"overlay hide __ --keep-env [ PWD OLDPWD ]"
-                    $"print '(ansi default_italic)(ansi grey)unload overlay (ansi default_bold)__(ansi reset)'"
+                    #$"hide %" # HACK: clean
+                    $"overlay hide % --keep-env [ PWD OLDPWD ]"
+                    $"print '(ansi default_italic)(ansi grey)unload overlay (ansi default_bold)%(ansi reset)'"
                 ] | str join (char newline))
             }
             {
-                condition: {|_, after| $after | path join __.nu | path exists }
+                condition: {|_, after| $after | path join %.nu | path exists }
                 code: ([
                     $load_msg
-                    $"overlay use --reload --prefix __.nu as __"
-                    $"direnv __"
-                    #$"project register $after --mod __"
+                    $"overlay use --reload --prefix %.nu as %"
+                    $"direnv %"
+                    #$"project register $after --mod %"
                 ] | str join (char newline))
             }
         ]
 
         let cmd = [
-            $"overlay use -r __.nu as __ -p"
-            $"direnv __"
+            $"overlay use -r %.nu as % -p"
+            $"direnv %"
             $load_msg
         ]
         | str join '; '
