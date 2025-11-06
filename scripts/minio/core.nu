@@ -1,7 +1,7 @@
 use argx
 
 export def mc-alias [] {
-    ^mc alias ls --json
+    ^mcli alias ls --json
     | from json -o
     | each {|x|
         {
@@ -41,7 +41,7 @@ export def 'nu-cmp mc-dest' [context: string] {
 export def mc-ls [
     src: string@'nu-cmp mc-src'
 ] {
-    ^mc ls $src --json
+    ^mcli ls $src --json
     | from json -o
     | each {|x|
         let t = match $x.type {
@@ -65,19 +65,19 @@ export def --wrapped mc-rm [
     src: string@'nu-cmp mc-src'
     ...args
 ] {
-    ^mc rm ...$args $src
+    ^mcli rm ...$args $src
 }
 
 export def mc-du [
     src: string@'nu-cmp mc-src'
 ] {
-    ^mc du $src
+    ^mcli du $src
 }
 
 export def mc-tree [
     src: string@'nu-cmp mc-src'
 ] {
-    ^mc tree $src
+    ^mcli tree $src
 }
 
 export def --wrapped mc-mv [
@@ -85,7 +85,7 @@ export def --wrapped mc-mv [
     dest: string@'nu-cmp mc-dest'
     ...args
 ] {
-    ^mc mv ...args $src $dest
+    ^mcli mv ...args $src $dest
 }
 
 export def --wrapped  mc-cp [
@@ -93,7 +93,7 @@ export def --wrapped  mc-cp [
     dest: string@'nu-cmp mc-dest'
     ...args
 ] {
-    ^mc cp ...$args $src $dest
+    ^mcli cp ...$args $src $dest
 }
 
 export def --wrapped mc-put [
@@ -101,5 +101,5 @@ export def --wrapped mc-put [
     dest: string@'nu-cmp mc-dest'
     ...args
 ] {
-    ^mc put ...$args $src $dest
+    ^mcli put ...$args $src $dest
 }

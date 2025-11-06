@@ -10,7 +10,7 @@ def mctg [] {
 }
 
 export def mc-users [--target(-t): string@mc-alias] {
-    ^mc admin user list ($target | mctg) --json | from json -o
+    ^mcli admin user list ($target | mctg) --json | from json -o
 }
 
 export def mc-user-add [
@@ -18,7 +18,7 @@ export def mc-user-add [
     secretkey: string
     --target(-t): string@mc-alias
 ] {
-    ^mc admin user add ($target | mctg) $accesskey $secretkey
+    ^mcli admin user add ($target | mctg) $accesskey $secretkey
 }
 
 def expand-keys [x, keys, -t: string] {
@@ -34,7 +34,7 @@ def expand-keys [x, keys, -t: string] {
 }
 
 export def 'mc-accesskey ls' [--target(-t): string@mc-alias] {
-    ^mc admin accesskey ls ($target | mctg) --json
+    ^mcli admin accesskey ls ($target | mctg) --json
     | from json -o
     | each {|x|
         expand-keys $x $x.stsKeys -t stsKeys
@@ -64,7 +64,7 @@ export def mc-accesskey [
     --target(-t): string@mc-alias
     ...args
 ] {
-    ^mc admin accesskey $sub ($target | mctg) $key ...$args
+    ^mcli admin accesskey $sub ($target | mctg) $key ...$args
 }
 
 
@@ -93,7 +93,7 @@ export def 'mc-accesskey edit' [
     if ($limit_upload | is-not-empty) { $args ++= [--limit_upload $limit_upload] }
     if ($limit_download | is-not-empty) { $args ++= [--limit_download $limit_download] }
     if ($custom_header | is-not-empty) { $args ++= [--custom-header $custom_header] }
-    ^mc admin accesskey edit ($target | mctg) $key ...$args
+    ^mcli admin accesskey edit ($target | mctg) $key ...$args
 }
 
 
@@ -121,12 +121,12 @@ export def 'mc-accesskey create' [
     if ($limit_upload | is-not-empty) { $args ++= [--limit_upload $limit_upload] }
     if ($limit_download | is-not-empty) { $args ++= [--limit_download $limit_download] }
     if ($custom_header | is-not-empty) { $args ++= [--custom-header $custom_header] }
-    ^mc admin accesskey create ($target | mctg) ...$args
+    ^mcli admin accesskey create ($target | mctg) ...$args
 }
 
 
 export def 'mc-policy ls' [--target(-t): string@mc-alias] {
-    ^mc admin policy ls ($target | mctg) | lines
+    ^mcli admin policy ls ($target | mctg) | lines
 }
 
 def 'nu-cmp mc-policy' [context] {
@@ -190,10 +190,10 @@ export def 'mc-policy create' [
         }
         let file = mktemp -t policy.json.XXX
         $content | to json | save -f $file
-        ^mc admin policy create ($target | mctg) $policy $file
+        ^mcli admin policy create ($target | mctg) $policy $file
         rm -f $file
     } else {
-        ^mc admin policy create ($target | mctg) $policy $file
+        ^mcli admin policy create ($target | mctg) $policy $file
     }
 }
 
@@ -202,7 +202,7 @@ export def 'mc-policy' [
     policy: string@'nu-cmp mc-policy'
     --target(-t): string@mc-alias
 ] {
-    ^mc admin policy $sub ($target | mctg) $policy
+    ^mcli admin policy $sub ($target | mctg) $policy
 }
 
 def 'nu-cmp mc-users' [context] {
@@ -223,7 +223,7 @@ export def 'mc-policy attach' [
     mut args = []
     if ($user | is-not-empty) { $args ++= [--user $user] }
     if ($group | is-not-empty) { $args ++= [--group $group] }
-    ^mc admin policy attach ($target | mctg) $policy ...$args
+    ^mcli admin policy attach ($target | mctg) $policy ...$args
 }
 
 export def 'mc-policy detach' [
@@ -235,12 +235,12 @@ export def 'mc-policy detach' [
     mut args = []
     if ($user | is-not-empty) { $args ++= [--user $user] }
     if ($group | is-not-empty) { $args ++= [--group $group] }
-    ^mc admin policy detach ($target | mctg) $policy ...$args
+    ^mcli admin policy detach ($target | mctg) $policy ...$args
 }
 
 export def --wrapped 'mc-policy entities' [
     --target(-t): string@mc-alias
     ...args
 ] {
-    ^mc admin policy entities ...$args ($target | mctg)
+    ^mcli admin policy entities ...$args ($target | mctg)
 }
