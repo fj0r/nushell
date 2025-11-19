@@ -137,7 +137,7 @@ export def 'git commit scratch' [scratch_id] {
 }
 
 export def 'gen README' [] {
-    open __.toml
+    open ,.toml
     | get manifest
     | where { $in.title? | is-not-empty }
     | sort-by rank

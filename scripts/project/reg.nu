@@ -46,10 +46,10 @@ export def --env 'project init-registry' [] {
 }
 
 # project exec <div> <act> -m [lg [history-utils/backup.nu *]]
-export def 'project global' [
+export def ,, [
     dir:string@cmpl-dir
     ...cmd:string@cmpl-cmd
-    --prefix:string='%'
+    --prefix:string=','
     --mods(-m): list<any>
 ] {
     cd $dir
@@ -77,9 +77,9 @@ export def 'project global' [
     let cmd = [
         'use project'
         ...$mods
-        'project direnv %'
-        'overlay use -r %.nu as % -p'
-        $'% ($cmd | str join " ")'
+        'project direnv ,'
+        'overlay use -r ,.nu as , -p'
+        $', ($cmd | str join " ")'
     ]
     | str join '; '
 
@@ -96,7 +96,7 @@ def sqlx [s] {
 }
 
 export def --env 'project register' [
-    --mod:string='%'
+    --mod:string=','
     dir?:string
 ] {
     let dir = if ($dir | is-empty) { $env.PWD } else { $dir }
