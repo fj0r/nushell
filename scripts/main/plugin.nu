@@ -40,13 +40,6 @@ use surrealdb
 #use just.nu *
 #use completion-generator.nu *
 
-export def 'clean-hist-all' [$keyword] {
-    print 'clean history'
-    history clean --cwd $keyword
-    print 'clean cwd history'
-    cwd history clean $keyword
-}
-
 use power
 $env.NU_POWER_SCHEMA = [
     [

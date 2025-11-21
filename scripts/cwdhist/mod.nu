@@ -64,11 +64,13 @@ def enter [path] {
 export-env {
     $env.CWD_HISTORY_FULL = false
     $env.CWD_HISTORY_FILE = $nu.data-dir | path join 'cwd_history.sqlite'
+    $env.CWD_HISTORY_BLOCK = []
 
     init
 
     $env.config.hooks.env_change.PWD ++= [{|_, dir|
         if $dir == $nu.home-path { return }
+        if ($env.CWD_HISTORY_BLOCK | any {|x| $dir =~ $x}) { return }
         let suffix = (do --ignore-errors { $dir | path relative-to  $nu.home-path })
         let path = if ($suffix | is-empty) {
             $dir
