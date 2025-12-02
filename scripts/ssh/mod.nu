@@ -1,3 +1,5 @@
+use argx
+
 export def 'str max-length' [] {
     $in | reduce -f 0 {|x, a|
         if ($x|is-empty) { return $a }
@@ -83,7 +85,18 @@ export def ssh-switch  [
     $o | save -f ([$env.HOME .ssh config] | path join)
 }
 
-export def cmpl-ssh [] {
+export def cmpl-ssh [context?] {
+    if ($context | is-not-empty) {
+        do -i {
+            let target = $context | argx parse | get opt
+            let environ = $target | get -o environ
+            let group = $target | get -o group
+            if ($environ | is-not-empty) or ($group | is-not-empty) {
+                ssh-switch $environ --group $group
+            }
+        }
+    }
+
     let t = [$env.HOME .ssh index.toml] | path join
     if not ($t | path exists) {
         ssh-index-init
@@ -120,20 +133,21 @@ export def cmpl-ssh [] {
     }
 }
 
-export extern main [
+export def --wrapped main [
     host: string@cmpl-ssh               # host
     ...cmd                              # cmd
+    --environ: string@cmpl-env
+    --group: string@cmpl-group
     -v                                  # verbose
     -i: string                          # key
     -p: int                             # port
-    -N                                  # n
-    -T                                  # t
-    -L                                  # l
-    -R                                  # r
-    -D                                  # d
-    -J: string                          # j
-    -W: string                          # w
-]
+] {
+    mut args = []
+    if $v { $args ++= [-v] }
+    if ($i | is-not-empty) { $args ++= [-i $i] }
+    if ($p | is-not-empty) { $args ++= [-p $p] }
+    ssh $host ...$args ...$cmd
+}
 
 export use parse.nu *
 export use utils.nu *
