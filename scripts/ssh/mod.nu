@@ -142,11 +142,16 @@ export def --wrapped main [
     -i: string                          # key
     -p: int                             # port
 ] {
+    let o = $in
     mut args = []
     if $v { $args ++= [-v] }
     if ($i | is-not-empty) { $args ++= [-i $i] }
     if ($p | is-not-empty) { $args ++= [-p $p] }
-    ssh $host ...$args ...$cmd
+    if ($o | is-empty) {
+        ssh $host ...$args ...$cmd
+    } else {
+        $o | ssh $host ...$args ...$cmd
+    }
 }
 
 export use parse.nu *
