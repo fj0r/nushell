@@ -128,6 +128,7 @@ export def kube-diff-helm [
             $args ++= [--set-json (record-to-set-json $values)]
         }
         let target = mktemp -t 'helm.XXX.out.yaml'
+        print $"(ansi grey)tmpfile: ($target)(ansi reset)"
         let tg = helm template --debug $name $chart -f $valuefile ...$args
         | from yaml
         let cntr = [spec template spec containers] | into cell-path
