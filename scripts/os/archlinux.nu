@@ -21,8 +21,9 @@ def parse_pkg_list [] {
         } else {
             let t = $"($char.i)($cur.t)"
             let v = $"($char.v)($cur.v)"
-            let c = $"($char.c)($cur.c)"
-            let x = $cur.x
+            let c = $"($char.c)($cur.c? | default '')"
+            let x = $cur.x?
+                | default ''
                 | str replace -ra  '\] \[' '/'
                 | str replace -ra  '[\[ \]]' ''
             let x = if ($x | is-empty) { "" } else { $"($char.c)/($x)" }
@@ -40,36 +41,39 @@ use argx *
 
 def cmpl-aur [ctx] {
     let k = $ctx | argx parse
-    paru -Ss ($k.args | last) | parse_pkg_list
+    ^yay -Ss ($k.args | last)
+    | parse_pkg_list
 }
 
 
 def cmpl-list [ctx] {
     let k = $ctx | argx parse
-    paru -Qs $k.opt.list | parse_pkg_list
+    ^yay -Qs ($k.opt.list? | default '')
+    | parse_pkg_list
 }
 
 def cmpl-remove [ctx] {
     let k = $ctx | argx parse
-    paru -Qs $k.opt.remove | parse_pkg_list
+    ^yay -Qs ($k.opt.remove? | default '')
+    | parse_pkg_list
 }
 
 
-export def --wrapped pa [
+export def --wrapped yay [
     --remove (-R): string@cmpl-remove
     --query (-q): string
     --list (-l): string@cmpl-list
     ...args: string@cmpl-aur
 ] {
     if ($query | is-not-empty) {
-        paru -Qo $query
+        ^yay -Qo $query
     } else if ($list | is-not-empty) {
-        paru -Ql $list
+        ^yay -Ql $list
     } else if ($remove | is-not-empty) {
-        paru -Rcns $remove
+        ^yay -cnsR $remove
     } else if ($args | is-empty) {
-        paru -Syu
+        ^yay -Syu
     } else {
-        paru ...$args
+        ^yay ...$args
     }
 }
