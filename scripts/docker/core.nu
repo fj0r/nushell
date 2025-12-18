@@ -430,6 +430,22 @@ export def host-path [path] {
     }
 }
 
+def mk-mount [path target] {
+    let first = $path | str substring ..<1
+    match $first {
+        '@' | '^' => {
+            let a = [
+                type=image
+                $"source=($path | str substring 1..)"
+                $"destination=($target)"
+                $"rw=($first == '^')"
+            ] | str join ','
+            [ --mount $a ]
+        }
+        _ =>  [-v $"(host-path $path):($target)"]
+    }
+}
+
 # run
 export def --wrapped container-create [
     --name: string
@@ -493,7 +509,7 @@ export def --wrapped container-create [
         $args ++= [-w $workdir -v $"($env.PWD):($workdir)"]
     }
     if ($vols | is-not-empty) {
-        $args ++= $vols | items {|k, v| [-v $"(host-path $k):($v)"]} | flatten
+        $args ++= $vols | items {|k, v| mk-mount $k $v } | flatten
     }
     if ($envs | is-not-empty) {
         $args ++= $envs | items {|k, v| [-e $"($k)=($v)"] } | flatten
