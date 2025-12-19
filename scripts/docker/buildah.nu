@@ -28,33 +28,3 @@ export def "bud rm" [
 ] {
     buildah rm $id
 }
-
-export def "bud data" [
-    image
-    --author (-a): string = ""
-    cb: closure
-] {
-    if (whoami) != 'root' {
-        print 'run `buildah unshare` first'
-        return
-    }
-    let working_container = buildah from scratch
-    lg level 1 { working_container: $working_container }
-    let mountpoint = buildah mount $working_container
-    lg level 1 { mountpoint: $mountpoint }
-    do -i $cb $mountpoint
-    buildah config --author $author --label "type=image-volume" $working_container
-    buildah unmount $working_container
-    lg level 1 'unmount'
-    buildah commit $working_container $image
-    lg level 3 commit $image
-}
-
-use complete.nu *
-use base.nu *
-export def "bud export" [
-    image: string@cmpl-docker-images
-    path
-] {
-    container export $image | tar -xC $path
-}

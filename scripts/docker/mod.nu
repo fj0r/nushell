@@ -218,4 +218,5 @@ export use base.nu *
 export use core.nu *
 export use utils.nu *
 export use registry.nu *
+export use oci.nu *
 export use buildah.nu *
