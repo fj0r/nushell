@@ -27,11 +27,12 @@ use base.nu *
 export def "oci unwrap" [
     image: string@cmpl-docker-images
     path
+    --subpath: path@cmpl-docker-cp = "/"
 ] {
     let c = container create $image
     do -i {
-        container export $c | tar -xC $path
+        container cp $"($c):($subpath)" $path
     }
-    print $"(ansi grey)clean ...(ansi reset)"
+    print $"(ansi grey)finish ...(ansi reset)"
     container rm $c
 }
