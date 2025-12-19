@@ -49,3 +49,12 @@ export def "bud data" [
     buildah commit $working_container $image
     lg level 3 commit $image
 }
+
+use complete.nu *
+use base.nu *
+export def "bud export" [
+    image: string@cmpl-docker-images
+    path
+] {
+    container export $image | tar -xC $path
+}

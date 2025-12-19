@@ -148,7 +148,9 @@ export def image-list [
         let r = container inspect $image
             | from json
             | get 0
-        let e = $r.Config.Env?
+        let e = $r
+            | get -o Config.Env
+            | default []
             | reduce -f {} {|i, a|
                 let x = $i | split row '='
                 $a | upsert $x.0 $x.1?
