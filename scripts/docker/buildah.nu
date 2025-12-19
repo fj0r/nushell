@@ -42,7 +42,7 @@ export def "bud data" [
     lg level 1 { working_container: $working_container }
     let mountpoint = buildah mount $working_container
     lg level 1 { mountpoint: $mountpoint }
-    do $cb $mountpoint
+    do -i $cb $mountpoint
     buildah config --author $author --label "type=image-volume" $working_container
     buildah unmount $working_container
     lg level 1 'unmount'
