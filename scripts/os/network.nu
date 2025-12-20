@@ -19,3 +19,11 @@ export def ip-route [] {
     ] | str join '\s*')
 }
 
+export def curls [
+    host: string
+    --addr(-a): string
+    --port(-p): number = 443
+] {
+    curl -ivk --resolve $"($host):($port):($addr)" $"https://($host)"
+}
+
