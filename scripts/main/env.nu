@@ -30,7 +30,7 @@ if $nu.os-info.family == 'windows'  {
         ($env.HOME)/.ghcup/bin
         ($env.HOME)/.local/bin
         /opt/*/bin
-        ($env.LS_ROOT?)/*/bin
+        ($env.LS_ROOT? | default /opt)/*/bin
     ]
 }
 
@@ -54,4 +54,4 @@ for s in ['/usr/local/bin', '/usr/bin'] {
 $env.PREFER_ALT = '1'
 $env.TERM = 'screen-256color'
 
-$env.EDITOR = 'nvim'
+$env.EDITOR = 'hx'

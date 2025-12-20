@@ -14,8 +14,8 @@ use scratch/integration/git.nu *
 use llm *
 use llm/shortcut.nu *
 use llm/integration/web.nu *
-source llm/agents/kubernetes.nu
-source llm/agents/research.nu
+# source llm/agents/kubernetes.nu
+# source llm/agents/research.nu
 use project *
 use ssh *
 use parser
@@ -23,16 +23,16 @@ use devcontainer
 
 # autoload
 use os *
-use nvim *
+# use nvim *
 use netcat *
 use nushell.nu *
 use benchmark
 use cwdhist *
 use history-utils *
 use history-utils/backup.nu *
-use resolvenv
+# use resolvenv
 use git-cmp.nu *
-use aichat-cmp.nu *
+# use aichat-cmp.nu *
 use rustic *
 use minio *
 use cdp *
