@@ -19,3 +19,28 @@ export def zellij-enter [name: string@cmpl-zellij-session] {
 export def zellij-delete [name: string@cmpl-zellij-session] {
     zellij delete-session $name
 }
+
+export def --env zellij-cd [path: string] {
+    if ("ZELLIJ" in $env) {
+        let dir_name = ($path | path basename)
+        zellij action rename-tab $dir_name
+    }
+    cd $path
+}
+
+export-env {
+    $env.config.keybindings ++= [
+        {
+            name: zellij_cd
+            modifier: control
+            keycode: enter
+            mode: [emacs, vi_insert, vi_normal]
+            event: [
+                { edit: movetolinestart }
+                { edit: insertstring value: 'zellij-cd '}
+                { send: Enter }
+            ]
+        }
+    ]
+}
+
