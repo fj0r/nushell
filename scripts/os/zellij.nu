@@ -20,12 +20,14 @@ export def zellij-delete [name: string@cmpl-zellij-session] {
     zellij delete-session $name
 }
 
-export def --env zellij-cd [path: string] {
+export def --env zellij-cd [path?: string] {
     if ("ZELLIJ" in $env) {
-        let dir_name = ($path | path basename)
+        let dir_name = ($path | default $env.PWD | path basename)
         zellij action rename-tab $dir_name
     }
-    cd $path
+    if ($path | is-not-empty) {
+        cd $path
+    }
 }
 
 export-env {
