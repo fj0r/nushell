@@ -133,7 +133,8 @@ export def kube-diff-helm [
         | from yaml
         let cntr = [spec template spec containers] | into cell-path
 
-        $tg | each {|x|
+        $tg
+        | each {|x|
             let n = $x | get -o metadata.name
             let c = $x | get -o $cntr
             if ($x.kind == 'Deployment') and ($n in $images) {
