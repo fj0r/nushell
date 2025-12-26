@@ -40,3 +40,21 @@ export def dfx [-x:list<string>] {
         }
     }
 }
+
+export def cptree [
+    source
+    target
+    --glob(-g): glob = **/*
+] {
+    mkdir $target
+    let target = $env.PWD | path join $target
+    cd $source
+    print $env.PWD
+    ls ($glob | into glob)
+    | get name
+    | each {|x|
+        let d = $target | path join ($x | path parse | get parent)
+        mkdir $d
+        cp -v -r $x $d
+    }
+}
