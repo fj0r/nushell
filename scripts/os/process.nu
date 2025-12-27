@@ -19,29 +19,57 @@ export def wait-cmd [action -i: duration = 1sec  -t: string='waiting'] {
     }
 }
 
-export def 'process ancestor' [pid: int@cmpl-ps] {
-    let px = ps
-    let cur = $px | where pid == $pid | get 0
-    mut s = [$cur]
-    loop {
-        let ppid = $s | last | get ppid
-        let p = $px | where pid == $ppid
-        if ($p | is-empty) { break }
-        $s ++= $p
+export module proc {
+    export def ancestor [pid: int@cmpl-ps] {
+        let px = ps
+        let cur = $px | where pid == $pid | get 0
+        mut s = [$cur]
+        loop {
+            let ppid = $s | last | get ppid
+            let p = $px | where pid == $ppid
+            if ($p | is-empty) { break }
+            $s ++= $p
+        }
+        $s
     }
-    $s
+
+    def desc [ps pid] {
+        let p = $ps | where ppid == $pid
+        if ($p | is-empty) {
+            return []
+        } else {
+            let pd = $p | each {|x| desc $ps $x.pid } | flatten
+            return [...$p ...$pd]
+        }
+    }
+    export def descendant [pid: int@cmpl-ps] {
+        desc (ps) $pid
+    }
 }
 
-export def 'process descendant' [pid: int@cmpl-ps] {
-    descendant (ps) $pid
+export def psgroup [] {
+    ps
+    | group-by name
+    | items {|k, v|
+        {
+            name: $k
+            cpu: ($v.cpu | math sum)
+            mem: ($v.mem | math sum)
+            count: ($v.pid | length)
+        }
+    }
+    | sort-by mem
 }
 
-def 'descendant' [ps pid] {
-    let p = $ps | where ppid == $pid
-    if ($p | is-empty) {
-        return []
-    } else {
-        let pd = $p | each {|x| descendant $ps $x.pid } | flatten
-        return [...$p ...$pd]
+def cmpl-pid [] {
+    ps -l | each {|x|
+        { value: $"($x.pid | fill -c ' ' -w 5) # ($x.name)", description: $x.command }
     }
 }
+
+export extern kill [
+    --force(-f)
+    --quiet(-q)
+    --signal(-s): int
+    ...pid: int@cmpl-pid
+]

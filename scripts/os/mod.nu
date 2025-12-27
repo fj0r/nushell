@@ -4,7 +4,6 @@ export use media.nu *
 export use disk.nu *
 export use archlinux.nu *
 export use process.nu *
-export use kill.nu *
 export use clip.nu *
 export use network.nu *
 export use proxy.nu *
