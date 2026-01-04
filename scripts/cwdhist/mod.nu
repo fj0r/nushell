@@ -69,9 +69,9 @@ export-env {
     init
 
     $env.config.hooks.env_change.PWD ++= [{|_, dir|
-        if $dir == $nu.home-path { return }
+        if $dir == $env.HOME { return }
         if ($env.CWD_HISTORY_BLOCK | any {|x| $dir =~ $x}) { return }
-        let suffix = (do --ignore-errors { $dir | path relative-to  $nu.home-path })
+        let suffix = (do --ignore-errors { $dir | path relative-to $env.HOME })
         let path = if ($suffix | is-empty) {
             $dir
         } else {
