@@ -35,7 +35,7 @@ export-env {
     power register kube {|bg|
         let ctx = kube ctx
         if ($ctx | is-empty) {
-            [$bg ""]
+            [$bg null]
         } else {
             let c = $env.NU_POWER_CONFIG.kube
             let t = $c.theme

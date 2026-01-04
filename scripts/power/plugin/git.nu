@@ -118,12 +118,12 @@ export-env {
 
     power register git {|bg|
         if (git rev-parse --is-inside-work-tree | complete).exit_code > 0 {
-            return [$bg '']
+            return [$bg null]
         }
 
         let status = _git_status
 
-        if $status.branch == 'no_branch' { return [$bg ''] }
+        if $status.branch == 'no_branch' { return [$bg null] }
 
         let c = $env.NU_POWER_CONFIG.git
         let branch = if ($status.remote | is-empty) {
