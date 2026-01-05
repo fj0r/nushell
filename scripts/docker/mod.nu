@@ -8,6 +8,15 @@ export-env {
     if 'CNTRCONFIG' not-in $env {
         $env.CNTRCONFIG = [$nu.data-dir 'container-preset.yml'] | path join
     }
+    if 'CNTRLAYER' not-in $env {
+        $env.CNTRLAYER = {
+            hx: {
+                image: 'ghcr.io/fj0r/data:helix'
+                mount: '/opt/helix'
+                # rw: false
+            }
+        }
+    }
     if not ($env.CNTRCONFIG | path exists) {
         "_: |-
         preset:

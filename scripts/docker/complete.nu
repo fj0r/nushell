@@ -1,5 +1,9 @@
 use base.nu *
 
+export def cmpl-image-vols [] {
+    $env.CNTRLAYER | keys
+}
+
 export def cmpl-docker-network [] {
     containers-network-list | get NAME
 }

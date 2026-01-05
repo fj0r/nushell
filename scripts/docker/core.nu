@@ -432,17 +432,22 @@ export def host-path [path] {
     }
 }
 
+def image-vol [path target --rw] {
+    let iv = [
+        type=image
+        $"source=($path)"
+        $"destination=($target)"
+        $"rw=($rw)"
+    ]
+    | str join ','
+    [ --mount $iv ]
+}
+
 def mk-mount [path target] {
     let first = $path | str substring ..<1
     match $first {
         '@' | '^' => {
-            let a = [
-                type=image
-                $"source=($path | str substring 1..)"
-                $"destination=($target)"
-                $"rw=($first == '^')"
-            ] | str join ','
-            [ --mount $a ]
+            image-vol ($path | str substring 1..) $target --rw=($first == '^')
         }
         _ =>  [-v $"(host-path $path):($target)"]
     }
@@ -471,6 +476,7 @@ export def --wrapped container-create [
     --with-x
     --nvidia:int
     --privileged(-P)
+    --image-volumes(-V): list<string>@cmpl-image-vols # image volumes
     --options: list<string>
     image: string@cmpl-docker-images           # image
     ...cmd                                     # command args
@@ -512,6 +518,14 @@ export def --wrapped container-create [
     }
     if ($vols | is-not-empty) {
         $args ++= $vols | items {|k, v| mk-mount $k $v } | flatten
+    }
+    if ($image_volumes | is-not-empty) {
+        $args ++= $image_volumes
+        | each {|x|
+            let d = $env.CNTRLAYER | get $x
+            image-vol $d.image $d.mount --rw=($d.rw? | default false)
+        }
+        | flatten
     }
     if ($envs | is-not-empty) {
         $args ++= $envs | items {|k, v| [-e $"($k)=($v)"] } | flatten
