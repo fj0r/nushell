@@ -33,22 +33,17 @@ def cmpl-alloc [context] {
 export def nomad-status [
     job?: string@cmpl-job
     alloc?: string@cmpl-alloc
+    path?: path
 ] {
     if ($job | is-empty) {
         nomad job status | from ssv -a
     } else if ($alloc | is-empty) {
         nomad job status $job
-    } else {
+    } else if ($path | is-empty) {
         nomad alloc logs -f $alloc
+    } else {
+        nomad alloc fs $alloc $path
     }
-}
-
-export def nomad-fs [
-    job:string@cmpl-job
-    alloc:string@cmpl-alloc
-    path?:path = .
-] {
-    nomad alloc fs $alloc $path
 }
 
 def cmpl-nomad-file [] {
