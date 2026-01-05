@@ -52,7 +52,7 @@ def cmpl-nomad-file [] {
 
 export def nomad-run [
     file:path@cmpl-nomad-file
-    --var(-v): record
+    --var(-v): record = {}
     --dry-run(-d)
 ] {
     $var
