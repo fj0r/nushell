@@ -18,6 +18,7 @@ use llm/integration/web.nu *
 # source llm/agents/research.nu
 use project *
 use ssh *
+use nomad *
 use parser
 use devcontainer
 
