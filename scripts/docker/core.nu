@@ -433,12 +433,20 @@ export def host-path [path] {
 }
 
 def image-vol [path target --rw] {
-    let iv = [
-        type=image
-        $"source=($path)"
-        $"destination=($target)"
-        $"rw=($rw)"
-    ]
+    let iv = match $env.CNTRCTL {
+        podman => [
+            type=image
+            $"source=($path)"
+            $"destination=($target)"
+            $"rw=($rw)"
+        ],
+        _ => [
+            type=image
+            $"src=($path)"
+            $"dst=($target)"
+            $"readonly=(not $rw)"
+        ]
+    }
     | str join ','
     [ --mount $iv ]
 }
