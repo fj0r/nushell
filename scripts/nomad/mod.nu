@@ -53,8 +53,19 @@ export def nomad-status [job?:string@cmpl-job] {
     }
 }
 
-export def nomad-run [file] {
-    nomad job run $file
+def cmpl-nomad-file [] {
+  do -i {ls **/*.nomad} | append (do -i {ls **/*.hcl}) | get name
+}
+
+export def nomad-run [
+    file:path@cmpl-nomad-file
+    --dry-run(-d)
+] {
+    if $dry_run {
+        nomad job plan $file
+    } else {
+        nomad job run $file
+    }
 }
 
 
