@@ -57,8 +57,15 @@ def cmpl-nomad-file [] {
 
 export def nomad-run [
     file:path@cmpl-nomad-file
+    --var(-v): record
     --dry-run(-d)
 ] {
+    $var
+    | transpose k v
+    | reduce -f {} {|i,a|
+        $a | insert $"NOMAD_VAR_($i.k)" $i.v
+    }
+    | load-env
     if $dry_run {
         nomad job plan $file
     } else {
