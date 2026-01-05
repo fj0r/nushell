@@ -30,11 +30,17 @@ def cmpl-alloc [context] {
     | { completions: $in, options: { sort: false } }
 }
 
-export def nomad-logs [
-    job:string@cmpl-job
-    alloc:string@cmpl-alloc
+export def nomad-status [
+    job?: string@cmpl-job
+    alloc?: string@cmpl-alloc
 ] {
-    nomad alloc logs -f $alloc
+    if ($job | is-empty) {
+        nomad job status | from ssv -a
+    } else if ($alloc | is-empty) {
+        nomad job status $job
+    } else {
+        nomad alloc logs -f $alloc
+    }
 }
 
 export def nomad-fs [
@@ -43,14 +49,6 @@ export def nomad-fs [
     path?:path = .
 ] {
     nomad alloc fs $alloc $path
-}
-
-export def nomad-status [job?:string@cmpl-job] {
-    if ($job | is-empty) {
-        nomad job status | from ssv -a
-    } else {
-        nomad job status $job
-    }
 }
 
 def cmpl-nomad-file [] {
