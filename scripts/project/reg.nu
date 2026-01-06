@@ -108,7 +108,8 @@ export def --env 'project register' [
     let cmds = scope modules | where name == $mod | first | get commands.name
     | each { $"\(($dir_id), (Q $in)\)" } | str join ', '
     sqlx $"insert into commands \(dir_id, command\) values ($cmds)
-        on conflict \(dir_id, command\) do nothing"
+        on conflict \(dir_id, command\)
+        do update set dir_id = EXCLUDED.dir_id, command = EXCLUDED.command"
 }
 
 export def 'project unregister' [
