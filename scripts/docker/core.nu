@@ -468,6 +468,7 @@ export def --wrapped container-create [
     --appimage
     --netadmin
     --user(-u): string
+    --master-user(-U)
     --proxy: string@cmpl-docker-run-proxy      # proxy
     --ssh(-s): string@cmpl-docker-run-sshkey   # specify ssh key
     --sshuser: string=root                     # default root
@@ -493,6 +494,8 @@ export def --wrapped container-create [
 
     if ($user | is-not-empty) {
         $args ++= [--user $user]
+    } else if $master_user {
+        $args ++= [--user 1000]
     }
     if $daemon {
         $args ++= [-d]
