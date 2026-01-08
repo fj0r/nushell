@@ -1,3 +1,5 @@
+use lg
+
 export def "oci wrap" [
     image
     --author (-a): string = ""
