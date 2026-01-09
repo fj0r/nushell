@@ -3,7 +3,7 @@ source $__dyn_load
 source env.nu
 
 # settings
-$env.config.show_banner = false
+$env.config.show_banner = 'short'
 $env.config.use_kitty_protocol = true
 $env.config.filesize.unit = 'metric'
 $env.config.datetime_format.normal = '%m/%d/%y %H:%M:%S'
