@@ -68,7 +68,7 @@ export def nomad-run [
     }
 }
 
-export def nomad-stop [
+export def nomad-terminate [
     job: string@cmpl-job
 ] {
     nomad job stop -purge $job
