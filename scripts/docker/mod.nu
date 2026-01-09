@@ -18,7 +18,7 @@ export-env {
         }
     }
     if not ($env.CNTRCONFIG | path exists) {
-        "_: |-
+        "
         preset:
         - name: rust
           image: rust
@@ -217,7 +217,7 @@ export-env {
             - --default-log-level=info
           options: []
         "
-        | from yaml | get _
+        | str trim | str replace -rma $'^\s{8}' ''
         | save -f $env.CNTRCONFIG
     }
 }

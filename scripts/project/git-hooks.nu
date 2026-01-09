@@ -111,7 +111,7 @@ export def git-install-hooks [
     let hs = if ($hooks | is-empty) { $hs | where {$in.v.default?} } else { $hs | where k in $hooks }
     for h in $hs {
         let p = [$hook_path $h.k] | path join
-        $"_: |-
+        $"
         #!/bin/env nu
         use project
         use ../../($mod).nu
@@ -127,7 +127,7 @@ export def git-install-hooks [
             }
         }
         "
-        | from yaml | get _
+        | str trim | str replace -rma $'^\s{8}' ''
         | save -f $p
         chmod +x $p
     }

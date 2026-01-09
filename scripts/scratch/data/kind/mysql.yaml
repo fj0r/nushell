@@ -5,7 +5,7 @@ runner: file
 cmd: |-
   # pip install pymysql
   let o = open {{}}
-  '_: |-
+  '
     import sys
     import yaml
     import pymysql.cursors
@@ -31,7 +31,7 @@ cmd: |-
             r = cursor.fetchall()
             print(yaml.dump(r))
   '
-  | from yaml | get _
+  | str trim | str replace -rma $'^\s{2}' ''
   | save -f query.py
 
   [{{args}}]
