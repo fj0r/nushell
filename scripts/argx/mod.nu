@@ -94,8 +94,9 @@ export def parse [offset?: int] {
     if ($ast | is-empty) { return }
     let x = $ast | get-args
 
-    let sign = scope commands
+    let def = scope commands
     | where decl_id == $ast.decl_id | first
+    let sign = $def
     | get -o signatures?.any?
     | insert name {|y|
         if ($y.parameter_name | is-empty) {
@@ -142,6 +143,7 @@ export def parse [offset?: int] {
     }
 
     $x
+    | insert tag $def.name
     | insert pos $pos
     | update opt $opt
 }
