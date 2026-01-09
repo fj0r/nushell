@@ -97,7 +97,7 @@ export def wrap-fn [alias cmd prelude?: list = [] ] {
     $'
     export def ($alias) [($args | str join ", ")] {
         let n = $in
-        ($prelude | str join (char newline))
+        ($prelude | str join "; ")
         $n | ([$c.tag ...$uses] | str join " ")
     }
     ' | str trim | str replace -rma $'^\s{4}' ''

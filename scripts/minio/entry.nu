@@ -3,6 +3,6 @@
 # export alias mls = mc-ls #[entry]
 export def mls [src: string] {
     let n = $in
-    use minio *
+    use minio *; use minio/shortcut.nu *
     $n | mc-ls $src
 }

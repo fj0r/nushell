@@ -171,7 +171,7 @@ export def 'gen entry' [] {
         $s ++= [
             $"print $'[\(date now | format date \"%+\"\)]($m)'"
             $"use ($m) *"
-            $"convert-alias-file ($i) [$'use ($m) *'] | save -f ($p | path join entry.nu)"
+            $"convert-alias-file ($i) [$'use ($m) *' $'use ($m)/shortcut.nu *'] | save -f ($p | path join entry.nu)"
         ]
     }
     $s

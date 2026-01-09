@@ -3,19 +3,19 @@
 # export alias dp = container-list #[entry]
 export def dp [container?: string, --all(-a)] {
     let n = $in
-    use docker *
+    use docker *; use docker/shortcut.nu *
     $n | container-list $container --all=$all
 }
 # export alias dr = container-create #[entry]
 export def dr [image: string, ...cmd: any, --name: string, --debug(-x), --appimage, --netadmin, --user(-u): string, --master-user(-U), --proxy: string, --ssh(-s): string, --mnt(-m): string, --vols(-v): record, --ports(-p): record, --envs(-e): record, --daemon(-d), --join(-j): string, --network: string, --workdir(-w): string, --entrypoint: string, --dry-run, --with-x, --nvidia: int, --privileged(-P), --image-volumes(-V): list<string>, --options: list<string>] {
     let n = $in
-    use docker *
+    use docker *; use docker/shortcut.nu *
     $n | container-create $image  ...$cmd --name $name --debug=$debug --appimage=$appimage --netadmin=$netadmin --user $user --master-user=$master_user --proxy $proxy --ssh $ssh --sshuser root --mnt $mnt --vols $vols --ports $ports --envs $envs --daemon=$daemon --join $join --network $network --workdir $workdir --entrypoint $entrypoint --dry-run=$dry_run --with-x=$with_x --nvidia $nvidia --privileged=$privileged --image-volumes $image_volumes --options $options
 }
 # export alias dx = container-preset #[entry]
 export def dx [preset: string, ...cmd: any, --vols(-v): any, --ports(-p): any, --envs(-e): any, --proxy: string, --ssh(-s): string, --debug(-d), --privileged(-P), --netadmin, --with-x, --dry-run] {
     let n = $in
-    use docker *
+    use docker *; use docker/shortcut.nu *
     $n | container-preset $preset  ...$cmd --vols $vols --ports $ports --envs $envs --proxy $proxy --ssh $ssh --debug=$debug --privileged=$privileged --netadmin=$netadmin --with-x=$with_x --dry-run=$dry_run
 }
 #[*]
@@ -23,6 +23,6 @@ export alias dl = container-log #[entry]
 # export alias di = image-list #[entry]
 export def di [image?: string, --layer, --history] {
     let n = $in
-    use docker *
+    use docker *; use docker/shortcut.nu *
     $n | image-list $image --layer=$layer --history=$history
 }

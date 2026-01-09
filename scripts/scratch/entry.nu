@@ -3,6 +3,6 @@
 # export alias sl = scratch-list #[entry]
 export def sl [...xtags: string, --search(-s): string, --trash(-T), --hidden(-H), --important(-i): int, --urgent(-u): int, --challenge(-c): int, --updated: duration, --created: duration, --deadline: duration, --relevant(-r): int, --sort: list<string>, --done(-x): int, --raw, --md(-m), --md-list(-l), --scratch-tree, --debug, --accumulator(-a): any] {
     let n = $in
-    use scratch *
+    use scratch *; use scratch/shortcut.nu *
     $n | scratch-list  ...$xtags --search $search --trash=$trash --hidden=$hidden --important $important --urgent $urgent --challenge $challenge --updated $updated --created $created --deadline $deadline --relevant $relevant --sort $sort --done $done --raw=$raw --md=$md --md-list=$md_list --indent 2 --body-lines 2 --scratch-tree=$scratch_tree --debug=$debug --accumulator $accumulator
 }
