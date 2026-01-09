@@ -162,3 +162,19 @@ export def 'gen README' [] {
     | str join (char newline)
     | save -f README.md
 }
+
+export def 'gen entry' [] {
+    mut s = ["use scripts/argx/utils.nu *"]
+    for i in (ls scripts/*/shortcut.nu | get name) {
+        let p = $i | path parse | get parent
+        let m = $p | path split | last
+        $s ++= [
+            $"print $'[\(date now | format date \"%+\"\)]($m)'"
+            $"use ($m) *"
+            $"convert-alias-file ($i) [$'use ($m) *'] | save -f ($p | path join entry.nu)"
+        ]
+    }
+    $s
+    | str join (char newline)
+    | nu -c $in
+}

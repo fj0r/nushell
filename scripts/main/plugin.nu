@@ -2,18 +2,18 @@
 use argx
 use lg
 use perform-or-print *
-use git *
-use git/shortcut.nu *
-use kubernetes *
-use kubernetes/shortcut.nu *
-use docker *
-use docker/shortcut.nu *
-use scratch *
-use scratch/shortcut.nu *
-use scratch/integration/git.nu *
-use llm *
-use llm/shortcut.nu *
-use llm/integration/web.nu *
+# use git *
+use git/entry.nu *
+# use kubernetes *
+use kubernetes/entry.nu *
+# use docker *
+use docker/entry.nu *
+# use scratch *
+# use scratch/integration/git.nu *
+use scratch/entry.nu *
+# use llm *
+# use llm/integration/web.nu *
+use llm/entry.nu *
 # source llm/agents/kubernetes.nu
 # source llm/agents/research.nu
 use project *

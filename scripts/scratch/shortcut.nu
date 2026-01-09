@@ -1,8 +1,7 @@
-use mod.nu *
 use completion.nu *
 use tag_base.nu *
 
-export alias sl = scratch-list
+export alias sl = scratch-list #[entry]
 export alias sa = scratch-add
 export alias se = scratch-edit
 export alias sm = scratch-move

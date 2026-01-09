@@ -1,25 +1,13 @@
-def default_parameter [i] {
-    if ($i.parameter_default | is-empty) {
-        return ''
-    }
-    match $i.syntax_shape {
-        string => $' = "($i.parameter_default)"'
-        _ => $' = ($i.parameter_default)'
-    }
-}
-
 export def convert-alias-file [file: path prelude?] {
     open -r $file
     | lines
     | each {|x|
-        let d = $x | parse -r '^\s*export\s+alias\s+(?<a>.+)\s+=\s+(?<f>.+)'
-        if ($d | is-empty) {
-            [$x]
-        } else {
+        let d = $x | parse -r '^\s*export\s+alias\s+(?<a>.+)\s+=\s+(?<f>.+)\s+#\[entry\]'
+        if ($d | is-not-empty) {
             let d = $d | first
             let d = do -i { wrap-fn $d.a $d.f $prelude }
             if ($d | is-empty) {
-                [$"# ******" $x]
+                [$"#[*]" $x]
             } else {
                 [$"# ($x)" $d]
             }
@@ -35,6 +23,33 @@ export def alias-to-fn [alias prelude?: list = []] {
     wrap-fn $cmd $alias $prelude
 }
 
+def handle_parameter [i] {
+    if ($i.parameter_name | is-empty) { return }
+    mut default = ''
+    if ($i.parameter_default | is-not-empty) {
+        $default = match $i.syntax_shape {
+            string => $' = "($i.parameter_default)"'
+            _ => $' = ($i.parameter_default)'
+        }
+    }
+    let typ = if ($i.syntax_shape | is-empty) {
+        ''
+    } else {
+        match $i.syntax_shape {
+        'closure()' => ': closure',
+        _ => $": ($i.syntax_shape)"
+    }
+    }
+    let shr = if ($i.short_flag | is-empty) { "" } else { $"\(-($i.short_flag)\)" }
+    {
+        prm: $i.parameter_name
+        arg: $"$($i.parameter_name | str snake-case)"
+        shr: $shr
+        dft: $default
+        typ: $typ
+    }
+}
+
 export def wrap-fn [alias cmd prelude?: list = [] ] {
     use argx
     let c = $cmd | argx parse
@@ -42,48 +57,48 @@ export def wrap-fn [alias cmd prelude?: list = [] ] {
     mut args = []
     mut uses = []
     for i in $s.any {
+        let d = handle_parameter $i
         match $i.parameter_type {
             positional => {
                 let q = if $i.is_optional { '?' } else { '' }
-                let d = default_parameter $i
-                let v = $c.pos | get -o $i.parameter_name
+                let v = $c.pos | get -o $d.prm
                 if ($v | is-empty) {
-                    $args ++= [$"($i.parameter_name)($q): ($i.syntax_shape)($d)"]
-                    $uses ++= [$"$($i.parameter_name)"]
+                    $args ++= [$"($d.prm)($q)($d.typ)($d.dft)"]
+                    $uses ++= [$d.arg]
                 } else {
                     $uses ++= [$v]
                 }
             }
             named => {
-                let d = default_parameter $i
-                let v = $c.opt | get -o $i.parameter_name
+                let v = $c.opt | get -o $d.prm
                 if ($v | is-empty) {
-                    $args ++= [$"--($i.parameter_name)\(-($i.short_flag)\): ($i.syntax_shape)($d)"]
-                    $uses ++= [$"--($i.parameter_name) $($i.parameter_name)"]
+                    $args ++= [$"--($d.prm)($d.shr)($d.typ)($d.dft)"]
+                    $uses ++= [$"--($d.prm) ($d.arg)"]
                 } else {
-                    $uses ++= [$"--($i.parameter_name) ($v)"]
+                    $uses ++= [$"--($d.prm) ($v)"]
                 }
             }
             switch => {
-                let v = $c.opt | get -o $i.parameter_name
+                let v = $c.opt | get -o $d.prm
                 if ($v | is-empty) {
-                    $args ++= [$"--($i.parameter_name)\(-($i.short_flag)\)"]
-                    $uses ++= [$"--($i.parameter_name)=$($i.parameter_name)"]
+                    $args ++= [$"--($d.prm)($d.shr)"]
+                    $uses ++= [$"--($d.prm)=($d.arg)"]
                 } else {
-                    $uses ++= [$"--($i.parameter_name)"]
+                    $uses ++= [$"--($d.prm)"]
                 }
             }
             rest => {
-                let v = $c.pos | get -o $i.parameter_name
-                $args ++= [$"...($i.parameter_name): ($i.syntax_shape)"]
-                $uses ++= [$"($v | str join ' ') ...$($i.parameter_name)"]
+                let v = $c.pos | get -o $d.prm
+                $args ++= [$"...($d.prm)($d.typ)"]
+                $uses ++= [$"($v | str join ' ') ...$($d.prm)"]
             }
         }
     }
     $'
     export def ($alias) [($args | str join ", ")] {
+        let n = $in
         ($prelude | str join (char newline))
-        ([$c.tag ...$uses] | str join " ")
+        $n | ([$c.tag ...$uses] | str join " ")
     }
     ' | str trim | str replace -rma $'^\s{4}' ''
 }

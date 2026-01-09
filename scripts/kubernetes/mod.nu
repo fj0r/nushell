@@ -2,6 +2,7 @@ export-env {
     use env.nu *
 }
 
+export use shortcut.nu *
 export use refine.nu *
 export use helm.nu *
 export use conf.nu *
