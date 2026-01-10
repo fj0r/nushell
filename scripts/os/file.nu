@@ -1,5 +1,17 @@
-export def is-text-file [$f] {
-    open -r $f | into binary | first 512 | bytes index-of 0x[00] | $in < 0
+export def is-binary-file [] {
+    $in | first 512 | bytes index-of 0x[00] | $in >= 0
+}
+
+export def verify-integrity [fmt] {
+    let n: binary = $in
+    match $fmt {
+        'jpg' | 'jpeg' => {
+            $n | last 2 | $in == 0x[ff d9]
+        }
+        'webp' => {
+            $n | bytes at 4..7 | into int | $in + 8 | $in == ($n | length)
+        }
+    }
 }
 
 # new dir and then cd
