@@ -67,29 +67,6 @@ export def --env direnv [
     | load-env
 }
 
-# new dir and then cd
-export def --env nd [
-    dir
-    --surrfix(-s)="--"
-    --temp(-t)
-] {
-    let dir = if not $temp {
-        $dir
-    } else {
-        $"($surrfix)($dir)($surrfix)" | path expand
-    }
-    mkdir $dir
-    cd $dir
-    if $temp {
-        $env.config.hooks.env_change.PWD ++= [
-            {
-                condition: {|before, after| $before == $dir }
-                code: $"rm -rf ($dir)"
-            }
-        ]
-    }
-}
-
 export def find-project [dir] {
     for d in (
         $dir
