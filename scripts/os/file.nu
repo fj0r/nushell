@@ -1,9 +1,9 @@
-export def is-binary-file [] {
+export def is-binary-file []: binary -> bool {
     $in | first 512 | bytes index-of 0x[00] | $in >= 0
 }
 
-export def verify-integrity [fmt] {
-    let n: binary = $in
+export def verify-integrity [fmt: string]: binary -> bool {
+    let n = $in
     match $fmt {
         'jpg' | 'jpeg' => {
             $n | last 2 | $in == 0x[ff d9]
