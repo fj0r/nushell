@@ -22,6 +22,7 @@ use nomad *
 use parser
 use devcontainer
 
+use std/dirs
 # autoload
 use os *
 # use nvim *

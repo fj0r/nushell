@@ -14,6 +14,19 @@ export def verify-integrity [fmt: string]: binary -> bool {
     }
 }
 
+export def with-cd [path act --yes(-y)] {
+    if not ($path | path exists) {
+        if $yes or ([y n] | input list $"create dir ($path)?") == 'y' {
+            mkdir $path
+        } else {
+            return
+        }
+    }
+    let old = $env.PWD
+    cd $path
+    do $act $path $old
+}
+
 # new dir and then cd
 export def --env nd [
     dir
