@@ -127,7 +127,7 @@ export def git-install-hooks [
             }
         }
         "
-        | str trim | str replace -rma $'^\s{8}' ''
+        | str trim | str replace -rma $'^ {8}' ''
         | save -f $p
         chmod +x $p
     }

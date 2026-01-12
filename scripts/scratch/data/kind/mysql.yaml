@@ -31,7 +31,7 @@ cmd: |-
             r = cursor.fetchall()
             print(yaml.dump(r))
   '
-  | str trim | str replace -rma $'^\s{2}' ''
+  | str trim | str replace -rma $'^ {2}' ''
   | save -f query.py
 
   [{{args}}]

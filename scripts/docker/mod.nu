@@ -217,7 +217,7 @@ export-env {
             - --default-log-level=info
           options: []
         "
-        | str trim | str replace -rma $'^\s{8}' ''
+        | str trim | str replace -rma $'^ {8}' ''
         | save -f $env.CNTRCONFIG
     }
 }

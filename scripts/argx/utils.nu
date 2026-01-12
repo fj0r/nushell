@@ -100,5 +100,5 @@ export def wrap-fn [alias cmd prelude?: list = [] ] {
         ($prelude | str join "; ")
         $n | ([$c.tag ...$uses] | str join " ")
     }
-    ' | str trim | str replace -rma $'^\s{4}' ''
+    ' | str trim | str replace -rma $'^ {4}' ''
 }
