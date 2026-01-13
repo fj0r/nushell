@@ -30,22 +30,33 @@ export def with-cd [path act --yes(-y)] {
 # new dir and then cd
 export def --env nd [
     dir
-    --surrfix(-s)="--"
+    --surrfix(-s)="__"
     --temp(-t)
 ] {
     let dir = $dir | into string
     let dir = if not $temp {
         $dir
     } else {
-        $"($surrfix)($dir)($surrfix)" | path expand
+        $"($surrfix)($dir)($surrfix)"
     }
+    | path expand
+
     mkdir $dir
-    cd $dir
+    use std/dirs
+    dirs add $dir
     if $temp {
         $env.config.hooks.env_change.PWD ++= [
             {
                 condition: {|before, after| $before == $dir }
-                code: $"rm -rf ($dir)"
+                code: (
+                    $"
+                    print $'\(ansi grey\)clean temp dir: `($dir)`\(ansi reset\)'
+                    rm -rf ($dir)
+                    $env.config.hooks.env_change.PWD = \($env.config.hooks.env_change.PWD | slice ..-2\)
+                    "
+                    | str trim
+                    | str replace -rma '^ {20}' ''
+                )
             }
         ]
     }
