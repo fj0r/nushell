@@ -107,7 +107,6 @@ export def wrap-fn [
         $"
         export def --env ($alias) [($args | str join ', ')] {
             ($prelude | str join '; ')
-            print $'\(ansi grey\)re-execute to load...\(ansi grey\)'
         }
         " | str trim | str replace -rma $'^ {8}' ''
     } else {

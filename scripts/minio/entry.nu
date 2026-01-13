@@ -2,6 +2,5 @@
 
 # export alias mls = mc-ls #[entry]
 export def --env mls [src: string] {
-    $env.config.hooks.pre_execution = [ { code: 'print $"(ansi grey)load minio...(ansi reset)";use minio *; $env.config.hooks.pre_execution = ($env.config.hooks.pre_execution | slice ..-2)' } ]
-    print $'(ansi grey)re-execute to load...(ansi grey)'
+    $env.config.hooks.pre_execution = [ { code: 'print $"(ansi grey)load (ansi xterm_grey58)minio(ansi grey)...(ansi reset)";use minio *; $env.config.hooks.pre_execution = ($env.config.hooks.pre_execution | slice ..-2)' } ]; print $'(ansi grey)the next command will load the `(ansi xterm_grey58)minio(ansi grey)` module.(ansi grey)'
 }

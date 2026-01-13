@@ -170,8 +170,8 @@ export def 'gen entry' [] {
         let m = $p | path split | last
         let x = [
             # $"print \$'\(ansi grey\)load ($m)...\(ansi reset\)'"
-            $"$env.config.hooks.pre_execution = [ { code: 'print \$\"\(ansi grey\)load ($m)...\(ansi reset\)\";use ($m) *; $env.config.hooks.pre_execution = \($env.config.hooks.pre_execution | slice ..-2\)' } ]"
-            # $"use ($m) *"
+            $"$env.config.hooks.pre_execution = [ { code: 'print \$\"\(ansi grey\)load \(ansi xterm_grey58\)($m)\(ansi grey\)...\(ansi reset\)\";use ($m) *; $env.config.hooks.pre_execution = \($env.config.hooks.pre_execution | slice ..-2\)' } ]"
+            $"print $'\(ansi grey\)the next command will load the `\(ansi xterm_grey58\)($m)\(ansi grey\)` module.\(ansi grey\)'"
         ]
 
         $s ++= [

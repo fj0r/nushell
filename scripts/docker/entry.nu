@@ -2,23 +2,19 @@
 
 # export alias dp = container-list #[entry]
 export def --env dp [container?: string, --all(-a)] {
-    $env.config.hooks.pre_execution = [ { code: 'print $"(ansi grey)load docker...(ansi reset)";use docker *; $env.config.hooks.pre_execution = ($env.config.hooks.pre_execution | slice ..-2)' } ]
-    print $'(ansi grey)re-execute to load...(ansi grey)'
+    $env.config.hooks.pre_execution = [ { code: 'print $"(ansi grey)load (ansi xterm_grey58)docker(ansi grey)...(ansi reset)";use docker *; $env.config.hooks.pre_execution = ($env.config.hooks.pre_execution | slice ..-2)' } ]; print $'(ansi grey)the next command will load the `(ansi xterm_grey58)docker(ansi grey)` module.(ansi grey)'
 }
 # export alias dr = container-create #[entry]
 export def --env dr [image: string, ...cmd: any, --name: string, --debug(-x), --appimage, --netadmin, --user(-u): string, --master-user(-U), --proxy: string, --ssh(-s): string, --mnt(-m): string, --vols(-v): record, --ports(-p): record, --envs(-e): record, --daemon(-d), --join(-j): string, --network: string, --workdir(-w): string, --entrypoint: string, --dry-run, --with-x, --nvidia: int, --privileged(-P), --image-volumes(-V): list<string>, --options: list<string>] {
-    $env.config.hooks.pre_execution = [ { code: 'print $"(ansi grey)load docker...(ansi reset)";use docker *; $env.config.hooks.pre_execution = ($env.config.hooks.pre_execution | slice ..-2)' } ]
-    print $'(ansi grey)re-execute to load...(ansi grey)'
+    $env.config.hooks.pre_execution = [ { code: 'print $"(ansi grey)load (ansi xterm_grey58)docker(ansi grey)...(ansi reset)";use docker *; $env.config.hooks.pre_execution = ($env.config.hooks.pre_execution | slice ..-2)' } ]; print $'(ansi grey)the next command will load the `(ansi xterm_grey58)docker(ansi grey)` module.(ansi grey)'
 }
 # export alias dx = container-preset #[entry]
 export def --env dx [preset: string, ...cmd: any, --vols(-v): any, --ports(-p): any, --envs(-e): any, --proxy: string, --ssh(-s): string, --debug(-d), --privileged(-P), --netadmin, --with-x, --dry-run] {
-    $env.config.hooks.pre_execution = [ { code: 'print $"(ansi grey)load docker...(ansi reset)";use docker *; $env.config.hooks.pre_execution = ($env.config.hooks.pre_execution | slice ..-2)' } ]
-    print $'(ansi grey)re-execute to load...(ansi grey)'
+    $env.config.hooks.pre_execution = [ { code: 'print $"(ansi grey)load (ansi xterm_grey58)docker(ansi grey)...(ansi reset)";use docker *; $env.config.hooks.pre_execution = ($env.config.hooks.pre_execution | slice ..-2)' } ]; print $'(ansi grey)the next command will load the `(ansi xterm_grey58)docker(ansi grey)` module.(ansi grey)'
 }
 #[*]
 export alias dl = container-log #[entry]
 # export alias di = image-list #[entry]
 export def --env di [image?: string, --layer, --history] {
-    $env.config.hooks.pre_execution = [ { code: 'print $"(ansi grey)load docker...(ansi reset)";use docker *; $env.config.hooks.pre_execution = ($env.config.hooks.pre_execution | slice ..-2)' } ]
-    print $'(ansi grey)re-execute to load...(ansi grey)'
+    $env.config.hooks.pre_execution = [ { code: 'print $"(ansi grey)load (ansi xterm_grey58)docker(ansi grey)...(ansi reset)";use docker *; $env.config.hooks.pre_execution = ($env.config.hooks.pre_execution | slice ..-2)' } ]; print $'(ansi grey)the next command will load the `(ansi xterm_grey58)docker(ansi grey)` module.(ansi grey)'
 }

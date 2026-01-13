@@ -2,6 +2,5 @@
 
 # export alias sl = scratch-list #[entry]
 export def --env sl [...xtags: string, --search(-s): string, --trash(-T), --hidden(-H), --important(-i): int, --urgent(-u): int, --challenge(-c): int, --updated: duration, --created: duration, --deadline: duration, --relevant(-r): int, --sort: list<string>, --done(-x): int, --raw, --md(-m), --md-list(-l), --scratch-tree, --debug, --accumulator(-a): any] {
-    $env.config.hooks.pre_execution = [ { code: 'print $"(ansi grey)load scratch...(ansi reset)";use scratch *; $env.config.hooks.pre_execution = ($env.config.hooks.pre_execution | slice ..-2)' } ]
-    print $'(ansi grey)re-execute to load...(ansi grey)'
+    $env.config.hooks.pre_execution = [ { code: 'print $"(ansi grey)load (ansi xterm_grey58)scratch(ansi grey)...(ansi reset)";use scratch *; $env.config.hooks.pre_execution = ($env.config.hooks.pre_execution | slice ..-2)' } ]; print $'(ansi grey)the next command will load the `(ansi xterm_grey58)scratch(ansi grey)` module.(ansi grey)'
 }
