@@ -1,11 +1,15 @@
-export def convert-alias-file [file: path prelude?] {
+export def convert-alias-file [
+    file: path
+    prelude?
+    --header(-h)
+] {
     open -r $file
     | lines
     | each {|x|
         let d = $x | parse -r '^\s*export\s+alias\s+(?<a>.+)\s+=\s+(?<f>.+)\s+#\[entry\]'
         if ($d | is-not-empty) {
             let d = $d | first
-            let d = do -i { wrap-fn $d.a $d.f $prelude }
+            let d = do -i { wrap-fn --header=$header $d.a $d.f $prelude }
             if ($d | is-empty) {
                 [$"#[*]" $x]
             } else {
@@ -50,7 +54,12 @@ def handle_parameter [i] {
     }
 }
 
-export def wrap-fn [alias cmd prelude?: list = [] ] {
+export def wrap-fn [
+    alias
+    cmd
+    prelude?: list = []
+    --header(-h)
+] {
     use argx
     let c = $cmd | argx parse
     let s = scope commands | where name == $c.tag | first | get signatures
@@ -94,11 +103,20 @@ export def wrap-fn [alias cmd prelude?: list = [] ] {
             }
         }
     }
-    $'
-    export def ($alias) [($args | str join ", ")] {
-        let n = $in
-        ($prelude | str join "; ")
-        $n | ([$c.tag ...$uses] | str join " ")
+    if $header {
+        $"
+        export def --env ($alias) [($args | str join ', ')] {
+            ($prelude | str join '; ')
+            print $'\(ansi grey\)re-execute to load...\(ansi grey\)'
+        }
+        " | str trim | str replace -rma $'^ {8}' ''
+    } else {
+        $'
+        export def --env ($alias) [($args | str join ", ")] {
+            let n = $in
+            ($prelude | str join "; ")
+            $n | ([$c.tag ...$uses] | str join " ")
+        }
+        ' | str trim | str replace -rma $'^ {8}' ''
     }
-    ' | str trim | str replace -rma $'^ {4}' ''
 }

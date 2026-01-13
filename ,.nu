@@ -168,10 +168,16 @@ export def 'gen entry' [] {
     for i in (ls scripts/*/shortcut.nu | get name) {
         let p = $i | path parse | get parent
         let m = $p | path split | last
+        let x = [
+            # $"print \$'\(ansi grey\)load ($m)...\(ansi reset\)'"
+            $"$env.config.hooks.pre_execution = [ { code: 'print \$\"\(ansi grey\)load ($m)...\(ansi reset\)\";use ($m) *; $env.config.hooks.pre_execution = \($env.config.hooks.pre_execution | slice ..-2\)' } ]"
+            # $"use ($m) *"
+        ]
+
         $s ++= [
             $"print $'[\(date now | format date \"%+\"\)]($m)'"
             $"use ($m) *"
-            $"convert-alias-file ($i) [$'use ($m) *' $'use ($m)/shortcut.nu *'] | save -f ($p | path join entry.nu)"
+            $"convert-alias-file --header ($i) ($x | to json -r) | save -f ($p | path join entry.nu)"
         ]
     }
     $s
