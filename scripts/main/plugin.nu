@@ -1,44 +1,55 @@
 # config
 use argx
 use lg
-use perform-or-print *
-# use git *
-use git/entry.nu *
-# use kubernetes *
-use kubernetes/entry.nu *
-# use docker *
-use docker/entry.nu *
+# use perform-or-print *
+
+# use git/entry.nu *
+use git *
+use git/shortcut.nu *
+
+# use kubernetes/entry.nu *
+use kubernetes *
+use kubernetes/shortcut.nu *
+
+# use docker/entry.nu *
+use docker *
+use docker/shortcut.nu *
+
+use scratch/entry.nu *
 # use scratch *
 # use scratch/integration/git.nu *
-use scratch/entry.nu *
+
+use llm/entry.nu *
 # use llm *
 # use llm/integration/web.nu *
-use llm/entry.nu *
 # source llm/agents/kubernetes.nu
 # source llm/agents/research.nu
+
 use project *
 use ssh *
 use nomad *
-use parser
-use devcontainer
+# use parser
+# use devcontainer
 
 use std/dirs
 # autoload
 use os *
 # use nvim *
-use netcat *
 use nushell.nu *
-use benchmark
+# use benchmark
 use cwdhist *
-use history-utils *
-use history-utils/backup.nu *
+
+# use history-utils *
+# use history-utils/backup.nu *
 # use resolvenv
+
 use git-cmp.nu *
 # use aichat-cmp.nu *
-use rustic *
-use minio *
-use cdp *
-use surrealdb
+# use rustic *
+# use minio *
+# use cdp *
+# use surrealdb
+
 #use just.nu *
 #use completion-generator.nu *
 

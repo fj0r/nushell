@@ -17,6 +17,7 @@ export use rbw.nu *
 export use ssl.nu *
 export use cargo.nu *
 export use file.nu *
+export use netcat.nu *
 
 export-env {
     # use niri.nu *
