@@ -6,17 +6,17 @@ use lg
 # use git/entry.nu *
 use git *
 
-# use kubernetes/entry.nu *
+use kubernetes/entry.nu *
 # use kubernetes *
 
-# use docker/entry.nu *
+use docker/entry.nu *
 # use docker *
 
-# use scratch/entry.nu *
+use scratch/entry.nu *
 # use scratch *
 # use scratch/integration/git.nu *
 
-# use llm/entry.nu *
+use llm/entry.nu *
 # use llm *
 # use llm/integration/web.nu *
 # source llm/agents/kubernetes.nu
