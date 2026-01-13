@@ -229,3 +229,4 @@ export use utils.nu *
 export use registry.nu *
 export use oci.nu *
 export use buildah.nu *
+export use shortcut.nu *
