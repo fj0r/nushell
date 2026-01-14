@@ -46,3 +46,10 @@ export-env {
     ]
 }
 
+export def notify-zellij [msg?] {
+    let tab = zellij action list-clients | lines | get 1 | split row -r '\s+' | get 1 | split row '_' | get 1
+    notify-send $env.pwd ($msg | default '')
+    sleep 5sec
+    print $"go-to-tab ($tab)"
+    zellij action go-to-tab $tab
+}
