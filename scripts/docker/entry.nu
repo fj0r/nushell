@@ -18,3 +18,11 @@ export alias dl = container-log #[entry]
 export def --env di [image?: string, --layer, --history] {
     $env.config.hooks.pre_execution = [ { code: 'print $"(ansi grey)load (ansi xterm_grey58)docker(ansi grey)...(ansi reset)";use docker *; $env.config.hooks.pre_execution = ($env.config.hooks.pre_execution | slice ..-2)' } ]; print $'(ansi grey)the next command will load the `(ansi xterm_grey58)docker(ansi grey)` module.(ansi grey)'
 }
+# export alias dpl = image-pull #[entry]
+export def --env dpl [image: any, --insecure(-i), --rename(-r): string, --dry-run] {
+    $env.config.hooks.pre_execution = [ { code: 'print $"(ansi grey)load (ansi xterm_grey58)docker(ansi grey)...(ansi reset)";use docker *; $env.config.hooks.pre_execution = ($env.config.hooks.pre_execution | slice ..-2)' } ]; print $'(ansi grey)the next command will load the `(ansi xterm_grey58)docker(ansi grey)` module.(ansi grey)'
+}
+# export alias dsv = image-save #[entry]
+export def --env dsv [...image: string] {
+    $env.config.hooks.pre_execution = [ { code: 'print $"(ansi grey)load (ansi xterm_grey58)docker(ansi grey)...(ansi reset)";use docker *; $env.config.hooks.pre_execution = ($env.config.hooks.pre_execution | slice ..-2)' } ]; print $'(ansi grey)the next command will load the `(ansi xterm_grey58)docker(ansi grey)` module.(ansi grey)'
+}
