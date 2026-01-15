@@ -70,10 +70,9 @@ export def cptree [
     target
     --glob(-g): glob = **/*
 ] {
+    let target = $target | path expand
     mkdir $target
-    let target = $env.PWD | path join $target
     cd $source
-    print $env.PWD
     ls ($glob | into glob)
     | get name
     | each {|x|
