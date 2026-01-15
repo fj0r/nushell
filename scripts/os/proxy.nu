@@ -34,7 +34,7 @@ export def --env "toggle proxy" [proxy?:string@cmpl-proxys] {
                 null
             } else {
                 let p = if ($proxy | is-empty) {
-                            'http://localhost:7890'
+                            'socks5://127.0.0.1:7891'
                         } else {
                             $proxy
                         }
