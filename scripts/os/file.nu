@@ -27,6 +27,11 @@ export def with-cd [path act --yes(-y)] {
     do $act $path $old
 }
 
+export def not-subpath [p] {
+    let sub = $in
+    do -i { $sub | path relative-to ($p) } | default '' |  is-empty
+}
+
 # new dir and then cd
 export def --env nd [
     dir
@@ -46,16 +51,15 @@ export def --env nd [
     dirs add $dir
     if $temp {
         use nushell.nu self-destruct-hook
-        let id = $'nd::($dir)'
         $env.config.hooks.env_change.PWD ++= [
             {
-                self-destruct: $id
-                condition: {|before, after| $before == $dir }
+                nd-destruct: $dir
+                condition: {|before, after| $after != $dir and ($after | not-subpath $dir) }
                 code: (
                     $"
                     print $'\(ansi grey\)clean temp dir: `($dir)`\(ansi reset\)'
                     rm -rf ($dir)
-                    (self-destruct-hook env_change.PWD self-destruct $id)
+                    (self-destruct-hook env_change.PWD nd-destruct $dir)
                     "
                     | str trim
                     | str replace -rma '^ {20}' ''
@@ -65,21 +69,18 @@ export def --env nd [
     }
 }
 
-export def cptree [
-    source
-    target
-    --glob(-g): glob = **/*
-] {
+export def into-tree [target: path, --cwd(-c): path]: list<string> -> nothing  {
+    let n = $in
     let target = $target | path expand
     mkdir $target
-    cd $source
-    ls ($glob | into glob)
-    | get name
-    | each {|x|
+    if ($cwd | is-not-empty) {
+        cd $cwd
+    }
+    for x in $n {
         let d = $target | path join ($x | path parse | get parent)
         if not ($d | path exists) {
             mkdir $d
         }
-        cp -v -r $x $d
+        cp -r -v $x $d
     }
 }
