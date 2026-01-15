@@ -164,13 +164,14 @@ export def 'gen README' [] {
 }
 
 export def 'gen entry' [] {
+    use nushell.nu self-destruct-hook
     mut s = ["use scripts/argx/utils.nu *"]
     for i in (ls scripts/*/shortcut.nu | get name) {
         let p = $i | path parse | get parent
         let m = $p | path split | last
         let x = [
             # $"print \$'\(ansi grey\)load ($m)...\(ansi reset\)'"
-            $"$env.config.hooks.pre_execution = [ { code: 'print \$\"\(ansi grey\)load \(ansi xterm_grey58\)($m)\(ansi grey\)...\(ansi reset\)\";use ($m) *; $env.config.hooks.pre_execution = \($env.config.hooks.pre_execution | slice ..-2\)' } ]"
+            $"$env.config.hooks.pre_execution ++= [ { self-destruct: ($m) code: 'print \$\"\(ansi grey\)load \(ansi xterm_grey58\)($m)\(ansi grey\)...\(ansi reset\)\";use ($m) *; (self-destruct-hook pre_execution self-destruct $m)' } ]"
             $"print $'\(ansi grey\)the next command will load the `\(ansi xterm_grey58\)($m)\(ansi grey\)` module.\(ansi grey\)'"
         ]
 

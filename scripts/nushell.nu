@@ -164,5 +164,5 @@ export def 'config reset' [] {
 }
 
 export def 'self-destruct-hook' [selector key id] {
-    $"$env.config.hooks.($selector) = $env.config.hooks.($selector) | where {|x| \($x | describe -d\).type != record or $x.($key)? != '($id)' }"
+    $"$env.config.hooks.($selector) = $env.config.hooks.($selector) | where {|x| \($x | describe -d\).type != record or $x.($key)? != ($id | into string) }"
 }

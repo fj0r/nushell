@@ -2,49 +2,49 @@
 
 # export alias kn = kube-change-namespace #[entry]
 export def --env kn [namespace: string] {
-    $env.config.hooks.pre_execution = [ { code: 'print $"(ansi grey)load (ansi xterm_grey58)kubernetes(ansi grey)...(ansi reset)";use kubernetes *; $env.config.hooks.pre_execution = ($env.config.hooks.pre_execution | slice ..-2)' } ]; print $'(ansi grey)the next command will load the `(ansi xterm_grey58)kubernetes(ansi grey)` module.(ansi grey)'
+    $env.config.hooks.pre_execution ++= [ { self-destruct: kubernetes code: 'print $"(ansi grey)load (ansi xterm_grey58)kubernetes(ansi grey)...(ansi reset)";use kubernetes *; $env.config.hooks.pre_execution = $env.config.hooks.pre_execution | where {|x| ($x | describe -d).type != record or $x.self-destruct? != kubernetes }' } ]; print $'(ansi grey)the next command will load the `(ansi xterm_grey58)kubernetes(ansi grey)` module.(ansi grey)'
 }
 # export alias kg = kube-get #[entry]
 export def --env kg [kind: string, resource?: string, --namespace(-n): string, --jsonpath(-p): string, --selector(-l): string, --verbose(-v), --wide(-w), --watch(-W), --all(-a)] {
-    $env.config.hooks.pre_execution = [ { code: 'print $"(ansi grey)load (ansi xterm_grey58)kubernetes(ansi grey)...(ansi reset)";use kubernetes *; $env.config.hooks.pre_execution = ($env.config.hooks.pre_execution | slice ..-2)' } ]; print $'(ansi grey)the next command will load the `(ansi xterm_grey58)kubernetes(ansi grey)` module.(ansi grey)'
+    $env.config.hooks.pre_execution ++= [ { self-destruct: kubernetes code: 'print $"(ansi grey)load (ansi xterm_grey58)kubernetes(ansi grey)...(ansi reset)";use kubernetes *; $env.config.hooks.pre_execution = $env.config.hooks.pre_execution | where {|x| ($x | describe -d).type != record or $x.self-destruct? != kubernetes }' } ]; print $'(ansi grey)the next command will load the `(ansi xterm_grey58)kubernetes(ansi grey)` module.(ansi grey)'
 }
 # export alias kd = kube-describe #[entry]
 export def --env kd [kind: string, resource: string, --namespace(-n): string] {
-    $env.config.hooks.pre_execution = [ { code: 'print $"(ansi grey)load (ansi xterm_grey58)kubernetes(ansi grey)...(ansi reset)";use kubernetes *; $env.config.hooks.pre_execution = ($env.config.hooks.pre_execution | slice ..-2)' } ]; print $'(ansi grey)the next command will load the `(ansi xterm_grey58)kubernetes(ansi grey)` module.(ansi grey)'
+    $env.config.hooks.pre_execution ++= [ { self-destruct: kubernetes code: 'print $"(ansi grey)load (ansi xterm_grey58)kubernetes(ansi grey)...(ansi reset)";use kubernetes *; $env.config.hooks.pre_execution = $env.config.hooks.pre_execution | where {|x| ($x | describe -d).type != record or $x.self-destruct? != kubernetes }' } ]; print $'(ansi grey)the next command will load the `(ansi xterm_grey58)kubernetes(ansi grey)` module.(ansi grey)'
 }
 # export alias kgno = kube-get-node #[entry]
 export def --env kgno [] {
-    $env.config.hooks.pre_execution = [ { code: 'print $"(ansi grey)load (ansi xterm_grey58)kubernetes(ansi grey)...(ansi reset)";use kubernetes *; $env.config.hooks.pre_execution = ($env.config.hooks.pre_execution | slice ..-2)' } ]; print $'(ansi grey)the next command will load the `(ansi xterm_grey58)kubernetes(ansi grey)` module.(ansi grey)'
+    $env.config.hooks.pre_execution ++= [ { self-destruct: kubernetes code: 'print $"(ansi grey)load (ansi xterm_grey58)kubernetes(ansi grey)...(ansi reset)";use kubernetes *; $env.config.hooks.pre_execution = $env.config.hooks.pre_execution | where {|x| ($x | describe -d).type != record or $x.self-destruct? != kubernetes }' } ]; print $'(ansi grey)the next command will load the `(ansi xterm_grey58)kubernetes(ansi grey)` module.(ansi grey)'
 }
 # export alias kgp = kube-get pods #[entry]
 export def --env kgp [resource?: string, --namespace(-n): string, --jsonpath(-p): string, --selector(-l): string, --verbose(-v), --wide(-w), --watch(-W), --all(-a)] {
-    $env.config.hooks.pre_execution = [ { code: 'print $"(ansi grey)load (ansi xterm_grey58)kubernetes(ansi grey)...(ansi reset)";use kubernetes *; $env.config.hooks.pre_execution = ($env.config.hooks.pre_execution | slice ..-2)' } ]; print $'(ansi grey)the next command will load the `(ansi xterm_grey58)kubernetes(ansi grey)` module.(ansi grey)'
+    $env.config.hooks.pre_execution ++= [ { self-destruct: kubernetes code: 'print $"(ansi grey)load (ansi xterm_grey58)kubernetes(ansi grey)...(ansi reset)";use kubernetes *; $env.config.hooks.pre_execution = $env.config.hooks.pre_execution | where {|x| ($x | describe -d).type != record or $x.self-destruct? != kubernetes }' } ]; print $'(ansi grey)the next command will load the `(ansi xterm_grey58)kubernetes(ansi grey)` module.(ansi grey)'
 }
 # export alias kwp = kube-get pods -W #[entry]
 export def --env kwp [resource?: string, --namespace(-n): string, --jsonpath(-p): string, --selector(-l): string, --verbose(-v), --wide(-w), --all(-a)] {
-    $env.config.hooks.pre_execution = [ { code: 'print $"(ansi grey)load (ansi xterm_grey58)kubernetes(ansi grey)...(ansi reset)";use kubernetes *; $env.config.hooks.pre_execution = ($env.config.hooks.pre_execution | slice ..-2)' } ]; print $'(ansi grey)the next command will load the `(ansi xterm_grey58)kubernetes(ansi grey)` module.(ansi grey)'
+    $env.config.hooks.pre_execution ++= [ { self-destruct: kubernetes code: 'print $"(ansi grey)load (ansi xterm_grey58)kubernetes(ansi grey)...(ansi reset)";use kubernetes *; $env.config.hooks.pre_execution = $env.config.hooks.pre_execution | where {|x| ($x | describe -d).type != record or $x.self-destruct? != kubernetes }' } ]; print $'(ansi grey)the next command will load the `(ansi xterm_grey58)kubernetes(ansi grey)` module.(ansi grey)'
 }
 # export alias kdp = kube-describe pod #[entry]
 export def --env kdp [resource: string, --namespace(-n): string] {
-    $env.config.hooks.pre_execution = [ { code: 'print $"(ansi grey)load (ansi xterm_grey58)kubernetes(ansi grey)...(ansi reset)";use kubernetes *; $env.config.hooks.pre_execution = ($env.config.hooks.pre_execution | slice ..-2)' } ]; print $'(ansi grey)the next command will load the `(ansi xterm_grey58)kubernetes(ansi grey)` module.(ansi grey)'
+    $env.config.hooks.pre_execution ++= [ { self-destruct: kubernetes code: 'print $"(ansi grey)load (ansi xterm_grey58)kubernetes(ansi grey)...(ansi reset)";use kubernetes *; $env.config.hooks.pre_execution = $env.config.hooks.pre_execution | where {|x| ($x | describe -d).type != record or $x.self-destruct? != kubernetes }' } ]; print $'(ansi grey)the next command will load the `(ansi xterm_grey58)kubernetes(ansi grey)` module.(ansi grey)'
 }
 # export alias kl = kube-log #[entry]
 export def --env kl [pod: string, --namespace(-n): string, --container(-c): string, --follow(-f), --previous(-p), --all-pods(-a)] {
-    $env.config.hooks.pre_execution = [ { code: 'print $"(ansi grey)load (ansi xterm_grey58)kubernetes(ansi grey)...(ansi reset)";use kubernetes *; $env.config.hooks.pre_execution = ($env.config.hooks.pre_execution | slice ..-2)' } ]; print $'(ansi grey)the next command will load the `(ansi xterm_grey58)kubernetes(ansi grey)` module.(ansi grey)'
+    $env.config.hooks.pre_execution ++= [ { self-destruct: kubernetes code: 'print $"(ansi grey)load (ansi xterm_grey58)kubernetes(ansi grey)...(ansi reset)";use kubernetes *; $env.config.hooks.pre_execution = $env.config.hooks.pre_execution | where {|x| ($x | describe -d).type != record or $x.self-destruct? != kubernetes }' } ]; print $'(ansi grey)the next command will load the `(ansi xterm_grey58)kubernetes(ansi grey)` module.(ansi grey)'
 }
 # export alias kgs = kube-get services #[entry]
 export def --env kgs [resource?: string, --namespace(-n): string, --jsonpath(-p): string, --selector(-l): string, --verbose(-v), --wide(-w), --watch(-W), --all(-a)] {
-    $env.config.hooks.pre_execution = [ { code: 'print $"(ansi grey)load (ansi xterm_grey58)kubernetes(ansi grey)...(ansi reset)";use kubernetes *; $env.config.hooks.pre_execution = ($env.config.hooks.pre_execution | slice ..-2)' } ]; print $'(ansi grey)the next command will load the `(ansi xterm_grey58)kubernetes(ansi grey)` module.(ansi grey)'
+    $env.config.hooks.pre_execution ++= [ { self-destruct: kubernetes code: 'print $"(ansi grey)load (ansi xterm_grey58)kubernetes(ansi grey)...(ansi reset)";use kubernetes *; $env.config.hooks.pre_execution = $env.config.hooks.pre_execution | where {|x| ($x | describe -d).type != record or $x.self-destruct? != kubernetes }' } ]; print $'(ansi grey)the next command will load the `(ansi xterm_grey58)kubernetes(ansi grey)` module.(ansi grey)'
 }
 # export alias kgd = kube-get deployments #[entry]
 export def --env kgd [resource?: string, --namespace(-n): string, --jsonpath(-p): string, --selector(-l): string, --verbose(-v), --wide(-w), --watch(-W), --all(-a)] {
-    $env.config.hooks.pre_execution = [ { code: 'print $"(ansi grey)load (ansi xterm_grey58)kubernetes(ansi grey)...(ansi reset)";use kubernetes *; $env.config.hooks.pre_execution = ($env.config.hooks.pre_execution | slice ..-2)' } ]; print $'(ansi grey)the next command will load the `(ansi xterm_grey58)kubernetes(ansi grey)` module.(ansi grey)'
+    $env.config.hooks.pre_execution ++= [ { self-destruct: kubernetes code: 'print $"(ansi grey)load (ansi xterm_grey58)kubernetes(ansi grey)...(ansi reset)";use kubernetes *; $env.config.hooks.pre_execution = $env.config.hooks.pre_execution | where {|x| ($x | describe -d).type != record or $x.self-destruct? != kubernetes }' } ]; print $'(ansi grey)the next command will load the `(ansi xterm_grey58)kubernetes(ansi grey)` module.(ansi grey)'
 }
 # export alias ktp = kube-top-pod #[entry]
 export def --env ktp [--namespace(-n): string, --all(-a)] {
-    $env.config.hooks.pre_execution = [ { code: 'print $"(ansi grey)load (ansi xterm_grey58)kubernetes(ansi grey)...(ansi reset)";use kubernetes *; $env.config.hooks.pre_execution = ($env.config.hooks.pre_execution | slice ..-2)' } ]; print $'(ansi grey)the next command will load the `(ansi xterm_grey58)kubernetes(ansi grey)` module.(ansi grey)'
+    $env.config.hooks.pre_execution ++= [ { self-destruct: kubernetes code: 'print $"(ansi grey)load (ansi xterm_grey58)kubernetes(ansi grey)...(ansi reset)";use kubernetes *; $env.config.hooks.pre_execution = $env.config.hooks.pre_execution | where {|x| ($x | describe -d).type != record or $x.self-destruct? != kubernetes }' } ]; print $'(ansi grey)the next command will load the `(ansi xterm_grey58)kubernetes(ansi grey)` module.(ansi grey)'
 }
 # export alias ktno = kube-top-node #[entry]
 export def --env ktno [] {
-    $env.config.hooks.pre_execution = [ { code: 'print $"(ansi grey)load (ansi xterm_grey58)kubernetes(ansi grey)...(ansi reset)";use kubernetes *; $env.config.hooks.pre_execution = ($env.config.hooks.pre_execution | slice ..-2)' } ]; print $'(ansi grey)the next command will load the `(ansi xterm_grey58)kubernetes(ansi grey)` module.(ansi grey)'
+    $env.config.hooks.pre_execution ++= [ { self-destruct: kubernetes code: 'print $"(ansi grey)load (ansi xterm_grey58)kubernetes(ansi grey)...(ansi reset)";use kubernetes *; $env.config.hooks.pre_execution = $env.config.hooks.pre_execution | where {|x| ($x | describe -d).type != record or $x.self-destruct? != kubernetes }' } ]; print $'(ansi grey)the next command will load the `(ansi xterm_grey58)kubernetes(ansi grey)` module.(ansi grey)'
 }
