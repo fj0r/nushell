@@ -17,7 +17,7 @@ export-env {
                 condition: {|_, after| ',' in (overlay list | where active | get name) }
                 code: ([
                     #$"hide ," # HACK: clean
-                    $"overlay hide , --keep-env [ PWD OLDPWD ]"
+                    $"overlay hide , --keep-env [ PWD OLDPWD config ]"
                     $"print '(ansi default_italic)(ansi grey)unload overlay (ansi default_bold),(ansi reset)'"
                 ] | str join (char newline))
             }

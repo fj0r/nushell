@@ -45,14 +45,17 @@ export def --env nd [
     use std/dirs
     dirs add $dir
     if $temp {
+        use nushell.nu self-destruct-hook
+        let id = $'nd::($dir)'
         $env.config.hooks.env_change.PWD ++= [
             {
+                self-destruct: $id
                 condition: {|before, after| $before == $dir }
                 code: (
                     $"
                     print $'\(ansi grey\)clean temp dir: `($dir)`\(ansi reset\)'
                     rm -rf ($dir)
-                    $env.config.hooks.env_change.PWD = \($env.config.hooks.env_change.PWD | slice ..-2\)
+                    (self-destruct-hook env_change.PWD self-destruct $id)
                     "
                     | str trim
                     | str replace -rma '^ {20}' ''

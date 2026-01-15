@@ -162,3 +162,7 @@ export def 'config reset' [] {
     | str join (char newline) | save -a $nu.config-path
     config env --default | save -f $nu.env-path
 }
+
+export def 'self-destruct-hook' [selector key id] {
+    $"$env.config.hooks.($selector) = $env.config.hooks.($selector) | where {|x| \($x | describe -d\).type != record or $x.($key)? != '($id)' }"
+}
