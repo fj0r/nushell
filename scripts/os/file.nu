@@ -78,7 +78,9 @@ export def cptree [
     | get name
     | each {|x|
         let d = $target | path join ($x | path parse | get parent)
-        mkdir $d
+        if not ($d | path exists) {
+            mkdir $d
+        }
         cp -v -r $x $d
     }
 }
