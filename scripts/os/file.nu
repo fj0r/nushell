@@ -42,9 +42,9 @@ export def --env nd [
     let dir = if not $temp {
         $dir
     } else {
-        $"($surrfix)($dir)($surrfix)"
+        let d = $dir | path expand | path split
+        $d | slice ..-2 | path join $"($surrfix)($d | last)($surrfix)" | path join
     }
-    | path expand
 
     mkdir $dir
     use std/dirs
