@@ -26,4 +26,3 @@ const __dyn_load = if ('~/.nu' | path exists) { '~/.nu' }
 source $__dyn_load
 
 source keymaps.nu
-
