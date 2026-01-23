@@ -7,7 +7,7 @@ def cmp-fs [] {
     | lines
     | slice 1..
     | split column -r '\s+' fs size used avail percent mount
-    | where { $in.fs | str starts-with '/' }
+    | where {|x| ($x.fs | str starts-with '/') and ($x.mount | path split | get 1?) in ['run', 'media'] }
     | each {|x|
         { value: $x.fs, description: $"($x.size)\t($x.mount)" }
     }
