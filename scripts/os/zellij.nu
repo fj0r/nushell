@@ -16,8 +16,11 @@ export def zellij-enter [name: string@cmpl-zellij-session] {
     zellij attach --create $name
 }
 
-export def zellij-delete [name: string@cmpl-zellij-session] {
-    zellij delete-session $name
+export def zellij-delete [name: string@cmpl-zellij-session --force(-f)] {
+    mut args = []
+    if $force { $args ++= [--force] }
+    $args ++= [$name]
+    zellij delete-session ...$args
 }
 
 export def --env zellij-cd [path?: string] {
