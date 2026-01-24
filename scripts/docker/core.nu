@@ -461,6 +461,23 @@ def mk-mount [path target] {
     }
 }
 
+export def --env container-register-layer [
+    name
+    image
+    --mount(-m): string
+] {
+    let m = if ($mount | is-empty) {
+        $'/opt/($name)'
+    } else {
+        $mount
+    }
+    $env.CNTRLAYER = ($env.CNTRLAYER | upsert $name {
+        image: $image
+        mount: $m
+    })
+    image-pull $image
+}
+
 # run
 export def --wrapped container-create [
     --name: string
