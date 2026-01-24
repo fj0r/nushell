@@ -461,7 +461,7 @@ def mk-mount [path target] {
     }
 }
 
-export def --env container-register-layer [
+export def --env image-volume-register [
     name
     image
     --mount(-m): string
