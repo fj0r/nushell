@@ -30,20 +30,37 @@ def cmpl-alloc [context] {
     | { completions: $in, options: { sort: false } }
 }
 
+def cmpl-task [context] {
+    use argx
+    let ctx = $context | argx parse
+    nomad alloc logs $ctx.pos.alloc err>| lines
+    | str trim
+    | where {$in | str starts-with '*' }
+    | each { $in | str substring 2.. }
+}
+
 export def nomad-status [
     job?: string@cmpl-job
     alloc?: string@cmpl-alloc
-    path?: path
+    task?: string@cmpl-task
 ] {
     if ($job | is-empty) {
         nomad job status | from ssv -a
     } else if ($alloc | is-empty) {
         nomad job status $job
-    } else if ($path | is-empty) {
+    } else if ($task | is-empty) {
         nomad alloc logs -f $alloc
     } else {
-        nomad alloc fs $alloc $path
+        nomad alloc logs -f $alloc $task
     }
+}
+
+export def nomad-ls [
+    job?: string@cmpl-job
+    alloc?: string@cmpl-alloc
+    path?: path = '.'
+] {
+    nomad alloc fs $alloc $path
 }
 
 def cmpl-nomad-file [] {
