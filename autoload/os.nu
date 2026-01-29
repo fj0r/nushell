@@ -10,7 +10,7 @@ export use ../scripts/os/proxy.nu *
 export use ../scripts/os/sh.nu *
 export use ../scripts/os/web.nu *
 export use ../scripts/os/qutebrowser.nu *
-# export use ../scripts/os/niri.nu *
+export use ../scripts/os/niri.nu *
 export use ../scripts/os/zellij.nu *
 export use ../scripts/os/asciinema.nu *
 export use ../scripts/os/rbw.nu *
@@ -21,6 +21,6 @@ export use ../scripts/os/netcat.nu *
 export use ../scripts/os/notify.nu *
 
 export-env {
-    # use niri.nu *
+    use ../scripts/os/niri.nu *
     use ../scripts/os/zellij.nu *
 }

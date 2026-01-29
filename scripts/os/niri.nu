@@ -1,4 +1,5 @@
 export-env {
+    $env.NIRI_SOCKET = glob /run/user/(id -u)/niri*sock | first
     $env.NIRI_STARTUP = [
         [okular alacritty]
         [alacritty qutebrowser neovide]
