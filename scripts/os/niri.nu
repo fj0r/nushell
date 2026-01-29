@@ -25,3 +25,31 @@ def cmpl-actions [context] {
 export def --wrapped nact [...args: string@cmpl-actions] {
     niri msg action ...$args
 }
+
+export def nwin [
+    --all(-a)
+    --len(-l): int = 20
+] {
+    let r = niri msg -j windows | from json
+    if $all {
+        $r
+    } else {
+        $r
+        | select id title app_id workspace_id pid
+        | update title {|x|
+            if ($x.title | str length) > 20 {
+                $"($x.title | str substring ..$len)..."
+            } else {
+                $x.title
+            }
+        }
+    }
+}
+
+def cmpl-win [] {
+    nwin -a | each {|x| {value: $x.id, description: $x.title} }
+}
+
+export def nfocus [id: int@cmpl-win] {
+    niri msg action focus-window --id $id
+}
