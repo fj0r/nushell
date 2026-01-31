@@ -26,3 +26,21 @@ const __dyn_load = if ('~/.nu' | path exists) { '~/.nu' }
 source $__dyn_load
 
 source keymaps.nu
+
+
+$env.config.hooks.pre_prompt = ($env.config.hooks.pre_prompt? | default [])
+$env.config.hooks.pre_execution = ($env.config.hooks.pre_execution? | default [])
+$env.config.hooks.pre_execution ++= [{
+    if ((commandline) | str starts-with ' ') {
+      $env.DELETE_FROM_HISTORY = 1
+    }
+}]
+
+$env.config.hooks.pre_prompt ++= [{
+  if ($env.DELETE_FROM_HISTORY? != null) {
+    print $"(ansi grey)Command executed but not saved to history \(leading space detected\).(ansi reset)"
+    open $nu.history-path
+    | query db $"DELETE FROM history WHERE command_line LIKE ' %'"
+    hide-env DELETE_FROM_HISTORY
+  }
+}]
