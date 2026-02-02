@@ -15,17 +15,33 @@ def cmp-fs [] {
     { completions: $c, options: { sort: false, partial: false } }
 }
 
-export def eject-disk [fs :string@cmp-fs] {
-    udisksctl unmount -b $fs
-    mut d = ""
-    for i in -2..-4 {
-        let $a = $fs | str substring ..$i
-        if ($a | path exists) {
-            $d = $a
-            break
-        }
+export def eject-disk [fs: string@cmp-fs] {
+    print $"(ansi y)Attempting to unmount ($fs)...(ansi reset)"
+    let unmount_res = (udisksctl unmount -b $fs | complete)
+
+    if $unmount_res.exit_code != 0 {
+        print $"(ansi r)Error: Target is busy or cannot be unmounted.(ansi reset)"
+        print $unmount_res.stderr
+        return
     }
-    if ($d | is-not-empty ) and ([y n] | input list $"Power off ($d)?") == 'y' {
-        udisksctl power-off -b $d
+
+    let parent = do -i { lsblk -pdno PKNAME $fs } | lines | first | default "" | str trim
+    let disk = if ($parent | is-empty) { $fs } else { $parent }
+
+    # Safety check and interactive power-off
+    let is_valid = ($disk | is-not-empty) and ($disk | path exists)
+
+    if $is_valid and ([y n] | input list $"Confirm: Power off and spin down ($disk)?") == 'y' {
+        print $"(ansi b)Flushing caches and cutting power...(ansi reset)"
+        sync # Essential for Btrfs metadata integrity on HDDs
+
+        let pwr_res = (udisksctl power-off -b $disk | complete)
+        if $pwr_res.exit_code == 0 {
+            print $"(ansi g)✅ Success: Hardware stopped. Safe to unplug.(ansi reset)"
+        } else {
+            print $"(ansi r)Failed to power off: ($pwr_res.stderr)(ansi reset)"
+        }
+    } else {
+        print $"(ansi r)Error: Could not resolve physical device path.(ansi reset)"
     }
 }
