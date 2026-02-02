@@ -23,7 +23,7 @@ use lg
 # source llm/agents/research.nu
 
 use project *
-# use ssh *
+use ssh *
 # use nomad *
 # use parser
 # use devcontainer
