@@ -84,3 +84,18 @@ export def into-tree [target: path, --cwd(-c): path]: list<string> -> nothing  {
         cp -r -v $x $d
     }
 }
+
+export def rename-by-modified [--base: int = 1] {
+    let f = $in
+    let f = if ($f | is-empty) {
+        ls | sort-by modified | get name
+    } else {
+        $f
+    }
+    let w = $f | length  | math log 10 | math ceil
+    for x in ($f | enumerate) {
+        let n = $x.index + $base | fill -a r -c 0 -w $w
+        let n = $x.item | path parse | update stem $n | path join
+        mv $x.item $n
+    }
+}
