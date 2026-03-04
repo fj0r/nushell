@@ -9,11 +9,11 @@ export use ../scripts/os/network.nu *
 export use ../scripts/os/proxy.nu *
 export use ../scripts/os/sh.nu *
 export use ../scripts/os/web.nu *
-export use ../scripts/os/qutebrowser.nu *
-export use ../scripts/os/niri.nu *
+# export use ../scripts/os/qutebrowser.nu *
+# export use ../scripts/os/niri.nu *
 export use ../scripts/os/zellij.nu *
 export use ../scripts/os/asciinema.nu *
-export use ../scripts/os/rbw.nu *
+# export use ../scripts/os/rbw.nu *
 export use ../scripts/os/ssl.nu *
 export use ../scripts/os/cargo.nu *
 export use ../scripts/os/file.nu *
