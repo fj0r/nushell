@@ -4,6 +4,8 @@ source env.nu
 
 # settings
 $env.config.show_banner = 'short'
+# TODO: v0.112
+# $env.config.history.path = $nu.data-dir
 $env.config.use_kitty_protocol = true
 $env.config.filesize.unit = 'metric'
 $env.config.datetime_format.normal = '%m/%d/%y %H:%M:%S'

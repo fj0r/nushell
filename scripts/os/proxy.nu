@@ -26,7 +26,7 @@ def cmpl-proxys [context: string, offset: int] {
     }
 }
 
-export def --env "toggle proxy" [proxy?:string@cmpl-proxys --socks5(-s): string] {
+export def --env "toggle proxy" [proxy?:string@cmpl-proxys] {
     let has_set = ($env.https_proxy? | is-not-empty)
     let no_val = ($proxy | is-empty)
     if $has_set and $no_val {
@@ -36,21 +36,15 @@ export def --env "toggle proxy" [proxy?:string@cmpl-proxys --socks5(-s): string]
         $env.all_proxy = null
     } else {
         let proxy = if ($proxy | is-empty) {
-            'http://127.0.0.1:7890'
+            'socks5://127.0.0.1:7891'
         } else {
             $proxy
         }
         echo $'set proxy ($proxy)'
         $env.http_proxy = $proxy
         $env.https_proxy = $proxy
-        $env.all_proxy = if ($socks5 | is-empty) {
-            $proxy
-            | url parse
-            | update scheme socks5
-            | update port {|x| ($x.port | into int) + 1 }
-            | url join
-        } else {
-            $socks5
+        if ($proxy | url parse).scheme in [socks5 socks5h] {
+            $env.all_proxy = $proxy
         }
     }
     $env.no_proxy = 'localhost,127.0.0.1'
