@@ -13,10 +13,11 @@ export def "kadm update sans" [] {
         sudo mv $"/etc/kubernetes/pki/apiserver.($k)" .
     }
     kubeadm init phase certs apiserver --config kubeadm.yaml
-    let p = kgp -n kube-system
-    | where { $in.name | str starts-with kube-apiserver }
+    let p = kubectl get pods -n kube-system
+    | from ssv -a
+    | where { $in.NAME | str starts-with kube-apiserver }
     | first
-    | get name
+    | get NAME
     let a = [yes no] | input list 'kill pod/kube-apiserver in kube-system'
     if $a == 'yes' {
         kubectl delete pod $p --force --grace-period=0
