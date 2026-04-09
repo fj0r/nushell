@@ -24,9 +24,6 @@ if not ($nu.cache-dir | path exists) { mkdir $nu.cache-dir }
 
 source plugin.nu
 
-const __dyn_load = if ('~/.nu' | path exists) { '~/.nu' }
-source $__dyn_load
-
 source keymaps.nu
 
 
@@ -46,3 +43,6 @@ $env.config.hooks.pre_prompt ++= [{
     hide-env DELETE_FROM_HISTORY
   }
 }]
+
+const __dyn_load = if ('~/.nu' | path exists) { '~/.nu' }
+source $__dyn_load
