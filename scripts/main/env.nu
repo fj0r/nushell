@@ -16,9 +16,10 @@ def --env merge-path [path] {
     | each { glob $in }
     | flatten
     | where {|x| $x not-in $env.PATH }
-    for x in $p {
-        $env.PATH = $env.PATH | prepend $x
-    }
+    | reduce -f $env.PATH {|i,a| $a | prepend $i }
+    | uniq
+    | { PATH: $in }
+    | load-env
 }
 
 
