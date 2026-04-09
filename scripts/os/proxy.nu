@@ -31,9 +31,12 @@ export def --env "toggle proxy" [proxy?:string@cmpl-proxys] {
     let no_val = ($proxy | is-empty)
     if $has_set and $no_val {
         echo 'hide proxy'
-        $env.http_proxy = null
-        $env.https_proxy = null
-        $env.all_proxy = null
+        {
+            http_proxy: null
+            https_proxy: null
+            all_proxy: null
+        }
+        | load-env
     } else {
         let proxy = if ($proxy | is-empty) {
             'socks5://127.0.0.1:7891'
@@ -41,8 +44,11 @@ export def --env "toggle proxy" [proxy?:string@cmpl-proxys] {
             $proxy
         }
         echo $'set proxy ($proxy)'
-        $env.http_proxy = $proxy
-        $env.https_proxy = $proxy
+        {
+            http_proxy: $proxy
+            https_proxy: $proxy
+        }
+        | load-env
         if ($proxy | url parse).scheme in [socks5 socks5h] {
             $env.all_proxy = $proxy
         }

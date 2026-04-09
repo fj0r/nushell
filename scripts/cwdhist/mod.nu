@@ -62,9 +62,12 @@ def enter [path] {
 }
 
 export-env {
-    $env.CWD_HISTORY_FULL = false
-    $env.CWD_HISTORY_FILE = $nu.data-dir | path join 'cwd_history.sqlite'
-    $env.CWD_HISTORY_BLOCK = []
+    {
+        CWD_HISTORY_FULL: false
+        CWD_HISTORY_FILE: ($nu.data-dir | path join 'cwd_history.sqlite')
+        CWD_HISTORY_BLOCK: []
+    }
+    | load-env
 
     init
 

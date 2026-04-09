@@ -1,7 +1,10 @@
 export-env {
-    $env.CDP_PORT = 9222
-    $env.CDP_COUNT = 0
-    $env.CDP_URL = ''
+    {
+        CDP_PORT: 9222
+        CDP_COUNT: 0
+        CDP_URL: ''
+    }
+    | load-env
 }
 
 export def 'cdp up' [

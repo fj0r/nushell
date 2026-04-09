@@ -35,15 +35,15 @@ if $nu.os-info.family == 'windows'  {
     ]
 }
 
-$env.LD_LIBRARY_PATH = if ($env.LD_LIBRARY_PATH? | is-empty) { [] } else { $env.LD_LIBRARY_PATH }
-$env.LD_LIBRARY_PATH = do -i {
-    $env.LD_LIBRARY_PATH
-    | prepend (
-        ls ((stack ghc -- --print-libdir) | str trim)
-        | where type == dir
-        | get name
-        )
+let ghc_libdir = do -i {
+    ls ((stack ghc -- --print-libdir) | str trim)
+    | where type == dir
+    | get name
 }
+let new_ld_lib_path = (if ($env.LD_LIBRARY_PATH? | is-empty) { [] } else { $env.LD_LIBRARY_PATH })
+    | prepend ($ghc_libdir | default [])
+    | flatten
+{ LD_LIBRARY_PATH: $new_ld_lib_path } | load-env
 
 for s in ['/usr/local/bin', '/usr/bin'] {
     let p = [$s, 'nu'] | path join
@@ -52,7 +52,9 @@ for s in ['/usr/local/bin', '/usr/bin'] {
         break
     }
 }
-$env.PREFER_ALT = '1'
-$env.TERM = 'screen-256color'
-
-$env.EDITOR = 'hx'
+{
+    PREFER_ALT: '1'
+    TERM: 'screen-256color'
+    EDITOR: 'nvim'
+}
+| load-env

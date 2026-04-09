@@ -340,9 +340,13 @@ export def 'main' [
         return
     }
 
-    $env.config.table.mode = 'compact'
-    $env.config.table.padding = 0
-    $env.config.datetime_format.normal = '%m/%d/%y %H:%M:%S'
+    {
+        config: {
+            table: { mode: 'compact', padding: 0 }
+            datetime_format: { normal: '%m/%d/%y %H:%M:%S' }
+        }
+    }
+    | load-env
 
     let changed = if $by_date {
         let baseimg_date = image created $"http://($o.reg)" $o.repo $base_tag

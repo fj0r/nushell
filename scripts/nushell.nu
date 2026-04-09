@@ -141,14 +141,20 @@ def cmpl-config-table-modes [] {
 }
 
 export def --env 'config table mode' [mode: string@cmpl-config-table-modes] {
-    $env.config.table.padding = 1
-    $env.config.table.mode = $mode
+    {
+        config: {
+            table: { padding: 1, mode: $mode }
+        }
+    }
+    | load-env
 }
 
 export def --env 'switch display output' [] {
-    let t = $env.config.hooks.display_output
-    $env.config.hooks.display_output = $env.alternative_display_output_hook
-    $env.alternative_display_output_hook = $t
+    {
+        config: { hooks: { display_output: $env.alternative_display_output_hook } }
+        alternative_display_output_hook: $env.config.hooks.display_output
+    }
+    | load-env
 }
 
 export def 'config reset' [] {

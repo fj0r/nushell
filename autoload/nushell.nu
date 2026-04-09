@@ -147,8 +147,11 @@ export def --env 'config table mode' [mode: string@cmpl-config-table-modes] {
 
 export def --env 'switch display output' [] {
     let t = $env.config.hooks.display_output
-    $env.config.hooks.display_output = $env.alternative_display_output_hook
-    $env.alternative_display_output_hook = $t
+    {
+        config: { hooks: { display_output: $env.alternative_display_output_hook } }
+        alternative_display_output_hook: $t
+    }
+    | load-env
 }
 
 export def 'config reset' [] {
