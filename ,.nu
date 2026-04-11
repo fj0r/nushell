@@ -144,7 +144,7 @@ export def 'gen README' [] {
         let dist = [scripts $x.from] | path join
         let readme = [$dist README.md] | path join
         let desc = if ($readme | path exists) {
-            let t = open $readme | lines | first | parse -r '# (?<title>.*)'
+            let t = open -r $readme | lines | first | parse -r '# (?<title>.*)'
             if ($t | is-empty) { [] } else { $t.title }
         } else {
             []

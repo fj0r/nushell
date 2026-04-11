@@ -55,6 +55,6 @@ for s in ['/usr/local/bin', '/usr/bin'] {
 {
     PREFER_ALT: '1'
     TERM: 'screen-256color'
-    EDITOR: 'nvim'
+    EDITOR: 'hx'
 }
 | load-env

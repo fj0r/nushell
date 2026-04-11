@@ -4,8 +4,7 @@ source env.nu
 
 # settings
 $env.config.show_banner = 'short'
-# TODO: v0.112
-# $env.config.history.path = $nu.data-dir
+$env.config.history.path = $nu.data-dir
 $env.config.use_kitty_protocol = true
 $env.config.filesize.unit = 'metric'
 $env.config.datetime_format.normal = '%m/%d/%y %H:%M:%S'
@@ -18,6 +17,7 @@ $env.config.table.header_on_separator = true
 $env.config.table.mode = 'light' # light|compact
 $env.config.table.padding = 0
 $env.config.color_config.hints = 'gray'
+$env.config.history.ignore_space_prefixed = true
 
 if not ($nu.data-dir | path exists) { mkdir $nu.data-dir }
 if not ($nu.cache-dir | path exists) { mkdir $nu.cache-dir }
@@ -25,24 +25,6 @@ if not ($nu.cache-dir | path exists) { mkdir $nu.cache-dir }
 source plugin.nu
 
 source keymaps.nu
-
-
-$env.config.hooks.pre_prompt = ($env.config.hooks.pre_prompt? | default [])
-$env.config.hooks.pre_execution = ($env.config.hooks.pre_execution? | default [])
-$env.config.hooks.pre_execution ++= [{
-    if ((commandline) | str starts-with ' ') {
-      $env.DELETE_FROM_HISTORY = 1
-    }
-}]
-
-$env.config.hooks.pre_prompt ++= [{
-  if ($env.DELETE_FROM_HISTORY? != null) {
-    print $"(ansi grey)Command executed but not saved to history \(leading space detected\).(ansi reset)"
-    open $nu.history-path
-    | query db $"DELETE FROM history WHERE command_line LIKE ' %'"
-    hide-env DELETE_FROM_HISTORY
-  }
-}]
 
 const __dyn_load = if ('~/.nu' | path exists) { '~/.nu' }
 source $__dyn_load
