@@ -14,8 +14,8 @@ $env.config.history.isolation = true
 $env.config.completions.algorithm = 'fuzzy' # prefix|substring|fuzzy
 $env.config.completions.partial = false
 $env.config.table.header_on_separator = true
-$env.config.table.mode = 'light' # light|compact
-$env.config.table.padding = 0
+$env.config.table.mode = 'frameless' # light|compact|frameless
+$env.config.table.padding = 1
 $env.config.color_config.hints = 'gray'
 $env.config.history.ignore_space_prefixed = true
 
