@@ -8,6 +8,7 @@ $env.config.use_kitty_protocol = true
 $env.config.filesize.unit = "metric"
 $env.config.datetime_format.normal = "%m/%d/%y %H:%M:%S"
 $env.config.datetime_format.table = "%m/%d/%y %H:%M:%S"
+if not ($nu.data-dir | path exists) { mkdir $nu.data-dir }
 $env.config.history.path = $nu.data-dir
 $env.config.history.file_format = "sqlite"
 $env.config.history.isolation = true
@@ -16,7 +17,6 @@ $env.config.completions.algorithm = "fuzzy" # prefix|substring|fuzzy
 $env.config.completions.partial = false
 $env.config.table.header_on_separator = true
 $env.config.table.mode = "frameless" # light|compact|frameless
-$env.config.color_config.hints = "gray"
 
 if not ($nu.data-dir | path exists) { mkdir $nu.data-dir }
 if not ($nu.cache-dir | path exists) { mkdir $nu.cache-dir }
