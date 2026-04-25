@@ -1,3 +1,5 @@
+const ID = ','
+
 def --env init-db [env_name:string, file:string, hook: closure] {
     let begin = date now
     if $env_name not-in $env {
@@ -49,7 +51,7 @@ export def --env 'project init-registry' [] {
 export def --wrapped ,, [
     dir:string@cmpl-dir
     ...cmd:string@cmpl-cmd
-    --prefix:string=','
+    --prefix:string=$ID
     --mods(-m): list<any>
 ] {
     cd $dir
@@ -96,7 +98,7 @@ def sqlx [s] {
 }
 
 export def --env 'project register' [
-    --mod:string=','
+    --mod:string=$ID
     dir?:string
 ] {
     let dir = if ($dir | is-empty) { $env.PWD } else { $dir }
@@ -118,4 +120,3 @@ export def 'project unregister' [
     let dir = if ($dir | is-empty) { $env.PWD } else { $dir }
     sqlx $"delete from commands where dir_id in \(select id from dirs where dir = (Q $dir)\) returning dir_id;"
 }
-

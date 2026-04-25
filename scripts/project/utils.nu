@@ -1,5 +1,7 @@
+const ID = ','
+
 export def 'scope project' [] {
-    scope modules | where name == ',' | get -o 0
+    scope modules | where name == $ID | get -o 0
 }
 
 def 'cmpl-cmd' [] {
@@ -12,14 +14,14 @@ def 'cmd exists' [] {
     scope commands | where name == $o | is-not-empty
 }
 
-# overlay use -r ,.nu as , -p
+# overlay use -r ($ID).nu as ($ID) -p
 export def --wrapped 'project watch' [...cmd:string@cmpl-cmd] {
-    run-and-watch -c -g ',.nu' {
+    run-and-watch -c -g $'($ID).nu' {
         [
             'use project'
-            'project direnv ,'
-            'overlay use -r ,.nu as , -p'
-            $', ($cmd |str join " ")'
+            $'project direnv ($ID)'
+            $'overlay use -r ($ID).nu as ($ID) -p'
+            $'($ID) ($cmd |str join " ")'
         ]
         | str join (char newline)
         | nu -c $in
@@ -50,7 +52,7 @@ export def parse-env [] {
 }
 
 export def --env direnv [
-    mod?:string=","
+    mod?:string=$ID
     --env-file(-e):string='.env'
 ] {
     let _ = if ($env_file | path exists) {
@@ -74,7 +76,7 @@ export def find-project [dir] {
         | path split
         | slice 1..
         | reduce -f ['/'] {|i, a| $a | append ([($a | last) $i] | path join) }
-        | each { [$in ',.nu'] | path join }
+        | each { [$in $'($ID).nu'] | path join }
         | reverse
     ) {
         if ($d | path exists) { return $d }

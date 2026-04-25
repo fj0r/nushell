@@ -1,3 +1,5 @@
+const ID = ','
+
 export def --env 'project init-git-hooks' [] {
     $env.GIT_HOOKS = {
         # commit
@@ -100,7 +102,7 @@ export def git-hooks-context [] {
 
 export def git-install-hooks [
     ...hooks:string@cmpl-hooks
-    --mod(-m)=","
+    --mod(-m)=$ID
     --fun(-f)="git-hooks"
 ] {
     let c = git-cdup
