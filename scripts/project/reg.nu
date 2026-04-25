@@ -79,9 +79,9 @@ export def --wrapped ,, [
     let cmd = [
         'use project'
         ...$mods
-        'project direnv ,'
-        'overlay use -r ,.nu as , -p'
-        $', ($cmd | str join " ")'
+        $'project direnv ($ID)'
+        $'overlay use -r ($ID).nu as ($ID) -p'
+        $'($ID) ($cmd | str join " ")'
     ]
     | str join '; '
 
