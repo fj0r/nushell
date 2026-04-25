@@ -1,4 +1,4 @@
-const ID = ','
+const ID = 'x'
 
 export def 'scope project' [] {
     scope modules | where name == $ID | get -o 0
@@ -82,4 +82,23 @@ export def find-project [dir] {
         if ($d | path exists) { return $d }
     }
     ''
+}
+
+export def project-rename-id [old] {
+    for i in (fd $"($old).nu" | lines) {
+        let x = $i | path parse
+        if $x.extension == 'nu' {
+            let n0 = $x | update stem $ID
+            let n = $n0 | path join
+            print $"($i) -> ($n)"
+            mv $i $n
+            for e in [yaml, yml, toml] {
+                let o0 = $x | update extension $e
+                let o = $o0 | path join
+                if ($o | path exists) {
+                    mv $o ($o0 | update stem $ID | path join)
+                }
+            }
+        }
+    }
 }

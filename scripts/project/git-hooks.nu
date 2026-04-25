@@ -1,4 +1,4 @@
-const ID = ','
+const ID = 'x'
 
 export def --env 'project init-git-hooks' [] {
     $env.GIT_HOOKS = {
