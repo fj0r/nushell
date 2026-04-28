@@ -48,7 +48,7 @@ export def --env 'project init-registry' [] {
 }
 
 # project exec <div> <act> -m [lg [history-utils/backup.nu *]]
-export def --wrapped ,, [
+export def --wrapped xx [
     dir:string@cmpl-dir
     ...cmd:string@cmpl-cmd
     --prefix:string=$ID
