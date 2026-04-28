@@ -22,6 +22,10 @@ def --env merge-path [path] {
     | load-env
 }
 
+alias py = python3
+alias ipy = ipython3
+alias js = bun
+alias ijs = bun repl
 
 if $nu.os-info.family == 'windows'  {
     $env.HOME = $env.HOMEPATH
@@ -53,7 +57,6 @@ for s in ['/usr/local/bin', '/usr/bin'] {
     }
 }
 {
-    PREFER_ALT: '1'
     TERM: 'screen-256color'
     EDITOR: 'hx'
 }
