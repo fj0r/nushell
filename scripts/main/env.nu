@@ -31,6 +31,7 @@ if $nu.os-info.family == 'windows'  {
     $env.HOME = $env.HOMEPATH
 } else {
     merge-path [
+        /run/wrappers/bin #nixos
         ($env.HOME)/.cargo/bin
         ($env.HOME)/.ghcup/bin
         ($env.HOME)/.local/bin
