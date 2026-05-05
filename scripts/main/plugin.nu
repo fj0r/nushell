@@ -88,13 +88,3 @@ power set kube {
     separator: '@'
 }
 power init
-
-
-def __init_plugin_query [] {
-    const plugin_query = (
-        $nu.current-exe | path dirname
-        | path join $"nu_plugin_query(if $nu.os-info.family == 'windows' {'.exe'})"
-    )
-    print $"plugin add ($plugin_query)"
-    print $"plugin use query"
-}
