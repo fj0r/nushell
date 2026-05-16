@@ -37,6 +37,7 @@ export def qemu-run [
     }
 
     mut args = [
+        -monitor stdio
         -enable-kvm
         -m $'($mem)G'
         -smp $core
@@ -112,7 +113,24 @@ export def qemu-run [
     }
 }
 
-export def qemu-create [disk --size:int = 60] {
-  let safe_name = if ($disk | str ends-with '.qcow2') { $disk } else { $'($disk).qcow2' }
-  qemu-img create -f qcow2 $safe_name $'($size)G'
+export def qemu-create [
+    disk
+    --size:int = 60
+] {
+    let safe_name = if ($disk | str ends-with '.qcow2') { $disk } else { $'($disk).qcow2' }
+    qemu-img create -f qcow2 $safe_name $'($size)G'
+}
+
+export def qemu-snapshot [
+  disk: path
+  name: string
+  --action: string
+] {
+  match $action {
+    "create" => { qemu-img snapshot -c $name $disk }
+    "apply"  => { qemu-img snapshot -a $name $disk }
+    "delete" => { qemu-img snapshot -d $name $disk }
+    "list"   => { qemu-img snapshot -l $disk }
+    _        => { error make { msg: "unknown action" } }
+  }
 }
