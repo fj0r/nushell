@@ -18,7 +18,9 @@ Instead of hacking fragile text-splitters or managing bloated external multi-she
 One of the cleanest developer experiences with argx.nu is that you can perfectly snapshot, test, and introspect your live autocomplete logic as a static data frame directly in your prompt by simply passing your CLI line as a string.
 Notice in the example below how the shortcut alias dr is decoded, short flags -e and -p are mapped to long forms, and the anonymous positional path string is cleanly resolved to its signature parameter name:
 
+```nu
 'dr -e {OPENAI_API_KEY: (asn --all | get api_key)} -p {8000:8000} skill:latest' | argx parse
+```
 
 ## 📦 Actual Output Schema
 argx.nu instantly extracts the developer's exact intent into this clear data structure:
