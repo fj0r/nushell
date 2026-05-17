@@ -1,6 +1,18 @@
+def cmpl-snapshot [context] {
+    use argx
+    let c = $context | argx parse
+    qemu-img info --out=json ($c.pos.disk | path expand)
+    | from json | get snapshots
+    | each {|x|
+        let date = $x.date-sec * 1000_000_000 | into datetime
+        let size = $x.vm-state-size  | into filesize
+        {value: $x.name, description: $"($date)(char tab)($size)" }
+    }
+}
+
 export def qemu-run [
     disk: path
-    --restore: string
+    --restore: string@cmpl-snapshot
     --core: int = 4
     --mem: int = 4
     --dry-run
@@ -127,15 +139,20 @@ export def qemu-create [
 }
 
 export def qemu-snapshot [
-  disk: path
-  name: string
-  --action: string
+    action: string@[create apply delete list]
+    disk: path
+    name?: string@cmpl-snapshot
 ] {
-  match $action {
-    "create" => { qemu-img snapshot -c $name $disk }
-    "apply"  => { qemu-img snapshot -a $name $disk }
-    "delete" => { qemu-img snapshot -d $name $disk }
-    "list"   => { qemu-img snapshot -l $disk }
-    _        => { error make { msg: "unknown action" } }
-  }
+    mut args = []
+    $args ++= [(match $action {
+        create => '-c'
+        apply => '-a'
+        delete => '-d'
+        list => '-l'
+    })]
+    $args ++= [$disk]
+    if ($name | is-not-empty) {
+        $args ++= [$name]
+    }
+    qemu-img snapshot ...$args
 }
