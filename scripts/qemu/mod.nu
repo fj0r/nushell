@@ -1,5 +1,6 @@
 export def qemu-run [
     disk: path
+    --restore: string
     --core: int = 4
     --mem: int = 4
     --dry-run
@@ -60,6 +61,10 @@ export def qemu-run [
 
     if not $spice {
         $args ++= [-device usb-tablet] # Safe mouse mounting in SDL window mode
+    }
+
+    if ($restore | is-not-empty) {
+      $args ++= [-loadvm $restore]
     }
 
     # Parse and append user-specified physical USB devices

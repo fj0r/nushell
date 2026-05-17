@@ -5,7 +5,7 @@
 - [Git](https://github.com/fj0r/git.nu) Git, Workflow, Activities
 - [Powerline prompt](https://github.com/fj0r/powerline.nu) NU_POWERLINE
 - [Project](https://github.com/fj0r/project.nu) Commands based on dir, git hook, parse-env, registry
-- [Argx](https://github.com/fj0r/argx.nu) Parse args
+- [Argx](https://github.com/fj0r/argx.nu) argx.nu 🚀
 - [minio-client](https://github.com/fj0r/minio-client.nu)
 - [dev-container](https://github.com/fj0r/devcontainer.nu) work with ci
 - [nvim](scripts/nvim)
