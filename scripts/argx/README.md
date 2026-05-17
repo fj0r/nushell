@@ -40,6 +40,30 @@ pos:  # 👈 Maps raw positionals into stable, semantic signature parameter name
   cmd: []
 ```
 
+## 💡 Example 1: Seamless Kubernetes Resource Autocompletion
+When writing intelligent completions for Kubernetes (kubectl), you often need to fetch live cluster resources based on the current command context—such as the resource type specified by positional arguments, or the target namespace provided via flags.
+With argx.nu, you can implement a dynamic resource completer using compact, idiomatic Nushell code that completely decouples short and long flag logic:
+
+# A dynamic completer for Kubernetes resource names
+```nu
+export def cmpl-kube-res [context: string, offset: int] {
+    # 1. Pipe the context into argx parse to get a highly structured record
+    let ctx = $context | argx parse
+    
+    # 2. Reliably extract the first positional argument (e.g., pod, svc, deployment)
+    let kind = $ctx | get args.0
+    
+    # 3. Core Strength: Thanks to automatic long-form normalization, whether the user 
+    #    typed `-n` or `--namespace`, you can safely read it via `.namespace?` in one line.
+    let ns = if ($ctx.opt.namespace? | is-empty) { [] } else { [-n $ctx.opt.namespace] }
+    
+    # 4. Query kubectl live to fetch instances matching the resolved namespace and kind
+    kubectl get ...$ns $kind | from ssv -a | get NAME
+}
+```
+
+
+
 # TODO
 - [x] parse `parameter_default` (get-sign)
 - [x] select the corresponding item in the `pipelines` based on the `offset` (get-ast)
