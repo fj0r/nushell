@@ -62,6 +62,25 @@ export def cmpl-kube-res [context: string, offset: int] {
 }
 ```
 
+## 🧠 Design Decisions & Tradeoffs
+During the development and testing of argx.nu, several common architectural questions and alternative approaches were explored. Below are the core design choices that shape the library today.
+
+### 1. Why output a pure Record instead of providing fluent helper filters (like argx when-tag)?
+
+- Decision: Keep the library strictly bounded as a pure data extractor.
+- Rationale: Introducing a custom Domain-Specific Language (DSL) or proprietary wrapper utilities creates an artificial learning curve. Nushell users already know how to fluently manipulate data using core native tools like match, if/else, get, and where. By returning an unopinionated, strongly-typed Record, developers can leverage 100% of their existing Nushell skills without reading a secondary API reference manual.
+
+### 2. Why doesn't argx recursively evaluate subexpressions/closures (e.g., statements inside ( ) or { }) to pass their live values to parent commands?
+
+- Decision: Keep nested blocks frozen as raw AST representations during the autocomplete phase.
+- Rationale:
+   - Boundary Isolation: When a user types a subexpression (e.g., (nested-cmd)), control is handed over entirely to Nushell's engine to execute a completely independent syntax tree. It is outside the scope of the parent command parser.
+   - Execution Safety: Running arbitrary commands during the live typing/Tab-completion phase is highly dangerous. Doing so could trigger unintended mutations, long network timeouts, or heavy CPU tasks (e.g., if a subexpression contains destructive flags or complex API requests). argx enforces strict, side-effect-free safety by treating nested syntax trees statically.
+
+### 3. Why not use a strict State Machine or Tree-based configuration for dynamic completions?
+
+- Decision: Avoid opinionated state-management frameworks and focus purely on context extraction.
+- Rationale: Standard multi-shell completion frameworks often enforce rigid tree structures, assuming a predictable user flow (Command ➔ Subcommand ➔ Flag ➔ Value). However, human interactive typing is messy and non-linear—users routinely inject flags out of order, insert global flags halfway, or jump back and forth in the prompt. Strict state machines suffer from exponential state-graph explosion under these conditions. By providing raw, normalized context snapshotting instead, argx allows you to write non-linear, zero-boilerplate matching logic that remains resilient regardless of input order.
 
 
 # TODO
