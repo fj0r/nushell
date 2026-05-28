@@ -67,7 +67,13 @@ export def cmpl-sort [] {
 
 export def cmpl-relevant-id [] {
     sqlx 'select id, name from person;'
-    | each { $"($in.id) # ($in.name)" }
+    | each {|x|
+        { value: $x.id, description: $x.name }
+    }
+    | {
+        options: { match_description: true, sort: false }
+        completions: $in
+    }
 }
 
 

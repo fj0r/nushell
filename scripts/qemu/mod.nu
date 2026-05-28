@@ -8,7 +8,7 @@ def cmpl-snapshot [context] {
         let size = $x.vm-state-size  | into filesize
         {value: $x.name, description: $"($date)(char tab)($size)" }
     }
-    | { completions: $in, options: { sort: false } }
+    | { completions: $in, options: { sort: false, match_description: true } }
 }
 
 export def qemu-run [

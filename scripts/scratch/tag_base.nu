@@ -29,7 +29,14 @@ export def cmpl-tag-3 [] {
 }
 
 export def cmpl-tag-id [] {
-   sqlx $"with (tag-tree) select * from tags" | each { $"($in.id) # ($in.name)" }
+    sqlx $"with (tag-tree) select * from tags"
+    | each {|x|
+        { value: $x.id, description: $x.name }
+    }
+    | {
+        options: { match_description: true, sort: false }
+        completions: $in
+    }
 }
 
 export def cmpl-id-tag [ctx] {

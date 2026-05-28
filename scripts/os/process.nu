@@ -1,6 +1,11 @@
 def cmpl-ps [] {
-    ps -l | each {|x|
-        { value: $"($x.pid | fill -c ' ' -w 5) # ($x.name)", description: $x.command }
+    ps -l
+    | each {|x|
+        { value: $x.pid, description: $"($x.name)(char tab)($x.command)" }
+    }
+    | {
+        options: { match_description: true, sort: false }
+        completions: $in
     }
 }
 
@@ -62,8 +67,13 @@ export def psgroup [] {
 }
 
 def cmpl-pid [] {
-    ps -l | each {|x|
-        { value: $"($x.pid | fill -c ' ' -w 5) # ($x.name)", description: $x.command }
+    ps -l
+    | each {|x|
+        { value: $x.pid, description: $"($x.name)(char tab)($x.command)" }
+    }
+    | {
+        options: { match_description: true, sort: false }
+        completions: $in
     }
 }
 
