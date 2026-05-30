@@ -40,16 +40,6 @@ if $nu.os-info.family == 'windows'  {
     ]
 }
 
-let ghc_libdir = do -i {
-    ls ((stack ghc -- --print-libdir) | str trim)
-    | where type == dir
-    | get name
-}
-let new_ld_lib_path = (if ($env.LD_LIBRARY_PATH? | is-empty) { [] } else { $env.LD_LIBRARY_PATH })
-    | prepend ($ghc_libdir | default [])
-    | flatten
-{ LD_LIBRARY_PATH: $new_ld_lib_path } | load-env
-
 for s in ['/usr/local/bin', '/usr/bin'] {
     let p = [$s, 'nu'] | path join
     if (which $p | is-not-empty) {
