@@ -114,7 +114,7 @@ export def git-install-hooks [
     for h in $hs {
         let p = [$hook_path $h.k] | path join
         $"
-        #!/bin/env nu
+        #!/usr/bin/env nu
         use project
         use ../../($mod).nu
 
