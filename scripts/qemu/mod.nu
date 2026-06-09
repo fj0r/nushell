@@ -19,9 +19,9 @@ export def qemu-run [
     --dry-run
     --port: record = {}
     --boot: path
-    --iso: list<string>
+    --iso: list<string> = []
     --usb: list<string> = []
-    --bios: path = /usr/share/OVMF/x64/OVMF.4m.fd
+    --bios: path # = /usr/share/OVMF/x64/OVMF.4m.fd
     --readonly
     --clipboard
     --spice
@@ -96,7 +96,25 @@ export def qemu-run [
     # ==========================================
 
     if ($bios | is-not-empty) {
+        # If a legacy unified BIOS was manually passed, keep the original logic
         $args ++= [-bios $bios]
+    } else if ($boot | is-empty) {
+        # Core logic: UEFI firmware is only needed for pure disk boot (no --boot flag).
+        # If booting from --boot ISO, we must NOT load it to prevent UEFI environment pollution that would break ISO boot!
+        let nix_ovmf_sys = "/run/libvirt/nix-ovmf/edk2-x86_64-code.fd"
+        let nix_ovmf_local = "/home/master/.qemu/edk2-x86_64-code.fd"
+
+        if not ($nix_ovmf_local | path exists) {
+            mkdir ($nix_ovmf_local | path dirname)
+            try {
+                cp $nix_ovmf_sys $nix_ovmf_local
+                chmod 644 $nix_ovmf_local
+            } catch {
+                error make {msg: "Due to NixOS system permission restrictions, please run the following command manually in your terminal once:\nsudo cp /run/libvirt/nix-ovmf/edk2-x86_64-code.fd /home/master/.qemu/edk2-x86_64-code.fd && sudo chmod 644 /home/master/.qemu/edk2-x86_64-code.fd"}
+            }
+        }
+        # Inject the local firmware without read permission restrictions to enable instant UEFI disk boot
+        $args ++= [-pflash $nix_ovmf_local]
     }
 
     if $readonly {
