@@ -31,7 +31,7 @@ use ssh *
 use std/dirs
 # autoload
 # use os *
-# use nvim *
+use nvim *
 # use nushell.nu *
 # use benchmark
 use cwdhist *
