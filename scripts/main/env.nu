@@ -49,6 +49,5 @@ for s in ['/usr/local/bin', '/usr/bin'] {
 }
 {
     TERM: 'screen-256color'
-    EDITOR: 'hx'
 }
 | load-env
