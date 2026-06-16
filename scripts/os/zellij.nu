@@ -33,22 +33,6 @@ export def --env zellij-cd [path?: string] {
     }
 }
 
-export-env {
-    $env.config.keybindings ++= [
-        {
-            name: zellij_cd
-            modifier: control
-            keycode: enter
-            mode: [emacs, vi_insert, vi_normal]
-            event: [
-                { edit: movetolinestart }
-                { edit: insertstring value: 'zellij-cd '}
-                { send: Enter }
-            ]
-        }
-    ]
-}
-
 export def notify-zellij [msg?] {
     let tab = zellij action list-clients | lines | get 1 | split row -r '\s+' | get 1 | split row '_' | get 1
     notify-send $env.pwd ($msg | default '')
