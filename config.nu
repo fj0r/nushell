@@ -1,6 +1,6 @@
 # Nushell Config File
 #
-# version = "0.112.1"
+# version = "0.114.0"
 $env.config.color_config = {
     separator: default
     leading_trailing_space_bg: { attr: n }
@@ -27,6 +27,8 @@ $env.config.color_config = {
     list: default
     closure: green_bold
     glob:cyan_bold
+    semver: cyan_bold
+    semver-range: cyan_bold
     block: default
     hints: dark_gray
     search_result: { bg: red fg: default }

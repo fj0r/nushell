@@ -41,7 +41,7 @@ export def --wrapped quadlet-create [
     if ($ports | is-not-empty) {
         for i in ($ports | transpose k v) {
             mut is_udp = false
-            let p = if ($i.k | str substring (-4).. | str downcase) == '/udp' {
+            let p = if ($i.k | str substring (-4).. | str lowercase) == '/udp' {
                 $is_udp = true
                 $i.k | str substring 0..-5 | into int
             } else {
