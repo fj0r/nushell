@@ -43,7 +43,7 @@ export-env {
 }
 
 # drop stdout to nvim buf
-export def drop [] {
+export def vim-buf [] {
     if ($env.NVIM? | is-empty) {
         echo $in
     } else {
