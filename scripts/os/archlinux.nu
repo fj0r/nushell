@@ -37,7 +37,7 @@ def parse_pkg_list [] {
     $r
 }
 
-use argx *
+use argx
 
 def cmpl-aur [ctx] {
     let k = $ctx | argx parse

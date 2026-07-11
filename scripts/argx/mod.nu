@@ -7,20 +7,11 @@ export def get-ast [offset?: int] {
     } else {
         let p = $d | get -o pipelines
         let o = $d.span.start + $offset
-        mut r = null
-        for i in $p {
-            for j in $i.elements {
-                let s = $j.expr.span
-                if ($s.start <= $o) and ($o <= $s.end) {
-                    $r = $j
-                    break
-                }
-            }
-        }
-        $r
+        let matched = $p | each {|i| $i.elements } | flatten | where {|j| let s = $j.expr.span; ($s.start <= $o) and ($o <= $s.end) }
+        if ($matched | is-not-empty) { $matched.0 } else { null }
     }
     if ($cur | is-not-empty) {
-        $cur.expr.expr.Call
+        $cur.expr.expr.Call?
     } else {
         null
     }
@@ -65,18 +56,10 @@ def get-args [] {
     }
     for i in $a {
         if ('Named' in $i) {
-            mut name = ''
-            mut expr = {Bool: true}
-            for j in $i.Named {
-                if ($j | is-not-empty) {
-                    if ($j.item? | is-not-empty) {
-                        $name = $j.item
-                    }
-                    if ($j.expr? | is-not-empty) {
-                        $expr = $j.expr
-                    }
-                }
-            }
+            let named_items = $i.Named
+            let name = $named_items | where {|j| ($j | is-not-empty) and ($j.item? | is-not-empty)} | get 0.item
+            let expr_filtered = $named_items | where {|j| ($j | is-not-empty) and ($j.expr? | is-not-empty)}
+            let expr = if ($expr_filtered | is-not-empty) { $expr_filtered.0.expr } else { {Bool: true} }
             $r.opt = $r.opt | upsert $name (expr-to-value $expr)
         }
         if ('Positional' in $i) {
