@@ -25,7 +25,7 @@ export def 'dump nu_scripts' [...mod:string@cmpl-mod --reverse(-r)] {
             (git-sync
                 $'($o)/($x.from)' $t
                 --push
-                --init=$"git@github-fjord:fj0r/($x.to).nu.git"
+                --init=$"git@github-orbit:orbit-shift/($x.to).nu.git"
                 --post-sync {|src, desc|
                     cd $desc
                     let md = ls | get name | path parse | where extension == 'md'
@@ -47,7 +47,7 @@ export def git-hooks [act ctx] {
         git add .
     }
     if $act == 'pre-push' and $ctx.branch == 'main' {
-        if $ctx.repo == 'git@github-fjord:fj0r/nushell.git' {
+        if $ctx.repo == 'git@github-orbit:orbit-shift/nushell.git' {
             dump nu_scripts
         }
     }
